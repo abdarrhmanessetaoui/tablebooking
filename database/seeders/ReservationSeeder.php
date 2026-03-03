@@ -5,7 +5,6 @@ namespace Database\Seeders;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\Reservation;
-use App\Models\Restaurant;
 use Illuminate\Support\Facades\File;
 
 class ReservationSeeder extends Seeder
