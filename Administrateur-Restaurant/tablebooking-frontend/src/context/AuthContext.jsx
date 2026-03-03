@@ -31,25 +31,6 @@ export const AuthProvider = ({ children }) => {
     loadUser();
   }, [token]);
 
-  const register = useCallback(async (data) => {
-    try {
-      setError(null);
-      const response = await authAPI.register(data);
-      const { token: newToken, user: userData } = response.data;
-      
-      localStorage.setItem('sanctum_token', newToken);
-      localStorage.setItem('user', JSON.stringify(userData));
-      setToken(newToken);
-      setUser(userData);
-      
-      return { success: true, user: userData };
-    } catch (err) {
-      const errorMessage = err.response?.data?.message || 'Registration failed';
-      setError(errorMessage);
-      return { success: false, error: errorMessage };
-    }
-  }, []);
-
   const login = useCallback(async (email, password) => {
     try {
       setError(null);
@@ -93,7 +74,6 @@ export const AuthProvider = ({ children }) => {
     error,
     isAuthenticated,
     isAdmin,
-    register,
     login,
     logout,
     setError,
