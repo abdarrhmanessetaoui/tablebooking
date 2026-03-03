@@ -8,7 +8,6 @@ use App\Http\Controllers\Api\ReservationController;
 use App\Http\Controllers\Api\DashboardController;
 
 // Public authentication routes
-Route::post('/auth/register', [AuthController::class, 'register']);
 Route::post('/auth/login', [AuthController::class, 'login']);
 
 // Protected routes (authenticated users only)
