@@ -44,9 +44,7 @@ const Login = () => {
     <div className="auth-container">
       <div className="auth-card">
         <div className="logo-section">
-          <div className="logo-icon">🍽️</div>
-          <h1 className="logo-text">TableBooking</h1>
-          <p className="logo-domain">.ma</p>
+          <img src="/logo.png" alt="TableBooking Logo" className="logo-image" />
         </div>
         
         {error && <div className="alert alert-error">{error}</div>}
