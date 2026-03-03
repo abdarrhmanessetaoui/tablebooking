@@ -6,3 +6,10 @@ module.exports = {
   },
   plugins: [],
 };
+``````javascript
+module.exports = {
+  plugins: {
+    tailwindcss: {},
+    autoprefixer: {},
+  },
+};
