@@ -2,115 +2,207 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
 use App\Models\Restaurant;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 
-class RestaurantController extends Controller
+class RestaurantController
 {
     /**
-     * Display a listing of all restaurants.
+     * Get all restaurants (admin sees only their own).
      */
-    public function index()
+    public function index(Request $request): JsonResponse
     {
-        return response()->json([
-            'data' => Restaurant::all()
-        ]);
+        try {
+            if ($request->user()->role === 'super_admin') {
+                $restaurants = Restaurant::with('admin')->get();
+            } else {
+                $restaurants = Restaurant::where('user_id', $request->user()->id)
+                    ->with('admin')
+                    ->get();
+            }
+
+            return response()->json([
+                'success' => true,
+                'data' => $restaurants,
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to retrieve restaurants',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
     }
 
     /**
-     * Store a newly created restaurant in storage.
+     * Create a new restaurant (super_admin only).
      */
-    public function store(Request $request)
+    public function store(Request $request): JsonResponse
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255|unique:restaurants',
-            'description' => 'nullable|string',
+        $validator = Validator::make($request->all(), [
+            'user_id' => 'required|exists:users,id',
+            'name' => 'required|string|max:255',
+            'city' => 'required|string|max:255',
             'address' => 'required|string|max:255',
             'phone' => 'required|string|max:20',
             'email' => 'required|email',
+            'description' => 'nullable|string',
             'cuisine_type' => 'nullable|string|max:100',
             'capacity' => 'required|integer|min:1',
-            'opening_time' => 'required|date_format:H:i',
-            'closing_time' => 'required|date_format:H:i',
+            'opening_time' => 'nullable|date_format:H:i',
+            'closing_time' => 'nullable|date_format:H:i',
         ]);
 
-        $restaurant = Restaurant::create($validated);
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed',
+                'errors' => $validator->errors(),
+            ], 422);
+        }
 
-        return response()->json([
-            'message' => 'Restaurant created successfully',
-            'data' => $restaurant
-        ], 201);
+        try {
+            $restaurant = Restaurant::create([
+                'user_id' => $request->user_id,
+                'name' => $request->name,
+                'city' => $request->city,
+                'slug' => Str::slug($request->name . '-' . $request->city),
+                'address' => $request->address,
+                'phone' => $request->phone,
+                'email' => $request->email,
+                'description' => $request->description,
+                'cuisine_type' => $request->cuisine_type,
+                'capacity' => $request->capacity,
+                'opening_time' => $request->opening_time,
+                'closing_time' => $request->closing_time,
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Restaurant created successfully',
+                'data' => $restaurant,
+            ], 201);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to create restaurant',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
     }
 
     /**
-     * Display the specified restaurant.
+     * Get a specific restaurant.
      */
-    public function show(string $id)
+    public function show(Request $request, Restaurant $restaurant): JsonResponse
     {
-        $restaurant = Restaurant::find($id);
+        try {
+            // Check authorization
+            if ($request->user()->role === 'admin' && $restaurant->user_id !== $request->user()->id) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Access denied',
+                ], 403);
+            }
 
-        if (!$restaurant) {
+            $restaurant->load(['admin', 'reservations']);
+
             return response()->json([
-                'message' => 'Restaurant not found'
-            ], 404);
+                'success' => true,
+                'data' => $restaurant,
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to retrieve restaurant',
+                'error' => $e->getMessage(),
+            ], 500);
         }
-
-        return response()->json([
-            'data' => $restaurant
-        ]);
     }
 
     /**
-     * Update the specified restaurant in storage.
+     * Update a restaurant.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, Restaurant $restaurant): JsonResponse
     {
-        $restaurant = Restaurant::find($id);
-
-        if (!$restaurant) {
+        // Check authorization
+        if ($request->user()->role === 'admin' && $restaurant->user_id !== $request->user()->id) {
             return response()->json([
-                'message' => 'Restaurant not found'
-            ], 404);
+                'success' => false,
+                'message' => 'Access denied',
+            ], 403);
         }
 
-        $validated = $request->validate([
-            'name' => 'sometimes|required|string|max:255|unique:restaurants,name,' . $id,
+        $validator = Validator::make($request->all(), [
+            'name' => 'sometimes|string|max:255',
+            'city' => 'sometimes|string|max:255',
+            'address' => 'sometimes|string|max:255',
+            'phone' => 'sometimes|string|max:20',
+            'email' => 'sometimes|email',
             'description' => 'nullable|string',
-            'address' => 'sometimes|required|string|max:255',
-            'phone' => 'sometimes|required|string|max:20',
-            'email' => 'sometimes|required|email',
             'cuisine_type' => 'nullable|string|max:100',
-            'capacity' => 'sometimes|required|integer|min:1',
-            'opening_time' => 'sometimes|required|date_format:H:i',
-            'closing_time' => 'sometimes|required|date_format:H:i',
+            'capacity' => 'sometimes|integer|min:1',
+            'opening_time' => 'nullable|date_format:H:i',
+            'closing_time' => 'nullable|date_format:H:i',
         ]);
 
-        $restaurant->update($validated);
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed',
+                'errors' => $validator->errors(),
+            ], 422);
+        }
 
-        return response()->json([
-            'message' => 'Restaurant updated successfully',
-            'data' => $restaurant
-        ]);
+        try {
+            $restaurant->update($request->only([
+                'name', 'city', 'address', 'phone', 'email', 'description',
+                'cuisine_type', 'capacity', 'opening_time', 'closing_time'
+            ]));
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Restaurant updated successfully',
+                'data' => $restaurant,
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to update restaurant',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
     }
 
     /**
-     * Remove the specified restaurant from storage.
+     * Delete a restaurant.
      */
-    public function destroy(string $id)
+    public function destroy(Request $request, Restaurant $restaurant): JsonResponse
     {
-        $restaurant = Restaurant::find($id);
-
-        if (!$restaurant) {
+        // Check authorization
+        if ($request->user()->role === 'admin' && $restaurant->user_id !== $request->user()->id) {
             return response()->json([
-                'message' => 'Restaurant not found'
-            ], 404);
+                'success' => false,
+                'message' => 'Access denied',
+            ], 403);
         }
 
-        $restaurant->delete();
+        try {
+            $restaurant->delete();
 
-        return response()->json([
-            'message' => 'Restaurant deleted successfully'
-        ]);
+            return response()->json([
+                'success' => true,
+                'message' => 'Restaurant deleted successfully',
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to delete restaurant',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
     }
 }
