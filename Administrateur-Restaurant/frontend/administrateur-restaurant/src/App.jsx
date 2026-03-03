@@ -12,7 +12,7 @@ function App() {
       <div className="max-w-7xl mt-6">
       <Routes>
         <Route path="/login" element={<Login />} />
-        <Routes>
+      <Routes>
       </div>
     </>
   )
