@@ -6,7 +6,11 @@ function App() {
   return (
     <>
       <div className="max-w-6xl mx-auto">
-        <nav c></nav>
+        <nav class name {
+          constructor(parameters) {
+            
+          }
+        }></nav>
         <h1>Administrateur Restaurant</h1>
       </div>
     </>
