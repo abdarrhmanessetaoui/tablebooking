@@ -13,7 +13,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', function (Request $request) {
         return $request->user();
     });
-    Route::
+    Route::get('/profile', function (Request $request) {
+        return $request->user();
+    });
 });
 
 Route::post('/register', function (Request $request) {
