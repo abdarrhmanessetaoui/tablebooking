@@ -10,7 +10,7 @@ function App() {
         <h1>Administrateur Restaurant</h1>
       </div>
       <div className="max-w-7xl mt-6">
-        <Routes></Routes>
+        <Routes>
           <Route path="/login" element={<Login />} />
         </Routes>
       </div>
