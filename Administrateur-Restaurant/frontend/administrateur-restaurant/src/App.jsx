@@ -1,3 +1,4 @@
+import { Route } from "react-router-dom"
 
 
 function App() {
@@ -9,7 +10,7 @@ function App() {
         <h1>Administrateur Restaurant</h1>
       </div>
       <div className="max-w-7xl mt-6">
-        
+        <Route
       </div>
     </>
   )
