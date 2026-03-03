@@ -33,9 +33,11 @@
 }
 
 .logo-icon {
-  font-size: 2rem;
+  height: 3rem;
+  width: auto;
   display: flex;
   align-items: center;
+  object-fit: contain;
 }
 
 .brand-name {
