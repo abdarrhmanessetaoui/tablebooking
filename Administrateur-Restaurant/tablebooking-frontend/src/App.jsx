@@ -10,7 +10,6 @@ function App() {
   return (
     <Router>
       <AuthProvider>
-      
         <Routes>
           <Route path="/login" element={<Login />} />
         </Routes>
