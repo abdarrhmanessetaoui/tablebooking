@@ -1,18 +1,20 @@
 [
     {
-        "id": 1,
-        "name": "John Doe",
-        "date": "2023-10-01",
-        "time": "19:00",
-        "partySize": 4,
-        "contact": "john.doe@example.com"
+      "restaurant_id": 1,
+      "client_name": "Ahmed",
+      "client_phone": "0600000000",
+      "date": "2026-03-10",
+      "time": "20:00:00",
+      "guests": 4,
+      "status": "pending"
     },
     {
-        "id": 2,
-        "name": "Jane Smith",
-        "date": "2023-10-02",
-        "time": "20:00",
-        "partySize": 2,
-        "contact": "jane.smith@example.com"
+      "restaurant_id": 2,
+      "client_name": "Salma",
+      "client_phone": "0611111111",
+      "date": "2026-03-11",
+      "time": "21:00:00",
+      "guests": 2,
+      "status": "confirmed"
     }
-]
+  ]
