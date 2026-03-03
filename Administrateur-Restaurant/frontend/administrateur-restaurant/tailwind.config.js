@@ -4,4 +4,4 @@ exports default {
     extend: {},
   },
   plugins: [],
-} 
+}
