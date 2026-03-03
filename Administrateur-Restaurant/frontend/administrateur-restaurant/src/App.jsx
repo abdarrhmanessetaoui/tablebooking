@@ -6,7 +6,7 @@ function App() {
   return (
     <>
       <div className="max-w-6xl mx-auto">
-        <nav class {
+        <nav className {
           constructor(parameters) {
             
           }
