@@ -8,5 +8,5 @@ module.exports = {
 };
 
 module.exports = {
-  plugins: []
+  plugins: [],
 };
