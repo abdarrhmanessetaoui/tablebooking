@@ -1,0 +1,37 @@
+[
+    {
+        "id": 1,
+        "name": "The Gourmet Kitchen",
+        "location": "Downtown",
+        "cuisine": "Italian",
+        "rating": 4.5
+    },
+    {
+        "id": 2,
+        "name": "Sushi World",
+        "location": "Uptown",
+        "cuisine": "Japanese",
+        "rating": 4.7
+    },
+    {
+        "id": 3,
+        "name": "Spice Symphony",
+        "location": "Midtown",
+        "cuisine": "Indian",
+        "rating": 4.6
+    },
+    {
+        "id": 4,
+        "name": "Burger Haven",
+        "location": "Suburbs",
+        "cuisine": "American",
+        "rating": 4.3
+    },
+    {
+        "id": 5,
+        "name": "Le Petit Bistro",
+        "location": "Downtown",
+        "cuisine": "French",
+        "rating": 4.8
+    }
+]
