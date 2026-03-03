@@ -12,7 +12,7 @@ class RestaurantController extends Controller
      */
     public function index()
     {
-        return return \App\Models\Restaurant::all();
+        return \App\Models\Restaurant::all();
     }
 
     /**
