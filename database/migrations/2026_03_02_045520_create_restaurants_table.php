@@ -14,19 +14,11 @@ return new class extends Migration
         Schema::create('restaurants', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('address');
-            $table->string('phone');
-            $table->string('email')->unique();
-            $table->string('cuisine_type');
-            $table->integer('capacity');
-            $table->string('opening_hours');
-            $table->string('image')->nullable();
-            $table->text('description')->nullable();
-            $table->decimal('average_rating', 3, 2)->default(0);
-            $table->integer('number_of_reviews')->default(0);
-            $table->decimal('price_range', 5, 2)->default(0);
-            $table->boolean('is_featured')->default(false);
-            $table->boolean('is_active')->default(true);
+            $table->string('city');
+            $table->string('slug')->unique();
+            $table->string('address')->nullable();
+            $table->string('phone')->nullable();
+            $table->integer('capacity')->default(0);
             $table->timestamps();
         });
     }
