@@ -19,7 +19,7 @@ class RestaurantSeeder extends Seeder
         foreach ($restaurants as $restaurant) {
             Restaurant::create([
                 'name' => $restaurant->name,
-                'city' => $restaurant->city,
+                'city' => $restaurant->city ?? null,
                 'slug' => strtolower(str_replace(' ', '-', $restaurant->name)),
                 'address' => $restaurant->address ?? null,
                 'phone' => $restaurant->phone ?? null,
