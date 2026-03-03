@@ -16,6 +16,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/profile', function (Request $request) {
         return $request->user();
     });
+    Route::apiResource('restaurants', RestaurantController::class);
 });
 
 Route::post('/register', function (Request $request) {
