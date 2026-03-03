@@ -23,6 +23,14 @@
   margin-bottom: 40px;
 }
 
+.logo-image {
+  max-width: 120px;
+  height: auto;
+  width: 100%;
+  object-fit: contain;
+  margin-bottom: 20px;
+}
+
 .logo-icon {
   font-size: 48px;
   margin-bottom: 12px;
