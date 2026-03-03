@@ -4,7 +4,7 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\RestaurantController
+use App\Http\Controllers\Api\RestaurantController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
