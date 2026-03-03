@@ -8,7 +8,7 @@ const Header = () => {
         {/* Logo and Brand */}
         <div className="header-left">
           <div className="logo-section">
-            <div className="logo-icon">🍽️</div>
+            <img src="/logo.png" alt="TableBooking Logo" className="logo-icon" />
             <h1 className="brand-name">TableBooking</h1>
           </div>
         </div>
