@@ -1,15 +1,54 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { saveToken } from '../utils/auth'
 import '../index.css'
 
 const Login = () => {
-
   const navigate = useNavigate()
-  const [showPassword, setShowPassword] = useState(false)
-  const [rememberMe, setRememberMe] = useState(false)
-  const handleLogin = () => {
-    navigate('/dashboard')
+  const [showPassword, setShowPassword]   = useState(false)
+  const [rememberMe, setRememberMe]       = useState(false)
+  const [email, setEmail]                 = useState('')
+  const [password, setPassword]           = useState('')
+  const [error, setError]                 = useState('')
+  const [loading, setLoading]             = useState(false)
+
+  const handleLogin = async () => {
+    if (!email || !password) {
+      setError('Please enter your email and password.')
+      return
+    }
+
+    setError('')
+    setLoading(true)
+
+    try {
+      const response = await fetch('http://localhost:8000/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify({ email, password, remember_me: rememberMe }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        setError(data.message || 'Login failed.')
+        return
+      }
+
+      saveToken(data.token, rememberMe)
+      navigate('/dashboard')
+
+    } catch (err) {
+      setError('Cannot connect to server. Please try again.')
+    } finally {
+      setLoading(false)
+    }
   }
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') handleLogin()
+  }
+
   return (
     <div
       className="min-h-screen flex flex-col items-center justify-center px-4"
@@ -25,6 +64,12 @@ const Login = () => {
 
       <div className="bg-white rounded shadow-xl px-6 sm:px-8 pt-6 pb-7 w-full max-w-sm">
 
+        {error && (
+          <div className="mb-4 px-3 py-2 bg-red-50 border border-red-200 rounded text-xs text-red-600">
+            {error}
+          </div>
+        )}
+
         <div className="mb-4">
           <label className="block text-sm text-gray-700 mb-1" htmlFor="email">
             Username or Email Address
@@ -32,9 +77,13 @@ const Login = () => {
           <input
             id="email"
             type="text"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            onKeyDown={handleKeyDown}
             className="w-full border border-gray-300 rounded px-3 py-2 text-sm text-gray-800 focus:outline-none focus:border-gray-400"
           />
         </div>
+
         <div className="mb-5">
           <label className="block text-sm text-gray-700 mb-1" htmlFor="password">
             Password
@@ -43,6 +92,9 @@ const Login = () => {
             <input
               id="password"
               type={showPassword ? 'text' : 'password'}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              onKeyDown={handleKeyDown}
               className="w-full border border-gray-300 rounded px-3 py-2 text-sm text-gray-800 focus:outline-none focus:border-gray-400 pr-9"
             />
             <button
@@ -78,10 +130,12 @@ const Login = () => {
           </label>
           <button
             type="button"
-            className="text-white text-sm font-medium px-4 py-1.5 rounded hover:opacity-90 transition-opacity focus:outline-none"
+            onClick={handleLogin}
+            disabled={loading}
+            className="text-white text-sm font-medium px-4 py-1.5 rounded hover:opacity-90 transition-opacity focus:outline-none disabled:opacity-60"
             style={{ backgroundColor: '#c8a97e' }}
           >
-            Log In
+            {loading ? 'Logging in...' : 'Log In'}
           </button>
         </div>
 
