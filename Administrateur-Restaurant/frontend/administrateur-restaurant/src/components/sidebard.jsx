@@ -85,6 +85,5 @@ export default function Sidebar({ open, onClose }) {
           </div>
         </div>
       </div>
-    </aside>
   );
 }
