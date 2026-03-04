@@ -3,6 +3,7 @@ import Login from './pages/login'
 import Dashboard from './pages/Dashboard'
 import Reservations from './pages/Reservations'
 import ProtectedRoute from './components/ProtectedRoute'
+import BlockedDates from './pages/BlockedDates'
 import Layout from './components/Layout'
 
 function App() {
