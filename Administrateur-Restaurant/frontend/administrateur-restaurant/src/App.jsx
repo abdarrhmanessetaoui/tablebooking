@@ -1,21 +1,35 @@
-import { Route, Routes } from "react-router-dom"
-import Login from "./components/login"
-import Dashboard from "./components/Dashboard"
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import Login from './pages/Login'
+import Dashboard from './pages/Dashboard'
+import ProtectedRoute from './components/ProtectedRoute'
 
 function App() {
- 
-
   return (
-    <>
-    <header className="w-full flex items-center px-8 py-3" style={{ backgroundColor: '#1e1208' }}>
-      <img src="images/tablebooking.png" alt="TableBooking Logo" className="h-10 object-contain" />
-    </header>
-    <Routes>
-      <Route path="/login" element={<Login />} />
-      <Route path="/dashboard" element={<Dashboard />} />
-    </Routes>
-  </>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Login />} />
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          }
+        />
+      </Routes>
+    </BrowserRouter>
   )
 }
 
 export default App
+```
+
+---
+
+## 🚀 Quick Start Checklist
+```
+1. php artisan migrate
+2. Create user via tinker (see step 3 above)
+3. php artisan serve          → runs on :8000
+4. npm run dev                → runs React on :5173
+5. Login with admin@example.com / password123
