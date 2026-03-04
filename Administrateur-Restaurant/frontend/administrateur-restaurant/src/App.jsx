@@ -11,7 +11,7 @@ function App() {
     </header>
     <Routes>
       <Route path="/login" element={<Login />} />
-      <R
+      <Route path="/" element={<Login />} />
     </Routes>
   </>
   )
