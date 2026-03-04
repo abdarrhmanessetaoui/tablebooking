@@ -13,8 +13,8 @@ Route::get('/blocked-dates', [BlockedDateController::class, 'index']);
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/me', fn(Request $request) => response()->json($request->user()));
     Route::get('/stats', [ReservationController::class, 'stats']);
+    Route::get('/reservations/by-date', [ReservationController::class, 'byDate']);
     Route::apiResource('reservations', ReservationController::class);
     Route::post('/blocked-dates', [BlockedDateController::class, 'store']);
     Route::delete('/blocked-dates/{blockedDate}', [BlockedDateController::class, 'destroy']);
-    Route::get('/reservations/by-date', [ReservationController::class, 'byDate']);
 });
