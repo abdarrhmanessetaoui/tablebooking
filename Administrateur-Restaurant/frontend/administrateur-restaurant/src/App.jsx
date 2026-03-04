@@ -11,7 +11,7 @@ function App() {
     </header>
     <Routes>
       <Route path="/login" element={<Login />} />
-      <Route path="/" element={<Lodgin />} />
+      <Route path="/" element={<DA />} />
     </Routes>
   </>
   )
