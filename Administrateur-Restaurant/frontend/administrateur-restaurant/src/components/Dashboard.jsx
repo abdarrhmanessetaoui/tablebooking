@@ -1,4 +1,3 @@
-import Sidebar from "./sidebard"
 
 const Dashboard = () => {
     return (<>
