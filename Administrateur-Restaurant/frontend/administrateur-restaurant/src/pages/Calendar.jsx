@@ -1,20 +1,16 @@
 import useCalendar from '../hooks/useCalendar'
 import CalendarNav from '../components/CalendarNav'
-import CalendarTimeline from '../components/CalendarTimeline'
+import CalendarWeek from '../components/CalendarWeek'
 
 export default function Calendar() {
-  const {
-    selectedDate, reservations,
-    loading, error,
-    prevDay, nextDay, goToday,
-  } = useCalendar()
+  const { weekDays, currentDate, loading, error, prevWeek, nextWeek, goToday, getByDate } = useCalendar()
 
   return (
     <div className="p-4 sm:p-8">
 
       <div className="mb-6">
-        <h1 className="text-xl sm:text-2xl font-semibold text-gray-800">Timeline</h1>
-        <p className="text-sm text-gray-400 mt-1">Daily reservation view</p>
+        <h1 className="text-xl sm:text-2xl font-semibold text-gray-800">Calendar</h1>
+        <p className="text-sm text-gray-400 mt-1">Weekly reservation overview</p>
       </div>
 
       {error && (
@@ -22,21 +18,35 @@ export default function Calendar() {
       )}
 
       <CalendarNav
-        selectedDate={selectedDate}
-        prevDay={prevDay}
-        nextDay={nextDay}
+        weekDays={weekDays}
+        currentDate={currentDate}
+        prevWeek={prevWeek}
+        nextWeek={nextWeek}
         goToday={goToday}
       />
+
+      {/* Legend */}
+      <div className="flex gap-4 mb-5">
+        {[
+          { label: 'Confirmed', bg: '#dbeafe', dot: '#3b82f6' },
+          { label: 'Pending',   bg: '#fef3c7', dot: '#f59e0b' },
+          { label: 'Cancelled', bg: '#fee2e2', dot: '#ef4444' },
+        ].map(s => (
+          <div key={s.label} className="flex items-center gap-1.5">
+            <div className="w-2 h-2 rounded-full" style={{ backgroundColor: s.dot }} />
+            <span className="text-xs text-gray-500">{s.label}</span>
+          </div>
+        ))}
+      </div>
 
       {loading ? (
         <div className="text-sm text-gray-400">Loading...</div>
       ) : (
-        <>
-          <p className="text-xs text-gray-400 mb-3">
-            {reservations.length} reservation{reservations.length !== 1 ? 's' : ''}
-          </p>
-          <CalendarTimeline reservations={reservations} />
-        </>
+        <div className="bg-white rounded-xl shadow-sm p-5 overflow-x-auto">
+          <div style={{ minWidth: '640px' }}>
+            <CalendarWeek weekDays={weekDays} getByDate={getByDate} />
+          </div>
+        </div>
       )}
 
     </div>
