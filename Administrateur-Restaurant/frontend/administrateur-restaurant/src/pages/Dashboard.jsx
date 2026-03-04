@@ -1,26 +1,7 @@
-import { useNavigate } from 'react-router-dom'
-import { getToken, removeToken } from '../utils/auth'
+import useDashboard from '../hooks/useDashboard'
 
 const Dashboard = () => {
-  const navigate = useNavigate()
-
-  const handleLogout = async () => {
-    try {
-      await fetch('http://localhost:8000/api/logout', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-          'Authorization': `Bearer ${getToken()}`,
-        },
-      })
-    } catch (e) {
-      // fail silently, still log out client side
-    }
-
-    removeToken()
-    navigate('/')
-  }
+  const { handleLogout } = useDashboard()
 
   return (
     <div className="p-8">
