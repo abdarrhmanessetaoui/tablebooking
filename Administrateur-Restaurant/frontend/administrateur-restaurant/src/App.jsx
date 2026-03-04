@@ -6,6 +6,7 @@ import BlockedDates from './pages/BlockedDates'
 import ProtectedRoute from './components/ProtectedRoute'
 import Layout from './components/Layout'
 import Calendar from './pages/Calendar'
+import Reports from './pages/Reports'
 
 function App() {
   return (
