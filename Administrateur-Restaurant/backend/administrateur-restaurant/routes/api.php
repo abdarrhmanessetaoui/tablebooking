@@ -16,4 +16,5 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('reservations', ReservationController::class);
     Route::post('/blocked-dates', [BlockedDateController::class, 'store']);
     Route::delete('/blocked-dates/{blockedDate}', [BlockedDateController::class, 'destroy']);
+    Route::get('/reservations/by-date', [ReservationController::class, 'byDate']);
 });
