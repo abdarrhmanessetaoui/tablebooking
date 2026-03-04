@@ -20,7 +20,7 @@ function App() {
         <Route path="/reservations" element={
           <ProtectedRoute><Layout><Reservations /></Layout></ProtectedRoute>
         } />
-                {/* <Route path="/calendar" element={
+                <Route path="/calendar" element={
   <ProtectedRoute><Layout><Calendar /></Layout></ProtectedRoute>
 } />
         <Route path="/blocked-dates" element={
@@ -28,7 +28,7 @@ function App() {
         } />
         <Route path="/reports" element={
   <ProtectedRoute><Layout><Reports /></Layout></ProtectedRoute>
-} /> */}
+} />
       </Routes>
     </BrowserRouter>
   )
