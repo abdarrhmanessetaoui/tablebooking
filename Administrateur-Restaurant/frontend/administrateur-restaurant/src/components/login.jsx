@@ -66,7 +66,6 @@ const Login = () => {
           </div>
         </div>
 
-        {/* Remember Me + Log In */}
         <div className="flex items-center justify-between">
           <label className="flex items-center gap-2 cursor-pointer select-none">
             <input
