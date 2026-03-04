@@ -61,4 +61,14 @@ class ReservationController extends Controller
 
         return response()->json(['message' => 'Reservation deleted']);
     }
+    public function stats()
+{
+    return response()->json([
+        'total'     => Reservation::count(),
+        'today'     => Reservation::whereDate('date', today())->count(),
+        'confirmed' => Reservation::where('status', 'confirmed')->count(),
+        'pending'   => Reservation::where('status', 'pending')->count(),
+        'cancelled' => Reservation::where('status', 'cancelled')->count(),
+    ]);
+}
 }
