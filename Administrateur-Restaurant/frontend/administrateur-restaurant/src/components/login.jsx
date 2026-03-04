@@ -5,6 +5,7 @@ import '../index.css'
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false)
   const [rememberMe, setRememberMe] = useState(false)
+  const navigate = useNavigate()
 
   return (
     <div
