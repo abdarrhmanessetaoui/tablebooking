@@ -1,6 +1,5 @@
 import useCalendar from '../hooks/useCalendar'
 import CalendarNav from '../components/CalendarNav'
-import CalendarWeek from '../components/CalendarWeek'
 
 export default function Calendar() {
   const { weekDays, currentDate, loading, error, prevWeek, nextWeek, goToday, getByDate } = useCalendar()
