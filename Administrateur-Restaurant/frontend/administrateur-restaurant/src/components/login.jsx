@@ -13,7 +13,7 @@ const login = () => {
               placeholder="Enter your email"
             />
           </div>
-          <div className="mb-4"></div>
+          <div className="mb-4">
             <input
               type="password"
               className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-400"
