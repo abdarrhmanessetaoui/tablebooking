@@ -7,7 +7,10 @@ const Login = () => {
   const navigate = useNavigate()
   const [showPassword, setShowPassword] = useState(false)
   const [rememberMe, setRememberMe] = useState(false)
-
+  const handleLogin = () => {
+    // your auth logic here
+    navigate('/dashboard')
+  }
   return (
     <div
       className="min-h-screen flex flex-col items-center justify-center px-4"
