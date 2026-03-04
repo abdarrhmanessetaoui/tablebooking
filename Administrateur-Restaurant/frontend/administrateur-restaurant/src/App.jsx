@@ -11,11 +11,11 @@ function App() {
     <img src="images/tablebooking.png" alt="TableBooking Logo" className="h-10 object-contain" />
   </header>
 </div>
-      <div className="max-w-7xl mt-6">
-        <Routes>
-          <Route path="/login" element={<Login />} />
-        </Routes>
-      </div>
+<div className="w-full max-w-7xl mx-auto mt-6 px-4 sm:px-6 lg:px-8">
+  <Routes>
+    <Route path="/login" element={<Login />} />
+  </Routes>
+</div>
     </>
   )
 }
