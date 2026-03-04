@@ -47,7 +47,7 @@ export default function Layout({ children }) {
           </button>
         </header>
 
-        <main className="flex-1 overflow-y-auto" style={{ backgroundColor: 'rgba(255, 255, 255, 0.8)' }}>
+        <main className="flex-1 overflow-y-auto">
           {children}
         </main>
 
