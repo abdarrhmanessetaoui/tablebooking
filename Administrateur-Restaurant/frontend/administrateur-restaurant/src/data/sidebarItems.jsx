@@ -1,6 +1,6 @@
 export const navItems = [
     {
-      to: '/dashboard',
+/*       to: '/dashboard',
       label: 'Dashboard',
       icon: (
         <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
@@ -51,7 +51,7 @@ export const navItems = [
             <line x1="6" y1="20" x2="6" y2="14"/>
           </svg>
         ),
-      } */
+      } */ */
   ]
   
   export const LogoutIcon = () => (
