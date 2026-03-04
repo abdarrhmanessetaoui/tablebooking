@@ -1,6 +1,5 @@
 import useDashboardStats from '../hooks/useDashboardStats'
 import StatCard from '../components/StatCard'
-import { icons } from '../data/dashboardIcons'
 
 export default function Dashboard() {
   const { stats, loading, error } = useDashboardStats()
@@ -23,11 +22,11 @@ export default function Dashboard() {
         <div className="text-sm text-gray-400">Loading stats...</div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          <StatCard label="Total Reservations" value={stats.total}     icon={icons.total}     />
-          <StatCard label="Today"               value={stats.today}     icon={icons.today}     />
-          <StatCard label="Confirmed"           value={stats.confirmed} icon={icons.confirmed} />
-          <StatCard label="Pending"             value={stats.pending}   icon={icons.pending}   />
-          <StatCard label="Cancelled"           value={stats.cancelled} icon={icons.cancelled} />
+          <StatCard label="Total Reservations" value={stats.total}     />
+          <StatCard label="Today"               value={stats.today}     />
+          <StatCard label="Confirmed"           value={stats.confirmed} />
+          <StatCard label="Pending"             value={stats.pending}   />
+          <StatCard label="Cancelled"           value={stats.cancelled} />
         </div>
       )}
 
