@@ -20,6 +20,9 @@ function App() {
         <Route path="/reservations" element={
           <ProtectedRoute><Layout><Reservations /></Layout></ProtectedRoute>
         } />
+                <Route path="/calendar" element={
+  <ProtectedRoute><Layout><Calendar /></Layout></ProtectedRoute>
+} />
         <Route path="/blocked-dates" element={
           <ProtectedRoute><Layout><BlockedDates /></Layout></ProtectedRoute>
         } />
