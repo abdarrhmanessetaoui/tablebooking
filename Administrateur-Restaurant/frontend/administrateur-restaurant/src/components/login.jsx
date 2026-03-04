@@ -19,7 +19,6 @@ const Login = () => {
         />
       </div>
 
-      {/* White Card */}
       <div className="bg-white rounded shadow-xl px-6 sm:px-8 pt-6 pb-7 w-full max-w-sm">
 
         <div className="mb-4">
