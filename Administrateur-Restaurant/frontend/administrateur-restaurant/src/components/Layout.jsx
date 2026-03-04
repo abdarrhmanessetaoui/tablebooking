@@ -8,12 +8,7 @@ export default function Layout({ children }) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
   return (
-    <div className="min-h-screen flex" style={{
-      backgroundImage: 'url(/images/back.)',
-      backgroundSize: 'cover',
-      backgroundPosition: 'center',
-      backgroundAttachment: 'fixed',
-    }}>
+    <div className="min-h-screen flex" style={{ backgroundColor: '#f5f0eb' }}>
 
       {/* Desktop sidebar */}
       <aside className="hidden md:flex w-56 min-h-screen flex-col flex-shrink-0" style={{ backgroundColor: '#2b2118' }}>
