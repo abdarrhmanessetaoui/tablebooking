@@ -5,40 +5,23 @@ export default function Reports() {
   const { data, loading, error } = useReports()
 
   return (
-    <div style={{ padding: '32px', minHeight: '100vh', background: '#15151c' }}>
+    <div className="p-4 sm:p-8">
 
-      <div style={{ marginBottom: '32px' }}>
-        <h1 style={{
-          fontSize: '22px', fontWeight: 800,
-          color: '#fff', fontFamily: 'Georgia, serif', margin: 0,
-        }}>
-          Reports
-        </h1>
-        <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.3)', marginTop: '4px' }}>
-          Booking analytics
-        </p>
+      <div className="mb-8">
+        <h1 className="text-xl sm:text-2xl font-semibold text-gray-800">Reports</h1>
+        <p className="text-sm text-gray-400 mt-1">Booking analytics</p>
       </div>
 
       {error && (
-        <div style={{ marginBottom: '16px', padding: '10px 14px', background: 'rgba(248,113,113,0.1)', border: '1px solid rgba(248,113,113,0.2)', borderRadius: '8px', fontSize: '12px', color: '#f87171' }}>
-          {error}
-        </div>
+        <div className="mb-4 px-3 py-2 bg-red-50 border border-red-200 rounded text-xs text-red-600">{error}</div>
       )}
 
       {loading ? (
-        <div style={{ fontSize: '13px', color: 'rgba(255,255,255,0.3)' }}>Loading...</div>
+        <div className="text-sm text-gray-400">Loading...</div>
       ) : (
-        <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
-          <BarChart
-            title="Most Booked Hours"
-            data={data.by_hour}
-            color="#c8a97e"
-          />
-          <BarChart
-            title="Reservations by Day"
-            data={data.by_day}
-            color="#4ade80"
-          />
+        <div className="flex flex-col lg:flex-row gap-5">
+          <BarChart title="Most Booked Hours"    data={data.by_hour} color="#c8a97e" />
+          <BarChart title="Reservations by Day"  data={data.by_day}  color="#c8a97e" />
         </div>
       )}
 
