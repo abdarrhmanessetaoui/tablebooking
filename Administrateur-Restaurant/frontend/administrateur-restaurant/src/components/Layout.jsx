@@ -9,7 +9,7 @@ export default function Layout({ children }) {
 
   return (
     <div className="min-h-screen flex" style={{
-      backgroundImage: 'url(/images/back.png)',
+      backgroundImage: 'url(/images/back.gif)',
       backgroundSize: 'cover',
       backgroundPosition: 'center',
       backgroundAttachment: 'fixed',
