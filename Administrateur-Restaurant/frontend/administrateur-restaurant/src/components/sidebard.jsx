@@ -1,5 +1,8 @@
 import { NavLink, useNavigate } from "react-router-dom";
-
+import {
+  IconGrid, IconCalendar, IconUsers,
+  IconSettings, IconLogout,
+} from "./Icons.jsx";
 
 const NAV = [
   { to: "/dashboard",    label: "Dashboard",     Icon: IconGrid     },
