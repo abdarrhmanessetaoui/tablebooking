@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { getToken } from '../utils/auth'
 
 const API = 'http://localhost:8000/api/reservations'
@@ -15,6 +15,9 @@ export default function useReservations() {
   const [error, setError]               = useState('')
   const [showModal, setShowModal]       = useState(false)
   const [editing, setEditing]           = useState(null)
+  const [search, setSearch]             = useState('')
+  const [filterStatus, setFilterStatus] = useState('all')
+  const [filterDate, setFilterDate]     = useState('')
   const [form, setForm] = useState({
     name: '', email: '', phone: '', date: '', time: '', guests: '', status: 'pending', notes: ''
   })
@@ -33,6 +36,19 @@ export default function useReservations() {
       setLoading(false)
     }
   }
+
+  const filtered = useMemo(() => {
+    return reservations.filter(r => {
+      const matchSearch = search === '' ||
+        r.name.toLowerCase().includes(search.toLowerCase()) ||
+        (r.phone && r.phone.includes(search))
+
+      const matchStatus = filterStatus === 'all' || r.status === filterStatus
+      const matchDate   = filterDate === '' || r.date === filterDate
+
+      return matchSearch && matchStatus && matchDate
+    })
+  }, [reservations, search, filterStatus, filterDate])
 
   const openCreate = () => {
     setEditing(null)
@@ -73,11 +89,21 @@ export default function useReservations() {
     }
   }
 
+  const clearFilters = () => {
+    setSearch('')
+    setFilterStatus('all')
+    setFilterDate('')
+  }
+
   return {
-    reservations, loading, error,
+    filtered, loading, error,
     showModal, setShowModal,
     form, setForm,
     editing,
+    search, setSearch,
+    filterStatus, setFilterStatus,
+    filterDate, setFilterDate,
+    clearFilters,
     openCreate, openEdit,
     handleSubmit, handleDelete,
   }
