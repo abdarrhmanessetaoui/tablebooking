@@ -1,5 +1,5 @@
 import React from 'react'
-import index
+import '../index.css'
 const login = () => {
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-100">
