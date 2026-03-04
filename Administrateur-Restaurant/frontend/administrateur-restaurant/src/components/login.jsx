@@ -22,7 +22,7 @@ const login = () => {
     </div>
   </div>
 </div>
-  
+    </>
   )
 }
 
