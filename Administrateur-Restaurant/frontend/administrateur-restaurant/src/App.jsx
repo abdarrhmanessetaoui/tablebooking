@@ -1,6 +1,6 @@
 import { Route, Routes } from "react-router-dom"
 import Login from "./components/login"
-import in
+import index from "./index.css"
 
 function App() {
  
