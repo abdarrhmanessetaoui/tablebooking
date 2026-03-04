@@ -4,13 +4,16 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\ReservationController;
+use App\Http\Controllers\BlockedDateController;
 
 Route::post('/login', [AuthenticatedSessionController::class, 'store']);
-Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])
-    ->middleware('auth:sanctum');
+Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->middleware('auth:sanctum');
+Route::get('/blocked-dates', [BlockedDateController::class, 'index']);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/me', fn(Request $request) => response()->json($request->user()));
     Route::get('/stats', [ReservationController::class, 'stats']);
     Route::apiResource('reservations', ReservationController::class);
+    Route::post('/blocked-dates', [BlockedDateController::class, 'store']);
+    Route::delete('/blocked-dates/{blockedDate}', [BlockedDateController::class, 'destroy']);
 });
