@@ -71,4 +71,11 @@ class ReservationController extends Controller
         'cancelled' => Reservation::where('status', 'cancelled')->count(),
     ]);
 }
+public function byDate(Request $request)
+{
+    $date = $request->query('date', today()->toDateString());
+    return response()->json(
+        Reservation::whereDate('date', $date)->orderBy('time')->get()
+    );
+}
 }
