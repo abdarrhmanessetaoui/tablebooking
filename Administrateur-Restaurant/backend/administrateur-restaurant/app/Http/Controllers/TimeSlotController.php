@@ -3,11 +3,14 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\File;
 
 class TimeSlotController extends Controller
 {
-    private string $path = 'restaurants/gusto/timeslots.json';
+    private function path(): string
+    {
+        return storage_path('app/private/restaurants/gusto/timeslots.json');
+    }
 
     private array $defaults = [
         '19:00', '19:30', '20:00', '20:30',
@@ -17,8 +20,10 @@ class TimeSlotController extends Controller
 
     public function index()
     {
-        $slots = Storage::exists($this->path)
-            ? json_decode(Storage::get($this->path), true)
+        $path = $this->path();
+
+        $slots = File::exists($path)
+            ? json_decode(File::get($path), true)
             : $this->defaults;
 
         return response()->json($slots);
@@ -31,8 +36,10 @@ class TimeSlotController extends Controller
             'slots.*' => 'required|date_format:H:i',
         ]);
 
-        Storage::ensureDirectoryExists('restaurants/gusto');
-        Storage::put($this->path, json_encode($data['slots']));
+        $path = $this->path();
+
+        File::ensureDirectoryExists(dirname($path));
+        File::put($path, json_encode($data['slots']));
 
         return response()->json($data['slots']);
     }
