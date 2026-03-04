@@ -1,147 +1,80 @@
-import React, { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { saveToken } from '../utils/auth'
-import '../index.css'
+import useLogin from '../hooks/useLogin'
+import { styles } from '../styles/loginStyles'
 
-const Login = () => {
-  const navigate = useNavigate()
-  const [showPassword, setShowPassword]   = useState(false)
-  const [rememberMe, setRememberMe]       = useState(false)
-  const [email, setEmail]                 = useState('')
-  const [password, setPassword]           = useState('')
-  const [error, setError]                 = useState('')
-  const [loading, setLoading]             = useState(false)
-
-  const handleLogin = async () => {
-    if (!email || !password) {
-      setError('Please enter your email and password.')
-      return
-    }
-
-    setError('')
-    setLoading(true)
-
-    try {
-      const response = await fetch('http://localhost:8000/api/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-        body: JSON.stringify({ email, password, remember_me: rememberMe }),
-      })
-
-      const data = await response.json()
-
-      if (!response.ok) {
-        setError(data.message || 'Login failed.')
-        return
-      }
-
-      saveToken(data.token, rememberMe)
-      navigate('/dashboard')
-
-    } catch (err) {
-      setError('Cannot connect to server. Please try again.')
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const handleKeyDown = (e) => {
-    if (e.key === 'Enter') handleLogin()
-  }
+export default function Login() {
+  const { form, error, loading, showPassword, handleChange, handleSubmit, togglePassword } = useLogin()
 
   return (
-    <div
-      className="min-h-screen flex flex-col items-center justify-center px-4"
-      style={{ backgroundColor: '#2b2118' }}
-    >
-      <div className="flex items-center justify-center mb-8">
-        <img
-          src="images/tablebooking.png"
-          alt="TableBooking Logo"
-          className="h-12 sm:h-16 object-contain"
-        />
-      </div>
+    <div style={styles.page}>
+      <div style={styles.blob1} />
+      <div style={styles.blob2} />
 
-      <div className="bg-white rounded shadow-xl px-6 sm:px-8 pt-6 pb-7 w-full max-w-sm">
+      <div style={styles.card}>
+
+        <div style={styles.header}>
+          <div style={styles.iconWrap}>
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M3 11l19-9-9 19-2-8-8-2z"/>
+            </svg>
+          </div>
+          <h1 style={styles.title}>Administrateur</h1>
+          <p style={styles.subtitle}>Connectez-vous à votre espace</p>
+        </div>
 
         {error && (
-          <div className="mb-4 px-3 py-2 bg-red-50 border border-red-200 rounded text-xs text-red-600">
-            {error}
+          <div style={styles.errorBox}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+            </svg>
+            <span>{error}</span>
           </div>
         )}
 
-        <div className="mb-4">
-          <label className="block text-sm text-gray-700 mb-1" htmlFor="email">
-            Username or Email Address
-          </label>
-          <input
-            id="email"
-            type="text"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            onKeyDown={handleKeyDown}
-            className="w-full border border-gray-300 rounded px-3 py-2 text-sm text-gray-800 focus:outline-none focus:border-gray-400"
-          />
-        </div>
+        <form onSubmit={handleSubmit} style={styles.form}>
 
-        <div className="mb-5">
-          <label className="block text-sm text-gray-700 mb-1" htmlFor="password">
-            Password
-          </label>
-          <div className="relative">
-            <input
-              id="password"
-              type={showPassword ? 'text' : 'password'}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              onKeyDown={handleKeyDown}
-              className="w-full border border-gray-300 rounded px-3 py-2 text-sm text-gray-800 focus:outline-none focus:border-gray-400 pr-9"
-            />
-            <button
-              type="button"
-              onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-2 top-1/2 -translate-y-1/2 focus:outline-none"
-              style={{ color: '#c8a97e' }}
-              tabIndex={-1}
-            >
-              {showPassword ? (
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
-                </svg>
-              ) : (
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                </svg>
-              )}
-            </button>
+          <div style={styles.field}>
+            <label style={styles.label}>Adresse email</label>
+            <div style={styles.inputWrap}>
+              <svg style={styles.inputIcon} width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                <polyline points="22,6 12,13 2,6"/>
+              </svg>
+              <input type="email" name="email" placeholder="admin@restaurant.com"
+                value={form.email} onChange={handleChange} required style={styles.input} />
+            </div>
           </div>
-        </div>
 
-        <div className="flex items-center justify-between">
-          <label className="flex items-center gap-2 cursor-pointer select-none">
-            <input
-              type="checkbox"
-              checked={rememberMe}
-              onChange={() => setRememberMe(!rememberMe)}
-              className="w-3.5 h-3.5"
-            />
-            <span className="text-xs text-gray-700">Remember Me</span>
-          </label>
-          <button
-            type="button"
-            onClick={handleLogin}
-            disabled={loading}
-            className="text-white text-sm font-medium px-4 py-1.5 rounded hover:opacity-90 transition-opacity focus:outline-none disabled:opacity-60"
-            style={{ backgroundColor: '#c8a97e' }}
-          >
-            {loading ? 'Logging in...' : 'Log In'}
+          <div style={styles.field}>
+            <label style={styles.label}>Mot de passe</label>
+            <div style={styles.inputWrap}>
+              <svg style={styles.inputIcon} width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+              </svg>
+              <input type={showPassword ? 'text' : 'password'} name="password" placeholder="••••••••"
+                value={form.password} onChange={handleChange} required style={styles.input} />
+              <button type="button" onClick={togglePassword} style={styles.eyeBtn}>
+                {showPassword ? (
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+                    <line x1="1" y1="1" x2="23" y2="23"/>
+                  </svg>
+                ) : (
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                    <circle cx="12" cy="12" r="3"/>
+                  </svg>
+                )}
+              </button>
+            </div>
+          </div>
+
+          <button type="submit" disabled={loading} style={{ ...styles.btn, opacity: loading ? 0.75 : 1 }}>
+            {loading ? <span style={styles.spinner} /> : 'Se connecter'}
           </button>
-        </div>
 
+        </form>
       </div>
     </div>
   )
 }
-
-export default Login
