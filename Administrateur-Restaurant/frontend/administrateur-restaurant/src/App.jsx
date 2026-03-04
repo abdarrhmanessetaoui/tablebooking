@@ -1,6 +1,6 @@
 import { Route, Routes } from "react-router-dom"
 import Login from "./components/login"
-import * as tailwind from 
+import * as tailwind from indexc
 
 function App() {
  
