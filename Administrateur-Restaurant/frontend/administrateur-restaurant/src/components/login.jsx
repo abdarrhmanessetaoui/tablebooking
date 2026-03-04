@@ -12,7 +12,7 @@ const Login = () => {
       {/* Logo on top */}
       <div className="flex items-center justify-center mb-8">
         <img
-          src="/tablebooking.png"
+          src="images/tablebooking.png"
           alt="TableBooking Logo"
           className="h-16 object-contain"
         />
