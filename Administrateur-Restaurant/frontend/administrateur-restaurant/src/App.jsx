@@ -14,6 +14,9 @@ function App() {
         <Route path="/dashboard" element={
           <ProtectedRoute><Layout><Dashboard /></Layout></ProtectedRoute>
         } />
+        <Route path="/calendar" element={
+  <ProtectedRoute><Layout><Calendar /></Layout></ProtectedRoute>
+} />
         <Route path="/reservations" element={
           <ProtectedRoute><Layout><Reservations /></Layout></ProtectedRoute>
         } />
