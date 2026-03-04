@@ -78,4 +78,25 @@ public function byDate(Request $request)
         Reservation::whereDate('date', $date)->orderBy('time')->get()
     );
 }
+public function reports()
+{
+    $byHour = Reservation::selectRaw('HOUR(time) as hour, COUNT(*) as total')
+        ->groupBy('hour')
+        ->orderBy('hour')
+        ->get()
+        ->mapWithKeys(fn($r) => [$r->hour . ':00' => $r->total]);
+
+    $byDay = Reservation::selectRaw('DAYOFWEEK(date) as day, COUNT(*) as total')
+        ->groupBy('day')
+        ->orderBy('day')
+        ->get()
+        ->mapWithKeys(fn($r) => [$r->day => $r->total]);
+
+    $days = ['', 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+    return response()->json([
+        'by_hour' => $byHour,
+        'by_day'  => collect(range(1, 7))->mapWithKeys(fn($d) => [$days[$d] => $byDay[$d] ?? 0]),
+    ]);
+}
 }
