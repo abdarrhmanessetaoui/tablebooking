@@ -21,7 +21,7 @@ export const navItems = [
         </svg>
       ),
     },
-    {
+/*     {
         to: '/calendar',
         label: 'Timeline',
         icon: (
@@ -51,7 +51,7 @@ export const navItems = [
             <line x1="6" y1="20" x2="6" y2="14"/>
           </svg>
         ),
-      }
+      } */
   ]
   
   export const LogoutIcon = () => (
