@@ -11,5 +11,6 @@ Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/me', fn(Request $request) => response()->json($request->user()));
+    Route::get('/stats', [ReservationController::class, 'stats']);
     Route::apiResource('reservations', ReservationController::class);
 });
