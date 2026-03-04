@@ -11,6 +11,7 @@ Route::post('/login', [AuthenticatedSessionController::class, 'store']);
 Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->middleware('auth:sanctum');
 Route::get('/blocked-dates', [BlockedDateController::class, 'index']);
 Route::get('/time-slots', [TimeSlotController::class, 'index']);
+Route::get('/reports', [ReservationController::class, 'reports']);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/me', fn(Request $request) => response()->json($request->user()));
