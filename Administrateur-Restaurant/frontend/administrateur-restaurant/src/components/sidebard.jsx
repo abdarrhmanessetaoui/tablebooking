@@ -9,14 +9,7 @@ export default function Sidebar({ open, onClose }) {
   const navigate = useNavigate();
 
   return (
-   
-      className={`
-        fixed inset-y-0 left-0 z-30 flex flex-col w-60 bg-[#111827] text-white
-        transform transition-transform duration-300 ease-in-out
-        lg:static lg:translate-x-0
-        ${open ? "translate-x-0" : "-translate-x-full"}
-      `}
-    >
+
       {/* Logo */}
       <div className="flex items-center gap-2.5 px-6 py-5 border-b border-white/10">
         <div className="w-8 h-8 rounded-lg bg-brand-500 flex items-center justify-center flex-shrink-0">
