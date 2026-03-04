@@ -11,7 +11,7 @@ function App() {
       </div>
       <div className="bg-blue-500 text-white text-4xl p-10">
       Tailwind Khddam
-    </div>
+      </div>
       <div className="max-w-7xl mt-6">
         <Routes>
           <Route path="/login" element={<Login />} />
