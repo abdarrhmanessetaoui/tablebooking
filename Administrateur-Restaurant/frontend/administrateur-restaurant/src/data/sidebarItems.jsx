@@ -31,7 +31,7 @@ export const navItems = [
             <line x1="8" y1="14" x2="16" y2="14"/>
           </svg>
         ),
-      }
+      },
     {
       to: '/blocked-dates',
       label: 'Blocked Dates',
