@@ -8,7 +8,6 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false)
   const [rememberMe, setRememberMe] = useState(false)
   const handleLogin = () => {
-    // your auth logic here
     navigate('/dashboard')
   }
   return (
