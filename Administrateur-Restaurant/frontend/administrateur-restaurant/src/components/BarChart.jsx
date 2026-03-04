@@ -3,62 +3,29 @@ export default function BarChart({ data, title, color = '#c8a97e' }) {
     const max     = Math.max(...entries.map(([, v]) => v), 1)
   
     return (
-      <div style={{
-        background: '#1c1c24',
-        borderRadius: '16px',
-        padding: '28px',
-        flex: 1,
-        minWidth: 0,
-      }}>
-        <h2 style={{
-          fontSize: '13px',
-          fontWeight: 700,
-          letterSpacing: '0.1em',
-          color: 'rgba(255,255,255,0.4)',
-          textTransform: 'uppercase',
-          marginBottom: '28px',
-          fontFamily: 'monospace',
-        }}>
-          {title}
-        </h2>
+      <div className="bg-white rounded-lg shadow-sm p-6 flex-1" style={{ minWidth: 0 }}>
+        <h2 className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-6">{title}</h2>
   
-        <div style={{ display: 'flex', alignItems: 'flex-end', gap: '8px', height: '160px' }}>
+        <div className="flex items-end gap-1.5" style={{ height: '160px' }}>
           {entries.map(([label, value]) => {
-            const pct     = (value / max) * 100
-            const isTop   = value === max
+            const pct   = (value / max) * 100
+            const isTop = value === max
   
             return (
-              <div key={label} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px', height: '100%', justifyContent: 'flex-end' }}>
-                {/* Value label on top bar */}
-                <div style={{
-                  fontSize: '10px',
-                  fontWeight: 800,
-                  color: isTop ? color : 'transparent',
-                  fontFamily: 'monospace',
-                  height: '14px',
-                }}>
+              <div key={label} className="flex flex-col items-center flex-1" style={{ height: '100%', justifyContent: 'flex-end', gap: '4px' }}>
+                <span className="text-xs font-bold" style={{ color: isTop ? color : 'transparent', height: '16px', fontVariantNumeric: 'tabular-nums' }}>
                   {isTop ? value : ''}
-                </div>
-  
-                {/* Bar */}
-                <div style={{
-                  width: '100%',
-                  height: `${Math.max(pct, 4)}%`,
-                  background: isTop ? color : 'rgba(255,255,255,0.08)',
-                  borderRadius: '4px 4px 2px 2px',
-                  transition: 'height 0.4s ease',
-                  position: 'relative',
-                }} />
-  
-                {/* Label */}
-                <div style={{
-                  fontSize: '10px',
-                  color: 'rgba(255,255,255,0.3)',
-                  fontFamily: 'monospace',
-                  whiteSpace: 'nowrap',
-                }}>
+                </span>
+                <div
+                  className="w-full rounded-t-sm transition-all"
+                  style={{
+                    height: `${Math.max(pct, 3)}%`,
+                    backgroundColor: isTop ? color : '#f0ebe4',
+                  }}
+                />
+                <span className="text-gray-400 text-center" style={{ fontSize: '10px', whiteSpace: 'nowrap' }}>
                   {label}
-                </div>
+                </span>
               </div>
             )
           })}
