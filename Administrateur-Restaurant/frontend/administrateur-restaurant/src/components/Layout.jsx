@@ -1,5 +1,4 @@
 import { NavLink } from 'react-router-dom'
-import useDashboard from '../hooks/useDashboard'
 
 const navItems = [
   { to: '/dashboard',    label: 'Dashboard',    icon: '🏠' },
