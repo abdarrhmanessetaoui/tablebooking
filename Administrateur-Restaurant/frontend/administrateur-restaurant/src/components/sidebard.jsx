@@ -9,7 +9,7 @@ export default function Sidebar({ open, onClose }) {
   const navigate = useNavigate();
 
   return (
-    <aside
+   
       className={`
         fixed inset-y-0 left-0 z-30 flex flex-col w-60 bg-[#111827] text-white
         transform transition-transform duration-300 ease-in-out
