@@ -1,12 +1,13 @@
 import React, { useState } from 'react'
 import '../index.css'
+
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false)
   const [rememberMe, setRememberMe] = useState(false)
 
   return (
     <div
-      className="min-h-screen flex flex-col items-center justify-center"
+      className="min-h-screen flex flex-col items-center justify-center px-4"
       style={{ backgroundColor: '#2b2118' }}
     >
       {/* Logo on top */}
@@ -14,12 +15,12 @@ const Login = () => {
         <img
           src="images/tablebooking.png"
           alt="TableBooking Logo"
-          className="h-16 object-contain"
+          className="h-12 sm:h-16 object-contain"
         />
       </div>
 
       {/* White Card */}
-      <div className="bg-white rounded shadow-xl px-8 pt-6 pb-7 w-80">
+      <div className="bg-white rounded shadow-xl px-6 sm:px-8 pt-6 pb-7 w-full max-w-sm">
 
         {/* Username */}
         <div className="mb-4">
