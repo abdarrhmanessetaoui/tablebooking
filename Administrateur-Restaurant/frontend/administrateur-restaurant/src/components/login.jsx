@@ -10,7 +10,6 @@ const Login = () => {
       className="min-h-screen flex flex-col items-center justify-center px-4"
       style={{ backgroundColor: '#2b2118' }}
     >
-      {/* Logo on top */}
       <div className="flex items-center justify-center mb-8">
         <img
           src="images/tablebooking.png"
