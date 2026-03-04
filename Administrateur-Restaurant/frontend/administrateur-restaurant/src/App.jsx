@@ -1,6 +1,6 @@
 import { Route, Routes } from "react-router-dom"
 import Login from "./components/login"
-import * as tailwind from "tailwindcss"
+import * as tailwind from 
 
 function App() {
  
