@@ -24,6 +24,9 @@ function App() {
         <Route path="/blocked-dates" element={
           <ProtectedRoute><Layout><BlockedDates /></Layout></ProtectedRoute>
         } />
+        <Route path="/reports" element={
+  <ProtectedRoute><Layout><Reports /></Layout></ProtectedRoute>
+} />
       </Routes>
     </BrowserRouter>
   )
