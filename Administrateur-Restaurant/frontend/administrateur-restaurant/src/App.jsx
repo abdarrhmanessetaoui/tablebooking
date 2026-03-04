@@ -5,6 +5,7 @@ import Reservations from './pages/Reservations'
 import BlockedDates from './pages/BlockedDates'
 import ProtectedRoute from './components/ProtectedRoute'
 import Layout from './components/Layout'
+import Calendar from './pages/Calendar'
 
 function App() {
   return (
