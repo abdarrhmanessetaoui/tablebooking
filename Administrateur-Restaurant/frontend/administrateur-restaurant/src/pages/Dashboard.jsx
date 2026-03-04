@@ -1,22 +1,8 @@
-import useDashboard from '../hooks/useDashboard'
-
-const Dashboard = () => {
-  const { handleLogout } = useDashboard()
-
+export default function Dashboard() {
   return (
     <div className="p-8">
-      <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold">Dashboard</h1>
-        <button
-          onClick={handleLogout}
-          className="text-white text-sm font-medium px-4 py-1.5 rounded hover:opacity-90 transition-opacity"
-          style={{ backgroundColor: '#c8a97e' }}
-        >
-          Log Out
-        </button>
-      </div>
+      <h1 className="text-2xl font-semibold text-gray-800">Dashboard</h1>
+      <p className="text-sm text-gray-500 mt-1">Welcome back, Admin</p>
     </div>
   )
 }
-
-export default Dashboard
