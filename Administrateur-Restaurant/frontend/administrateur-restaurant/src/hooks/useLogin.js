@@ -1,49 +1,59 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import axios from 'axios'
+import { saveToken } from '../utils/auth'
 
 export default function useLogin() {
   const navigate = useNavigate()
-  const [form, setForm] = useState({ email: '', password: '' })
-  const [error, setError] = useState('')
-  const [loading, setLoading] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
+  const [rememberMe, setRememberMe]     = useState(false)
+  const [email, setEmail]               = useState('')
+  const [password, setPassword]         = useState('')
+  const [error, setError]               = useState('')
+  const [loading, setLoading]           = useState(false)
 
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value })
+  const handleLogin = async () => {
+    if (!email || !password) {
+      setError('Please enter your email and password.')
+      return
+    }
+
     setError('')
-  }
-
-  const handleSubmit = async (e) => {
-    e.preventDefault()
     setLoading(true)
-    setError('')
 
     try {
-      const { data } = await axios.post('http://127.0.0.1:8000/api/login', form)
-      localStorage.setItem('token', data.token)
-      localStorage.setItem('user', JSON.stringify(data.user))
-      navigate('/dashboard')
-    } catch (err) {
-      if (err.response?.status === 401) {
-        setError('Email ou mot de passe incorrect.')
-      } else if (err.response?.status === 422) {
-        setError(Object.values(err.response.data.errors).flat()[0])
-      } else {
-        setError('Erreur de connexion. Veuillez réessayer.')
+      const response = await fetch('http://localhost:8000/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify({ email, password, remember_me: rememberMe }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        setError(data.message || 'Login failed.')
+        return
       }
+
+      saveToken(data.token, rememberMe)
+      navigate('/dashboard')
+
+    } catch (err) {
+      setError('Cannot connect to server. Please try again.')
     } finally {
       setLoading(false)
     }
   }
 
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') handleLogin()
+  }
+
   return {
-    form,
-    error,
-    loading,
-    showPassword,
-    handleChange,
-    handleSubmit,
-    togglePassword: () => setShowPassword(!showPassword),
+    email, setEmail,
+    password, setPassword,
+    showPassword, setShowPassword,
+    rememberMe, setRememberMe,
+    error, loading,
+    handleLogin, handleKeyDown,
   }
 }
