@@ -2,10 +2,10 @@ import { NavLink, useNavigate } from "react-router-dom";
 
 
 const NAV = [
-  { to: "/dashboard",    label: "Dashboard",     Icon: IconGrid     },
-  { to: "/reservations", label: "Reservations",  Icon: IconCalendar },
-  { to: "/clients",      label: "Clients",       Icon: IconUsers    },
-  { to: "/settings",     label: "Settings",      Icon: IconSettings },
+    { to: "/dashboard",    label: "Dashboard",     Icon: IconGrid     },
+    { to: "/reservations", label: "Reservations",  Icon: IconCalendar },
+    { to: "/clients",      label: "Clients",       Icon: IconUsers    },
+    { to: "/settings",     label: "Settings",      Icon: IconSettings },
 ];
 
 export default function Sidebar({ open, onClose }) {
