@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom'
 import '../index.css'
 
 const Login = () => {
-    const navigate = useNavigate()
+
+const navigate = useNavigate()
   const [showPassword, setShowPassword] = useState(false)
   const [rememberMe, setRememberMe] = useState(false)
 
