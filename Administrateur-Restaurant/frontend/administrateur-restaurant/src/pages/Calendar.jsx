@@ -34,7 +34,7 @@ export default function Calendar() {
           <p className="text-xs text-gray-400 mb-3">
             {reservations.length} reservation{reservations.length !== 1 ? 's' : ''}
           </p>
-          <CalendarTimeline reservations={reservations} />
+          <CalendarWeek reservations={reservations} />
         </>
       )}
 
