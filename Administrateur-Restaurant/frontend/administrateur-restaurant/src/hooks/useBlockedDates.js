@@ -23,7 +23,7 @@ export default function useBlockedDates() {
     try {
       const res  = await fetch(API, { headers: headers() })
       const data = await res.json()
-      setBlockedDates(data)
+      setBlockedDates(Array.isArray(data) ? data : [])
     } catch {
       setError('Failed to load blocked dates.')
     } finally {
