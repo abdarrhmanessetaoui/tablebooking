@@ -19,7 +19,7 @@ export default function useReservations() {
   const [filterStatus, setFilterStatus] = useState('all')
   const [filterDate, setFilterDate]     = useState('')
   const [form, setForm] = useState({
-    name: '', email: '', phone: '', date: '', time: '', guests: '', status: 'Pending', notes: ''
+    name: '', email: '', phone: '', date: '', start_time: '', guests: '', status: 'Pending', notes: ''
   })
 
   useEffect(() => { fetchReservations() }, [])
@@ -29,15 +29,17 @@ export default function useReservations() {
     try {
       const res  = await fetch(API, { headers: headers() })
       const data = await res.json()
-      setReservations(data)
+      setReservations(Array.isArray(data) ? data : [])
     } catch {
       setError('Failed to load reservations.')
+      setReservations([])
     } finally {
       setLoading(false)
     }
   }
 
   const filtered = useMemo(() => {
+    if (!Array.isArray(reservations)) return []
     return reservations.filter(r => {
       const matchSearch = search === '' ||
         (r.name  && r.name.toLowerCase().includes(search.toLowerCase())) ||
