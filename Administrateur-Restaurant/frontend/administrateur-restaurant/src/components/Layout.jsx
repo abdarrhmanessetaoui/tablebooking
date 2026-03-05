@@ -44,16 +44,11 @@ export default function Layout({ children }) {
         <Sidebar handleLogout={handleLogout} onNavClick={() => setSidebarOpen(false)} />
       </aside>
 
-      {/* Right side — content area with rounded top-left */}
-      <div
-        className="flex-1 flex flex-col min-w-0 min-h-screen"
-        style={{
-          backgroundColor: '#f5f0eb',
-          borderRadius: '24px 0 0 24px',
-          overflow: 'hidden',
-        }}
-      >
-
+{/* Right side */}
+<div
+  className="flex-1 flex flex-col min-w-0 min-h-screen"
+  style={{ backgroundColor: '#f5f0eb' }}
+>
 {/* Top header */}
 <header
   className="flex items-center justify-between px-6 sm:px-8 py-4 flex-shrink-0"
