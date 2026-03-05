@@ -1,36 +1,40 @@
 export default function CalendarNav({ selectedDate, prevDay, nextDay, goToday }) {
   const formatted = selectedDate.toLocaleDateString('en-US', {
-    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+    month: 'long', year: 'numeric'
   })
 
   const isToday = selectedDate.toDateString() === new Date().toDateString()
 
   return (
-    <div className="flex items-center gap-3 mb-6 flex-wrap">
-      <button
-        onClick={prevDay}
-        className="p-2 rounded border border-gray-300 hover:bg-gray-100 transition-colors text-gray-600"
-      >
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <polyline points="15 18 9 12 15 6"/>
-        </svg>
-      </button>
+    <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center gap-2">
+        <button
+          onClick={prevDay}
+          className="p-2 rounded-lg bg-white border border-gray-200 hover:border-gray-300 transition-colors text-gray-500"
+        >
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="15 18 9 12 15 6"/>
+          </svg>
+        </button>
 
-      <span className="text-sm font-medium text-gray-700">{formatted}</span>
+        <span className="text-sm font-semibold text-gray-700 min-w-[140px] text-center">
+          {formatted}
+        </span>
 
-      <button
-        onClick={nextDay}
-        className="p-2 rounded border border-gray-300 hover:bg-gray-100 transition-colors text-gray-600"
-      >
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <polyline points="9 18 15 12 9 6"/>
-        </svg>
-      </button>
+        <button
+          onClick={nextDay}
+          className="p-2 rounded-lg bg-white border border-gray-200 hover:border-gray-300 transition-colors text-gray-500"
+        >
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="9 18 15 12 9 6"/>
+          </svg>
+        </button>
+      </div>
 
       {!isToday && (
         <button
           onClick={goToday}
-          className="text-xs font-medium px-3 py-1.5 rounded border border-gray-300 hover:bg-gray-50 text-gray-600"
+          className="text-xs font-medium px-4 py-2 rounded-lg border border-gray-200 bg-white hover:bg-gray-50 text-gray-600 transition-colors"
         >
           Today
         </button>
