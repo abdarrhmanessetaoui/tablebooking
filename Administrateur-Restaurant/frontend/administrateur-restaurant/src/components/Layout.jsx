@@ -82,23 +82,6 @@ export default function Layout({ children }) {
           {/* Right Section */}
           <div className="flex items-center gap-4 sm:gap-5">
 
-            {/* Notifications Button */}
-            <button
-              className="relative w-10 h-10 rounded-lg flex items-center justify-center transition-all duration-200 hover:bg-white/10 active:bg-white/15"
-              style={{ backgroundColor: 'rgba(255,255,255,0.06)' }}
-              aria-label="View notifications"
-            >
-              <MdNotifications size={20} color="rgba(200,169,126,0.85)" />
-              <span
-                className="absolute top-2 right-2 w-2.5 h-2.5 rounded-full animate-pulse"
-                style={{ backgroundColor: '#c8a97e' }}
-                aria-label="New notification"
-              />
-            </button>
-
-            {/* Divider */}
-            <div className="hidden sm:block w-px h-6" style={{ backgroundColor: 'rgba(255,255,255,0.08)' }} />
-
             {/* User Profile Button */}
             <button className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/10 active:bg-white/15 transition-all duration-200 group">
               <div
