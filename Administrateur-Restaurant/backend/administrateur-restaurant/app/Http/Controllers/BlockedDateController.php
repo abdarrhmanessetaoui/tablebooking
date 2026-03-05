@@ -12,9 +12,14 @@ class BlockedDateController extends Controller
         return auth()->user()->restaurant_form_id ?? 0;
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $formId = request()->query('form_id') ?? $this->formId();
+        // If authenticated (admin), use their form_id
+        // If public (client), use query param
+        $formId = auth('sanctum')->check()
+            ? auth('sanctum')->user()->restaurant_form_id
+            : $request->query('form_id');
+    
         return response()->json(
             BlockedDate::where('form_id', $formId)->orderBy('date')->get()
         );
