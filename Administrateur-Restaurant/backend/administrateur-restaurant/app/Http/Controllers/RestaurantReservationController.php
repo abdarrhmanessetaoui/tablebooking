@@ -4,38 +4,97 @@ namespace App\Http\Controllers;
 
 use App\Models\WpMessage;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class RestaurantReservationController extends Controller
 {
-    // Get formid from authenticated user
     private function formId(): int
     {
         return auth()->user()->restaurant_form_id;
     }
 
+    private function parseStatus(string $postedData): string
+    {
+        $data = @unserialize($postedData);
+        return is_array($data) ? ($data['app_status_1'] ?? 'Pending') : 'Pending';
+    }
+
     public function index(Request $request)
     {
-        $query = WpMessage::where('formid', $this->formId())
-            ->orderByDesc('time');
+        $messages = WpMessage::where('formid', $this->formId())
+            ->orderByDesc('time')
+            ->get();
 
-        // Optional filters
+        $clean = $messages->map(fn($m) => $m->toCleanArray());
+
+        // Filter by date if provided
         if ($request->has('date')) {
-            $query->whereRaw("JSON_UNQUOTE(JSON_EXTRACT(posted_data, '$.app_date_1')) = ?", [$request->date]);
+            $clean = $clean->filter(fn($r) => $r['date'] === $request->date)->values();
         }
 
-        $messages = $query->get();
-
-        return response()->json(
-            $messages->map(fn($m) => $m->toCleanArray())
-        );
+        return response()->json($clean);
     }
 
     public function show(int $id)
     {
-        $message = WpMessage::where('formid', $this->formId())
-            ->findOrFail($id);
-
+        $message = WpMessage::where('formid', $this->formId())->findOrFail($id);
         return response()->json($message->toCleanArray());
+    }
+
+    public function byDate(Request $request)
+    {
+        $date     = $request->query('date', now()->toDateString());
+        $messages = WpMessage::where('formid', $this->formId())->get();
+
+        $filtered = $messages
+            ->map(fn($m) => $m->toCleanArray())
+            ->filter(fn($r) => $r['date'] === $date)
+            ->values();
+
+        return response()->json($filtered);
+    }
+
+    public function stats()
+    {
+        $messages = WpMessage::where('formid', $this->formId())->get();
+        $clean    = $messages->map(fn($m) => $m->toCleanArray());
+
+        return response()->json([
+            'total'     => $clean->count(),
+            'today'     => $clean->filter(fn($r) => $r['date'] === now()->toDateString())->count(),
+            'confirmed' => $clean->filter(fn($r) => $r['status'] === 'Confirmed')->count(),
+            'pending'   => $clean->filter(fn($r) => $r['status'] === 'Pending')->count(),
+            'cancelled' => $clean->filter(fn($r) => $r['status'] === 'Cancelled')->count(),
+        ]);
+    }
+
+    public function reports()
+    {
+        $messages = WpMessage::where('formid', $this->formId())->get();
+        $clean    = $messages->map(fn($m) => $m->toCleanArray());
+
+        // By hour
+        $byHour = $clean->groupBy(fn($r) => $r['start_time'] ? substr($r['start_time'], 0, 5) : null)
+            ->filter(fn($g, $k) => $k !== null)
+            ->map(fn($g) => $g->count())
+            ->sortKeys();
+
+        // By day of week
+        $days    = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+        $byDay   = collect(array_fill_keys(['Mon','Tue','Wed','Thu','Fri','Sat','Sun'], 0));
+
+        $clean->each(function ($r) use (&$byDay, $days) {
+            if (!$r['date']) return;
+            try {
+                $day = $days[date('w', strtotime($r['date']))];
+                $byDay[$day] = ($byDay[$day] ?? 0) + 1;
+            } catch (\Exception $e) {}
+        });
+
+        return response()->json([
+            'by_hour' => $byHour,
+            'by_day'  => $byDay,
+        ]);
     }
 
     public function updateStatus(Request $request, int $id)
@@ -44,17 +103,16 @@ class RestaurantReservationController extends Controller
             'status' => 'required|in:Pending,Confirmed,Cancelled',
         ]);
 
-        $message = WpMessage::where('formid', $this->formId())
-            ->findOrFail($id);
+        $message = WpMessage::where('formid', $this->formId())->findOrFail($id);
 
         $data = @unserialize($message->posted_data);
         if (is_array($data)) {
-            $data['app_status_1']                = $request->status;
-            $data['apps'][0]['cancelled']        = $request->status;
-            $message->posted_data                = serialize($data);
+            $data['app_status_1']         = $request->status;
+            $data['apps'][0]['cancelled'] = $request->status;
+            $message->posted_data         = serialize($data);
             $message->save();
         }
 
         return response()->json($message->toCleanArray());
     }
-}php
+}
