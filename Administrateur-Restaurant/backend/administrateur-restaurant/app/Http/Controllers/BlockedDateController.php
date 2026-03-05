@@ -14,8 +14,7 @@ class BlockedDateController extends Controller
 
     public function index(Request $request)
     {
-        // If authenticated (admin), use their form_id
-        // If public (client), use query param
+
         $formId = auth('sanctum')->check()
             ? auth('sanctum')->user()->restaurant_form_id
             : $request->query('form_id');
