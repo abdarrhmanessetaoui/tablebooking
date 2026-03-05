@@ -67,15 +67,15 @@ export default function Dashboard() {
 
                 <div className="flex items-center gap-3 mt-5 flex-wrap">
                   <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg" style={{ backgroundColor: 'rgba(74,222,128,0.1)' }}>
-                    <PiCheckCircleFill size={14} color="#4ade80" />
+                    <MdCheckCircle size={14} color="#4ade80" />
                     <span className="text-xs font-semibold text-green-400">{stats.today_confirmed} confirmed</span>
                   </div>
                   <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg" style={{ backgroundColor: 'rgba(251,191,36,0.1)' }}>
-                    <PiClockFill size={14} color="#fbbf24" />
+                    <MdAccessTime size={14} color="#fbbf24" />
                     <span className="text-xs font-semibold text-yellow-400">{stats.today_pending} pending</span>
                   </div>
                   <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg" style={{ backgroundColor: 'rgba(248,113,113,0.1)' }}>
-                    <PiXCircleFill size={14} color="#f87171" />
+                    <MdCancel size={14} color="#f87171" />
                     <span className="text-xs font-semibold text-red-400">{stats.today_cancelled} cancelled</span>
                   </div>
                 </div>
@@ -86,11 +86,11 @@ export default function Dashboard() {
                   className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl flex items-center justify-center"
                   style={{ backgroundColor: 'rgba(200,169,126,0.12)', border: '1px solid rgba(200,169,126,0.25)' }}
                 >
-                  <PiCalendarCheckFill size={36} color="#c8a97e" />
+                  <MdCalendarToday size={36} color="#c8a97e" />
                 </div>
                 <div className="flex items-center gap-1" style={{ color: 'rgba(200,169,126,0.5)' }}>
                   <span className="text-xs font-medium">Timeline</span>
-                  <PiArrowRightBold size={10} color="rgba(200,169,126,0.5)" />
+                  <MdArrowForward size={11} color="rgba(200,169,126,0.5)" />
                 </div>
               </div>
             </div>
@@ -104,9 +104,9 @@ export default function Dashboard() {
             >
               <div className="flex items-center justify-between mb-3">
                 <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: '#f0fdf4' }}>
-                  <PiCalendarFill size={22} color="#16a34a" />
+                  <MdCalendarMonth size={22} color="#16a34a" />
                 </div>
-                <PiArrowRightBold size={13} color="#d1d5db" />
+                <MdArrowForward size={16} color="#d1d5db" />
               </div>
               <p className="text-3xl font-bold text-gray-900">{stats.tomorrow}</p>
               <p className="text-xs text-gray-400 mt-0.5 font-medium">Tomorrow</p>
@@ -115,7 +115,7 @@ export default function Dashboard() {
             <div className="bg-white rounded-2xl border border-gray-100 p-5">
               <div className="flex items-center justify-between mb-3">
                 <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: '#f9fafb' }}>
-                  <PiTrendUpFill size={22} color="#6b7280" />
+                  <MdTrendingUp size={22} color="#6b7280" />
                 </div>
               </div>
               <p className="text-3xl font-bold text-gray-900">{stats.total}</p>
@@ -128,19 +128,19 @@ export default function Dashboard() {
             <StatCard
               label="Confirmed today"
               value={stats.today_confirmed}
-              icon={<PiCheckCircleFill size={22} color="#16a34a" />}
+              icon={<MdCheckCircle size={22} color="#16a34a" />}
               bg="#f0fdf4"
             />
             <StatCard
               label="Pending today"
               value={stats.today_pending}
-              icon={<PiClockFill size={22} color="#d97706" />}
+              icon={<MdAccessTime size={22} color="#d97706" />}
               bg="#fffbeb"
             />
             <StatCard
               label="Cancelled today"
               value={stats.today_cancelled}
-              icon={<PiXCircleFill size={22} color="#dc2626" />}
+              icon={<MdCancel size={22} color="#dc2626" />}
               bg="#fef2f2"
             />
           </div>
