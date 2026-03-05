@@ -7,9 +7,17 @@ use Illuminate\Http\Request;
 
 class BlockedDateController extends Controller
 {
+    private function formId(): int
+    {
+        return auth()->user()->restaurant_form_id ?? 0;
+    }
+
     public function index()
     {
-        return response()->json(BlockedDate::orderBy('date')->get());
+        $formId = request()->query('form_id') ?? $this->formId();
+        return response()->json(
+            BlockedDate::where('form_id', $formId)->orderBy('date')->get()
+        );
     }
 
     public function store(Request $request)
@@ -18,6 +26,8 @@ class BlockedDateController extends Controller
             'date'   => 'required|date|unique:blocked_dates,date',
             'reason' => 'nullable|string|max:255',
         ]);
+
+        $data['form_id'] = $this->formId();
 
         return response()->json(BlockedDate::create($data), 201);
     }
