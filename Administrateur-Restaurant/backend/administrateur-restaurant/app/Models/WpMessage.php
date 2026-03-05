@@ -24,23 +24,31 @@ class WpMessage extends Model
     }
 
     public function toCleanArray(): array
-    {
-        $d = $this->parsed_data;
+{
+    $d = $this->parsed_data;
 
-        return [
-            'id'         => $this->id,
-            'formid'     => $this->formid,
-            'booked_at'  => $this->time,
-            'name'       => $d['fieldname3']      ?? null,
-            'phone'      => $d['fieldname6']      ?? null,
-            'email'      => $d['email']           ?? null,
-            'date'       => $d['app_date_1']      ?? null,
-            'start_time' => $d['app_starttime_1'] ?? null,
-            'end_time'   => $d['app_endtime_1']   ?? null,
-            'guests'     => $d['app_quantity_1']  ?? null,
-            'service'    => $d['app_service_1']   ?? null,
-            'status'     => $d['app_status_1']    ?? null,
-            'notes'      => $d['fieldname8']      ?? null,
-        ];
+    // Convert date from DD/MM/YYYY to YYYY-MM-DD
+    $rawDate = $d['app_date_1'] ?? null;
+    $date    = null;
+    if ($rawDate) {
+        $parsed = \DateTime::createFromFormat('d/m/Y', $rawDate);
+        $date   = $parsed ? $parsed->format('Y-m-d') : $rawDate;
     }
+
+    return [
+        'id'         => $this->id,
+        'formid'     => $this->formid,
+        'booked_at'  => $this->time,
+        'name'       => $d['fieldname3']      ?? null,
+        'phone'      => $d['fieldname6']      ?? null,
+        'email'      => $d['email']           ?? null,
+        'date'       => $date,
+        'start_time' => $d['app_starttime_1'] ?? null,
+        'end_time'   => $d['app_endtime_1']   ?? null,
+        'guests'     => $d['app_quantity_1']  ?? null,
+        'service'    => $d['app_service_1']   ?? null,
+        'status'     => $d['app_status_1']    ?? null,
+        'notes'      => $d['fieldname8']      ?? null,
+    ];
+}
 }
