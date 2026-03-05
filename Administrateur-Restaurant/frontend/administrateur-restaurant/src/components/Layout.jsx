@@ -59,7 +59,7 @@ export default function Layout({ children }) {
           className="flex items-center justify-between px-6 sm:px-8 py-4 flex-shrink-0"
           style={{
             backgroundColor: '#2b2118',
-            borderRadius: '2px 24px 0 0',
+            borderRadius: '2px 2px 0 0',
             borderBottom: '1px solid rgba(255,255,255,0.06)',
           }}
         >
