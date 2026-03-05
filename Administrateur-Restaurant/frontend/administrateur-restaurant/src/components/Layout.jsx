@@ -3,7 +3,7 @@ import { useLocation } from 'react-router-dom'
 import useDashboard from '../hooks/useDashboard'
 import Sidebar from './Sidebar'
 import { HamburgerIcon, CloseIcon } from '../data/sidebarItems'
-import { MdKeyboardArrowDown } from 'react-icons/md'
+import { MdKeyboardArrowDown, MdMail, MdChat } from 'react-icons/md'
 
 const PAGE_TITLES = {
   '/dashboard':     'Dashboard',
@@ -57,36 +57,26 @@ export default function Layout({ children }) {
 
         {/* Header */}
         <header
-          className="flex items-center justify-between px-6 sm:px-8 py-5 flex-shrink-0 border-b"
+          className="flex items-center justify-between px-6 sm:px-8 py-4 flex-shrink-0"
           style={{
-            backgroundColor: '#2b2118',
-            borderColor: 'rgba(255,255,255,0.08)',
+            backgroundColor: '#1a1410',
+            borderBottom: '1px solid rgba(255,255,255,0.05)',
           }}
         >
-          {/* Left Section */}
-          <div className="flex items-center gap-4 min-w-0">
+          {/* Left Section - Logo/Restaurant Name */}
+          <div className="flex items-center gap-3 min-w-0">
             <button
               onClick={handleSidebarToggle}
-              className="md:hidden p-2 rounded-lg text-amber-100 hover:bg-white/10 active:bg-white/20 transition-all duration-200"
+              className="md:hidden p-2 rounded-lg text-white hover:bg-white/10 transition-all duration-200"
               aria-label={sidebarOpen ? 'Close sidebar' : 'Open sidebar'}
               aria-expanded={sidebarOpen}
-              aria-controls="mobile-sidebar"
             >
               {sidebarOpen ? <CloseIcon /> : <HamburgerIcon />}
             </button>
-            <h1 className="text-lg sm:text-xl font-bold text-white truncate" style={{ color: '#ffffff' }}>
-              {pageTitle}
-            </h1>
-          </div>
-
-          {/* Right Section */}
-          <div className="flex items-center gap-4 sm:gap-5">
-
-            {/* User Profile Button */}
-            <button className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/10 active:bg-white/15 transition-all duration-200 group">
+            <div className="hidden md:flex items-center gap-2">
               <div
-                className="w-9 h-9 rounded-lg overflow-hidden flex items-center justify-center flex-shrink-0"
-                style={{ backgroundColor: 'rgba(200,169,126,0.15)' }}
+                className="w-8 h-8 rounded-md overflow-hidden flex items-center justify-center flex-shrink-0"
+                style={{ backgroundColor: '#c8a97e' }}
               >
                 <img 
                   src="/images/tablebooking.png" 
@@ -95,16 +85,49 @@ export default function Layout({ children }) {
                   loading="lazy"
                 />
               </div>
-              <div className="hidden sm:flex flex-col text-left min-w-0">
-                <p className="text-xs font-bold text-white leading-tight">Dal Corso</p>
-                <p className="text-xs leading-tight truncate" style={{ color: 'rgba(200,169,126,0.65)' }}>
-                  Marrakech
-                </p>
+              <span className="text-sm font-semibold text-white">Dal Corso</span>
+            </div>
+          </div>
+
+          {/* Right Section - Icons & Profile */}
+          <div className="flex items-center gap-2 sm:gap-3">
+            
+            {/* Action Icons */}
+            <button 
+              className="p-2 rounded-md hover:bg-white/10 transition-all duration-200"
+              aria-label="Messages"
+            >
+              <MdMail size={20} color="rgba(200,169,126,0.8)" />
+            </button>
+            
+            <button 
+              className="p-2 rounded-md hover:bg-white/10 transition-all duration-200"
+              aria-label="Chat"
+            >
+              <MdChat size={20} color="rgba(200,169,126,0.8)" />
+            </button>
+
+            {/* Divider */}
+            <div className="w-px h-6 mx-1" style={{ backgroundColor: 'rgba(255,255,255,0.08)' }} />
+
+            {/* User Profile Dropdown */}
+            <button className="flex items-center gap-2 px-2 py-1.5 rounded-md hover:bg-white/10 transition-all duration-200 group">
+              <div
+                className="w-8 h-8 rounded-md overflow-hidden flex items-center justify-center flex-shrink-0"
+                style={{ backgroundColor: 'rgba(200,169,126,0.2)' }}
+              >
+                <img 
+                  src="/images/tablebooking.png" 
+                  alt="User Avatar" 
+                  className="w-5 h-5 object-contain"
+                  loading="lazy"
+                />
               </div>
+              <span className="hidden sm:block text-xs font-medium text-white">Erza Miller</span>
               <MdKeyboardArrowDown 
-                size={18} 
-                color="rgba(200,169,126,0.65)"
-                className="flex-shrink-0 transition-transform duration-200 group-hover:translate-y-0.5"
+                size={16} 
+                color="rgba(200,169,126,0.7)"
+                className="flex-shrink-0"
               />
             </button>
 
