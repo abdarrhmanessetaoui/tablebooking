@@ -4,18 +4,20 @@ import CalendarWeek from '../components/CalendarWeek'
 
 export default function Calendar() {
   const {
-    weekDays, currentDate,
+    view, setView,
+    currentDate, setCurrentDate,
+    weekDays, monthDays,
     loading, error,
-    prevWeek, nextWeek, goToday,
-    getByDate,
+    navigate, goToday,
+    getByDate, getByMonth,
+    navLabel,
   } = useCalendar()
 
   return (
     <div className="p-4 sm:p-8">
-
       <div className="mb-6">
         <h1 className="text-xl sm:text-2xl font-semibold text-gray-800">Timeline</h1>
-        <p className="text-sm text-gray-400 mt-1">Weekly reservation view</p>
+        <p className="text-sm text-gray-400 mt-1">Manage your reservations by day, week, month or year</p>
       </div>
 
       {error && (
@@ -23,18 +25,28 @@ export default function Calendar() {
       )}
 
       <CalendarNav
-        selectedDate={currentDate}
-        prevDay={prevWeek}
-        nextDay={nextWeek}
+        view={view}
+        setView={setView}
+        navLabel={navLabel}
+        navigate={navigate}
         goToday={goToday}
+        currentDate={currentDate}
       />
 
       {loading ? (
         <div className="text-sm text-gray-400">Loading...</div>
       ) : (
-        <CalendarWeek weekDays={weekDays} getByDate={getByDate} />
+        <CalendarWeek
+          view={view}
+          setView={setView}
+          weekDays={weekDays}
+          monthDays={monthDays}
+          currentDate={currentDate}
+          setCurrentDate={setCurrentDate}
+          getByDate={getByDate}
+          getByMonth={getByMonth}
+        />
       )}
-
     </div>
   )
 }
