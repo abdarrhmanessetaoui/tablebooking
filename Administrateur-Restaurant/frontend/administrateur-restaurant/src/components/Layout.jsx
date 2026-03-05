@@ -3,7 +3,7 @@ import { useLocation } from 'react-router-dom'
 import useDashboard from '../hooks/useDashboard'
 import Sidebar from './Sidebar'
 import { HamburgerIcon, CloseIcon } from '../data/sidebarItems'
-import { MdNotifications, MdKeyboardArrowDown } from 'react-icons/md'
+import { MdKeyboardArrowDown } from 'react-icons/md'
 
 const PAGE_TITLES = {
   '/dashboard':     'Dashboard',
