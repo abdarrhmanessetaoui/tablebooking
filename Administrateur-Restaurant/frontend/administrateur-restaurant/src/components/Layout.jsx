@@ -50,7 +50,7 @@ export default function Layout({ children }) {
         style={{
           backgroundColor: '#f5f0eb',
           borderRadius: '10px',
-      
+          minHeight: 'calc(100vh - 24px)',
         }}
       >
 
