@@ -111,35 +111,5 @@ class RestaurantReservationController extends Controller
     
         return response()->json($message->toCleanArray());
     }
-    public function timeSlots()
-{
-    $form = \DB::table('wpjn_cpappbk_forms')
-        ->where('id', auth()->user()->restaurant_form_id)
-        ->first();
-
-    if (!$form) return response()->json([]);
-
-    $structure = json_decode($form->form_structure, true);
-    $slots     = [];
-
-    foreach ($structure[0] ?? [] as $field) {
-        if (($field['ftype'] ?? '') !== 'fapp') continue;
-        foreach ($field['allOH'] ?? [] as $oh) {
-            foreach ($oh['openhours'] ?? [] as $hour) {
-                $h1 = str_pad($hour['h1'], 2, '0', STR_PAD_LEFT);
-                $m1 = str_pad($hour['m1'], 2, '0', STR_PAD_LEFT);
-                $h2 = str_pad($hour['h2'], 2, '0', STR_PAD_LEFT);
-                $m2 = str_pad($hour['m2'], 2, '0', STR_PAD_LEFT);
-                $slots[] = [
-                    'name'  => $oh['name'],
-                    'open'  => "$h1:$m1",
-                    'close' => "$h2:$m2",
-                ];
-            }
-        }
-        break;
-    }
-
-    return response()->json($slots);
-}
+    
 }
