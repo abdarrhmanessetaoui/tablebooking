@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\WpMessage;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class RestaurantReservationController extends Controller
 {
