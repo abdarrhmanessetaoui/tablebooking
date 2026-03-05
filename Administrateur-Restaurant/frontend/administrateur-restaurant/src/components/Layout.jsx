@@ -49,7 +49,7 @@ export default function Layout({ children }) {
         className="flex-1 flex flex-col min-w-0 overflow-hidden"
         style={{
           backgroundColor: '#f5f0eb',
-          borderRadius: '2px',
+          borderRadius: '12px',
           minHeight: 'calc(100vh - 24px)',
         }}
       >
