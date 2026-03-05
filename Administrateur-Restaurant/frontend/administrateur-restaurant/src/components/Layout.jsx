@@ -20,96 +20,120 @@ export default function Layout({ children }) {
   const location = useLocation()
   const pageTitle = PAGE_TITLES[location.pathname] || 'Dashboard'
 
-  return (
-    <div className="min-h-screen flex p-3 gap-3" style={{ backgroundColor: '#2b2118' }}>
+  const handleSidebarClose = () => setSidebarOpen(false)
+  const handleSidebarToggle = () => setSidebarOpen(!sidebarOpen)
 
-      {/* Desktop sidebar */}
-      <aside className="hidden md:flex w-60 flex-col flex-shrink-0">
+  return (
+    <div className="min-h-screen flex gap-4 p-4 bg-amber-950 md:gap-6 md:p-6" style={{ backgroundColor: '#2b2118' }}>
+
+      {/* Desktop Sidebar */}
+      <aside className="hidden md:flex md:w-60 flex-col flex-shrink-0">
         <Sidebar handleLogout={handleLogout} onNavClick={() => {}} />
       </aside>
 
-      {/* Mobile overlay */}
+      {/* Mobile Overlay */}
       {sidebarOpen && (
-        <div className="fixed inset-0 bg-black/60 z-40 md:hidden" onClick={() => setSidebarOpen(false)} />
+        <button
+          onClick={handleSidebarClose}
+          className="fixed inset-0 bg-black/40 z-40 md:hidden transition-opacity duration-300"
+          aria-label="Close sidebar"
+          aria-hidden="true"
+        />
       )}
 
-      {/* Mobile sidebar */}
+      {/* Mobile Sidebar */}
       <aside
-        className="fixed top-0 left-0 h-full w-60 flex flex-col z-50 md:hidden transition-transform duration-300"
+        className="fixed top-0 left-0 h-full w-60 flex flex-col z-50 md:hidden shadow-xl transition-transform duration-300 ease-out"
         style={{
           backgroundColor: '#2b2118',
           transform: sidebarOpen ? 'translateX(0)' : 'translateX(-100%)',
         }}
       >
-        <Sidebar handleLogout={handleLogout} onNavClick={() => setSidebarOpen(false)} />
+        <Sidebar handleLogout={handleLogout} onNavClick={handleSidebarClose} />
       </aside>
 
-      {/* Right content — fully rounded card */}
-      <div
-        className="flex-1 flex flex-col min-w-0 overflow-hidden"
-        style={{
-          backgroundColor: '#f5f0eb',
-          borderRadius: '12px',
-          minHeight: 'calc(100vh - 24px)',
-        }}
-      >
+      {/* Main Content Container */}
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden rounded-2xl shadow-sm bg-amber-50" style={{ backgroundColor: '#f5f0eb', minHeight: 'calc(100vh - 32px)' }}>
 
         {/* Header */}
         <header
-          className="flex items-center justify-between px-6 sm:px-8 py-4 flex-shrink-0"
+          className="flex items-center justify-between px-6 sm:px-8 py-5 flex-shrink-0 border-b"
           style={{
             backgroundColor: '#2b2118',
-            borderRadius: '2px 2px 0 0',
-            borderBottom: '1px solid rgba(255,255,255,0.06)',
+            borderColor: 'rgba(255,255,255,0.08)',
           }}
         >
-          {/* Left */}
-          <div className="flex items-center gap-3">
+          {/* Left Section */}
+          <div className="flex items-center gap-4 min-w-0">
             <button
-              className="md:hidden p-1.5 rounded-xl"
-              style={{ color: '#c8a97e' }}
-              onClick={() => setSidebarOpen(!sidebarOpen)}
+              onClick={handleSidebarToggle}
+              className="md:hidden p-2 rounded-lg text-amber-100 hover:bg-white/10 active:bg-white/20 transition-all duration-200"
+              aria-label={sidebarOpen ? 'Close sidebar' : 'Open sidebar'}
+              aria-expanded={sidebarOpen}
+              aria-controls="mobile-sidebar"
             >
               {sidebarOpen ? <CloseIcon /> : <HamburgerIcon />}
             </button>
-            <h2 className="text-base font-bold text-white">{pageTitle}</h2>
+            <h1 className="text-lg sm:text-xl font-bold text-white truncate" style={{ color: '#ffffff' }}>
+              {pageTitle}
+            </h1>
           </div>
 
-          {/* Right */}
-          <div className="flex items-center gap-2">
+          {/* Right Section */}
+          <div className="flex items-center gap-4 sm:gap-5">
 
+            {/* Notifications Button */}
             <button
-              className="relative w-9 h-9 rounded-xl flex items-center justify-center transition-colors hover:bg-white/5"
+              className="relative w-10 h-10 rounded-lg flex items-center justify-center transition-all duration-200 hover:bg-white/10 active:bg-white/15"
               style={{ backgroundColor: 'rgba(255,255,255,0.06)' }}
+              aria-label="View notifications"
             >
-              <MdNotifications size={19} color="rgba(200,169,126,0.8)" />
+              <MdNotifications size={20} color="rgba(200,169,126,0.85)" />
               <span
-                className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full"
+                className="absolute top-2 right-2 w-2.5 h-2.5 rounded-full animate-pulse"
                 style={{ backgroundColor: '#c8a97e' }}
+                aria-label="New notification"
               />
             </button>
 
-            <div className="w-px h-7 mx-1" style={{ backgroundColor: 'rgba(255,255,255,0.08)' }} />
+            {/* Divider */}
+            <div className="hidden sm:block w-px h-6" style={{ backgroundColor: 'rgba(255,255,255,0.08)' }} />
 
-            <button className="flex items-center gap-2.5 px-2 py-1.5 rounded-xl hover:bg-white/5 transition-colors">
+            {/* User Profile Button */}
+            <button className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/10 active:bg-white/15 transition-all duration-200 group">
               <div
-                className="w-8 h-8 rounded-xl overflow-hidden flex items-center justify-center"
+                className="w-9 h-9 rounded-lg overflow-hidden flex items-center justify-center flex-shrink-0"
                 style={{ backgroundColor: 'rgba(200,169,126,0.15)' }}
               >
-                <img src="/images/tablebooking.png" alt="Logo" className="w-5 h-5 object-contain" />
+                <img 
+                  src="/images/tablebooking.png" 
+                  alt="Restaurant Logo" 
+                  className="w-5 h-5 object-contain"
+                  loading="lazy"
+                />
               </div>
-              <div className="hidden sm:block text-left">
+              <div className="hidden sm:flex flex-col text-left min-w-0">
                 <p className="text-xs font-bold text-white leading-tight">Dal Corso</p>
-                <p className="text-xs leading-tight" style={{ color: 'rgba(200,169,126,0.6)' }}>Marrakech</p>
+                <p className="text-xs leading-tight truncate" style={{ color: 'rgba(200,169,126,0.65)' }}>
+                  Marrakech
+                </p>
               </div>
-              <MdKeyboardArrowDown size={16} color="rgba(200,169,126,0.6)" />
+              <MdKeyboardArrowDown 
+                size={18} 
+                color="rgba(200,169,126,0.65)"
+                className="flex-shrink-0 transition-transform duration-200 group-hover:translate-y-0.5"
+              />
             </button>
 
           </div>
         </header>
 
-        {/* Page content */}
-        <main className="flex-1 overflow-y-auto" style={{ backgroundColor: '#f5f0eb' }}>
+        {/* Page Content */}
+        <main 
+          className="flex-1 overflow-y-auto"
+          style={{ backgroundColor: '#f5f0eb' }}
+          role="main"
+        >
           {children}
         </main>
 
