@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react'
 import { getToken } from '../utils/auth'
 
-const API = 'http://localhost:8000/api/reservations'
+const API = 'http://localhost:8000/api/restaurant/reservations'
 
 const headers = () => ({
   'Content-Type': 'application/json',
