@@ -3,44 +3,60 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\DB;
 
 class TimeSlotController extends Controller
 {
-    private function path(): string
+    private function getForm()
     {
-        return storage_path('app/private/restaurants/gusto/timeslots.json');
+        return DB::table('wpjn_cpappbk_forms')
+            ->where('id', auth()->user()->restaurant_form_id)
+            ->first();
     }
-
-    private array $defaults = [
-        '19:00', '19:30', '20:00', '20:30',
-        '21:00', '21:30', '22:00', '22:30',
-        '23:00', '23:30'
-    ];
 
     public function index()
     {
-        $path = $this->path();
+        $form      = $this->getForm();
+        if (!$form) return response()->json([]);
 
-        $slots = File::exists($path)
-            ? json_decode(File::get($path), true)
-            : $this->defaults;
+        $structure = json_decode($form->form_structure, true);
+        $fields    = $structure[0] ?? [];
 
-        return response()->json($slots);
+        foreach ($fields as $field) {
+            if (($field['ftype'] ?? '') !== 'fapp') continue;
+
+            return response()->json([
+                'allOH'         => $field['allOH'] ?? [],
+                'working_dates' => $field['working_dates'] ?? [],
+            ]);
+        }
+
+        return response()->json([]);
     }
 
     public function update(Request $request)
     {
-        $data = $request->validate([
-            'slots'   => 'required|array|min:1',
-            'slots.*' => 'required|date_format:H:i',
+        $request->validate([
+            'allOH'           => 'required|array',
+            'working_dates'   => 'required|array',
         ]);
 
-        $path = $this->path();
+        $form = $this->getForm();
+        if (!$form) return response()->json(['message' => 'Form not found'], 404);
 
-        File::ensureDirectoryExists(dirname($path));
-        File::put($path, json_encode($data['slots']));
+        $structure = json_decode($form->form_structure, true);
 
-        return response()->json($data['slots']);
+        foreach ($structure[0] as &$field) {
+            if (($field['ftype'] ?? '') !== 'fapp') continue;
+            $field['allOH']         = $request->allOH;
+            $field['working_dates'] = $request->working_dates;
+            break;
+        }
+
+        DB::table('wpjn_cpappbk_forms')
+            ->where('id', auth()->user()->restaurant_form_id)
+            ->update(['form_structure' => json_encode($structure)]);
+
+        return response()->json(['message' => 'Saved successfully']);
     }
 }
