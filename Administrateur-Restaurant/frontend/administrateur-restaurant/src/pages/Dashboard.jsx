@@ -54,7 +54,7 @@ export default function Dashboard() {
               className="w-20 h-20 rounded-2xl flex items-center justify-center"
               style={{ backgroundColor: 'rgba(200,169,126,0.12)' }}
             >
-              
+              <CalendarDays size={38} color="#c8a97e" strokeWidth={1.5} />
             </div>
           </div>
 
