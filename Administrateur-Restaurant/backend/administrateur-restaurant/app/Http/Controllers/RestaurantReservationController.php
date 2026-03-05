@@ -20,44 +20,41 @@ class RestaurantReservationController extends Controller
 
     public function index(Request $request)
     {
+        /** @var \Illuminate\Database\Eloquent\Collection<\App\Models\WpMessage> $messages */
         $messages = WpMessage::where('formid', $this->formId())
             ->orderByDesc('time')
             ->get();
-
+    
         $clean = $messages->map(fn($m) => $m->toCleanArray());
-
-        // Filter by date if provided
+    
         if ($request->has('date')) {
             $clean = $clean->filter(fn($r) => $r['date'] === $request->date)->values();
         }
-
+    
         return response()->json($clean);
     }
-
-    public function show(int $id)
-    {
-        $message = WpMessage::where('formid', $this->formId())->findOrFail($id);
-        return response()->json($message->toCleanArray());
-    }
-
+    
     public function byDate(Request $request)
     {
-        $date     = $request->query('date', now()->toDateString());
+        $date = $request->query('date', now()->toDateString());
+    
+        /** @var \Illuminate\Database\Eloquent\Collection<\App\Models\WpMessage> $messages */
         $messages = WpMessage::where('formid', $this->formId())->get();
-
+    
         $filtered = $messages
             ->map(fn($m) => $m->toCleanArray())
             ->filter(fn($r) => $r['date'] === $date)
             ->values();
-
+    
         return response()->json($filtered);
     }
-
+    
     public function stats()
     {
+        /** @var \Illuminate\Database\Eloquent\Collection<\App\Models\WpMessage> $messages */
         $messages = WpMessage::where('formid', $this->formId())->get();
         $clean    = $messages->map(fn($m) => $m->toCleanArray());
-
+    
         return response()->json([
             'total'     => $clean->count(),
             'today'     => $clean->filter(fn($r) => $r['date'] === now()->toDateString())->count(),
@@ -66,44 +63,44 @@ class RestaurantReservationController extends Controller
             'cancelled' => $clean->filter(fn($r) => $r['status'] === 'Cancelled')->count(),
         ]);
     }
-
+    
     public function reports()
     {
+        /** @var \Illuminate\Database\Eloquent\Collection<\App\Models\WpMessage> $messages */
         $messages = WpMessage::where('formid', $this->formId())->get();
         $clean    = $messages->map(fn($m) => $m->toCleanArray());
-
-        // By hour
+    
         $byHour = $clean->groupBy(fn($r) => $r['start_time'] ? substr($r['start_time'], 0, 5) : null)
             ->filter(fn($g, $k) => $k !== null)
             ->map(fn($g) => $g->count())
             ->sortKeys();
-
-        // By day of week
-        $days    = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-        $byDay   = collect(array_fill_keys(['Mon','Tue','Wed','Thu','Fri','Sat','Sun'], 0));
-
+    
+        $days  = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+        $byDay = ['Mon' => 0, 'Tue' => 0, 'Wed' => 0, 'Thu' => 0, 'Fri' => 0, 'Sat' => 0, 'Sun' => 0];
+    
         $clean->each(function ($r) use (&$byDay, $days) {
             if (!$r['date']) return;
             try {
-                $day = $days[date('w', strtotime($r['date']))];
+                $day         = $days[date('w', strtotime($r['date']))];
                 $byDay[$day] = ($byDay[$day] ?? 0) + 1;
             } catch (\Exception $e) {}
         });
-
+    
         return response()->json([
             'by_hour' => $byHour,
             'by_day'  => $byDay,
         ]);
     }
-
+    
     public function updateStatus(Request $request, int $id)
     {
         $request->validate([
             'status' => 'required|in:Pending,Confirmed,Cancelled',
         ]);
-
+    
+        /** @var \App\Models\WpMessage $message */
         $message = WpMessage::where('formid', $this->formId())->findOrFail($id);
-
+    
         $data = @unserialize($message->posted_data);
         if (is_array($data)) {
             $data['app_status_1']         = $request->status;
@@ -111,7 +108,7 @@ class RestaurantReservationController extends Controller
             $message->posted_data         = serialize($data);
             $message->save();
         }
-
+    
         return response()->json($message->toCleanArray());
     }
 }
