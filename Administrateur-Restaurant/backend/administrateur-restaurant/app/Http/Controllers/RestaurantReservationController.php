@@ -51,16 +51,19 @@ class RestaurantReservationController extends Controller
     
     public function stats()
     {
-        /** @var \Illuminate\Database\Eloquent\Collection<\App\Models\WpMessage> $messages */
         $messages = WpMessage::where('formid', $this->formId())->get();
         $clean    = $messages->map(fn($m) => $m->toCleanArray());
+        $today    = now()->toDateString();
+    
+        $todayRes = $clean->filter(fn($r) => $r['date'] === $today);
     
         return response()->json([
-            'total'     => $clean->count(),
-            'today'     => $clean->filter(fn($r) => $r['date'] === now()->toDateString())->count(),
-            'confirmed' => $clean->filter(fn($r) => $r['status'] === 'Confirmed')->count(),
-            'pending'   => $clean->filter(fn($r) => $r['status'] === 'Pending')->count(),
-            'cancelled' => $clean->filter(fn($r) => $r['status'] === 'Cancelled')->count(),
+            'total'             => $clean->count(),
+            'tomorrow'          => $clean->filter(fn($r) => $r['date'] === now()->addDay()->toDateString())->count(),
+            'today'             => $todayRes->count(),
+            'today_confirmed'   => $todayRes->filter(fn($r) => $r['status'] === 'Confirmed')->count(),
+            'today_pending'     => $todayRes->filter(fn($r) => $r['status'] === 'Pending')->count(),
+            'today_cancelled'   => $todayRes->filter(fn($r) => $r['status'] === 'Cancelled')->count(),
         ]);
     }
     
