@@ -103,9 +103,16 @@ export default function Layout({ children }) {
 </header>
 
         {/* Page content */}
-        <main className="flex-1 overflow-y-auto">
-          {children}
-        </main>
+        <main
+  className="flex-1 overflow-y-auto"
+  style={{
+    backgroundColor: '#f5f0eb',
+    borderTopLeftRadius: '28px',
+    marginTop: '-1px',
+  }}
+>
+  {children}
+</main>
 
       </div>
     </div>
