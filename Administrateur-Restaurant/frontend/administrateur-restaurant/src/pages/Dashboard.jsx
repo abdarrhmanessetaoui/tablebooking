@@ -1,7 +1,15 @@
 import { useNavigate } from 'react-router-dom'
 import useDashboardStats from '../hooks/useDashboardStats'
 import StatCard from '../components/StatCard'
-import { PiCalendarCheckFill, PiCheckCircleFill, PiClockFill, PiXCircleFill, PiTrendUpFill, PiCalendarFill, PiArrowRightBold } from 'react-icons/pi'
+import {
+  MdCalendarToday,
+  MdCheckCircle,
+  MdAccessTime,
+  MdCancel,
+  MdTrendingUp,
+  MdCalendarMonth,
+  MdArrowForward,
+} from 'react-icons/md'
 
 export default function Dashboard() {
   const { stats, loading, error } = useDashboardStats()
