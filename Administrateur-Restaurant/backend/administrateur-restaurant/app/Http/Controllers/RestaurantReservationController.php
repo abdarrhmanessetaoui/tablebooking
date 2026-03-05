@@ -55,6 +55,7 @@ class RestaurantReservationController extends Controller
         $messages = WpMessage::where('formid', $this->formId())->get();
         $clean    = $messages->map(fn($m) => $m->toCleanArray());
         $today    = now()->toDateString();
+        $todayRes = $clean->filter(fn($r) => $r['date'] === $today);
     
         return response()->json([
             'total'     => $clean->count(),
