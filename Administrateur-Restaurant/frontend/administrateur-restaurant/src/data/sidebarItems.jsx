@@ -1,8 +1,8 @@
 import {
-  PiLayoutDashboardFill,
+  PiHouseFill,
   PiCalendarFill,
   PiProhibitFill,
-  PiClockFill,
+  PiCalendarCheckFill,
   PiChartBarFill,
   PiGearFill,
   PiSignOutFill,
@@ -11,12 +11,12 @@ import {
 } from 'react-icons/pi'
 
 export const navItems = [
-  { to: '/dashboard',     label: 'Dashboard',     icon: <PiLayoutDashboardFill size={18} /> },
-  { to: '/reservations',  label: 'Reservations',  icon: <PiCalendarFill        size={18} /> },
-  { to: '/blocked-dates', label: 'Blocked Dates', icon: <PiProhibitFill        size={18} /> },
-  { to: '/calendar',      label: 'Timeline',      icon: <PiClockFill           size={18} /> },
-  { to: '/reports',       label: 'Reports',       icon: <PiChartBarFill        size={18} /> },
-  { to: '/settings',      label: 'Settings',      icon: <PiGearFill            size={18} /> },
+  { to: '/dashboard',     label: 'Dashboard',     icon: <PiHouseFill         size={18} /> },
+  { to: '/reservations',  label: 'Reservations',  icon: <PiCalendarFill      size={18} /> },
+  { to: '/blocked-dates', label: 'Blocked Dates', icon: <PiProhibitFill      size={18} /> },
+  { to: '/calendar',      label: 'Timeline',      icon: <PiCalendarCheckFill size={18} /> },
+  { to: '/reports',       label: 'Reports',       icon: <PiChartBarFill      size={18} /> },
+  { to: '/settings',      label: 'Settings',      icon: <PiGearFill          size={18} /> },
 ]
 
 export const LogoutIcon    = () => <PiSignOutFill size={18} />
