@@ -3,10 +3,10 @@ import Login from './pages/login'
 import Dashboard from './pages/Dashboard'
 import Reservations from './pages/Reservations'
 import BlockedDates from './pages/BlockedDates'
-import ProtectedRoute from './components/ProtectedRoute'
-import Layout from './components/Layout'
 import Calendar from './pages/Calendar'
 import Reports from './pages/Reports'
+import ProtectedRoute from './components/ProtectedRoute'
+import Layout from './components/Layout'
 
 function App() {
   return (
@@ -16,19 +16,18 @@ function App() {
         <Route path="/dashboard" element={
           <ProtectedRoute><Layout><Dashboard /></Layout></ProtectedRoute>
         } />
-
         <Route path="/reservations" element={
           <ProtectedRoute><Layout><Reservations /></Layout></ProtectedRoute>
         } />
-                <Route path="/calendar" element={
-  <ProtectedRoute><Layout><Calendar /></Layout></ProtectedRoute>
-} />
         <Route path="/blocked-dates" element={
           <ProtectedRoute><Layout><BlockedDates /></Layout></ProtectedRoute>
         } />
+        <Route path="/calendar" element={
+          <ProtectedRoute><Layout><Calendar /></Layout></ProtectedRoute>
+        } />
         <Route path="/reports" element={
-  <ProtectedRoute><Layout><Reports /></Layout></ProtectedRoute>
-} />
+          <ProtectedRoute><Layout><Reports /></Layout></ProtectedRoute>
+        } />
       </Routes>
     </BrowserRouter>
   )
