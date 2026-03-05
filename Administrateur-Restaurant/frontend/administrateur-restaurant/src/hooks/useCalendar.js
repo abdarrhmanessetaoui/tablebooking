@@ -3,51 +3,73 @@ import { getToken } from '../utils/auth'
 
 const toDateString = (date) => date.toISOString().split('T')[0]
 
+const getWeekDays = (date) => {
+  const day    = date.getDay()
+  const diff   = date.getDate() - day + (day === 0 ? -6 : 1)
+  const monday = new Date(date)
+  monday.setDate(diff)
+  return Array.from({ length: 7 }, (_, i) => {
+    const d = new Date(monday)
+    d.setDate(monday.getDate() + i)
+    return d
+  })
+}
+
 export default function useCalendar() {
-  const [selectedDate, setSelectedDate] = useState(new Date())
+  const [currentDate, setCurrentDate]   = useState(new Date())
   const [reservations, setReservations] = useState([])
   const [loading, setLoading]           = useState(true)
   const [error, setError]               = useState('')
 
-  useEffect(() => { fetchReservations() }, [selectedDate])
+  const weekDays = getWeekDays(currentDate)
 
-  const fetchReservations = async () => {
+  useEffect(() => { fetchWeek() }, [currentDate])
+
+  const fetchWeek = async () => {
     setLoading(true)
     setError('')
     try {
-      const date = toDateString(selectedDate)
-      const res  = await fetch(`http://localhost:8000/api/reservations/by-date?date=${date}`, {
+      const res  = await fetch('http://localhost:8000/api/restaurant/reservations', {
         headers: {
           'Accept': 'application/json',
           'Authorization': `Bearer ${getToken()}`,
-        },
+        }
       })
       const data = await res.json()
-      setReservations(data)
+      setReservations(Array.isArray(data) ? data : [])
     } catch {
       setError('Failed to load reservations.')
+      setReservations([])
     } finally {
       setLoading(false)
     }
   }
 
-  const prevDay = () => {
-    const d = new Date(selectedDate)
-    d.setDate(d.getDate() - 1)
-    setSelectedDate(d)
+  const prevWeek = () => {
+    const d = new Date(currentDate)
+    d.setDate(d.getDate() - 7)
+    setCurrentDate(d)
   }
 
-  const nextDay = () => {
-    const d = new Date(selectedDate)
-    d.setDate(d.getDate() + 1)
-    setSelectedDate(d)
+  const nextWeek = () => {
+    const d = new Date(currentDate)
+    d.setDate(d.getDate() + 7)
+    setCurrentDate(d)
   }
 
-  const goToday = () => setSelectedDate(new Date())
+  const goToday = () => setCurrentDate(new Date())
+
+  const getByDate = (date) => {
+    const str = toDateString(date)
+    return reservations.filter(r => r.date === str).sort((a, b) =>
+      (a.start_time || '').localeCompare(b.start_time || '')
+    )
+  }
 
   return {
-    selectedDate, setSelectedDate,
-    reservations, loading, error,
-    prevDay, nextDay, goToday,
+    weekDays, currentDate,
+    loading, error,
+    prevWeek, nextWeek, goToday,
+    getByDate,
   }
 }
