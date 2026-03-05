@@ -9,8 +9,6 @@ class WpForm extends Model
     protected $table      = 'wpjn_cpappbk_forms';
     public    $timestamps = false;
 
-    protected $fillable   = ['defaultstatus'];
-
     public function messages()
     {
         return $this->hasMany(WpMessage::class, 'formid');
