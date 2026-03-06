@@ -70,7 +70,7 @@ export default function Layout({ children }) {
               {sidebarOpen ? <CloseIcon /> : <HamburgerIcon />}
             </button>
             <div>
-              <h2 className="text-sm font-bold text-fff-900">{pageTitle}</h2>
+              <h2 className="text-sm font-bold text-gray-900">{pageTitle}</h2>
               <p className="text-xs text-gray-400 hidden sm:block">{today}</p>
             </div>
           </div>
