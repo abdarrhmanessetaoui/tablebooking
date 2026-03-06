@@ -71,7 +71,6 @@ export default function Layout({ children }) {
             </div>
           </div>
 
-          {/* Right — profile only */}
 
         </header>
 
