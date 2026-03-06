@@ -72,21 +72,7 @@ export default function Layout({ children }) {
           </div>
 
           {/* Right — profile only */}
-          <div className="flex items-center gap-2">
-            <button className="flex items-center gap-2.5 px-2 py-1.5 rounded-xl hover:bg-white/5 transition-colors">
-              <div
-                className="w-8 h-8 rounded-xl overflow-hidden flex items-center justify-center"
-                style={{ backgroundColor: 'rgba(200,169,126,0.15)' }}
-              >
-                <img src="/images/tablebooking.png" alt="Logo" className="w-5 h-5 object-contain" />
-              </div>
-              <div className="hidden sm:block text-left">
-                <p className="text-xs font-bold text-white leading-tight">Dal Corso</p>
-                <p className="text-xs leading-tight" style={{ color: 'rgba(200,169,126,0.6)' }}>Marrakech</p>
-              </div>
-              <MdKeyboardArrowDown size={16} color="rgba(200,169,126,0.6)" />
-            </button>
-          </div>
+
         </header>
 
         {/* Content */}
