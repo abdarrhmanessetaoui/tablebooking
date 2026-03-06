@@ -64,7 +64,7 @@ class RestaurantReservationController extends Controller
         $clean    = $messages->map(fn($m) => $m->toCleanArray());
         $today    = now()->toDateString();
         $todayRes = $clean->filter(fn($r) => $r['date'] === $today);
-        $tomorrow = now()->addDay()->toDateString();
+        
         $tomorrowRes = $messages->filter(fn($r) => $r['date'] === $tomorrow);
         return response()->json([
             'total'           => $messages->count(),
