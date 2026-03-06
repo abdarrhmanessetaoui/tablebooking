@@ -101,7 +101,7 @@ export default function Layout({ children }) {
               </div>
               <div className="hidden sm:block">
                 <p className="text-xs font-bold text-white">Dal Corso</p>
-                <p className="text-xs text-gray-400">Marrakech</p>
+                <p className="text-xs text-white-400">Marrakech</p>
               </div>
             </div>
 
