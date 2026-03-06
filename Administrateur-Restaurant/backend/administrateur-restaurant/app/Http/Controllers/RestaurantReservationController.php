@@ -57,8 +57,8 @@ class RestaurantReservationController extends Controller
         return response()->json($filtered);
     }
 
-    /** @var \Illuminate\Database\Eloquent\Collection<\App\Models\WpMessage> $messages */
     public function stats()
+    /** @var \Illuminate\Database\Eloquent\Collection<\App\Models\WpMessage> $messages */
     {
         $messages = WpMessage::where('formid', $this->formId())->get();
         $clean    = $messages->map(fn($m) => $m->toCleanArray());
