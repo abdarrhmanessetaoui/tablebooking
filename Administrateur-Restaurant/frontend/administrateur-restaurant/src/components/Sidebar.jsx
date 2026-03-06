@@ -3,7 +3,7 @@ import { navItems, LogoutIcon } from '../data/sidebarItems'
 
 export default function Sidebar({ handleLogout, onNavClick }) {
   return (
-    <div className="flex flex-col h-full">
+    <div className="">
 
       {/* Logo block */}
       <div className="flex flex-col items-center justify-center py-7 px-4">
