@@ -57,30 +57,30 @@ class RestaurantReservationController extends Controller
         return response()->json($filtered);
     }
 
-    public function stats()
-    {
-        /** @var \Illuminate\Database\Eloquent\Collection<\App\Models\WpMessage> $messages */
-        $messages = WpMessage::where('formid', $this->formId())->get()
+    /** @var \Illuminate\Database\Eloquent\Collection<\App\Models\WpMessage> $messages */
+public function stats()
+{
+    $messages = WpMessage::where('formid', $this->formId())->get()
         ->map(fn($m) => $m->toCleanArray());
-    
-        $today    = now()->toDateString();
-        $tomorrow = now()->addDay()->toDateString();
-    
-        $todayRes    = $messages->filter(fn($r) => $r['date'] === $today);
-        $tomorrowRes = $messages->filter(fn($r) => $r['date'] === $tomorrow);
-    
-        return response()->json([
-            'total'           => $messages->count(),
-            'today'           => $todayRes->count(),
-            'today_confirmed' => $todayRes->filter(fn($r) => $r['status'] === 'Confirmed')->count(),
-            'today_pending'   => $todayRes->filter(fn($r) => $r['status'] === 'Pending')->count(),
-            'today_cancelled' => $todayRes->filter(fn($r) => $r['status'] === 'Cancelled')->count(),
-            'confirmed'       => $messages->filter(fn($r) => $r['status'] === 'Confirmed')->count(),
-            'pending'         => $messages->filter(fn($r) => $r['status'] === 'Pending')->count(),
-            'cancelled'       => $messages->filter(fn($r) => $r['status'] === 'Cancelled')->count(),
-            'tomorrow'        => $tomorrowRes->count(),
-        ]);
-    }
+
+    $today    = now()->toDateString();
+    $tomorrow = now()->addDay()->toDateString();
+
+    $todayRes    = $messages->filter(fn($r) => $r['date'] === $today);
+    $tomorrowRes = $messages->filter(fn($r) => $r['date'] === $tomorrow);
+
+    return response()->json([
+        'total'           => $messages->count(),
+        'today'           => $todayRes->count(),
+        'today_confirmed' => $todayRes->filter(fn($r) => $r['status'] === 'Confirmed')->count(),
+        'today_pending'   => $todayRes->filter(fn($r) => $r['status'] === 'Pending')->count(),
+        'today_cancelled' => $todayRes->filter(fn($r) => $r['status'] === 'Cancelled')->count(),
+        'confirmed'       => $messages->filter(fn($r) => $r['status'] === 'Confirmed')->count(),
+        'pending'         => $messages->filter(fn($r) => $r['status'] === 'Pending')->count(),
+        'cancelled'       => $messages->filter(fn($r) => $r['status'] === 'Cancelled')->count(),
+        'tomorrow'        => $tomorrowRes->count(),
+    ]);
+}
 
     public function info()
     {
