@@ -1,20 +1,23 @@
 import useCalendar from '../hooks/useCalendar'
 import CalendarNav from '../components/CalendarNav'
-import CalendarTimeline from '../components/CalendarTimeline'
+import CalendarWeek from '../components/CalendarWeek'
 
 export default function Calendar() {
   const {
-    selectedDate, reservations,
+    view, setView,
+    currentDate, setCurrentDate,
+    weekDays, monthDays,
     loading, error,
-    prevDay, nextDay, goToday,
+    navigate, goToday,
+    getByDate, getByMonth,
+    navLabel,
   } = useCalendar()
 
   return (
     <div className="p-4 sm:p-8">
-
       <div className="mb-6">
         <h1 className="text-xl sm:text-2xl font-semibold text-gray-800">Timeline</h1>
-        <p className="text-sm text-gray-400 mt-1">Daily reservation view</p>
+        <p className="text-sm text-gray-400 mt-1">Manage your reservations by day, week, month or year</p>
       </div>
 
       {error && (
@@ -22,23 +25,28 @@ export default function Calendar() {
       )}
 
       <CalendarNav
-        selectedDate={selectedDate}
-        prevDay={prevDay}
-        nextDay={nextDay}
+        view={view}
+        setView={setView}
+        navLabel={navLabel}
+        navigate={navigate}
         goToday={goToday}
+        currentDate={currentDate}
       />
 
       {loading ? (
         <div className="text-sm text-gray-400">Loading...</div>
       ) : (
-        <>
-          <p className="text-xs text-gray-400 mb-3">
-            {reservations.length} reservation{reservations.length !== 1 ? 's' : ''}
-          </p>
-          <CalendarTimeline reservations={reservations} />
-        </>
+        <CalendarWeek
+          view={view}
+          setView={setView}
+          weekDays={weekDays}
+          monthDays={monthDays}
+          currentDate={currentDate}
+          setCurrentDate={setCurrentDate}
+          getByDate={getByDate}
+          getByMonth={getByMonth}
+        />
       )}
-
     </div>
   )
 }

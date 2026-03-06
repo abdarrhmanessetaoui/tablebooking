@@ -23,9 +23,10 @@ export default function useBlockedDates() {
     try {
       const res  = await fetch(API, { headers: headers() })
       const data = await res.json()
-      setBlockedDates(data)
+      setBlockedDates(Array.isArray(data) ? data : [])
     } catch {
       setError('Failed to load blocked dates.')
+      setBlockedDates([])
     } finally {
       setLoading(false)
     }
@@ -38,10 +39,7 @@ export default function useBlockedDates() {
     try {
       const res  = await fetch(API, { method: 'POST', headers: headers(), body: JSON.stringify(form) })
       const data = await res.json()
-      if (!res.ok) {
-        setError(data.message || 'Failed to block date.')
-        return
-      }
+      if (!res.ok) { setError(data.message || 'Failed to block date.'); return }
       setBlockedDates(prev => [...prev, data].sort((a, b) => a.date.localeCompare(b.date)))
       setForm({ date: '', reason: '' })
     } catch {
@@ -63,8 +61,7 @@ export default function useBlockedDates() {
 
   return {
     blockedDates, loading, error,
-    form, setForm,
-    submitting,
+    form, setForm, submitting,
     handleBlock, handleUnblock,
   }
 }

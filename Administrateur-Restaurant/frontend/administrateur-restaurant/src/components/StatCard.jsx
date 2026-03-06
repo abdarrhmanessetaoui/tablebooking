@@ -1,9 +1,13 @@
-export default function StatCard({ label, value, change }) {
-    return (
-      <div className="bg-white rounded-xl p-6 shadow-sm border-l-4" style={{ borderLeftColor: '#c8a97e' }}>
-        <p className="text-xs font-medium uppercase tracking-widest text-gray-400 mb-3">{label}</p>
-        <p className="text-5xl font-bold text-gray-900">{value}</p>
-        {change && <p className="text-xs text-gray-400 mt-3">{change}</p>}
+export default function StatCard({ label, value, icon, color = '#6b7280', bg = '#f9fafb' }) {
+  return (
+    <div className="bg-white rounded-2xl border border-gray-100 p-5 flex flex-col gap-3">
+      <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: bg }}>
+        {icon}
       </div>
-    )
-  }
+      <div>
+        <p className="text-3xl font-bold text-gray-900">{value ?? '—'}</p>
+        <p className="text-xs text-gray-400 mt-0.5 font-medium">{label}</p>
+      </div>
+    </div>
+  )
+}

@@ -3,19 +3,16 @@ import { getToken } from '../utils/auth'
 
 const API = 'http://localhost:8000/api/time-slots'
 
-const ALL_SLOTS = [
-  '12:00','12:30','13:00','13:30','14:00','14:30',
-  '15:00','15:30','16:00','16:30','17:00','17:30',
-  '18:00','18:30','19:00','19:30','20:00','20:30',
-  '21:00','21:30','22:00','22:30','23:00','23:30',
-]
+const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
 
 export default function useTimeSlots() {
-  const [active, setActive]       = useState([])
-  const [loading, setLoading]     = useState(true)
-  const [saving, setSaving]       = useState(false)
-  const [error, setError]         = useState('')
-  const [success, setSuccess]     = useState(false)
+  const [allOH, setAllOH]               = useState([])
+  const [workingDates, setWorkingDates] = useState([false,true,true,true,true,true,true])
+  const [activeOH, setActiveOH]         = useState(0)
+  const [loading, setLoading]           = useState(true)
+  const [saving, setSaving]             = useState(false)
+  const [error, setError]               = useState('')
+  const [success, setSuccess]           = useState(false)
 
   useEffect(() => { fetchSlots() }, [])
 
@@ -26,19 +23,27 @@ export default function useTimeSlots() {
         headers: { 'Accept': 'application/json', 'Authorization': `Bearer ${getToken()}` }
       })
       const data = await res.json()
-      setActive(data)
+      setAllOH(data.allOH || [])
+      setWorkingDates(data.working_dates || [false,true,true,true,true,true,true])
     } catch {
-      setError('Failed to load time slots.')
+      setError('Failed to load.')
     } finally {
       setLoading(false)
     }
   }
 
-  const toggleSlot = (slot) => {
-    setActive(prev =>
-      prev.includes(slot) ? prev.filter(s => s !== slot) : [...prev, slot].sort()
-    )
+  const updateOH = (index, field, value) => {
     setSuccess(false)
+    setAllOH(prev => prev.map((oh, i) =>
+      i === index
+        ? { ...oh, openhours: oh.openhours.map((h, j) => j === 0 ? { ...h, [field]: value } : h) }
+        : oh
+    ))
+  }
+
+  const toggleWorkingDay = (dayIndex) => {
+    setSuccess(false)
+    setWorkingDates(prev => prev.map((v, i) => i === dayIndex ? !v : v))
   }
 
   const handleSave = async () => {
@@ -53,23 +58,21 @@ export default function useTimeSlots() {
           'Accept': 'application/json',
           'Authorization': `Bearer ${getToken()}`,
         },
-        body: JSON.stringify({ slots: active }),
+        body: JSON.stringify({ allOH, working_dates: workingDates }),
       })
-      if (!res.ok) {
-        setError('Failed to save time slots.')
-        return
-      }
+      if (!res.ok) { setError('Failed to save.'); return }
       setSuccess(true)
     } catch {
-      setError('Failed to save time slots.')
+      setError('Failed to save.')
     } finally {
       setSaving(false)
     }
   }
 
   return {
-    allSlots: ALL_SLOTS,
-    active, loading, saving, error, success,
-    toggleSlot, handleSave,
+    allOH, workingDates, activeOH, setActiveOH,
+    loading, saving, error, success,
+    updateOH, toggleWorkingDay, handleSave,
+    DAYS,
   }
 }

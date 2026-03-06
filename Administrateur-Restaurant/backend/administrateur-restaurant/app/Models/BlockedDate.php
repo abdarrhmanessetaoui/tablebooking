@@ -6,5 +6,5 @@ use Illuminate\Database\Eloquent\Model;
 
 class BlockedDate extends Model
 {
-    protected $fillable = ['date', 'reason'];
+    protected $fillable = ['date', 'reason', 'form_id'];
 }
