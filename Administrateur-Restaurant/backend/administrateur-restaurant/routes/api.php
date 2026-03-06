@@ -21,6 +21,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/reports',                                    [RestaurantReservationController::class, 'reports']);
     Route::get('/restaurant/reservations',                    [RestaurantReservationController::class, 'index']);
     Route::get('/restaurant/reservations/{id}',               [RestaurantReservationController::class, 'show']);
+    Route::get('/restaurant/info', [RestaurantReservationController::class, 'info']);
     Route::patch('/restaurant/reservations/{id}/status',      [RestaurantReservationController::class, 'updateStatus']);
     Route::post('/blocked-dates',                             [BlockedDateController::class, 'store']);
     Route::delete('/blocked-dates/{blockedDate}',             [BlockedDateController::class, 'destroy']);
