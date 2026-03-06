@@ -66,12 +66,15 @@ class RestaurantReservationController extends Controller
         $todayRes = $clean->filter(fn($r) => $r['date'] === $today);
 
         return response()->json([
-            'total'           => $clean->count(),
-            'tomorrow'        => $clean->filter(fn($r) => $r['date'] === now()->addDay()->toDateString())->count(),
+            'total'           => $messages->count(),
             'today'           => $todayRes->count(),
             'today_confirmed' => $todayRes->filter(fn($r) => $r['status'] === 'Confirmed')->count(),
             'today_pending'   => $todayRes->filter(fn($r) => $r['status'] === 'Pending')->count(),
             'today_cancelled' => $todayRes->filter(fn($r) => $r['status'] === 'Cancelled')->count(),
+            'confirmed'       => $messages->filter(fn($r) => $r['status'] === 'Confirmed')->count(),
+            'pending'         => $messages->filter(fn($r) => $r['status'] === 'Pending')->count(),
+            'cancelled'       => $messages->filter(fn($r) => $r['status'] === 'Cancelled')->count(),
+            'tomorrow'        => $tomorrowRes->count(),
         ]);
     }
 
