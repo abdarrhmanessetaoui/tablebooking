@@ -9,7 +9,18 @@ class WpMessage extends Model
     protected $table      = 'wpjn_cpappbk_messages';
     public    $timestamps = false;
 
-    protected $fillable   = ['posted_data'];
+    
+    protected $fillable = [
+        'formid',
+        'time',
+        'ipaddr',
+        'notifyto',
+        'posted_data',
+        'whoadded',
+        'reminderstatus',
+        'reminderstatussnd',
+        'isold',
+    ];
 
     public function form()
     {

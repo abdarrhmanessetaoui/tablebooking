@@ -114,5 +114,28 @@ class RestaurantReservationController extends Controller
     
         return response()->json($message->toCleanArray());
     }
+    public function info()
+{
+    $form = \Illuminate\Support\Facades\DB::table('wpjn_cpappbk_forms')
+        ->where('id', $this->formId())
+        ->first();
+
+    if (!$form) return response()->json([]);
+
+    $parts    = explode(' - ', $form->form_name);
+    $name     = trim($parts[0] ?? $form->form_name);
+    $location = trim($parts[1] ?? '');
+
+    return response()->json([
+        'name'           => $name,
+        'location'       => $location,
+        'form_name'      => $form->form_name,
+        'email'          => $form->fp_from_email,
+        'contact_name'   => $form->fp_from_name,
+        'dest_emails'    => $form->fp_destination_emails,
+        'language'       => $form->calendar_language,
+        'default_status' => $form->defaultstatus,
+    ]);
+}
     
 }
