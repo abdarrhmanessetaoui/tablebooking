@@ -29,7 +29,7 @@ export default function Layout({ children }) {
   })
 
   return (
-    <div className="min-h-screen flex" style={{ backgroundColor: '#c8a97e' }}>
+    <div className="min-h-screen flex" style={{ backgroundColor: '#f5f0eb' }}>
 
       {/* Desktop sidebar */}
       <aside className="hidden md:flex w-60 min-h-screen flex-col flex-shrink-0" style={{ backgroundColor: '#2b2118' }}>
