@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { getToken } from '../utils/auth'
+import { getToken } from '../utils/auth.js'
 
 export default function useDashboardStats() {
   const [stats, setStats]     = useState(null)

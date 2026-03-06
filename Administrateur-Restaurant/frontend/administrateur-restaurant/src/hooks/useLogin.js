@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { saveToken } from '../utils/auth'
+import { saveToken } from '../utils/auth.js'
 
 export default function useLogin() {
   const navigate = useNavigate()
@@ -38,7 +38,7 @@ export default function useLogin() {
       navigate('/dashboard')
 
     } catch (err) {
-      setError('Cannot connect to server. Please try again.')
+      setError('Cannot connect to server. Please try again.',err)
     } finally {
       setLoading(false)
     }

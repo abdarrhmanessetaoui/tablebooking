@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react'
-import { getToken } from '../utils/auth'
+import { getToken } from '../utils/auth.js'
 
 const API = 'http://localhost:8000/api/restaurant/reservations'
 

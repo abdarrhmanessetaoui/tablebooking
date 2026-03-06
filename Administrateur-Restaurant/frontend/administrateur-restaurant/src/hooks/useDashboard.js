@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom'
-import { getToken, removeToken } from '../utils/auth'
+import { getToken, removeToken } from '../utils/auth.js'
 
 export default function useDashboard() {
   const navigate = useNavigate()
@@ -16,6 +16,7 @@ export default function useDashboard() {
       })
     } catch (e) {
       // fail silently, still log out client side
+      console.error('Logout failed:',e)
     }
 
     removeToken()
