@@ -55,7 +55,7 @@ export default function Dashboard() {
             <div className="relative flex items-start justify-between gap-4">
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-4">
-                  <div className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ backgroundColor: '#c8a97e' }} />
+                  <div className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ backgroundColor: '#' }} />
                   <p className="text-xs font-bold uppercase tracking-widest" style={{ color: 'rgba(200,169,126,0.7)' }}>
                     Today's Reservations
                   </p>
