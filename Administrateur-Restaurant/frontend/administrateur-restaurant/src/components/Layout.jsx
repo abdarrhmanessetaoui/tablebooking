@@ -87,12 +87,7 @@ export default function Layout({ children }) {
               {today}
             </div>
 
-            {/* Notification bell */}
-            <button
-              className="relative w-9 h-9 rounded-xl flex items-center justify-center border border-gray-100 bg-gray-50 hover:bg-gray-100 transition-colors"
-            >
-              <MdNotifications size={18} color="#6b7280" />
-            </button>
+
 
             {/* Divider */}
             <div className="w-px h-6 bg-gray-200" />
