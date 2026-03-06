@@ -3,7 +3,7 @@ import { useLocation } from 'react-router-dom'
 import useDashboard from '../hooks/useDashboard'
 import Sidebar from './Sidebar'
 import { HamburgerIcon, CloseIcon } from '../data/sidebarItems'
-import { MdNotifications, MdKeyboardArrowDown } from 'react-icons/md'
+import { MdKeyboardArrowDown } from 'react-icons/md'
 
 const PAGE_TITLES = {
   '/dashboard':     'Dashboard',
@@ -51,7 +51,7 @@ export default function Layout({ children }) {
       {/* Right side */}
       <div className="flex-1 flex flex-col min-w-0">
 
-        {/* Header — same dark background as sidebar */}
+        {/* Header */}
         <header
           className="flex items-center justify-between px-6 sm:px-8 py-4 flex-shrink-0"
           style={{ backgroundColor: '#2b2118' }}
@@ -71,25 +71,8 @@ export default function Layout({ children }) {
             </div>
           </div>
 
-          {/* Right */}
+          {/* Right — profile only */}
           <div className="flex items-center gap-2">
-
-            {/* Notification */}
-            <button
-              className="relative w-9 h-9 rounded-xl flex items-center justify-center transition-colors hover:bg-white/5"
-              style={{ backgroundColor: 'rgba(255,255,255,0.06)' }}
-            >
-              <MdNotifications size={19} color="rgba(200,169,126,0.8)" />
-              <span
-                className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full"
-                style={{ backgroundColor: '#c8a97e' }}
-              />
-            </button>
-
-            {/* Divider */}
-            <div className="w-px h-7 mx-1" style={{ backgroundColor: 'rgba(255,255,255,0.08)' }} />
-
-            {/* Profile */}
             <button className="flex items-center gap-2.5 px-2 py-1.5 rounded-xl hover:bg-white/5 transition-colors">
               <div
                 className="w-8 h-8 rounded-xl overflow-hidden flex items-center justify-center"
@@ -103,16 +86,15 @@ export default function Layout({ children }) {
               </div>
               <MdKeyboardArrowDown size={16} color="rgba(200,169,126,0.6)" />
             </button>
-
           </div>
         </header>
 
-        {/* Content — white rounded card */}
+        {/* Content */}
         <main
           className="flex-1 overflow-y-auto"
           style={{
             backgroundColor: '#f5f0eb',
-            borderRadius: '28px 28px 0 0',
+            borderRadius: '28px 0 0 0',
           }}
         >
           {children}
