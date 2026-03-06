@@ -59,9 +59,9 @@ class RestaurantReservationController extends Controller
 
     public function stats()
     {
+        /** @var \Illuminate\Database\Eloquent\Collection<\App\Models\WpMessage> $messages */
         $messages = WpMessage::where('formid', $this->formId())->get()
         ->map(fn($m) => $m->toCleanArray());
-        /** @var \Illuminate\Database\Eloquent\Collection<\App\Models\WpMessage> $messages */
     
         $today    = now()->toDateString();
         $tomorrow = now()->addDay()->toDateString();
