@@ -71,7 +71,6 @@ export default function Layout({ children }) {
             </button>
             <div>
               <h2 className="text-sm font-bold text-light-900">{pageTitle}</h2>
-              <p className="text-xs text-gray-400 hidden sm:block">{today}</p>
             </div>
           </div>
 
