@@ -58,7 +58,7 @@ export default function Layout({ children }) {
         {/* Top header bar */}
         <header
           className="flex items-center justify-between px-4 sm:px-8 py-3 flex-shrink-0"
-          style={{ backgroundColor: 'rgba(200,169,126,0.15)', borderBottom: '1px solid #f0ebe5' }}
+          style={{ backgroundColor: '#c8a97e', borderBottom: '1px solid #f0ebe5' }}
         >
           {/* Left — mobile hamburger + page title */}
           <div className="flex items-center gap-3">
