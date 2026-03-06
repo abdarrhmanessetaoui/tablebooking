@@ -8,7 +8,7 @@ export default function Sidebar({ handleLogout, onNavClick }) {
       {/* Logo block */}
       <div className="flex flex-col items-center justify-center py-7 px-4">
         <div className="w-16 h-16 rounded-2xl overflow-hidden flex items-center justify-center mb-3"
-          style={{ backgroundColor: '#c8a97e' }}>
+          style={{ backgroundColor: 'rgba(200,169,126,0.15)' }}>
           <img src="/images/tablebooking.png" alt="Logo" className="w-12 h-12 object-contain" />
         </div>
         <p className="text-white text-sm font-bold text-center leading-tight">Dal Corso</p>
