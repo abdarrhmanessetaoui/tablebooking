@@ -70,7 +70,7 @@ export default function Layout({ children }) {
               {sidebarOpen ? <CloseIcon /> : <HamburgerIcon />}
             </button>
             <div>
-              <h2 className="text-sm font-bold text-w-900">{pageTitle}</h2>
+              <h2 className="text-sm font-bold text-gray">{pageTitle}</h2>
             </div>
           </div>
 
