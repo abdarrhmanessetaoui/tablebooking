@@ -100,7 +100,7 @@ export default function Layout({ children }) {
                 <img src="/images/tablebooking.png" alt="Logo" className="w-6 h-6 object-contain" />
               </div>
               <div className="hidden sm:block">
-                <p className="text-xs font-bold text-gray-800 leading-tight">Dal Corso</p>
+                <p className="text-xs font-bold text-gray">Dal Corso</p>
                 <p className="text-xs text-gray-400">Marrakech</p>
               </div>
             </div>
