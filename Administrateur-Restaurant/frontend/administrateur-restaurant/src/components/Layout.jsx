@@ -64,7 +64,7 @@ export default function Layout({ children }) {
           <div className="flex items-center gap-3">
             <button
               className="md:hidden p-1.5 rounded-lg"
-              style={{ color: '#2b2118' }}
+              style={{ color: '#fff' }}
               onClick={() => setSidebarOpen(!sidebarOpen)}
             >
               {sidebarOpen ? <CloseIcon /> : <HamburgerIcon />}
