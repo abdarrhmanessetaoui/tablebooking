@@ -4,7 +4,7 @@ import { B } from '../../utils/brand'
 import useCountUp from '../../hooks/Dashboard/useCountUp'
 import FadeUp from './FadeUp'
 
-export default function StatCard({ icon: Icon, iconColor, iconBg, value, label, sub, onClick, delay = 0 }) {
+export default function StatCard({ icon: Icon, iconColor, iconBg, value, label, onClick, delay = 0 }) {
   const n = useCountUp(value, 700, delay + 150)
   const [hov, setHov] = useState(false)
 
@@ -16,37 +16,35 @@ export default function StatCard({ icon: Icon, iconColor, iconBg, value, label, 
         onMouseLeave={() => setHov(false)}
         style={{
           background: B.surface,
-          border: `1px solid ${hov ? B.borderHov : B.border}`,
-          borderRadius: 12,
-          padding: '20px 20px 18px',
+          border: `1.5px solid ${hov ? B.borderHov : B.border}`,
+          borderRadius: 14,
+          padding: '20px 22px 18px',
           cursor: onClick ? 'pointer' : 'default',
-          height: '100%',
-          boxSizing: 'border-box',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 16,
+          height: '100%', boxSizing: 'border-box',
+          display: 'flex', flexDirection: 'column', gap: 18,
           transition: 'box-shadow 0.18s ease, border-color 0.18s ease, transform 0.18s ease',
           boxShadow: hov && onClick
-            ? '0 4px 16px rgba(0,0,0,0.08)'
-            : '0 1px 3px rgba(0,0,0,0.04)',
-          transform: hov && onClick ? 'translateY(-1px)' : 'none',
+            ? '0 6px 20px rgba(160,124,56,0.10)'
+            : '0 1px 4px rgba(0,0,0,0.05)',
+          transform: hov && onClick ? 'translateY(-2px)' : 'none',
         }}
       >
-        {/* Top row */}
+        {/* Icon row */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div style={{
-            width: 38, height: 38, borderRadius: 9,
+            width: 40, height: 40, borderRadius: 10,
             background: iconBg, display: 'flex',
             alignItems: 'center', justifyContent: 'center',
           }}>
-            <Icon size={17} color={iconColor} strokeWidth={1.9} />
+            <Icon size={18} color={iconColor} strokeWidth={2} />
           </div>
           {onClick && (
             <div style={{
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              width: 26, height: 26, borderRadius: 7,
+              width: 28, height: 28, borderRadius: 8,
               background: hov ? B.bg : 'transparent',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
               transition: 'background 0.15s',
+              border: hov ? `1px solid ${B.border}` : '1px solid transparent',
             }}>
               <ChevronRight size={14} color={hov ? B.textSub : B.textMute} />
             </div>
@@ -56,15 +54,22 @@ export default function StatCard({ icon: Icon, iconColor, iconBg, value, label, 
         {/* Value + label */}
         <div>
           <p style={{
-            margin: 0, fontSize: 32, fontWeight: 700,
+            margin: 0,
+            fontSize: 38, fontWeight: 800,
             color: B.text, lineHeight: 1,
             fontVariantNumeric: 'tabular-nums',
-            letterSpacing: '-0.5px',
+            letterSpacing: '-1px',
           }}>
             {n}
           </p>
-          <p style={{ margin: '5px 0 0', fontSize: 13, color: B.textSub, fontWeight: 500 }}>{label}</p>
-          {sub && <p style={{ margin: '3px 0 0', fontSize: 11, color: B.textMute }}>{sub}</p>}
+          <p style={{
+            margin: '7px 0 0',
+            fontSize: 13, fontWeight: 600,
+            color: B.textSub,
+            lineHeight: 1.3,
+          }}>
+            {label}
+          </p>
         </div>
       </div>
     </FadeUp>
