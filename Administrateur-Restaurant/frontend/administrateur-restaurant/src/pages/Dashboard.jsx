@@ -1,9 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import {
-  CalendarCheck, ClipboardList, Users,
-  Download, MapPin, RefreshCw, Clock4, Flame,
-} from 'lucide-react'
+import { CalendarCheck, ClipboardList, Users, Download, MapPin, RefreshCw, Clock4, Flame } from 'lucide-react'
 
 import useDashboardStats from '../hooks/Dashboard/useDashboardStats'
 import useRestaurantInfo from '../hooks/useRestaurantInfo'
@@ -11,6 +8,8 @@ import { B } from '../utils/brand'
 
 import FadeUp    from '../components/Dashboard/FadeUp'
 import Spinner   from '../components/Dashboard/Spinner'
+import Card      from '../components/Dashboard/Card'
+import IBox      from '../components/Dashboard/IBox'
 import TodayHero from '../components/Dashboard/TodayHero'
 import StatCard  from '../components/Dashboard/StatCard'
 
@@ -47,7 +46,7 @@ function ServiceBanner() {
       </span>
       <span style={{
         marginLeft: 'auto', fontSize: 14, fontWeight: 700,
-        color: isDinner ? 'rgba(255,255,255,0.55)' : B.brown,
+        color: isDinner ? 'rgba(255,255,255,0.5)' : B.brown,
         display: 'flex', alignItems: 'center', gap: 6,
       }}>
         <Clock4 size={14} strokeWidth={2} />
@@ -61,18 +60,15 @@ function ServiceBanner() {
 function SectionHead({ label }) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 10, margin: '0 0 14px' }}>
-      <div style={{ width: 4, height: 20, background: B.brown, borderRadius: 2 }} />
-      <p style={{
-        margin: 0, fontSize: 11, fontWeight: 900,
-        color: B.blackSoft, letterSpacing: '0.16em', textTransform: 'uppercase',
-      }}>
+      <div style={{ width: 4, height: 20, background: B.brown, borderRadius: 2, flexShrink: 0 }} />
+      <p style={{ margin: 0, fontSize: 11, fontWeight: 900, color: B.blackSoft, letterSpacing: '0.16em', textTransform: 'uppercase' }}>
         {label}
       </p>
     </div>
   )
 }
 
-/* ── Button ─────────────────────────────────────────────────────────────── */
+/* ── Button — uses same press/hover as Card ─────────────────────────────── */
 function Btn({ children, onClick, primary = false }) {
   const [hov, setHov] = useState(false)
   const [pressed, setPressed] = useState(false)
@@ -86,9 +82,7 @@ function Btn({ children, onClick, primary = false }) {
       style={{
         display: 'flex', alignItems: 'center', gap: 9,
         padding: '14px 24px',
-        background: primary
-          ? (hov ? B.brownDark : B.brown)
-          : (hov ? '#E8E8E8' : '#EFEFEF'),
+        background: primary ? (hov ? B.brownDark : B.brown) : (hov ? '#E8E8E8' : '#EFEFEF'),
         border: 'none', borderRadius: 14,
         fontSize: 14, fontWeight: 800,
         color: primary ? '#fff' : B.blackSoft,
@@ -125,41 +119,34 @@ export default function Dashboard() {
 
       <div style={{ maxWidth: 1160, margin: '0 auto', padding: 'clamp(24px,4vw,48px) clamp(16px,3vw,36px)' }}>
 
-        {/* ── TOP BAR ── */}
+        {/* ── TOP BAR — uses Card ── */}
         <FadeUp delay={0}>
-          <div style={{
-            display: 'flex', flexWrap: 'wrap',
-            alignItems: 'center', justifyContent: 'space-between',
-            gap: 16, marginBottom: 24,
-            background: B.surface,
-            borderRadius: 20, padding: '20px 32px',
-          }}>
-            <div>
-              <h1 style={{
-                margin: 0, fontSize: 30, fontWeight: 900,
-                color: B.black, letterSpacing: '-1px', lineHeight: 1,
-              }}>
-                Aujourd'hui
-              </h1>
-              <p style={{ margin: '5px 0 0', fontSize: 14, fontWeight: 600, color: B.inkMute, textTransform: 'capitalize' }}>
-                {today}
-              </p>
-            </div>
+          <Card padding="20px 32px" style={{ marginBottom: 24 }}>
+            <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
+              <div>
+                <h1 style={{ margin: 0, fontSize: 30, fontWeight: 900, color: B.black, letterSpacing: '-1px', lineHeight: 1 }}>
+                  Aujourd'hui
+                </h1>
+                <p style={{ margin: '5px 0 0', fontSize: 14, fontWeight: 600, color: B.inkMute, textTransform: 'capitalize' }}>
+                  {today}
+                </p>
+              </div>
 
-            <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 10 }}>
-              {info?.location && (
-                <div style={{
-                  display: 'flex', alignItems: 'center', gap: 7,
-                  padding: '14px 20px', background: B.pageBg, borderRadius: 14,
-                  fontSize: 13, fontWeight: 700, color: B.blackSoft,
-                }}>
-                  <MapPin size={15} color={B.inkMute} strokeWidth={2} /> {info.location}
-                </div>
-              )}
-              <Btn onClick={() => {}}><RefreshCw size={15} strokeWidth={2.5} /> Actualiser</Btn>
-              <Btn primary onClick={() => {}}><Download size={15} strokeWidth={2.5} /> Exporter</Btn>
+              <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 10 }}>
+                {info?.location && (
+                  <div style={{
+                    display: 'flex', alignItems: 'center', gap: 7,
+                    padding: '14px 20px', background: B.pageBg, borderRadius: 14,
+                    fontSize: 13, fontWeight: 700, color: B.blackSoft,
+                  }}>
+                    <MapPin size={15} color={B.inkMute} strokeWidth={2} /> {info.location}
+                  </div>
+                )}
+                <Btn onClick={() => {}}><RefreshCw size={15} strokeWidth={2.5} /> Actualiser</Btn>
+                <Btn primary onClick={() => {}}><Download size={15} strokeWidth={2.5} /> Exporter</Btn>
+              </div>
             </div>
-          </div>
+          </Card>
         </FadeUp>
 
         {/* ── SERVICE BANNER ── */}
