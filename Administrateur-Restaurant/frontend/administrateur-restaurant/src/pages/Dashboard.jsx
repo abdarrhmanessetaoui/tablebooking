@@ -109,13 +109,7 @@ export default function Dashboard() {
             borderRadius: 16, padding: '13px 22px',
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 13 }}>
-              <div style={{
-                width: 44, height: 44, borderRadius: 12,
-                background: B.dark,
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-              }}>
-                <UtensilsCrossed size={20} color="#E5C97A" strokeWidth={2} />
-              </div>
+
               <div>
                 <h1 style={{ margin: 0, fontSize: 20, fontWeight: 900, color: B.ink, letterSpacing: '-0.5px' }}>Dashboard</h1>
                 <p style={{ margin: '2px 0 0', fontSize: 12, fontWeight: 600, color: B.inkMute, textTransform: 'capitalize' }}>{today}</p>
