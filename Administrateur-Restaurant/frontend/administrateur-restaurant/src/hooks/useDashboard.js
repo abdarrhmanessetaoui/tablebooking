@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom'
-import { getToken, removeToken } from '../../utils/auth'
+import { getToken, removeToken } from '../utils/auth'
 
 export default function useDashboard() {
   const navigate = useNavigate()
