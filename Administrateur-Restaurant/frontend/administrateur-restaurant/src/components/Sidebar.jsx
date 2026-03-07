@@ -1,13 +1,7 @@
 import { NavLink } from 'react-router-dom'
 import { navItems, LogoutIcon } from '../data/sidebarItems'
 import { useState } from 'react'
-
-const BROWN      = '#9A6F2E'
-const BROWN_DARK = '#7A5520'
-const BROWN_LIGHT= 'rgba(196,154,74,0.18)'
-const TEXT_DIM   = 'rgba(255,255,255,0.45)'
-const TEXT_MED   = 'rgba(255,255,255,0.72)'
-const TEXT_ON    = '#FFFFFF'
+import { B } from '../utils/brand'
 
 export default function Sidebar({ handleLogout, onNavClick }) {
   const [hov, setHov]       = useState(null)
@@ -17,7 +11,7 @@ export default function Sidebar({ handleLogout, onNavClick }) {
     <div style={{
       width: '100%',
       height: '100%',
-      background: '#7A5520',
+      background: '#FFFFFF',
       display: 'flex',
       flexDirection: 'column',
       fontFamily: "'Plus Jakarta Sans','DM Sans',system-ui,sans-serif",
@@ -25,22 +19,24 @@ export default function Sidebar({ handleLogout, onNavClick }) {
 
       {/* ── LOGO ── */}
       <div style={{
-        padding: '26px 22px 22px',
-        borderBottom: '1px solid rgba(255,255,255,0.10)',
+        padding: '24px 22px 20px',
+        borderBottom: '1px solid #F5F0EA',
         flexShrink: 0,
       }}>
         <img
           src="/images/tablebooking.png"
           alt="TableBooking.ma"
-          style={{ height: 30, objectFit: 'contain', display: 'block', filter: 'brightness(0) invert(1)' }}
+          style={{ height: 28, objectFit: 'contain', display: 'block' }}
           onError={e => {
             e.target.style.display = 'none'
             e.target.nextSibling.style.display = 'block'
           }}
         />
+        {/* Text fallback */}
         <div style={{ display: 'none' }}>
-          <span style={{ fontSize: 16, fontWeight: 900, color: '#fff', letterSpacing: '-0.3px' }}>
-            Table<span style={{ opacity: 0.6 }}>Booking</span><span style={{ opacity: 0.5 }}>.ma</span>
+          <span style={{ fontSize: 16, fontWeight: 900, color: B.brown || '#9A6F2E', letterSpacing: '-0.3px' }}>
+            Table<span style={{ color: '#1C1C1C' }}>Booking</span>
+            <span style={{ color: B.brown || '#9A6F2E' }}>.ma</span>
           </span>
         </div>
       </div>
@@ -48,12 +44,13 @@ export default function Sidebar({ handleLogout, onNavClick }) {
       {/* ── NAV ── */}
       <nav style={{
         flex: 1,
-        padding: '14px 12px',
+        padding: '14px 10px',
         display: 'flex',
         flexDirection: 'column',
-        gap: 2,
+        gap: 1,
         overflowY: 'auto',
       }}>
+
         {navItems.map((item, i) => (
           <NavLink
             key={item.to}
@@ -65,50 +62,70 @@ export default function Sidebar({ handleLogout, onNavClick }) {
               display: 'flex',
               alignItems: 'center',
               gap: 11,
-              padding: '10px 14px',
-              borderRadius: 10,
+              padding: '10px 13px',
+              borderRadius: 11,
               textDecoration: 'none',
-              transition: 'background 0.13s, color 0.13s',
+              position: 'relative',
+              transition: 'background 0.13s',
               background: isActive
-                ? 'rgba(255,255,255,0.15)'
+                ? (B.brownTint || '#FDF6E8')
                 : hov === i
-                  ? 'rgba(255,255,255,0.08)'
+                  ? '#FAF8F5'
                   : 'transparent',
-              color: isActive ? TEXT_ON : hov === i ? TEXT_MED : TEXT_DIM,
+              color: isActive
+                ? (B.brown || '#9A6F2E')
+                : hov === i
+                  ? '#2D2418'
+                  : '#6B6B6B',
             })}
           >
             {({ isActive }) => (
               <>
+                {/* Active left bar — warm brown */}
                 {isActive && (
                   <div style={{
                     position: 'absolute',
-                    left: 12, top: '20%', bottom: '20%',
-                    width: 3, borderRadius: 2,
-                    background: 'rgba(255,255,255,0.9)',
-                    // relative parent needed
+                    left: 0, top: '18%', bottom: '18%',
+                    width: 3, borderRadius: '0 3px 3px 0',
+                    background: B.brown || '#9A6F2E',
                   }} />
                 )}
-                <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, flexShrink: 0 }}>
+
+                {/* Icon */}
+                <span style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: 18,
+                  lineHeight: 1,
+                  flexShrink: 0,
+                  color: 'inherit',
+                  opacity: isActive ? 1 : hov === i ? 1 : 0.75,
+                }}>
                   {item.icon}
                 </span>
-                <span style={{ fontSize: 13, fontWeight: isActive ? 800 : 600, whiteSpace: 'nowrap' }}>
+
+                {/* Label */}
+                <span style={{
+                  fontSize: 13,
+                  fontWeight: isActive ? 800 : 600,
+                  color: 'inherit',
+                  whiteSpace: 'nowrap',
+                  letterSpacing: isActive ? '-0.1px' : 'normal',
+                }}>
                   {item.label}
                 </span>
-                {isActive && (
-                  <span style={{
-                    marginLeft: 'auto',
-                    width: 6, height: 6, borderRadius: '50%',
-                    background: 'rgba(255,255,255,0.7)', flexShrink: 0,
-                  }} />
-                )}
               </>
             )}
           </NavLink>
         ))}
       </nav>
 
+      {/* ── Divider ── */}
+      <div style={{ margin: '0 14px', height: 1, background: '#F0EDE8', flexShrink: 0 }} />
+
       {/* ── LOGOUT ── */}
-      <div style={{ padding: '10px 12px 26px', borderTop: '1px solid rgba(255,255,255,0.10)', flexShrink: 0 }}>
+      <div style={{ padding: '10px 10px 24px', flexShrink: 0 }}>
         <button
           onClick={handleLogout}
           onMouseEnter={() => setHovOut(true)}
@@ -116,23 +133,25 @@ export default function Sidebar({ handleLogout, onNavClick }) {
           style={{
             width: '100%',
             display: 'flex', alignItems: 'center', gap: 11,
-            padding: '10px 14px',
-            borderRadius: 10,
-            background: hovOut ? 'rgba(255,255,255,0.08)' : 'transparent',
+            padding: '10px 13px',
+            borderRadius: 11,
+            background: hovOut ? '#FFF5F5' : 'transparent',
             border: 'none',
-            color: hovOut ? '#FCA5A5' : TEXT_DIM,
+            color: hovOut ? '#C0182B' : '#9CA3AF',
             cursor: 'pointer',
-            transition: 'all 0.13s',
+            transition: 'background 0.13s, color 0.13s',
             textAlign: 'left',
-            marginTop: 10,
           }}
         >
-          <span style={{ display: 'flex', alignItems: 'center', fontSize: 18, flexShrink: 0 }}>
+          <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, lineHeight: 1, flexShrink: 0 }}>
             <LogoutIcon />
           </span>
-          <span style={{ fontSize: 13, fontWeight: 600 }}>Déconnexion</span>
+          <span style={{ fontSize: 13, fontWeight: 600, whiteSpace: 'nowrap' }}>
+            Déconnexion
+          </span>
         </button>
       </div>
+
     </div>
   )
 }
