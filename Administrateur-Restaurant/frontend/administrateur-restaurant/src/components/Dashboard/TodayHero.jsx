@@ -26,66 +26,57 @@ export default function TodayHero({ value, confirmed, pending, cancelled, onClic
       style={{
         background: B.surface,
         border: `1.5px solid ${hov ? B.borderHov : B.border}`,
-        borderRadius: 14,
-        padding: '24px 26px 22px',
+        borderRadius: 16,
+        padding: '28px 30px 24px',
         cursor: 'pointer',
         transition: 'box-shadow 0.18s ease, border-color 0.18s ease',
-        boxShadow: hov
-          ? '0 6px 24px rgba(160,124,56,0.12)'
-          : '0 1px 4px rgba(0,0,0,0.05)',
+        boxShadow: hov ? '0 8px 28px rgba(160,124,56,0.13)' : '0 1px 4px rgba(0,0,0,0.06)',
       }}
     >
-      {/* Header row */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 22 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <span style={{ position: 'relative', display: 'inline-flex', width: 8, height: 8 }}>
-            <span style={{
-              position: 'absolute', inset: 0, borderRadius: '50%',
-              background: '#16a34a', opacity: 0.4,
-              animation: 'pulse-ring 1.6s ease infinite',
-            }} />
-            <span style={{ position: 'relative', width: 8, height: 8, borderRadius: '50%', background: '#16a34a', display: 'block' }} />
+      {/* Header */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
+          <span style={{ position: 'relative', display: 'inline-flex', width: 10, height: 10 }}>
+            <span style={{ position: 'absolute', inset: 0, borderRadius: '50%', background: '#16a34a', opacity: 0.4, animation: 'pulse-ring 1.6s ease infinite' }} />
+            <span style={{ position: 'relative', width: 10, height: 10, borderRadius: '50%', background: '#16a34a', display: 'block' }} />
           </span>
-          <span style={{
-            fontSize: 11, fontWeight: 700, color: B.textMute,
-            letterSpacing: '0.1em', textTransform: 'uppercase',
-          }}>
+          <span style={{ fontSize: 12, fontWeight: 800, color: B.textMute, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
             En direct · Aujourd'hui
           </span>
         </div>
         <button style={{
-          display: 'flex', alignItems: 'center', gap: 5,
-          fontSize: 12, fontWeight: 700, color: B.warm,
-          background: B.tint, border: `1px solid ${B.tintBdr}`,
-          borderRadius: 7, padding: '5px 10px', cursor: 'pointer',
+          display: 'flex', alignItems: 'center', gap: 6,
+          fontSize: 13, fontWeight: 700, color: B.warm,
+          background: B.tint, border: `1.5px solid ${B.tintBdr}`,
+          borderRadius: 8, padding: '6px 13px', cursor: 'pointer',
         }}>
-          Voir tout <ArrowRight size={12} strokeWidth={2.5} />
+          Voir tout <ArrowRight size={13} strokeWidth={2.5} />
         </button>
       </div>
 
-      {/* Big number + status side by side */}
-      <div style={{ display: 'flex', alignItems: 'flex-start', gap: 36, flexWrap: 'wrap' }}>
+      {/* Big number + status boxes */}
+      <div style={{ display: 'flex', alignItems: 'flex-start', gap: 40, flexWrap: 'wrap' }}>
 
-        {/* Big number */}
-        <div style={{ minWidth: 110 }}>
+        {/* Number */}
+        <div style={{ minWidth: 120 }}>
           <span style={{
             display: 'block',
-            fontSize: 'clamp(60px, 8vw, 88px)',
-            fontWeight: 800,
+            fontSize: 'clamp(72px, 10vw, 104px)',
+            fontWeight: 900,
             color: B.text,
             lineHeight: 1,
             fontVariantNumeric: 'tabular-nums',
-            letterSpacing: '-2px',
+            letterSpacing: '-3px',
           }}>
             {n}
           </span>
-          <p style={{ margin: '8px 0 0', fontSize: 15, fontWeight: 700, color: B.textSub }}>
+          <p style={{ margin: '10px 0 0', fontSize: 17, fontWeight: 700, color: B.textSub }}>
             réservations ce soir
           </p>
         </div>
 
-        {/* 3 status boxes */}
-        <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', paddingTop: 4 }}>
+        {/* Status boxes */}
+        <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', paddingTop: 6 }}>
           {[
             { Icon: CheckCircle2, val: c,  label: 'Confirmées', color: B.green, bg: B.greenBg, bdr: B.greenBdr },
             { Icon: Clock,        val: p,  label: 'En attente', color: B.amber, bg: B.amberBg, bdr: B.amberBdr },
@@ -93,19 +84,19 @@ export default function TodayHero({ value, confirmed, pending, cancelled, onClic
           ].map(({ Icon, val, label, color, bg, bdr }) => (
             <div key={label} style={{
               background: bg, border: `1.5px solid ${bdr}`,
-              borderRadius: 11, padding: '13px 18px', minWidth: 108,
+              borderRadius: 13, padding: '16px 20px', minWidth: 120,
             }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginBottom: 9 }}>
-                <Icon size={13} color={color} strokeWidth={2.5} />
-                <span style={{ fontSize: 11, fontWeight: 700, color, letterSpacing: '0.04em', textTransform: 'uppercase' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10 }}>
+                <Icon size={15} color={color} strokeWidth={2.5} />
+                <span style={{ fontSize: 12, fontWeight: 800, color, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
                   {label}
                 </span>
               </div>
               <p style={{
-                margin: 0, fontSize: 30, fontWeight: 800,
+                margin: 0, fontSize: 36, fontWeight: 900,
                 color: B.text, lineHeight: 1,
                 fontVariantNumeric: 'tabular-nums',
-                letterSpacing: '-0.5px',
+                letterSpacing: '-1px',
               }}>
                 {val}
               </p>
@@ -114,21 +105,21 @@ export default function TodayHero({ value, confirmed, pending, cancelled, onClic
         </div>
       </div>
 
-      {/* Progress bar */}
-      <div style={{ marginTop: 22 }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 7 }}>
-          <span style={{ fontSize: 12, fontWeight: 600, color: B.textMute }}>
+      {/* Progress */}
+      <div style={{ marginTop: 26 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+          <span style={{ fontSize: 13, fontWeight: 700, color: B.textSub }}>
             Taux de confirmation
           </span>
           <span style={{
-            fontSize: 12, fontWeight: 800, color: B.warm,
-            background: B.tint, border: `1px solid ${B.tintBdr}`,
-            padding: '2px 8px', borderRadius: 20,
+            fontSize: 13, fontWeight: 900, color: B.warm,
+            background: B.tint, border: `1.5px solid ${B.tintBdr}`,
+            padding: '3px 10px', borderRadius: 20,
           }}>
             {rate}%
           </span>
         </div>
-        <div style={{ height: 6, background: B.bg, borderRadius: 99, overflow: 'hidden', border: `1px solid ${B.border}` }}>
+        <div style={{ height: 8, background: B.bg, borderRadius: 99, overflow: 'hidden', border: `1px solid ${B.border}` }}>
           <div style={{
             height: '100%', borderRadius: 99,
             background: `linear-gradient(90deg, ${B.mid} 0%, ${B.muted} 100%)`,
