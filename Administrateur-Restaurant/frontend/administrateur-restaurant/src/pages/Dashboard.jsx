@@ -10,7 +10,7 @@ import Spinner    from '../components/Dashboard/Spinner'
 import TodayHero  from '../components/TodayHero'
 import StatCard   from '../components/ui/StatCard'
 import WeekChart  from '../components/WeekChart'
-import QuickNav   from '../components/QuickNav'
+import QuickNav   from '../components/Dashboard/QuickNav'
 
 export default function Dashboard() {
   const { stats, loading, error } = useDashboardStats()
