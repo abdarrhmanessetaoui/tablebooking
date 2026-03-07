@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { B } from '../utils/brand'
+import { B } from '../../utils/brand'
 
 export default function Card({ children, onClick, style = {} }) {
   const [hov, setHov] = useState(false)

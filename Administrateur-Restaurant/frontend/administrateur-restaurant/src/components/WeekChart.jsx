@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { TrendingUp } from 'lucide-react'
 import { B } from '../utils/brand'
-import Card from './Card'
+import Card from './Dashboard/Card'
 import IBox from './Dashboard/IBox'
 
 export default function WeekChart({ todayCount }) {

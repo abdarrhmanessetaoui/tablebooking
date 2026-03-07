@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { CalendarDays, ClipboardList, ChevronRight, Sunrise } from 'lucide-react'
 import { B } from '../utils/brand'
-import Card from './Card'
+import Card from './Dashboard/Card'
 import IBox from './Dashboard/IBox'
 
 export default function QuickNav({ tomorrow, onCalendar, onReservations }) {
