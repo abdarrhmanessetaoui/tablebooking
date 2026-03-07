@@ -72,7 +72,7 @@ export default function Layout({ children }) {
               <p className="text-xs hidden sm:block capitalize" style={{ color: 'rgba(200,169,126,0.5)' }}>{today}</p>
             </div>
           </div>
-        */}
+        /*</div>*/}
 
           {/* Right — restaurant info */}
             {/* <div className="flex items-center gap-2.5"> */}
