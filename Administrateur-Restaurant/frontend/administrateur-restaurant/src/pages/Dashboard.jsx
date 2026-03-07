@@ -1,17 +1,64 @@
 import { useNavigate } from 'react-router-dom'
-import { CalendarCheck, ClipboardList, Users, Download, MapPin, Mail } from 'lucide-react'
+import { CalendarCheck, ClipboardList, Users, Download, MapPin, Mail, RefreshCw } from 'lucide-react'
 
 import useDashboardStats from '../hooks/Dashboard/useDashboardStats'
 import useRestaurantInfo from '../hooks/useRestaurantInfo'
 import { B }             from '../utils/brand'
 
-import FadeUp     from '../components/Dashboard/FadeUp'
-import Spinner    from '../components/Dashboard/Spinner'
-import TodayHero  from '../components/Dashboard/TodayHero'
-import StatCard   from '../components/Dashboard/StatCard'
-import WeekChart  from '../components/Dashboard/WeekChart'
-import QuickNav   from '../components/Dashboard/QuickNav'
+import FadeUp    from '../components/Dashboard/FadeUp'
+import Spinner   from '../components/Dashboard/Spinner'
+import TodayHero from '../components/Dashboard/TodayHero'
+import StatCard  from '../components/Dashboard/StatCard'
+import WeekChart from '../components/Dashboard/WeekChart'
+import QuickNav  from '../components/Dashboard/QuickNav'
 
+/* ── Tiny section label ─────────────────────────────────────────────────── */
+function SectionLabel({ children }) {
+  return (
+    <p style={{
+      margin: '0 0 10px',
+      fontSize: 11, fontWeight: 600,
+      color: B.textMute,
+      letterSpacing: '0.08em',
+      textTransform: 'uppercase',
+    }}>
+      {children}
+    </p>
+  )
+}
+
+/* ── Top bar button ─────────────────────────────────────────────────────── */
+function TopBtn({ children, onClick, primary = false }) {
+  const [hov, setHov] = useState(false)
+  return (
+    <button
+      onClick={onClick}
+      onMouseEnter={() => setHov(true)}
+      onMouseLeave={() => setHov(false)}
+      style={{
+        display: 'flex', alignItems: 'center', gap: 6,
+        padding: '7px 14px',
+        background: primary
+          ? (hov ? B.mid : B.warm)
+          : (hov ? B.bg : B.surface),
+        border: `1px solid ${primary ? 'transparent' : (hov ? B.borderHov : B.border)}`,
+        borderRadius: 8,
+        fontSize: 12, fontWeight: 600,
+        color: primary ? '#fff' : B.textSub,
+        cursor: 'pointer',
+        transition: 'all 0.15s ease',
+        boxShadow: primary ? `0 1px 4px ${B.warm}40` : 'none',
+        whiteSpace: 'nowrap',
+      }}
+    >
+      {children}
+    </button>
+  )
+}
+
+import { useState } from 'react'
+
+/* ── MAIN ───────────────────────────────────────────────────────────────── */
 export default function Dashboard() {
   const { stats, loading, error } = useDashboardStats()
   const { info }                  = useRestaurantInfo()
@@ -24,47 +71,90 @@ export default function Dashboard() {
   if (loading) return <Spinner />
 
   return (
-    <div style={{ minHeight: '100vh', background: '#FAF8F5', fontFamily: 'system-ui,-apple-system,sans-serif' }}>
-      <div style={{ maxWidth: 1080, margin: '0 auto', padding: 'clamp(20px,4vw,36px)' }}>
+    <div style={{
+      minHeight: '100vh',
+      background: B.bg,
+      fontFamily: "'DM Sans', system-ui, -apple-system, sans-serif",
+    }}>
+      <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+      <div style={{ maxWidth: 1100, margin: '0 auto', padding: 'clamp(24px, 4vw, 40px) clamp(16px, 3vw, 32px)' }}>
 
         {/* ── Top bar ── */}
         <FadeUp delay={0}>
-          <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 14, marginBottom: 28 }}>
+          <div style={{
+            display: 'flex', flexWrap: 'wrap',
+            alignItems: 'center', justifyContent: 'space-between',
+            gap: 12, marginBottom: 28,
+            paddingBottom: 20,
+            borderBottom: `1px solid ${B.border}`,
+          }}>
+            {/* Left: title + date */}
             <div>
-              <h1 style={{ margin: 0, fontSize: 22, fontWeight: 900, color: '#111827', letterSpacing: '-0.4px' }}>Dashboard</h1>
-              <p style={{ margin: '3px 0 0', fontSize: 13, color: '#9CA3AF', textTransform: 'capitalize' }}>{today}</p>
+              <h1 style={{
+                margin: 0, fontSize: 20, fontWeight: 700,
+                color: B.text, letterSpacing: '-0.3px',
+              }}>
+                Dashboard
+              </h1>
+              <p style={{ margin: '2px 0 0', fontSize: 12, color: B.textMute, textTransform: 'capitalize' }}>
+                {today}
+              </p>
             </div>
+
+            {/* Right: meta + actions */}
             <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 8 }}>
               {info.location && (
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 12px', background: '#fff', border: `1.5px solid #F0EBE3`, borderRadius: 10, fontSize: 12, fontWeight: 600, color: '#374151' }}>
-                  <MapPin size={13} color={B.warm} strokeWidth={2} /> {info.location}
+                <div style={{
+                  display: 'flex', alignItems: 'center', gap: 5,
+                  padding: '6px 11px',
+                  background: B.surface,
+                  border: `1px solid ${B.border}`,
+                  borderRadius: 8,
+                  fontSize: 12, fontWeight: 500, color: B.textSub,
+                }}>
+                  <MapPin size={12} color={B.textMute} strokeWidth={2} />
+                  {info.location}
                 </div>
               )}
               {info.email && (
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 12px', background: '#fff', border: `1.5px solid #F0EBE3`, borderRadius: 10, fontSize: 12, color: '#6B7280' }}>
-                  <Mail size={13} color={B.warm} strokeWidth={2} /> {info.email}
+                <div style={{
+                  display: 'flex', alignItems: 'center', gap: 5,
+                  padding: '6px 11px',
+                  background: B.surface,
+                  border: `1px solid ${B.border}`,
+                  borderRadius: 8,
+                  fontSize: 12, color: B.textSub,
+                }}>
+                  <Mail size={12} color={B.textMute} strokeWidth={2} />
+                  {info.email}
                 </div>
               )}
-              <button
-                style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 14px', background: B.dark, border: 'none', borderRadius: 10, fontSize: 12, fontWeight: 700, color: '#fff', cursor: 'pointer' }}
-                onMouseEnter={e => e.currentTarget.style.background = B.mid}
-                onMouseLeave={e => e.currentTarget.style.background = B.dark}
-              >
-                <Download size={13} color="#fff" strokeWidth={2.5} /> Export CSV
-              </button>
+              <TopBtn>
+                <RefreshCw size={12} strokeWidth={2.2} /> Actualiser
+              </TopBtn>
+              <TopBtn primary>
+                <Download size={12} strokeWidth={2.5} /> Export CSV
+              </TopBtn>
             </div>
           </div>
         </FadeUp>
 
         {/* ── Error banner ── */}
         {error && (
-          <div style={{ padding: '11px 16px', background: '#FEF2F2', border: '1px solid #FECACA', borderRadius: 12, fontSize: 12, color: '#DC2626', marginBottom: 18 }}>
+          <div style={{
+            display: 'flex', alignItems: 'center', gap: 8,
+            padding: '10px 14px',
+            background: B.redBg, border: `1px solid ${B.redBdr}`,
+            borderRadius: 9, fontSize: 12, color: B.red, marginBottom: 20,
+          }}>
             ⚠️ {error}
           </div>
         )}
 
         {/* ── Hero ── */}
-        <FadeUp delay={70} style={{ marginBottom: 20 }}>
+        <FadeUp delay={60} style={{ marginBottom: 24 }}>
+          <SectionLabel>Aujourd'hui en temps réel</SectionLabel>
           <TodayHero
             value={stats.today}
             confirmed={stats.today_confirmed}
@@ -75,25 +165,45 @@ export default function Dashboard() {
         </FadeUp>
 
         {/* ── 3 stat cards ── */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(180px,1fr))', gap: 16, marginBottom: 20 }}>
-          <StatCard icon={CalendarCheck} iconColor="#6366f1" iconBg="#EEF2FF" value={stats.tomorrow}        label="Réservations demain"    onClick={() => navigate('/calendar')} delay={110} />
-          <StatCard icon={ClipboardList} iconColor="#0EA5E9" iconBg="#F0F9FF" value={stats.total}           label="Total réservations"                                             delay={160} />
-          <StatCard icon={Users}         iconColor="#059669" iconBg="#ECFDF5" value={stats.today_confirmed} label="Confirmées aujourd'hui"                                         delay={210} />
-        </div>
+        <FadeUp delay={120} style={{ marginBottom: 24 }}>
+          <SectionLabel>Vue d'ensemble</SectionLabel>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))', gap: 12 }}>
+            <StatCard
+              icon={CalendarCheck} iconColor={B.indigo} iconBg={B.indigoBg}
+              value={stats.tomorrow} label="Réservations demain"
+              onClick={() => navigate('/calendar')} delay={0}
+            />
+            <StatCard
+              icon={ClipboardList} iconColor={B.blue} iconBg={B.blueBg}
+              value={stats.total} label="Total réservations"
+              delay={60}
+            />
+            <StatCard
+              icon={Users} iconColor={B.green} iconBg={B.greenBg}
+              value={stats.today_confirmed} label="Confirmées aujourd'hui"
+              delay={120}
+            />
+          </div>
+        </FadeUp>
 
         {/* ── Bottom row ── */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(280px,1fr))', gap: 16 }}>
-          <FadeUp delay={270} style={{ gridColumn: 'span 2', minWidth: 0 }}>
-            <WeekChart todayCount={stats.today} />
-          </FadeUp>
-          <FadeUp delay={330}>
+        <FadeUp delay={200}>
+          <SectionLabel>Activité & Navigation</SectionLabel>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 12, alignItems: 'start' }}>
+
+            {/* Chart — spans 2 cols on wider screens */}
+            <div style={{ gridColumn: 'span 2' }}>
+              <WeekChart todayCount={stats.today} />
+            </div>
+
+            {/* Quick nav */}
             <QuickNav
               tomorrow={stats.tomorrow}
               onCalendar={() => navigate('/calendar')}
               onReservations={() => navigate('/reservations')}
             />
-          </FadeUp>
-        </div>
+          </div>
+        </FadeUp>
 
       </div>
     </div>
