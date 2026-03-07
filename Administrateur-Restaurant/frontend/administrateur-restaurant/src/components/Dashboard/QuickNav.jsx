@@ -10,30 +10,48 @@ function NavRow({ icon: Icon, iconColor, iconBg, title, sub, onClick, dark = fal
       onMouseEnter={() => setHov(true)}
       onMouseLeave={() => setHov(false)}
       style={{
-        background: dark ? (hov ? B.mid : B.dark) : (hov ? B.bg : B.surface),
-        border: `1px solid ${dark ? 'transparent' : (hov ? B.borderHov : B.border)}`,
-        borderRadius: 10,
-        padding: '14px 16px',
-        display: 'flex', alignItems: 'center', gap: 12,
+        background: dark
+          ? (hov ? B.mid : B.dark)
+          : (hov ? B.tint : B.surface),
+        border: `1.5px solid ${dark ? 'transparent' : (hov ? B.tintBdr : B.border)}`,
+        borderRadius: 11,
+        padding: '15px 16px',
+        display: 'flex', alignItems: 'center', gap: 13,
         cursor: 'pointer',
         transition: 'all 0.16s ease',
         boxShadow: dark
-          ? (hov ? `0 4px 14px ${B.dark}60` : `0 2px 8px ${B.dark}30`)
-          : (hov ? '0 2px 8px rgba(0,0,0,0.07)' : '0 1px 3px rgba(0,0,0,0.04)'),
+          ? (hov ? `0 6px 18px ${B.dark}70` : `0 2px 8px ${B.dark}40`)
+          : (hov ? `0 3px 10px rgba(160,124,56,0.12)` : '0 1px 3px rgba(0,0,0,0.04)'),
       }}
     >
       <div style={{
-        width: 36, height: 36, borderRadius: 8,
-        background: dark ? 'rgba(255,255,255,0.12)' : iconBg,
+        width: 38, height: 38, borderRadius: 9,
+        background: dark ? 'rgba(255,255,255,0.1)' : iconBg,
         display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+        border: dark ? '1px solid rgba(255,255,255,0.08)' : 'none',
       }}>
-        <Icon size={16} color={dark ? '#fff' : iconColor} strokeWidth={1.9} />
+        <Icon size={16} color={dark ? B.muted : iconColor} strokeWidth={2} />
       </div>
       <div style={{ flex: 1, minWidth: 0 }}>
-        <p style={{ margin: 0, fontSize: 13, fontWeight: 600, color: dark ? '#fff' : B.text }}>{title}</p>
-        <p style={{ margin: '1px 0 0', fontSize: 11, color: dark ? 'rgba(255,255,255,0.5)' : B.textMute, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{sub}</p>
+        <p style={{
+          margin: 0, fontSize: 13, fontWeight: 700,
+          color: dark ? '#fff' : B.text,
+        }}>
+          {title}
+        </p>
+        <p style={{
+          margin: '2px 0 0', fontSize: 11, fontWeight: 500,
+          color: dark ? 'rgba(255,255,255,0.45)' : B.textMute,
+          whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+        }}>
+          {sub}
+        </p>
       </div>
-      <ChevronRight size={14} color={dark ? 'rgba(255,255,255,0.4)' : (hov ? B.textSub : B.textMute)} />
+      <ChevronRight
+        size={15}
+        color={dark ? 'rgba(255,255,255,0.35)' : (hov ? B.warm : B.textMute)}
+        strokeWidth={2.2}
+      />
     </div>
   )
 }
@@ -49,37 +67,41 @@ export default function QuickNav({ tomorrow, onCalendar, onReservations }) {
       />
 
       <NavRow
-        icon={ClipboardList} iconColor="#fff" iconBg={B.warm}
+        icon={ClipboardList} iconColor={B.muted} iconBg={B.mid}
         title="Réservations" sub="Gérer toutes les réservations"
         onClick={onReservations} dark
       />
 
-      {/* Demain card */}
+      {/* Demain */}
       <div style={{
         background: B.surface,
-        border: `1px solid ${B.border}`,
-        borderRadius: 10,
-        padding: '14px 16px',
-        display: 'flex', alignItems: 'center', gap: 12,
+        border: `1.5px solid ${B.border}`,
+        borderRadius: 11,
+        padding: '15px 16px',
+        display: 'flex', alignItems: 'center', gap: 13,
         boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
         marginTop: 'auto',
       }}>
         <div style={{
-          width: 36, height: 36, borderRadius: 8,
-          background: '#EEF2FF',
+          width: 38, height: 38, borderRadius: 9,
+          background: B.indigoBg,
           display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
         }}>
-          <Sunrise size={16} color="#4F46E5" strokeWidth={1.9} />
+          <Sunrise size={16} color={B.indigo} strokeWidth={2} />
         </div>
         <div style={{ flex: 1 }}>
-          <p style={{ margin: 0, fontSize: 13, fontWeight: 600, color: B.text }}>Demain</p>
-          <p style={{ margin: '1px 0 0', fontSize: 11, color: B.textMute }}>Réservations prévues</p>
+          <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: B.text }}>Demain</p>
+          <p style={{ margin: '2px 0 0', fontSize: 11, fontWeight: 500, color: B.textMute }}>Réservations prévues</p>
         </div>
         <div style={{
-          background: '#EEF2FF', border: '1px solid #C7D2FE',
-          borderRadius: 8, padding: '4px 10px',
+          background: B.tint,
+          border: `1.5px solid ${B.tintBdr}`,
+          borderRadius: 9, padding: '5px 12px',
         }}>
-          <span style={{ fontSize: 18, fontWeight: 700, color: '#4F46E5', fontVariantNumeric: 'tabular-nums' }}>
+          <span style={{
+            fontSize: 22, fontWeight: 800, color: B.warm,
+            fontVariantNumeric: 'tabular-nums', letterSpacing: '-0.5px',
+          }}>
             {tomorrow}
           </span>
         </div>
