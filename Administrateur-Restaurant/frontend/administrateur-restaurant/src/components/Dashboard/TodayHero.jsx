@@ -1,91 +1,141 @@
-import { useState, useEffect } from 'react'
-import { CheckCircle2, Clock, XCircle, ChevronRight } from 'lucide-react'
-import { B } from '../../utils/brand'
-import Card from './Card'
-import useCountUp from '../../hooks/Dashboard/useCountUp'
+import { useState, useEffect } from "react"
+import { CheckCircle2, Clock, XCircle, ChevronRight } from "lucide-react"
+import Card from "./Card"
+import useCountUp from "../../hooks/Dashboard/useCountUp"
 
 export default function TodayHero({ value, confirmed, pending, cancelled, onClick }) {
-  const n  = useCountUp(value,     800, 150)
+
+  const n  = useCountUp(value, 800, 150)
   const c  = useCountUp(confirmed, 700, 320)
-  const p  = useCountUp(pending,   700, 400)
+  const p  = useCountUp(pending, 700, 400)
   const ca = useCountUp(cancelled, 700, 480)
 
   const rate = value > 0 ? Math.round((confirmed / value) * 100) : 0
   const [bar, setBar] = useState(0)
+
   useEffect(() => {
-    const t = setTimeout(() => setBar(rate), 950)
+    const t = setTimeout(() => setBar(rate), 900)
     return () => clearTimeout(t)
   }, [rate])
 
   return (
     <Card onClick={onClick}>
-      {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <span style={{ position: 'relative', display: 'inline-flex', width: 10, height: 10 }}>
-            <span style={{ position: 'absolute', inset: 0, borderRadius: '50%', background: '#10b981', opacity: 0.5, animation: 'pulse-ring 1.4s ease infinite' }} />
-            <span style={{ position: 'relative', width: 10, height: 10, borderRadius: '50%', background: '#10b981', display: 'block' }} />
+
+      {/* header */}
+      <div className="flex items-center justify-between mb-6">
+
+        <div className="flex items-center gap-2">
+          <span className="relative flex h-2.5 w-2.5">
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75"></span>
+            <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-emerald-500"></span>
           </span>
-          <span style={{ fontSize: 11, fontWeight: 700, color: '#6b7280', letterSpacing: '0.12em', textTransform: 'uppercase' }}>
+
+          <span className="text-[11px] font-bold tracking-widest uppercase text-gray-500">
             En direct · Aujourd'hui
           </span>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 12, fontWeight: 600, color: B.mid, cursor: 'pointer' }}>
-          Voir tout <ChevronRight size={14} color={B.mid} />
+
+        <div className="flex items-center gap-1 text-sm font-semibold text-gray-500 hover:text-gray-900 transition">
+          Voir tout
+          <ChevronRight size={16}/>
         </div>
+
       </div>
 
-      {/* Big number */}
-      <div style={{ display: 'flex', alignItems: 'flex-end', gap: 16, marginBottom: 28 }}>
-        <span style={{ fontSize: 'clamp(72px, 10vw, 110px)', fontWeight: 900, color: B.dark, lineHeight: 1, fontVariantNumeric: 'tabular-nums', letterSpacing: '-2px' }}>
+      {/* big number */}
+      <div className="flex items-end gap-4 mb-8">
+
+        <span className="text-[88px] font-black leading-none text-gray-900 tracking-tight tabular-nums">
           {n}
         </span>
-        <div style={{ paddingBottom: 10 }}>
-          <p style={{ margin: 0, fontSize: 20, fontWeight: 800, color: '#111827' }}>réservations</p>
-          <p style={{ margin: '3px 0 0', fontSize: 13, color: '#9ca3af' }}>ce soir</p>
+
+        <div className="pb-2">
+          <p className="text-lg font-semibold text-gray-900">
+            réservations
+          </p>
+          <p className="text-sm text-gray-400">
+            ce soir
+          </p>
         </div>
+
       </div>
 
-      {/* 3 status boxes */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, marginBottom: 22 }}>
-        {[
-          { Icon: CheckCircle2, val: c,  label: 'Confirmées', iconColor: '#059669', bg: '#ECFDF5', border: '#A7F3D0' },
-          { Icon: Clock,        val: p,  label: 'En attente',  iconColor: '#D97706', bg: '#FFFBEB', border: '#FDE68A' },
-          { Icon: XCircle,      val: ca, label: 'Annulées',    iconColor: '#DC2626', bg: '#FEF2F2', border: '#FECACA' },
-        ].map(({ Icon, val, label, iconColor, bg, border }) => (
-          <div key={label} style={{ background: bg, border: `1.5px solid ${border}`, borderRadius: 14, padding: '16px 14px' }}>
-            <Icon size={18} color={iconColor} strokeWidth={2} />
-            <p style={{ margin: '10px 0 0', fontSize: 30, fontWeight: 900, color: '#111827', lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>{val}</p>
-            <p style={{ margin: '5px 0 0', fontSize: 12, fontWeight: 600, color: iconColor }}>{label}</p>
-          </div>
-        ))}
+      {/* status cards */}
+      <div className="grid grid-cols-3 gap-3 mb-6">
+
+        <StatusBox
+          icon={CheckCircle2}
+          value={c}
+          label="Confirmées"
+          color="emerald"
+        />
+
+        <StatusBox
+          icon={Clock}
+          value={p}
+          label="En attente"
+          color="amber"
+        />
+
+        <StatusBox
+          icon={XCircle}
+          value={ca}
+          label="Annulées"
+          color="red"
+        />
+
       </div>
 
-      {/* Progress bar */}
+      {/* progress */}
       <div>
-        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 7 }}>
-          <span style={{ fontSize: 12, color: '#9ca3af', fontWeight: 500 }}>Taux de confirmation</span>
-          <span style={{ fontSize: 12, fontWeight: 800, color: B.dark }}>{rate}%</span>
+
+        <div className="flex justify-between mb-2 text-sm">
+          <span className="text-gray-400">
+            Taux de confirmation
+          </span>
+
+          <span className="font-bold text-gray-900">
+            {rate}%
+          </span>
         </div>
-        <div style={{ height: 7, background: '#F3F4F6', borderRadius: 99, overflow: 'hidden' }}>
-          <div style={{
-            height: '100%', borderRadius: 99,
-            background: `linear-gradient(90deg, ${B.dark} 0%, ${B.warm} 100%)`,
-            width: `${bar}%`,
-            transition: 'width 1.1s cubic-bezier(0.34,1.4,0.64,1)',
-          }} />
+
+        <div className="h-2 rounded-full bg-gray-100 overflow-hidden">
+
+          <div
+            className="h-full bg-gradient-to-r from-amber-900 to-amber-500 transition-all duration-1000 ease-out"
+            style={{ width: `${bar}%` }}
+          />
+
         </div>
-        <div style={{ display: 'flex', gap: 16, marginTop: 10 }}>
-          {[['#10b981', 'Confirmées'], ['#f59e0b', 'En attente'], ['#ef4444', 'Annulées']].map(([col, lbl]) => (
-            <div key={lbl} style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-              <span style={{ width: 7, height: 7, borderRadius: '50%', background: col, flexShrink: 0 }} />
-              <span style={{ fontSize: 11, color: '#9ca3af' }}>{lbl}</span>
-            </div>
-          ))}
-        </div>
+
       </div>
 
-      <style>{`@keyframes pulse-ring { 0% { transform:scale(1); opacity:.5 } 70% { transform:scale(2.2); opacity:0 } 100% { transform:scale(2.2); opacity:0 } }`}</style>
     </Card>
+  )
+}
+
+
+function StatusBox({ icon: Icon, value, label, color }) {
+
+  const colors = {
+    emerald: "bg-emerald-50 border-emerald-200 text-emerald-700",
+    amber: "bg-amber-50 border-amber-200 text-amber-700",
+    red: "bg-red-50 border-red-200 text-red-700"
+  }
+
+  return (
+    <div className={`rounded-xl border p-4 ${colors[color]}`}>
+
+      <Icon size={18} className="mb-2"/>
+
+      <p className="text-2xl font-bold text-gray-900 tabular-nums">
+        {value}
+      </p>
+
+      <p className="text-xs font-semibold">
+        {label}
+      </p>
+
+    </div>
   )
 }
