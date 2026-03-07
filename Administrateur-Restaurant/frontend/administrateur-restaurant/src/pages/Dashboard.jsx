@@ -29,11 +29,26 @@ function LiveClock() {
   )
 }
 
-function Label({ text }) {
+function Label({ text, sub }) {
   return (
-    <p style={{ margin:'0 0 22px', fontSize:11, fontWeight:900, color:DARK, letterSpacing:'0.28em', textTransform:'uppercase' }}>
-      {text}
-    </p>
+    <div style={{ marginBottom: 32 }}>
+      <h2 style={{
+        margin: 0,
+        fontSize: 'clamp(28px,3.5vw,42px)',
+        fontWeight: 900,
+        color: DARK,
+        letterSpacing: '-1.2px',
+        lineHeight: 1,
+        fontFamily: "'Plus Jakarta Sans','DM Sans',system-ui",
+      }}>
+        {text}
+      </h2>
+      {sub && (
+        <p style={{ margin:'8px 0 0', fontSize:13, fontWeight:700, color:GOLD, letterSpacing:'-0.1px' }}>
+          {sub}
+        </p>
+      )}
+    </div>
   )
 }
 
@@ -63,7 +78,7 @@ function Stat({ value, label, gold=false, delay=0, icon:Icon }) {
       }}>
         {n}
       </p>
-      <p style={{ margin:'10px 0 0', fontSize:14, fontWeight:700, color:DARK }}>{label}</p>
+      <p style={{ margin:'12px 0 0', fontSize:16, fontWeight:800, color:DARK, letterSpacing:'-0.3px' }}>{label}</p>
     </div>
   )
 }
@@ -159,10 +174,10 @@ export default function Dashboard() {
         <FadeUp delay={0}>
           <div className="topbar">
             <div>
-              <h1 style={{ margin:0, fontSize:'clamp(26px,4vw,40px)', fontWeight:900, color:DARK, letterSpacing:'-1.5px', lineHeight:1 }}>
+              <h1 style={{ margin:0, fontSize:'clamp(30px,4.5vw,48px)', fontWeight:900, color:DARK, letterSpacing:'-2px', lineHeight:1 }}>
                 Tableau de bord
               </h1>
-              <p style={{ margin:'10px 0 0', fontSize:14, fontWeight:700, color:GOLD, textTransform:'capitalize' }}>
+              <p style={{ margin:'10px 0 0', fontSize:15, fontWeight:700, color:GOLD, textTransform:'capitalize' }}>
                 {today}&nbsp;·&nbsp;<LiveClock />
               </p>
             </div>
@@ -178,9 +193,9 @@ export default function Dashboard() {
         </FadeUp>
 
         <FadeUp delay={40}>
-          <Label text="Aujourd'hui — total" />
+          <Label text="Aujourd'hui" sub="Total des réservations du jour" />
           <HeroNum value={stats.today} />
-          <p style={{ margin:'18px 0 0', fontSize:15, fontWeight:700, color:DARK }}>
+          <p style={{ margin:'18px 0 0', fontSize:17, fontWeight:800, color:DARK, letterSpacing:'-0.3px' }}>
             réservations aujourd'hui&emsp;
             <Link onClick={() => navigate('/reservations')}>Voir tout</Link>
           </p>
@@ -189,7 +204,7 @@ export default function Dashboard() {
         <div className="hr" />
 
         <FadeUp delay={110}>
-          <Label text="Détail du jour" />
+          <Label text="Détail du jour" sub="Confirmées · En attente · Annulées" />
           <div className="three">
             <Stat icon={CheckCircle} value={stats.today_confirmed} label="Confirmées"  delay={110} />
             <Stat icon={Clock}       value={stats.today_pending}   label="En attente"  gold delay={145} />
@@ -200,7 +215,7 @@ export default function Dashboard() {
         <div className="hr" />
 
         <FadeUp delay={230}>
-          <Label text="À venir" />
+          <Label text="À venir" sub="Demain et total du mois" />
           <div className="two">
             <div>
               <Stat icon={CalendarDays} value={stats.tomorrow} label="Demain" gold delay={230} />
@@ -215,7 +230,7 @@ export default function Dashboard() {
         <div className="hr" />
 
         <FadeUp delay={310}>
-          <Label text="Ce mois — détail" />
+          <Label text="Ce mois" sub="Bilan mensuel des réservations" />
           <div className="three">
             <Stat icon={CheckCircle} value={stats.confirmed} label="Confirmées"  delay={310} />
             <Stat icon={Clock}       value={stats.pending}   label="En attente"  gold delay={340} />
