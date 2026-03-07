@@ -4,7 +4,6 @@ import useDashboard from '../hooks/Dashboard/useDashboard'
 import useRestaurantInfo from '../hooks/useRestaurantInfo'
 import Sidebar from './Sidebar'
 import { HamburgerIcon, CloseIcon } from '../data/sidebarItems'
-import { MdKeyboardArrowDown, MdLocationOn } from 'react-icons/md'
 
 const PAGE_TITLES = {
   '/dashboard':     'Dashboard',
@@ -14,115 +13,138 @@ const PAGE_TITLES = {
   '/reports':       'Rapports',
   '/settings':      'Paramètres',
 }
-  
+
 export default function Layout({ children }) {
-  const { handleLogout }  = useDashboard()
-  const { info }          = useRestaurantInfo()
+  const { handleLogout }              = useDashboard()
+  const { info }                      = useRestaurantInfo()
   const [sidebarOpen, setSidebarOpen] = useState(false)
-  const location = useLocation()
+  const location                      = useLocation()
   const pageTitle = PAGE_TITLES[location.pathname] || 'Dashboard'
 
-  const today = new Date().toLocaleDateString('fr-FR', {
-    weekday: 'short', month: 'short', day: 'numeric',
-  })
-
   return (
-    <div className="min-h-screen flex" style={{ backgroundColor: '#2b2118' }}>
+    <div style={{
+      minHeight: '100vh',
+      display: 'flex',
+      background: '#0E1117',
+      fontFamily: "'Plus Jakarta Sans','DM Sans',system-ui,sans-serif",
+    }}>
 
-      {/* Desktop sidebar */}
-      <aside className="hidden md:flex w-60 min-h-screen flex-col flex-shrink-0">
+      {/* ── Desktop sidebar ── */}
+      <aside style={{
+        display: 'none',
+        width: 240,
+        minHeight: '100vh',
+        flexShrink: 0,
+        flexDirection: 'column',
+      }}
+        className="md-sidebar"
+      >
         <Sidebar handleLogout={handleLogout} onNavClick={() => {}} />
       </aside>
 
-      {/* Mobile overlay */}
+      {/* ── Mobile overlay ── */}
       {sidebarOpen && (
-        <div className="fixed inset-0 bg-black/60 z-40 md:hidden" onClick={() => setSidebarOpen(false)} />
+        <div
+          onClick={() => setSidebarOpen(false)}
+          style={{
+            position: 'fixed', inset: 0,
+            background: 'rgba(0,0,0,0.65)',
+            zIndex: 40,
+          }}
+        />
       )}
 
-      {/* Mobile sidebar */}
-      <aside
-        className="fixed top-0 left-0 h-full w-60 flex flex-col z-50 md:hidden transition-transform duration-300"
-        style={{
-          backgroundColor: '#2b2118',
-          transform: sidebarOpen ? 'translateX(0)' : 'translateX(-100%)',
-        }}
-      >
-        <Sidebar handleLogout={handleLogout} onNavClick={() => setSidebarOpen(false)} />
+      {/* ── Mobile sidebar ── */}
+      <aside style={{
+        position: 'fixed',
+        top: 0, left: 0,
+        height: '100%',
+        width: 240,
+        zIndex: 50,
+        transform: sidebarOpen ? 'translateX(0)' : 'translateX(-100%)',
+        transition: 'transform 0.28s cubic-bezier(0.22,1,0.36,1)',
+        flexDirection: 'column',
+        display: 'flex',
+      }}>
+        <Sidebar
+          handleLogout={handleLogout}
+          onNavClick={() => setSidebarOpen(false)}
+        />
       </aside>
 
-      {/* Right side */}
-      <div className="flex-1 flex flex-col min-w-0">
+      {/* ── Main area ── */}
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
 
-{/* /*         {/* Header */}
-{/*         <header
-          className="flex items-center justify-between px-6 sm:px-8 py-4 flex-shrink-0"
-          style={{ backgroundColor: '#2b2118' }}
+        {/* ── Mobile top bar ── */}
+        <header style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '14px 20px',
+          background: '#0E1117',
+          borderBottom: '1px solid rgba(255,255,255,0.06)',
+          flexShrink: 0,
+        }}
+          className="mobile-header"
         >
-          {/* Left — page title */}
-          {/* <div className="flex items-center gap-3">
-            <button
-              className="md:hidden p-1.5 rounded-xl"
-              style={{ color: '#c8a97e' }}
-              onClick={() => setSidebarOpen(!sidebarOpen)}
-            >
-              {sidebarOpen ? <CloseIcon /> : <HamburgerIcon />}
-            </button>
-            <div>
-              <h2 className="text-base font-bold text-white">{pageTitle}</h2>
-              <p className="text-xs hidden sm:block capitalize" style={{ color: 'rgba(200,169,126,0.5)' }}>{today}</p>
-            </div>
-          </div> */}
-        {/* </div> */}
+          {/* Hamburger */}
+          <button
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+            style={{
+              width: 38, height: 38, borderRadius: 10,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              background: 'rgba(255,255,255,0.05)',
+              border: '1px solid rgba(255,255,255,0.08)',
+              color: 'rgba(196,154,74,0.9)',
+              cursor: 'pointer',
+            }}
+          >
+            {sidebarOpen ? <CloseIcon /> : <HamburgerIcon />}
+          </button>
 
-          {/* Right — restaurant info */}
-            {/* <div className="flex items-center gap-2.5"> */}
+          {/* Logo centered */}
+          <img
+            src="/images/tablebooking.png"
+            alt="TableBooking.ma"
+            style={{ height: 26, objectFit: 'contain' }}
+            onError={e => { e.target.style.display = 'none' }}
+          />
 
-              {/* Location pill — desktop only */}
-              {/* {info.location && (
-                <div
-                  className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold"
-                  style={{ backgroundColor: 'rgba(200,169,126,0.08)', color: 'rgba(200,169,126,0.7)' }}
-                >
-                  <MdLocationOn size={13} color="#c8a97e" />
-                  {info.location}
-                </div>
-              )} */}
+          {/* Page title right */}
+          <span style={{ fontSize: 13, fontWeight: 700, color: 'rgba(255,255,255,0.5)' }}>
+            {pageTitle}
+          </span>
+        </header>
 
-              {/* Divider */}
-              {/* <div className="w-px h-6" style={{ backgroundColor: 'rgba(255,255,255,0.08)' }} /> */}
-
-              {/* Restaurant avatar + name */}
-              {/* <button className="flex items-center gap-2.5 px-2 py-1.5 rounded-xl hover:bg-white/5 transition-colors">
-                <div
-                  className="w-8 h-8 rounded-xl overflow-hidden flex items-center justify-center flex-shrink-0"
-                  style={{ backgroundColor: 'rgba(200,169,126,0.15)' }}
-                >
-                  <img src="/images/tablebooking.png" alt="Logo" className="w-5 h-5 object-contain" />
-                </div>
-                <div className="hidden sm:block text-left">
-                  <p className="text-xs font-bold text-white leading-tight">{info.name || 'Dal Corso'}</p>
-                  <p className="text-xs leading-tight" style={{ color: 'rgba(200,169,126,0.6)' }}>
-                    {info.email || 'Restaurant'}
-                  </p>
-                </div>
-                <MdKeyboardArrowDown size={15} color="rgba(200,169,126,0.5)" />
-              </button> */}
-
-            {/* </div> */}
-        {/* </header> */}
-
-        {/* Content */}
-        <main
-          className="flex-1 overflow-y-auto"
-          style={{
-            backgroundColor: '#f5f0eb',
-            borderRadius: ' 8px 0 0 0',
-          }}
-        >
+        {/* ── Content ── */}
+        <main style={{
+          flex: 1,
+          overflowY: 'auto',
+          background: '#F0F2F5',
+          borderRadius: '12px 0 0 0',
+        }}>
           {children}
         </main>
 
       </div>
+
+      {/* ── Responsive CSS ── */}
+      <style>{`
+        @media (min-width: 768px) {
+          .md-sidebar {
+            display: flex !important;
+          }
+          .mobile-header {
+            display: none !important;
+          }
+        }
+        @media (max-width: 767px) {
+          .md-sidebar {
+            display: none !important;
+          }
+        }
+      `}</style>
+
     </div>
   )
 }
