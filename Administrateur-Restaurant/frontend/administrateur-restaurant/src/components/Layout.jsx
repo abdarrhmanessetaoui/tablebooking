@@ -1,146 +1,127 @@
-import { NavLink } from 'react-router-dom'
-import { navItems, LogoutIcon } from '../data/sidebarItems'
 import { useState } from 'react'
+import { useLocation } from 'react-router-dom'
+import useDashboard from '../hooks/Dashboard/useDashboard'
+import Sidebar from './Sidebar'
+import { HamburgerIcon, CloseIcon } from '../data/sidebarItems'
 
-export default function Sidebar({ handleLogout, onNavClick }) {
-  const [hov, setHov]       = useState(null)
-  const [hovOut, setHovOut] = useState(false)
+const PAGE_TITLES = {
+  '/dashboard':     'Dashboard',
+  '/reservations':  'Réservations',
+  '/blocked-dates': 'Dates bloquées',
+  '/calendar':      'Planning',
+  '/reports':       'Rapports',
+  '/settings':      'Paramètres',
+}
+
+const SW = 62
+
+export default function Layout({ children }) {
+  const { handleLogout }    = useDashboard()
+  const [open, setOpen]     = useState(false)
+  const location            = useLocation()
+  const pageTitle           = PAGE_TITLES[location.pathname] || 'Dashboard'
 
   return (
-    <div style={{
-      width: '100%',
-      height: '100%',
-      background: '#fff',
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      fontFamily: 'system-ui, sans-serif',
-    }}>
-
-      <nav style={{
-        flex: 1,
-        width: '100%',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        paddingTop: 12,
-        overflowY: 'auto',
-        overflowX: 'visible',
-      }}>
-        {navItems.map((item, i) => (
-          <div
-            key={item.to}
-            style={{ position: 'relative', width: '100%' }}
-            onMouseEnter={() => setHov(i)}
-            onMouseLeave={() => setHov(null)}
-          >
-            <NavLink
-              to={item.to}
-              onClick={onNavClick}
-              style={({ isActive }) => ({
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                width: '100%',
-                height: 52,
-                textDecoration: 'none',
-                position: 'relative',
-                color: isActive ? '#1C1F24' : hov === i ? '#1C1F24' : '#B0B7C3',
-                background: 'transparent',
-              })}
-            >
-              {({ isActive }) => (
-                <>
-                  {isActive && (
-                    <div style={{
-                      position: 'absolute',
-                      left: 0,
-                      top: '20%',
-                      bottom: '20%',
-                      width: 3,
-                      background: '#1C1F24',
-                    }} />
-                  )}
-                  <span style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontSize: 22,
-                    lineHeight: 1,
-                  }}>
-                    {item.icon}
-                  </span>
-                </>
-              )}
-            </NavLink>
-
-            {hov === i && (
-              <div style={{
-                position: 'absolute',
-                left: 'calc(100% + 8px)',
-                top: '50%',
-                transform: 'translateY(-50%)',
-                background: '#1C1F24',
-                borderRadius: 6,
-                padding: '5px 10px',
-                whiteSpace: 'nowrap',
-                pointerEvents: 'none',
-                zIndex: 9999,
-                animation: 'tfade .1s ease',
-              }}>
-                <span style={{ fontSize: 12, fontWeight: 600, color: '#fff' }}>
-                  {item.label}
-                </span>
-              </div>
-            )}
-          </div>
-        ))}
-      </nav>
-
-      {/* Divider */}
-      <div style={{ width: '50%', height: 1, background: '#F0F0F0', margin: '4px 0', flexShrink: 0 }} />
-
-      {/* Logout */}
-      <div
-        style={{ paddingBottom: 20, paddingTop: 4, position: 'relative', flexShrink: 0 }}
-        onMouseEnter={() => setHovOut(true)}
-        onMouseLeave={() => setHovOut(false)}
-      >
-        <button
-          onClick={handleLogout}
-          style={{
-            width: 52, height: 52,
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            background: 'transparent',
-            border: 'none',
-            color: hovOut ? '#EF4444' : '#B0B7C3',
-            cursor: 'pointer',
-            fontSize: 22,
-          }}
-        >
-          <LogoutIcon />
-        </button>
-
-        {hovOut && (
-          <div style={{
-            position: 'absolute',
-            left: 'calc(100% + 8px)',
-            top: '50%', transform: 'translateY(-50%)',
-            background: '#1C1F24', borderRadius: 6,
-            padding: '5px 10px', whiteSpace: 'nowrap',
-            pointerEvents: 'none', zIndex: 9999,
-          }}>
-            <span style={{ fontSize: 12, fontWeight: 600, color: '#F87171' }}>Déconnexion</span>
-          </div>
-        )}
-      </div>
-
+    <>
       <style>{`
-        @keyframes tfade {
-          from { opacity:0; transform:translateY(-50%) translateX(-4px); }
-          to   { opacity:1; transform:translateY(-50%) translateX(0); }
+        *, *::before, *::after { box-sizing: border-box; }
+        html, body { margin: 0; padding: 0; }
+        .l-root {
+          min-height: 100vh;
+          display: flex;
+          background: #F0F2F5;
+          font-family: 'Plus Jakarta Sans','DM Sans',system-ui,sans-serif;
+        }
+        .l-sidebar {
+          width: ${SW}px;
+          min-height: 100vh;
+          flex-shrink: 0;
+          position: sticky;
+          top: 0;
+          height: 100vh;
+          overflow: visible;
+          z-index: 20;
+          background: #fff;
+          border-right: 1px solid #EBEBEB;
+        }
+        .l-mobile-bar {
+          display: none;
+          align-items: center;
+          justify-content: space-between;
+          padding: 12px 18px;
+          background: #fff;
+          border-bottom: 1px solid #EBEBEB;
+          flex-shrink: 0;
+          position: sticky;
+          top: 0;
+          z-index: 30;
+        }
+        .l-main {
+          flex: 1;
+          min-width: 0;
+          display: flex;
+          flex-direction: column;
+          background: #F0F2F5;
+          min-height: 100vh;
+          overflow-x: hidden;
+        }
+        @media (max-width: 767px) {
+          .l-sidebar    { display: none !important; }
+          .l-mobile-bar { display: flex !important; }
         }
       `}</style>
-    </div>
+
+      <div className="l-root">
+
+        {/* Desktop sidebar */}
+        <aside className="l-sidebar">
+          <Sidebar handleLogout={handleLogout} onNavClick={() => {}} />
+        </aside>
+
+        {/* Mobile overlay */}
+        {open && (
+          <div
+            onClick={() => setOpen(false)}
+            style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.35)', zIndex: 40 }}
+          />
+        )}
+
+        {/* Mobile drawer */}
+        <aside style={{
+          position: 'fixed', top: 0, left: 0,
+          width: SW, height: '100%', zIndex: 50,
+          background: '#fff', borderRight: '1px solid #EBEBEB',
+          transform: open ? 'translateX(0)' : 'translateX(-100%)',
+          transition: 'transform 0.25s cubic-bezier(0.22,1,0.36,1)',
+        }}>
+          <Sidebar handleLogout={handleLogout} onNavClick={() => setOpen(false)} />
+        </aside>
+
+        {/* Right side */}
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+
+          {/* Mobile top bar */}
+          <header className="l-mobile-bar">
+            <button
+              onClick={() => setOpen(!open)}
+              style={{
+                width: 36, height: 36, borderRadius: 9,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                background: '#F4F5F7', border: '1px solid #E4E7ED',
+                color: '#6B7280', cursor: 'pointer',
+              }}
+            >
+              {open ? <CloseIcon /> : <HamburgerIcon />}
+            </button>
+            <span style={{ fontSize: 14, fontWeight: 700, color: '#111827' }}>{pageTitle}</span>
+            <div style={{ width: 36 }} />
+          </header>
+
+          {/* Page content */}
+          <main className="l-main">{children}</main>
+
+        </div>
+      </div>
+    </>
   )
 }
