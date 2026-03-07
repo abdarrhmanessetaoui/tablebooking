@@ -181,24 +181,6 @@ export default function Dashboard() {
           </div>
         </FadeUp>
 
-        {/* BOTTOM ROW */}
-        <FadeUp delay={240}>
-          <SectionHead label="Activité hebdomadaire & Navigation" />
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit,minmax(255px,1fr))',
-            gap: 12, alignItems: 'start',
-          }}>
-            <div style={{ gridColumn: 'span 2' }}>
-              <WeekChart todayCount={stats.today} />
-            </div>
-            <QuickNav
-              tomorrow={stats.tomorrow}
-              onCalendar={() => navigate('/calendar')}
-              onReservations={() => navigate('/reservations')}
-            />
-          </div>
-        </FadeUp>
 
       </div>
     </div>
