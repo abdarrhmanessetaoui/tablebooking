@@ -9,7 +9,7 @@ import FadeUp     from '../components/Dashboard/FadeUp'
 import Spinner    from '../components/Dashboard/Spinner'
 import TodayHero  from '../components/TodayHero'
 import StatCard   from '../components/ui/StatCard'
-import WeekChart  from '../components/WeekChart'
+import WeekChart  from '../components/Dashboard/WeekChart'
 import QuickNav   from '../components/Dashboard/QuickNav'
 
 export default function Dashboard() {
