@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { TrendingUp } from 'lucide-react'
 import { B } from '../utils/brand'
 import Card from './Card'
-import IBox from './IBox'
+import IBox from './Dashboard/IBox'
 
 export default function WeekChart({ todayCount }) {
   const targets = [35, 58, 42, 75, 50, 88, Math.min(Math.max((todayCount / 10) * 100, 12), 100)]
