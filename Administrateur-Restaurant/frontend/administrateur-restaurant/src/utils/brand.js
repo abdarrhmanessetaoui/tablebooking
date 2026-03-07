@@ -1,39 +1,49 @@
-// ── TableBooking.ma brand palette ──────────────────────────────────────────
-// Gold extracted from logo: #A07C38
-// Dark extracted from logo background: #0D0D0D
-
+// ── TableBooking.ma — Pro Admin Palette ────────────────────────────────────
 export const B = {
-  // Brand gold
-  dark:      '#0D0D0D',   // logo black
-  mid:       '#7A5C20',   // deep gold
-  warm:      '#A07C38',   // primary gold (logo color)
-  muted:     '#C4A05A',   // light gold
-  tint:      '#FAF5EB',   // warm cream tint
-  tintBdr:   '#E8D9B5',   // cream border
+  // Brand
+  gold:      '#9A6F2E',   // primary gold action
+  goldHov:   '#7A5520',   // gold hover/dark
+  goldLight: '#F5EDD8',   // gold tint bg
+  goldBdr:   '#D4B483',   // gold border
 
-  // Surfaces
-  bg:        '#F7F7F5',   // off-white, warm-tinted
-  surface:   '#FFFFFF',
-  border:    '#E4E0D8',   // warm gray border
-  borderHov: '#CFC9BC',   // hover border
+  // UI Base — pure white & strong contrast
+  bg:        '#F4F5F7',   // page bg (light cool gray)
+  surface:   '#FFFFFF',   // card surface
+  border:    '#E2E4E9',   // default border
+  borderHov: '#C5C8D0',   // hover border
+  divider:   '#ECEEF2',   // section divider
 
-  // Text — bold & high contrast
-  text:      '#0D0D0D',   // near-black, maximum legibility
-  textSub:   '#3D3730',   // dark warm gray
-  textMute:  '#8C8070',   // muted warm gray
+  // Text — maximum contrast
+  text:      '#0A0C10',   // near-black — headings
+  textSub:   '#2D3142',   // dark navy — body
+  textMute:  '#6B7280',   // gray — labels
+  textLight: '#9CA3AF',   // light — meta
 
-  // Status — kept vivid for clarity
-  green:     '#166534',
-  greenBg:   '#DCFCE7',
+  // Status — solid vivid
+  green:     '#15803D',
+  greenBg:   '#F0FDF4',
   greenBdr:  '#86EFAC',
-  amber:     '#92400E',
-  amberBg:   '#FEF3C7',
+  greenSolid:'#16A34A',
+
+  amber:     '#B45309',
+  amberBg:   '#FFFBEB',
   amberBdr:  '#FCD34D',
-  red:       '#991B1B',
-  redBg:     '#FEE2E2',
+  amberSolid:'#D97706',
+
+  red:       '#B91C1C',
+  redBg:     '#FFF1F1',
   redBdr:    '#FCA5A5',
-  blue:      '#1E40AF',
-  blueBg:    '#DBEAFE',
-  indigo:    '#3730A3',
-  indigoBg:  '#E0E7FF',
+  redSolid:  '#DC2626',
+
+  blue:      '#1D4ED8',
+  blueBg:    '#EFF6FF',
+  blueBdr:   '#93C5FD',
+
+  indigo:    '#4338CA',
+  indigoBg:  '#EEF2FF',
+  indigoBdr: '#A5B4FC',
+
+  // Dark card (sidebar nav)
+  dark:      '#111827',
+  darkHov:   '#1F2937',
 }
