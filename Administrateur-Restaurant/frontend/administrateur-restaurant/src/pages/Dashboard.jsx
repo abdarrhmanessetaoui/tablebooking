@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom'
 import { CalendarCheck, ClipboardList, Users, Download, MapPin, Mail } from 'lucide-react'
 
-import useDashboardStats from '../hooks/useDashboardStats'
+import useDashboardStats from '../hooks/Dashboard/useDashboardStats'
 import useRestaurantInfo from '../hooks/useRestaurantInfo'
 import { B }             from '../utils/brand'
 
