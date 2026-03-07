@@ -1,4 +1,4 @@
-import { B } from '../utils/brand'
+import { B } from '../../utils/brand'
 
 export default function Spinner() {
   return (
