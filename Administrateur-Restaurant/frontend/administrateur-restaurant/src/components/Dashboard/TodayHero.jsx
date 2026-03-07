@@ -18,10 +18,8 @@ function OccupancyRing({ rate, size = 120 }) {
     <div style={{ position: 'relative', width: size, height: size, flexShrink: 0 }}>
       <svg width={size} height={size} style={{ transform: 'rotate(-90deg)' }}>
         <circle cx={cx} cy={cy} r={r} fill="none" stroke="#EBEBEB" strokeWidth={9} />
-        <circle
-          cx={cx} cy={cy} r={r} fill="none"
-          stroke={B.brown} strokeWidth={9}
-          strokeLinecap="round"
+        <circle cx={cx} cy={cy} r={r} fill="none"
+          stroke={B.brown} strokeWidth={9} strokeLinecap="round"
           strokeDasharray={`${dash} ${circ}`}
           style={{ transition: 'stroke-dasharray 1.2s cubic-bezier(0.34,1.3,0.64,1)' }}
         />
@@ -41,6 +39,9 @@ function OccupancyRing({ rate, size = 120 }) {
 }
 
 export default function TodayHero({ value, confirmed, pending, cancelled, onClick }) {
+  const [hov, setHov] = useState(false)
+  const [btnHov, setBtnHov] = useState(false)
+
   const n  = useCountUp(value,     900, 80)
   const c  = useCountUp(confirmed, 750, 200)
   const p  = useCountUp(pending,   750, 300)
@@ -55,41 +56,57 @@ export default function TodayHero({ value, confirmed, pending, cancelled, onClic
 
   return (
     <div
-      onClick={onClick}
       style={{
-        background: B.surface,
+        background: hov ? '#FAFAFA' : B.surface,
         borderRadius: 18,
         overflow: 'hidden',
         cursor: 'pointer',
+        transition: 'background 0.2s ease',
       }}
+      onMouseEnter={() => setHov(true)}
+      onMouseLeave={() => setHov(false)}
+      onClick={onClick}
     >
       <div style={{ padding: '36px 40px 34px' }}>
 
         {/* Top row */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 36 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
-            <span style={{ width: 9, height: 9, borderRadius: '50%', background: B.brown, display: 'inline-block' }} />
+            <span style={{
+              width: 10, height: 10, borderRadius: '50%',
+              background: B.brown, display: 'inline-block',
+              boxShadow: `0 0 0 4px ${B.brownTint}`,
+            }} />
             <span style={{ fontSize: 12, fontWeight: 800, color: B.inkMute, letterSpacing: '0.12em', textTransform: 'uppercase' }}>
               En direct
             </span>
           </div>
 
-          {/* BIG CTA button */}
-          <button style={{
-            display: 'flex', alignItems: 'center', gap: 9,
-            background: B.brown, border: 'none',
-            borderRadius: 14, padding: '14px 24px',
-            fontSize: 15, fontWeight: 800, color: '#fff',
-            cursor: 'pointer', letterSpacing: '-0.2px',
-          }}>
-            Voir les réservations <ArrowUpRight size={16} strokeWidth={2.5} color="#fff" />
+          {/* CLEAR CTA button with hover */}
+          <button
+            onClick={onClick}
+            onMouseEnter={() => setBtnHov(true)}
+            onMouseLeave={() => setBtnHov(false)}
+            style={{
+              display: 'flex', alignItems: 'center', gap: 10,
+              background: btnHov ? B.brownDark : B.brown,
+              border: 'none', borderRadius: 14,
+              padding: '15px 26px',
+              fontSize: 15, fontWeight: 900, color: '#fff',
+              cursor: 'pointer', letterSpacing: '-0.2px',
+              transition: 'background 0.15s ease, transform 0.1s ease',
+              transform: btnHov ? 'translateY(-2px)' : 'none',
+            }}
+          >
+            Voir les réservations
+            <ArrowUpRight size={18} strokeWidth={2.5} color="#fff" />
           </button>
         </div>
 
         {/* Main content */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 52, flexWrap: 'wrap' }}>
 
-          {/* HUGE number */}
+          {/* HUGE number — clicking hint */}
           <div style={{ flex: '0 0 auto' }}>
             <span style={{
               fontSize: 'clamp(120px,15vw,180px)',
@@ -100,6 +117,7 @@ export default function TodayHero({ value, confirmed, pending, cancelled, onClic
               letterSpacing: '-8px',
               fontFamily: "'Plus Jakarta Sans', 'DM Sans', system-ui",
               display: 'block',
+              transition: 'color 0.15s',
             }}>
               {n}
             </span>
@@ -143,6 +161,24 @@ export default function TodayHero({ value, confirmed, pending, cancelled, onClic
             ))}
           </div>
         </div>
+      </div>
+
+      {/* Bottom click hint bar — makes it OBVIOUS it's clickable */}
+      <div style={{
+        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+        padding: '14px 40px',
+        background: hov ? B.brown : '#F5F5F5',
+        transition: 'background 0.2s ease',
+      }}>
+        <span style={{
+          fontSize: 13, fontWeight: 800,
+          color: hov ? '#fff' : B.inkMute,
+          letterSpacing: '0.04em',
+          transition: 'color 0.2s ease',
+        }}>
+          Appuyez pour gérer les réservations
+        </span>
+        <ArrowUpRight size={15} strokeWidth={2.5} color={hov ? '#fff' : B.inkMute} style={{ transition: 'color 0.2s' }} />
       </div>
     </div>
   )
