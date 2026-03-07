@@ -8,7 +8,7 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview"
-      "serve": "php artisan serve",
+    "serve": "php artisan serve",
   "start": "concurrently \"php artisan serve\" \"npm run dev\""
   },
   "dependencies": {
