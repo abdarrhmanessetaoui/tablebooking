@@ -1,46 +1,79 @@
+import { useState } from 'react'
+import { Search, X } from 'lucide-react'
+
+const DARK      = '#2b2118'
+const GOLD      = '#c8a97e'
+const GOLD_DARK = '#a8834e'
+
 export default function ReservationsFilters({ search, setSearch, filterStatus, setFilterStatus, filterDate, setFilterDate, clearFilters }) {
   const hasFilters = search || filterStatus !== 'all' || filterDate
 
-  return (
-    <div className="flex flex-col sm:flex-row gap-3 mb-3">
+  const inputStyle = {
+    background: '#fff',
+    border: '2px solid #e8e0d8',
+    borderRadius: 0,
+    padding: '11px 16px',
+    fontSize: 14, fontWeight: 600,
+    color: DARK, fontFamily: 'inherit',
+    outline: 'none', width: '100%', boxSizing: 'border-box',
+  }
 
-      <div className="relative flex-1">
-        <svg className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
-        </svg>
+  return (
+    <div style={{
+      display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 16,
+      fontFamily: "'Plus Jakarta Sans','DM Sans',system-ui,sans-serif",
+    }}>
+      <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800;900&display=swap" rel="stylesheet" />
+
+      {/* Search */}
+      <div style={{ position: 'relative', flex: '1 1 200px', minWidth: 180 }}>
+        <Search size={14} color="#bbb" strokeWidth={2.5} style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }} />
         <input
           type="text"
-          placeholder="Search by name or phone..."
+          placeholder="Rechercher…"
           value={search}
           onChange={e => setSearch(e.target.value)}
-          className="w-full border border-gray-300 rounded px-3 py-2 pl-9 text-sm text-gray-800 focus:outline-none focus:border-gray-400 bg-white"
+          style={{ ...inputStyle, paddingLeft: 38 }}
         />
       </div>
 
+      {/* Status */}
       <select
         value={filterStatus}
         onChange={e => setFilterStatus(e.target.value)}
-        className="border border-gray-300 rounded px-3 py-2 text-sm text-gray-800 focus:outline-none focus:border-gray-400 bg-white"
+        style={{ ...inputStyle, flex: '0 0 auto', width: 'auto', cursor: 'pointer', paddingRight: 32 }}
       >
-        <option value="all">All Statuses</option>
-        <option value="Pending">Pending</option>
-        <option value="Confirmed">Confirmed</option>
-        <option value="Cancelled">Cancelled</option>
+        <option value="all">Tous les statuts</option>
+        <option value="Pending">En attente</option>
+        <option value="Confirmed">Confirmées</option>
+        <option value="Cancelled">Annulées</option>
       </select>
 
+      {/* Date */}
       <input
         type="date"
         value={filterDate}
         onChange={e => setFilterDate(e.target.value)}
-        className="border border-gray-300 rounded px-3 py-2 text-sm text-gray-800 focus:outline-none focus:border-gray-400 bg-white"
+        style={{ ...inputStyle, flex: '0 0 auto', width: 'auto', cursor: 'pointer' }}
       />
 
+      {/* Clear */}
       {hasFilters && (
-        <button onClick={clearFilters} className="text-sm text-gray-500 px-3 py-2 rounded border border-gray-300 hover:bg-gray-50 whitespace-nowrap">
-          Clear
+        <button
+          onClick={clearFilters}
+          style={{
+            display: 'flex', alignItems: 'center', gap: 6,
+            padding: '11px 16px',
+            background: DARK, border: 'none',
+            fontSize: 13, fontWeight: 800, color: GOLD,
+            cursor: 'pointer', fontFamily: 'inherit',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          <X size={13} strokeWidth={2.5} />
+          Réinitialiser
         </button>
       )}
-
     </div>
   )
 }
