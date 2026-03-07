@@ -8,7 +8,7 @@ import { B }             from '../utils/brand'
 import FadeUp     from '../components/Dashboard/FadeUp'
 import Spinner    from '../components/Spinner'
 import TodayHero  from '../components/TodayHero'
-import StatCard   from '../components/StatCard'
+import StatCard   from '../components/ui/StatCard'
 import WeekChart  from '../components/WeekChart'
 import QuickNav   from '../components/QuickNav'
 

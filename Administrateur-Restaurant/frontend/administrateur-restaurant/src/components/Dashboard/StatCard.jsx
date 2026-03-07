@@ -1,8 +1,8 @@
 import { ChevronRight } from 'lucide-react'
-import Card from './Card'
-import FadeUp from './Dashboard/FadeUp'
-import IBox from './IBox'
-import useCountUp from '../hooks/useCountUp'
+import Card from '../Card'
+import FadeUp from '../Dashboard/FadeUp'
+import IBox from '../IBox'
+import useCountUp from '../../hooks/useCountUp'
 
 export default function StatCard({ icon, iconColor, iconBg, value, label, onClick, delay = 0 }) {
   const n = useCountUp(value, 700, delay + 200)
