@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useLocation } from 'react-router-dom'
-import useDashboard from '../hooks/useDashboard'
+import useDashboard from '../hooks/Dashboard/useDashboard'
 import useRestaurantInfo from '../hooks/useRestaurantInfo'
 import Sidebar from './Sidebar'
 import { HamburgerIcon, CloseIcon } from '../data/sidebarItems'
