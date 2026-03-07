@@ -116,7 +116,7 @@ export default function Layout({ children }) {
           className="flex-1 overflow-y-auto"
           style={{
             backgroundColor: '#f5f0eb',
-            borderRadius: '28px 0 0 0',
+           /*  borderRadius: '28px 0 0 0', */
           }}
         >
           {children}
