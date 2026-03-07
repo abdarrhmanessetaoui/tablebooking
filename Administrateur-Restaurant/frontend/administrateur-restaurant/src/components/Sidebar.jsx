@@ -1,7 +1,7 @@
 import { NavLink } from 'react-router-dom'
 import { navItems, LogoutIcon } from '../data/sidebarItems'
 import useRestaurantInfo from '../hooks/useRestaurantInfo'
-
+import useDashboard from '../hooks/Dashboard/useDashboard'
 export default function Sidebar({ handleLogout, onNavClick }) {
   const { info } = useRestaurantInfo()
 
