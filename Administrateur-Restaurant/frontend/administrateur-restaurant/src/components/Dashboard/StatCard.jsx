@@ -33,7 +33,7 @@ export default function StatCard({ icon: Icon, iconColor, iconBg, value, label, 
         <p style={{
           margin: 0,
           fontSize: 48, fontWeight: 900,
-          color: B.ink, lineHeight: 1,
+          color: B.black, lineHeight: 1,
           fontVariantNumeric: 'tabular-nums',
           letterSpacing: '-2px',
           fontFamily: "'Plus Jakarta Sans', 'DM Sans', system-ui",
@@ -41,11 +41,7 @@ export default function StatCard({ icon: Icon, iconColor, iconBg, value, label, 
           {n}
         </p>
 
-        <p style={{
-          margin: '9px 0 0',
-          fontSize: 13, fontWeight: 700,
-          color: B.inkSub,
-        }}>
+        <p style={{ margin: '9px 0 0', fontSize: 13, fontWeight: 700, color: B.inkSub }}>
           {label}
         </p>
 
@@ -53,11 +49,11 @@ export default function StatCard({ icon: Icon, iconColor, iconBg, value, label, 
           <div style={{
             display: 'flex', alignItems: 'center', gap: 4,
             marginTop: 10, padding: '4px 9px',
-            background: B.confirmedBg,
+            background: B.brownTint,
             borderRadius: 99, width: 'fit-content',
           }}>
-            <TrendingUp size={11} color={B.confirmed} strokeWidth={2.5} />
-            <span style={{ fontSize: 11, fontWeight: 700, color: B.confirmed }}>{trend}</span>
+            <TrendingUp size={11} color={B.brown} strokeWidth={2.5} />
+            <span style={{ fontSize: 11, fontWeight: 700, color: B.brown }}>{trend}</span>
           </div>
         )}
       </div>
