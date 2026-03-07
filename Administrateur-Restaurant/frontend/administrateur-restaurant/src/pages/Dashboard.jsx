@@ -86,28 +86,76 @@ function Stat({ value, label, gold=false, delay=0, icon:Icon }) {
 function Link({ children, onClick }) {
   const [hov, setHov] = useState(false)
   return (
-    <button onClick={onClick}
-      onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
-      style={{ display:'inline-flex', alignItems:'center', gap:7, background:'none', border:'none', padding:0, fontSize:14, fontWeight:800, color: hov ? GOLD_DARK : GOLD, cursor:'pointer', fontFamily:'inherit', transition:'color 0.13s' }}>
-      {children} <ArrowRight size={15} strokeWidth={2.5} />
+    <button
+      onClick={onClick}
+      onMouseEnter={() => setHov(true)}
+      onMouseLeave={() => setHov(false)}
+      style={{
+        display: 'inline-flex', alignItems: 'center', gap: 8,
+        background: 'none', border: 'none', padding: '4px 0',
+        fontSize: 14, fontWeight: 800,
+        color: hov ? GOLD_DARK : GOLD,
+        cursor: 'pointer', fontFamily: 'inherit',
+        transition: 'color 0.15s',
+        position: 'relative',
+      }}
+    >
+      {/* sliding underline */}
+      <span style={{
+        position: 'absolute', bottom: 0, left: 0,
+        height: 2, background: GOLD,
+        width: hov ? '100%' : '0%',
+        transition: 'width 0.22s cubic-bezier(0.22,1,0.36,1)',
+      }} />
+      {children}
+      {/* arrow slides right on hover */}
+      <span style={{
+        display: 'flex', alignItems: 'center',
+        transform: hov ? 'translateX(5px)' : 'translateX(0)',
+        transition: 'transform 0.2s cubic-bezier(0.22,1,0.36,1)',
+      }}>
+        <ArrowRight size={15} strokeWidth={2.5} />
+      </span>
     </button>
   )
 }
 
-function Btn({ children, onClick, primary, disabled, icon:Icon }) {
+function Btn({ children, onClick, primary, disabled, icon: Icon }) {
   const [hov, setHov] = useState(false)
   return (
-    <button onClick={onClick} disabled={disabled}
-      onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
+    <button
+      onClick={onClick}
+      disabled={disabled}
+      onMouseEnter={() => setHov(true)}
+      onMouseLeave={() => setHov(false)}
       style={{
-        display:'flex', alignItems:'center', gap:9, padding:'14px 26px',
+        display: 'flex', alignItems: 'center', gap: 9,
+        padding: '14px 26px',
         background: primary ? (hov ? GOLD_DARK : GOLD) : (hov ? GOLD : DARK),
-        border:'none', color: primary ? DARK : '#fff',
-        fontSize:14, fontWeight:800, cursor: disabled ? 'not-allowed' : 'pointer',
-        opacity: disabled ? 0.5 : 1, transition:'background 0.15s',
-        fontFamily:'inherit', letterSpacing:'-0.2px', whiteSpace:'nowrap',
+        border: 'none',
+        color: primary ? DARK : '#fff',
+        fontSize: 14, fontWeight: 800,
+        cursor: disabled ? 'not-allowed' : 'pointer',
+        opacity: disabled ? 0.5 : 1,
+        /* lift + shadow on hover */
+        transform: hov && !disabled ? 'translateY(-2px)' : 'translateY(0)',
+        boxShadow: hov && !disabled
+          ? primary
+            ? `0 8px 24px rgba(200,169,126,0.45)`
+            : `0 8px 24px rgba(43,33,24,0.35)`
+          : 'none',
+        transition: 'background 0.15s, transform 0.18s cubic-bezier(0.22,1,0.36,1), box-shadow 0.18s',
+        fontFamily: 'inherit', letterSpacing: '-0.2px', whiteSpace: 'nowrap',
+      }}
+    >
+      {/* icon spins slightly on hover for Refresh */}
+      <span style={{
+        display: 'flex', alignItems: 'center',
+        transform: hov && !disabled ? 'rotate(20deg)' : 'rotate(0deg)',
+        transition: 'transform 0.25s cubic-bezier(0.22,1,0.36,1)',
       }}>
-      {Icon && <Icon size={16} strokeWidth={2.2} />}
+        {Icon && <Icon size={16} strokeWidth={2.2} />}
+      </span>
       {children}
     </button>
   )
