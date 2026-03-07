@@ -5,7 +5,7 @@ import useDashboardStats from '../hooks/useDashboardStats'
 import useRestaurantInfo from '../hooks/useRestaurantInfo'
 import { B }             from '../utils/brand'
 
-import FadeUp     from '../components/FadeUp'
+import FadeUp     from '../components/Dashboard/FadeUp'
 import Spinner    from '../components/Spinner'
 import TodayHero  from '../components/TodayHero'
 import StatCard   from '../components/StatCard'
