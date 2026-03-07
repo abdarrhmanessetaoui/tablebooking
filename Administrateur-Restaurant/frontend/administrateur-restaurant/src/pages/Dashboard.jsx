@@ -2,8 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
   CalendarCheck, ClipboardList, Users,
-  Download, MapPin, RefreshCw,
-  UtensilsCrossed, Clock4, Flame,
+  Download, MapPin, RefreshCw, Clock4, Flame,
 } from 'lucide-react'
 
 import useDashboardStats from '../hooks/Dashboard/useDashboardStats'
@@ -24,16 +23,16 @@ function ServiceBanner() {
     <div style={{
       display: 'flex', alignItems: 'center', gap: 9,
       padding: '10px 16px',
-      background: isDinner ? B.dark : B.goldTint,
+      background: isDinner ? B.black : B.brownTint,
       borderRadius: 12, marginBottom: 20,
     }}>
-      <Flame size={14} color={isDinner ? '#E5C97A' : B.gold} strokeWidth={2.5} />
-      <span style={{ fontSize: 13, fontWeight: 700, color: isDinner ? '#fff' : B.gold }}>
+      <Flame size={14} color={isDinner ? B.brownLight : B.brown} strokeWidth={2.5} />
+      <span style={{ fontSize: 13, fontWeight: 700, color: isDinner ? '#fff' : B.brown }}>
         {isDinner ? '🌙 Service du soir en cours' : '☀️ Service du midi en cours'}
       </span>
       <span style={{
         marginLeft: 'auto', fontSize: 11, fontWeight: 700,
-        color: isDinner ? B.darkMuted : B.gold,
+        color: isDinner ? B.darkMuted : B.brown,
         display: 'flex', alignItems: 'center', gap: 5,
       }}>
         <Clock4 size={12} strokeWidth={2} />
@@ -64,7 +63,7 @@ function Btn({ children, onClick, primary = false }) {
       style={{
         display: 'flex', alignItems: 'center', gap: 7,
         padding: '8px 16px',
-        background: primary ? B.gold : B.pageBg,
+        background: primary ? B.brown : B.pageBg,
         border: 'none',
         borderRadius: 10,
         fontSize: 12, fontWeight: 700,
@@ -109,10 +108,13 @@ export default function Dashboard() {
             borderRadius: 16, padding: '13px 22px',
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 13 }}>
-
               <div>
-                <h1 style={{ margin: 0, fontSize: 20, fontWeight: 900, color: B.ink, letterSpacing: '-0.5px' }}>Dashboard</h1>
-                <p style={{ margin: '2px 0 0', fontSize: 12, fontWeight: 600, color: B.inkMute, textTransform: 'capitalize' }}>{today}</p>
+                <h1 style={{ margin: 0, fontSize: 20, fontWeight: 900, color: B.black, letterSpacing: '-0.5px' }}>
+                  Aujourd'hui
+                </h1>
+                <p style={{ margin: '2px 0 0', fontSize: 12, fontWeight: 600, color: B.inkMute, textTransform: 'capitalize' }}>
+                  {today}
+                </p>
               </div>
             </div>
 
@@ -141,7 +143,7 @@ export default function Dashboard() {
             padding: '12px 16px',
             background: B.cancelledBg,
             borderRadius: 12, fontSize: 13, fontWeight: 700,
-            color: B.cancelled, marginBottom: 22,
+            color: B.blackSoft, marginBottom: 22,
           }}>
             ⚠️ {error}
           </div>
@@ -150,7 +152,7 @@ export default function Dashboard() {
         {/* HERO */}
         <FadeUp delay={80}>
           <div style={{ marginBottom: 26 }}>
-            <SectionHead label="Aujourd'hui en temps réel" />
+            <SectionHead label="Réservations en temps réel" />
             <TodayHero
               value={stats.today}
               confirmed={stats.today_confirmed}
@@ -166,13 +168,12 @@ export default function Dashboard() {
           <div style={{ marginBottom: 26 }}>
             <SectionHead label="Vue d'ensemble" />
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(192px,1fr))', gap: 12 }}>
-              <StatCard icon={CalendarCheck} iconColor={B.indigo} iconBg={B.indigoBg} value={stats.tomorrow} label="Réservations demain" trend="+8 vs hier" onClick={() => navigate('/calendar')} delay={0} />
-              <StatCard icon={ClipboardList} iconColor={B.blue} iconBg={B.blueBg} value={stats.total} label="Total réservations" trend="ce mois" delay={80} />
-              <StatCard icon={Users} iconColor={B.confirmed} iconBg={B.confirmedBg} value={stats.today_confirmed} label="Confirmées aujourd'hui" delay={160} />
+              <StatCard icon={CalendarCheck} iconColor={B.brown} iconBg={B.brownTint} value={stats.tomorrow} label="Réservations demain" trend="+8 vs hier" onClick={() => navigate('/calendar')} delay={0} />
+              <StatCard icon={ClipboardList} iconColor={B.black} iconBg="#F0F0F0" value={stats.total} label="Total réservations" trend="ce mois" delay={80} />
+              <StatCard icon={Users} iconColor={B.black} iconBg="#F0F0F0" value={stats.today_confirmed} label="Confirmées aujourd'hui" delay={160} />
             </div>
           </div>
         </FadeUp>
-
 
       </div>
     </div>
