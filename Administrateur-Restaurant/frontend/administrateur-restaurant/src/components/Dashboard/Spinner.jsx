@@ -5,16 +5,18 @@ export default function Spinner() {
     <div style={{
       display: 'flex', flexDirection: 'column',
       alignItems: 'center', justifyContent: 'center',
-      height: '100vh', background: B.pageBg, gap: 14,
+      height: '100vh', background: B.pageBg, gap: 16,
     }}>
       <div style={{
-        width: 34, height: 34,
-        border: `3px solid #F0F0F0`,
-        borderTop: `3px solid ${B.gold}`,
+        width: 36, height: 36,
+        border: `3px solid #EBEBEB`,
+        borderTop: `3px solid ${B.brown}`,
         borderRadius: '50%',
-        animation: 'sp 0.7s linear infinite',
+        animation: 'sp 0.75s linear infinite',
       }} />
-      <p style={{ margin: 0, fontSize: 13, fontWeight: 600, color: B.inkMute }}>Chargement...</p>
+      <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: B.inkMute }}>
+        Chargement...
+      </p>
       <style>{`@keyframes sp { to { transform: rotate(360deg) } }`}</style>
     </div>
   )
