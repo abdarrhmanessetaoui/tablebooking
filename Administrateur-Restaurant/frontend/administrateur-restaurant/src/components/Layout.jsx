@@ -13,7 +13,7 @@ const PAGE_TITLES = {
   '/settings':      'Paramètres',
 }
 
-const SW = 62
+const SW = 210
 
 export default function Layout({ children }) {
   const { handleLogout }    = useDashboard()
@@ -31,7 +31,6 @@ export default function Layout({ children }) {
           display: flex;
           font-family: 'Plus Jakarta Sans','DM Sans',system-ui,sans-serif;
         }
-        /* Sidebar: white, ONE hairline right border, zero shadow */
         .l-aside {
           width: ${SW}px;
           min-height: 100vh;
@@ -39,7 +38,6 @@ export default function Layout({ children }) {
           position: sticky;
           top: 0;
           height: 100vh;
-          overflow: visible;
           z-index: 20;
           background: #fff;
           border-right: 1px solid #EBEBEB;
@@ -98,7 +96,7 @@ export default function Layout({ children }) {
             <button
               onClick={() => setOpen(!open)}
               style={{
-                width:36, height:36,
+                width:36, height:36, borderRadius:8,
                 display:'flex', alignItems:'center', justifyContent:'center',
                 background:'transparent', border:'none',
                 color:'#374151', cursor:'pointer', fontSize:20,
