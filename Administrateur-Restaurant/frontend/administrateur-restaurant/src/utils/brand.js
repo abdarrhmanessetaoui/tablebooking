@@ -1,49 +1,56 @@
-// ── TableBooking.ma — Pro Admin Palette ────────────────────────────────────
+// ── TableBooking.ma — Luxury Restaurant Admin ──────────────────────────────
 export const B = {
-  // Brand
-  gold:      '#9A6F2E',   // primary gold action
-  goldHov:   '#7A5520',   // gold hover/dark
-  goldLight: '#F5EDD8',   // gold tint bg
-  goldBdr:   '#D4B483',   // gold border
+  // ── Brand Gold (from logo) ──
+  gold:       '#9A6F2E',
+  goldDark:   '#6B4C1A',
+  goldLight:  '#C49A4A',
+  goldTint:   '#FDF6E8',
+  goldBorder: '#E8D5A8',
 
-  // UI Base — pure white & strong contrast
-  bg:        '#F4F5F7',   // page bg (light cool gray)
-  surface:   '#FFFFFF',   // card surface
-  border:    '#E2E4E9',   // default border
-  borderHov: '#C5C8D0',   // hover border
-  divider:   '#ECEEF2',   // section divider
+  // ── UI Surfaces ──
+  pageBg:     '#F0F2F5',       // cool page background
+  surface:    '#FFFFFF',       // card surface
+  surfaceAlt: '#FAFAFA',       // secondary surface
+  overlay:    'rgba(10,12,18,0.04)',
 
-  // Text — maximum contrast
-  text:      '#0A0C10',   // near-black — headings
-  textSub:   '#2D3142',   // dark navy — body
-  textMute:  '#6B7280',   // gray — labels
-  textLight: '#9CA3AF',   // light — meta
+  // ── Borders ──
+  border:     '#E4E7ED',
+  borderMed:  '#CDD1DA',
+  borderDark: '#B0B7C3',
 
-  // Status — solid vivid
-  green:     '#15803D',
-  greenBg:   '#F0FDF4',
-  greenBdr:  '#86EFAC',
-  greenSolid:'#16A34A',
+  // ── Typography — strong contrast ──
+  ink:        '#090C14',       // near-black — headings
+  inkMed:     '#1E2435',       // body text
+  inkSub:     '#4B5368',       // supporting text
+  inkMute:    '#8891A5',       // muted / labels
+  inkLight:   '#B8BEC9',       // disabled / hints
 
-  amber:     '#B45309',
-  amberBg:   '#FFFBEB',
-  amberBdr:  '#FCD34D',
-  amberSolid:'#D97706',
+  // ── Status ──
+  confirmed:  '#0A6640',
+  confirmedBg:'#EAFAF1',
+  confirmedBd:'#6FCF97',
 
-  red:       '#B91C1C',
-  redBg:     '#FFF1F1',
-  redBdr:    '#FCA5A5',
-  redSolid:  '#DC2626',
+  pending:    '#975A00',
+  pendingBg:  '#FFF8EC',
+  pendingBd:  '#F6C96B',
 
-  blue:      '#1D4ED8',
-  blueBg:    '#EFF6FF',
-  blueBdr:   '#93C5FD',
+  cancelled:  '#C0182B',
+  cancelledBg:'#FFF0F0',
+  cancelledBd:'#F99',
 
-  indigo:    '#4338CA',
-  indigoBg:  '#EEF2FF',
-  indigoBdr: '#A5B4FC',
+  // ── Accents ──
+  blue:       '#1A56E8',
+  blueBg:     '#EBF2FF',
+  blueBd:     '#93BBF7',
 
-  // Dark card (sidebar nav)
-  dark:      '#111827',
-  darkHov:   '#1F2937',
+  indigo:     '#4338CA',
+  indigoBg:   '#EEEEFF',
+  indigoBd:   '#A5B4FC',
+
+  // ── Dark (sidebar / dark cards) ──
+  dark:       '#0E1117',
+  darkCard:   '#161B26',
+  darkBorder: '#2A3142',
+  darkMuted:  'rgba(255,255,255,0.38)',
+  darkSub:    'rgba(255,255,255,0.65)',
 }
