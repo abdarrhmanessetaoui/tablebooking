@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import { ArrowUpRight, TrendingUp } from 'lucide-react'
 import { B } from '../../utils/brand'
 import useCountUp from '../../hooks/Dashboard/useCountUp'
@@ -13,7 +12,6 @@ export default function StatCard({ icon: Icon, iconColor, iconBg, value, label, 
         onClick={onClick}
         style={{
           background: B.surface,
-          border: `1.5px solid ${B.border}`,
           borderRadius: 16,
           padding: '22px 24px',
           cursor: onClick ? 'pointer' : 'default',
@@ -21,7 +19,6 @@ export default function StatCard({ icon: Icon, iconColor, iconBg, value, label, 
           display: 'flex', flexDirection: 'column',
         }}
       >
-        {/* Icon row */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 18 }}>
           <div style={{
             width: 42, height: 42, borderRadius: 12,
@@ -30,12 +27,9 @@ export default function StatCard({ icon: Icon, iconColor, iconBg, value, label, 
           }}>
             <Icon size={20} color={iconColor} strokeWidth={2.2} />
           </div>
-          {onClick && (
-            <ArrowUpRight size={16} color={B.inkMute} strokeWidth={2} />
-          )}
+          {onClick && <ArrowUpRight size={16} color={B.inkMute} strokeWidth={2} />}
         </div>
 
-        {/* Number */}
         <p style={{
           margin: 0,
           fontSize: 48, fontWeight: 900,
@@ -47,16 +41,14 @@ export default function StatCard({ icon: Icon, iconColor, iconBg, value, label, 
           {n}
         </p>
 
-        {/* Label */}
         <p style={{
           margin: '9px 0 0',
           fontSize: 13, fontWeight: 700,
-          color: B.inkSub, lineHeight: 1.3,
+          color: B.inkSub,
         }}>
           {label}
         </p>
 
-        {/* Optional trend badge */}
         {trend && (
           <div style={{
             display: 'flex', alignItems: 'center', gap: 4,
