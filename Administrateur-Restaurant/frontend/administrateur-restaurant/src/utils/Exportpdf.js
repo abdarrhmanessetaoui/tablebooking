@@ -12,11 +12,13 @@ export function exportPDF(stats) {
   const { jsPDF } = window.jspdf
   const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' })
 
-  const W     = 210
-  const PAD   = 20
-  const COL   = W - PAD * 2   // 170mm usable
-  const colW3 = COL / 3
-  const colW2 = COL / 2
+  const W      = 210
+  const PAD    = 20
+  const COL    = W - PAD * 2   // 170mm usable
+  const colW3  = COL / 3
+  const colW2  = COL / 2
+  const PAGE_H = 297
+  const FOOTER_Y = PAGE_H - 16  // footer line position
 
   const today    = new Date().toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'long', year:'numeric' })
   const now      = new Date().toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit' })
@@ -27,134 +29,139 @@ export function exportPDF(stats) {
   const setWhite = () => doc.setTextColor(255,255,255)
   const fillDark = () => doc.setFillColor(...hexToRgb(DARK))
 
+  // Horizontal rule
   function hline(yPos) {
-    doc.setDrawColor(...hexToRgb(DARK))
-    doc.setLineWidth(0.7)
+    doc.setDrawColor(220, 210, 200)
+    doc.setLineWidth(0.4)
     doc.line(PAD, yPos, W - PAD, yPos)
   }
 
-  // Big dark title + gold subtitle — returns y after block
+  // Section title — returns y after the block
   function sectionTitle(title, sub, yPos) {
     doc.setFont('helvetica','bold')
-    doc.setFontSize(24)
+    doc.setFontSize(16)
     setDark()
     doc.text(title, PAD, yPos)
-    doc.setFont('helvetica','bold')
-    doc.setFontSize(10)
+    doc.setFont('helvetica','normal')
+    doc.setFontSize(8.5)
     setGold()
-    doc.text(sub, PAD, yPos + 7)
-    return yPos + 16
+    doc.text(sub, PAD, yPos + 6)
+    return yPos + 14   // tighter than before (was 16)
   }
 
-  // Stat number + label at given x
-  function statCell(value, label, x, yPos, gold) {
+  // Single stat: big number + label
+  function statCell(value, label, x, yNum, gold) {
     doc.setFont('helvetica','bold')
-    doc.setFontSize(32)
+    doc.setFontSize(28)
     gold ? setGold() : setDark()
-    doc.text(String(value), x, yPos)
-    doc.setFont('helvetica','bold')
-    doc.setFontSize(10)
+    doc.text(String(value), x, yNum)
+    doc.setFont('helvetica','normal')
+    doc.setFontSize(8.5)
     setDark()
-    doc.text(label, x, yPos + 7)
+    doc.text(label, x, yNum + 6.5)
   }
 
-  /* ────────── HEADER ────────── */
+  /* ── HEADER ────────────────────────────────────────────── */
   fillDark()
-  doc.rect(0, 0, W, 34, 'F')
+  doc.rect(0, 0, W, 30, 'F')
   doc.setFont('helvetica','bold')
-  doc.setFontSize(18)
+  doc.setFontSize(16)
   setGold()
-  doc.text('TableBooking', PAD, 21)
+  doc.text('TableBooking', PAD, 19)
   const tbW = doc.getTextWidth('TableBooking')
   setWhite()
-  doc.text('.ma', PAD + tbW, 21)
+  doc.text('.ma', PAD + tbW, 19)
   doc.setFont('helvetica','bold')
-  doc.setFontSize(7.5)
+  doc.setFontSize(7)
   setGold()
-  doc.text('TABLEAU DE BORD', W - PAD, 14, { align:'right' })
+  doc.text('TABLEAU DE BORD', W - PAD, 12, { align:'right' })
   doc.setFont('helvetica','normal')
-  doc.setFontSize(8)
+  doc.setFontSize(7.5)
   setWhite()
-  doc.text(`${today}  ·  ${now}`, W - PAD, 23, { align:'right' })
+  doc.text(`${today}  ·  ${now}`, W - PAD, 21, { align:'right' })
 
-  /* ────────── SECTION 1 — AUJOURD'HUI ────────── */
-  let y = 46
+  /* ── SECTION 1 — AUJOURD'HUI ───────────────────────────── */
+  let y = 40
   y = sectionTitle("Aujourd'hui", "Total des réservations du jour", y)
-  // hero
+
   doc.setFont('helvetica','bold')
-  doc.setFontSize(60)
+  doc.setFontSize(48)           // was 60 — slightly smaller to save space
   setDark()
-  doc.text(String(stats.today), PAD, y + 22)
+  doc.text(String(stats.today), PAD, y + 17)
   doc.setFont('helvetica','bold')
-  doc.setFontSize(10)
+  doc.setFontSize(9)
   setGold()
-  doc.text("réservations aujourd'hui", PAD, y + 31)
-  y += 38
+  doc.text("réservations aujourd'hui", PAD, y + 25)
+  y += 30                       // was 38
 
-  hline(y); y += 14
+  hline(y); y += 12             // was 14
 
-  /* ────────── SECTION 2 — DÉTAIL DU JOUR ────────── */
+  /* ── SECTION 2 — DÉTAIL DU JOUR ────────────────────────── */
   y = sectionTitle('Détail du jour', 'Confirmées · En attente · Annulées', y)
   ;[
     { v: stats.today_confirmed, l: 'Confirmées', g: false },
     { v: stats.today_pending,   l: 'En attente', g: true  },
     { v: stats.today_cancelled, l: 'Annulées',   g: false },
-  ].forEach((s,i) => statCell(s.v, s.l, PAD + i*colW3, y+14, s.g))
-  y += 28
+  ].forEach((s,i) => statCell(s.v, s.l, PAD + i * colW3, y + 12, s.g))
+  y += 24                       // was 28
 
-  hline(y); y += 14
+  hline(y); y += 12
 
-  /* ────────── SECTION 3 — À VENIR ────────── */
+  /* ── SECTION 3 — À VENIR ───────────────────────────────── */
   y = sectionTitle('À venir', 'Demain et total du mois', y)
   ;[
     { v: stats.tomorrow, l: 'Réservations demain', g: true  },
     { v: stats.total,    l: 'Total ce mois',       g: false },
-  ].forEach((s,i) => statCell(s.v, s.l, PAD + i*colW2, y+14, s.g))
-  y += 28
+  ].forEach((s,i) => statCell(s.v, s.l, PAD + i * colW2, y + 12, s.g))
+  y += 24
 
-  hline(y); y += 14
+  hline(y); y += 12
 
-  /* ────────── SECTION 4 — CE MOIS ────────── */
+  /* ── SECTION 4 — CE MOIS ───────────────────────────────── */
   y = sectionTitle('Ce mois', 'Bilan mensuel des réservations', y)
   ;[
     { v: stats.confirmed, l: 'Confirmées', g: false },
     { v: stats.pending,   l: 'En attente', g: true  },
     { v: stats.cancelled, l: 'Annulées',   g: false },
-  ].forEach((s,i) => statCell(s.v, s.l, PAD + i*colW3, y+14, s.g))
-  y += 30
+  ].forEach((s,i) => statCell(s.v, s.l, PAD + i * colW3, y + 12, s.g))
+  y += 24
 
-  /* ────────── SUMMARY BAR ────────── */
+  /* ── SUMMARY BAR ────────────────────────────────────────── */
+  // Always pin summary bar 28mm above footer so it never overlaps
+  const summaryY = Math.max(y + 8, FOOTER_Y - 28)
   const rate = stats.total > 0 ? Math.round(stats.confirmed / stats.total * 100) : 0
-  fillDark()
-  doc.rect(PAD, y, COL, 14, 'F')
-  doc.setFont('helvetica','bold')
-  doc.setFontSize(9)
-  // left
-  setGold()
-  doc.text('Total du mois :', PAD + 6, y + 9)
-  setWhite()
-  doc.text(` ${stats.total} réservations`, PAD + 6 + doc.getTextWidth('Total du mois :'), y + 9)
-  // right
-  const rateStr  = `Taux de confirmation :  ${rate}%`
-  const rateLbl  = 'Taux de confirmation :'
-  const rateVal  = `  ${rate}%`
-  const totalRW  = doc.getTextWidth(rateStr)
-  setGold()
-  doc.text(rateLbl, W - PAD - 6 - totalRW, y + 9)
-  setWhite()
-  doc.text(rateVal, W - PAD - 6 - doc.getTextWidth(rateVal), y + 9)
 
-  /* ────────── FOOTER ────────── */
-  const pageH = 297
-  doc.setDrawColor(...hexToRgb(GOLD))
-  doc.setLineWidth(0.5)
-  doc.line(PAD, pageH - 14, W - PAD, pageH - 14)
+  fillDark()
+  doc.rect(PAD, summaryY, COL, 13, 'F')
+
   doc.setFont('helvetica','bold')
-  doc.setFontSize(8)
+  doc.setFontSize(8.5)
   setGold()
-  doc.text('TableBooking.ma — Rapport automatique', PAD, pageH - 8)
+  doc.text('Total du mois :', PAD + 5, summaryY + 8.5)
+  setWhite()
+  const lblW = doc.getTextWidth('Total du mois :')
+  doc.text(` ${stats.total} réservations`, PAD + 5 + lblW, summaryY + 8.5)
+
+  const rateLabel = 'Taux de confirmation :'
+  const rateValue = `  ${rate}%`
+  const rateValW  = doc.getTextWidth(rateValue)
+  const rateLblW  = doc.getTextWidth(rateLabel)
+  setGold()
+  doc.text(rateLabel, W - PAD - 5 - rateValW - rateLblW, summaryY + 8.5)
+  setWhite()
+  doc.text(rateValue, W - PAD - 5 - rateValW, summaryY + 8.5)
+
+  /* ── FOOTER ─────────────────────────────────────────────── */
+  doc.setDrawColor(...hexToRgb(GOLD))
+  doc.setLineWidth(0.4)
+  doc.line(PAD, FOOTER_Y, W - PAD, FOOTER_Y)
+  doc.setFont('helvetica','bold')
+  doc.setFontSize(7.5)
+  setGold()
+  doc.text('TableBooking.ma — Rapport automatique', PAD, FOOTER_Y + 6)
+  doc.setFont('helvetica','normal')
   setDark()
-  doc.text(`Généré le ${today} à ${now}`, W - PAD, pageH - 8, { align:'right' })
+  doc.text(`Généré le ${today} à ${now}`, W - PAD, FOOTER_Y + 6, { align:'right' })
 
   doc.save(filename)
 }
