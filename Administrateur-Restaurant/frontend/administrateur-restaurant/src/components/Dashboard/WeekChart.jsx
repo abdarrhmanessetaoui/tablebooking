@@ -19,12 +19,10 @@ export default function WeekChart({ todayCount }) {
   return (
     <div style={{
       background: B.surface,
-      border: `1.5px solid ${B.border}`,
       borderRadius: 16,
       padding: '22px 24px 20px',
       height: '100%', boxSizing: 'border-box',
     }}>
-      {/* Header */}
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 22 }}>
         <div>
           <p style={{ margin: 0, fontSize: 16, fontWeight: 800, color: B.ink }}>Cette semaine</p>
@@ -42,7 +40,6 @@ export default function WeekChart({ todayCount }) {
         </div>
       </div>
 
-      {/* Chart area */}
       <div style={{ display: 'flex', gap: 9, alignItems: 'flex-end', height: 115 }}>
         {bars.map((val, i) => {
           const isToday = i === 6
@@ -53,11 +50,10 @@ export default function WeekChart({ todayCount }) {
           return (
             <div
               key={i}
-              style={{ flex: 1, height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-end', gap: 0, cursor: 'default', position: 'relative' }}
+              style={{ flex: 1, height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-end', position: 'relative', cursor: 'default' }}
               onMouseEnter={() => setHovI(i)}
               onMouseLeave={() => setHovI(null)}
             >
-              {/* Tooltip */}
               {isHov && (
                 <div style={{
                   position: 'absolute',
@@ -76,11 +72,7 @@ export default function WeekChart({ todayCount }) {
                 height: `${pct}%`,
                 minHeight: 5,
                 borderRadius: '6px 6px 3px 3px',
-                background: isToday
-                  ? B.gold
-                  : isHov
-                    ? '#D1D5DB'
-                    : '#F3F4F6',
+                background: isToday ? B.gold : isHov ? '#D1D5DB' : '#F0F0F0',
                 transition: `height 0.65s cubic-bezier(0.34,1.2,0.64,1) ${i * 52}ms, background 0.15s`,
               }} />
             </div>
@@ -88,7 +80,6 @@ export default function WeekChart({ todayCount }) {
         })}
       </div>
 
-      {/* Day labels */}
       <div style={{ display: 'flex', gap: 9, marginTop: 11 }}>
         {days.map((d, i) => (
           <div key={i} style={{ flex: 1, textAlign: 'center' }}>
