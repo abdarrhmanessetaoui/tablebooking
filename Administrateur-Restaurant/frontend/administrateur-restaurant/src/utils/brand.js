@@ -8,22 +8,20 @@ export const B = {
   goldBorder: '#E8D5A8',
 
   // ── UI Surfaces ──
-  pageBg:     '#F0F2F5',       // cool page background
-  surface:    '#FFFFFF',       // card surface
-  surfaceAlt: '#FAFAFA',       // secondary surface
-  overlay:    'rgba(10,12,18,0.04)',
+  pageBg:     '#F7F8FA',
+  surface:    '#FFFFFF',
+  surfaceAlt: '#FAFAFA',
 
   // ── Borders ──
-  border:     '#E4E7ED',
-  borderMed:  '#CDD1DA',
-  borderDark: '#B0B7C3',
+  border:     '#EAEAEA',
+  borderMed:  '#D8D8D8',
 
-  // ── Typography — strong contrast ──
-  ink:        '#090C14',       // near-black — headings
-  inkMed:     '#1E2435',       // body text
-  inkSub:     '#4B5368',       // supporting text
-  inkMute:    '#8891A5',       // muted / labels
-  inkLight:   '#B8BEC9',       // disabled / hints
+  // ── Typography ──
+  ink:        '#0A0A0A',
+  inkMed:     '#1E2435',
+  inkSub:     '#4B5368',
+  inkMute:    '#8891A5',
+  inkLight:   '#B8BEC9',
 
   // ── Status ──
   confirmed:  '#0A6640',
@@ -48,7 +46,7 @@ export const B = {
   indigoBd:   '#A5B4FC',
 
   // ── Dark (sidebar / dark cards) ──
-  dark:       '#0E1117',
+  dark:       '#0A0A0A',
   darkCard:   '#161B26',
   darkBorder: '#2A3142',
   darkMuted:  'rgba(255,255,255,0.38)',
