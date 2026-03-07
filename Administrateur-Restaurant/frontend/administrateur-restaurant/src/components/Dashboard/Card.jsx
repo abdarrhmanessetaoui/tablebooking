@@ -1,28 +1,41 @@
 import { useState } from 'react'
 import { B } from '../../utils/brand'
 
-export default function Card({ children, onClick, style = {}, padding = 20 }) {
-  const [hov, setHov] = useState(false)
+// Shared base card — use this everywhere, never repeat hover logic
+export default function Card({ children, onClick, style = {}, padding = '28px 30px' }) {
+  const [hov,     setHov]     = useState(false)
+  const [pressed, setPressed] = useState(false)
+  const clickable = !!onClick
+
   return (
     <div
       onClick={onClick}
-      onMouseEnter={() => onClick && setHov(true)}
-      onMouseLeave={() => setHov(false)}
+      onMouseEnter={() => clickable && setHov(true)}
+      onMouseLeave={() => { setHov(false); setPressed(false) }}
+      onMouseDown={() => clickable && setPressed(true)}
+      onMouseUp={() => setPressed(false)}
       style={{
         background: B.surface,
-        border: `1px solid ${hov ? B.borderHov : B.border}`,
-        borderRadius: 12,
+        borderRadius: 20,
+        overflow: 'hidden',
+        cursor: clickable ? 'pointer' : 'default',
+        userSelect: 'none',
+        transition: 'transform 0.13s ease',
+        transform: pressed ? 'scale(0.975)' : hov ? 'translateY(-3px)' : 'none',
         padding,
-        cursor: onClick ? 'pointer' : 'default',
-        transition: 'box-shadow 0.18s ease, border-color 0.18s ease, transform 0.18s ease',
-        boxShadow: hov && onClick
-          ? '0 4px 16px rgba(0,0,0,0.08)'
-          : '0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.03)',
-        transform: hov && onClick ? 'translateY(-1px)' : 'none',
         ...style,
       }}
     >
       {children}
     </div>
   )
+}
+
+// Export hover state helper for children that need to know
+export function useCardHover(onClick) {
+  const [hov, setHov] = useState(false)
+  return { hov, bind: {
+    onMouseEnter: () => onClick && setHov(true),
+    onMouseLeave: () => setHov(false),
+  }}
 }
