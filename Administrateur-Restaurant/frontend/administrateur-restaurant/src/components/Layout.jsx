@@ -54,7 +54,7 @@ export default function Layout({ children }) {
       <div className="flex-1 flex flex-col min-w-0">
 
 {/* /*         {/* Header */}
-        <header
+{/*         <header
           className="flex items-center justify-between px-6 sm:px-8 py-4 flex-shrink-0"
           style={{ backgroundColor: '#2b2118' }}
         >
@@ -71,7 +71,7 @@ export default function Layout({ children }) {
               <h2 className="text-base font-bold text-white">{pageTitle}</h2>
               <p className="text-xs hidden sm:block capitalize" style={{ color: 'rgba(200,169,126,0.5)' }}>{today}</p>
             </div>
-          </div>
+          </div> */}
 
           {/* Right — restaurant info */}
             {/* <div className="flex items-center gap-2.5"> */}
