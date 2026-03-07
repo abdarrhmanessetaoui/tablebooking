@@ -1,7 +1,7 @@
 import useReservations from '../hooks/useReservations'
 import ReservationsFilters from '../components/ReservationsFilters'
 import ReservationsTable from '../components/ReservationsTable'
-import ReservationModal from '../components/ReservationModal'
+import ReservationModal from '../components/Reservations/ReservationModal'
 
 export default function Reservations() {
   const {
