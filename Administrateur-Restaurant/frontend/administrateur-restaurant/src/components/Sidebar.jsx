@@ -3,15 +3,15 @@ import { navItems, LogoutIcon } from '../data/sidebarItems'
 import { useState } from 'react'
 
 export default function Sidebar({ handleLogout, onNavClick }) {
-  const [hov, setHov] = useState(null)
+  const [hov, setHov]     = useState(null)
   const [hovOut, setHovOut] = useState(false)
 
   return (
     <div style={{
       width: '100%',
       height: '100%',
-      background: '#111318',
-      borderRight: '1px solid rgba(255,255,255,0.07)',
+      background: '#FFFFFF',
+      borderRight: '1px solid #E4E7ED',
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
@@ -26,7 +26,7 @@ export default function Sidebar({ handleLogout, onNavClick }) {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        borderBottom: '1px solid rgba(255,255,255,0.07)',
+        borderBottom: '1px solid #F0F2F5',
         flexShrink: 0,
       }}>
         <img
@@ -38,13 +38,13 @@ export default function Sidebar({ handleLogout, onNavClick }) {
             e.target.nextSibling.style.display = 'flex'
           }}
         />
-        {/* fallback monogram */}
+        {/* Fallback monogram */}
         <div style={{
-          display: 'none', width: 36, height: 36,
+          display: 'none', width: 38, height: 38,
           borderRadius: 10, alignItems: 'center', justifyContent: 'center',
           background: 'linear-gradient(135deg,#9A6F2E,#C49A4A)',
         }}>
-          <span style={{ fontSize: 14, fontWeight: 900, color: '#fff' }}>TB</span>
+          <span style={{ fontSize: 13, fontWeight: 900, color: '#fff', letterSpacing: '-0.5px' }}>TB</span>
         </div>
       </div>
 
@@ -55,11 +55,10 @@ export default function Sidebar({ handleLogout, onNavClick }) {
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        padding: '12px 0',
+        padding: '14px 0',
         gap: 4,
         overflowY: 'auto',
         overflowX: 'visible',
-        position: 'relative',
       }}>
         {navItems.map((item, i) => (
           <div
@@ -76,30 +75,31 @@ export default function Sidebar({ handleLogout, onNavClick }) {
                 alignItems: 'center',
                 justifyContent: 'center',
                 width: 44, height: 44,
-                borderRadius: 13,
+                borderRadius: 12,
                 textDecoration: 'none',
                 transition: 'all 0.15s ease',
                 position: 'relative',
                 background: isActive
-                  ? 'rgba(196,154,74,0.16)'
+                  ? 'linear-gradient(135deg, rgba(154,111,46,0.12), rgba(196,154,74,0.08))'
                   : hov === i
-                    ? 'rgba(255,255,255,0.07)'
+                    ? '#F4F5F7'
                     : 'transparent',
                 border: isActive
-                  ? '1.5px solid rgba(196,154,74,0.3)'
+                  ? '1.5px solid rgba(196,154,74,0.35)'
                   : '1.5px solid transparent',
-                color: isActive ? '#C49A4A' : hov === i ? 'rgba(255,255,255,0.75)' : 'rgba(255,255,255,0.35)',
+                color: isActive ? '#9A6F2E' : hov === i ? '#2D3142' : '#9CA3AF',
               })}
             >
               {({ isActive }) => (
                 <>
+                  {/* Active left bar */}
                   {isActive && (
                     <div style={{
-                      position: 'absolute', left: -1,
-                      top: '18%', bottom: '18%',
+                      position: 'absolute',
+                      left: -1, top: '20%', bottom: '20%',
                       width: 3, borderRadius: '0 3px 3px 0',
                       background: 'linear-gradient(180deg,#C49A4A,#9A6F2E)',
-                      boxShadow: '0 0 10px rgba(196,154,74,0.6)',
+                      boxShadow: '0 0 8px rgba(196,154,74,0.5)',
                     }} />
                   )}
                   <span style={{
@@ -112,32 +112,31 @@ export default function Sidebar({ handleLogout, onNavClick }) {
               )}
             </NavLink>
 
-            {/* Floating tooltip */}
+            {/* Tooltip */}
             {hov === i && (
               <div style={{
                 position: 'absolute',
                 left: 'calc(100% + 10px)',
                 top: '50%', transform: 'translateY(-50%)',
-                background: '#1E2333',
-                border: '1px solid rgba(255,255,255,0.10)',
+                background: '#1C2333',
+                border: '1px solid rgba(255,255,255,0.08)',
                 borderRadius: 9,
-                padding: '7px 12px',
+                padding: '8px 13px',
                 whiteSpace: 'nowrap',
                 pointerEvents: 'none',
                 zIndex: 9999,
-                boxShadow: '0 8px 24px rgba(0,0,0,0.4)',
+                boxShadow: '0 8px 28px rgba(0,0,0,0.22)',
                 animation: 'tfade .12s ease',
               }}>
-                <span style={{ fontSize: 13, fontWeight: 700, color: 'rgba(255,255,255,0.9)' }}>
+                <span style={{ fontSize: 13, fontWeight: 700, color: '#fff' }}>
                   {item.label}
                 </span>
-                {/* arrow */}
                 <span style={{
                   position: 'absolute',
                   left: -4, top: '50%',
                   width: 7, height: 7,
-                  background: '#1E2333',
-                  border: '1px solid rgba(255,255,255,0.10)',
+                  background: '#1C2333',
+                  border: '1px solid rgba(255,255,255,0.08)',
                   borderRight: 'none', borderTop: 'none',
                   transform: 'translateY(-50%) rotate(45deg)',
                   display: 'block',
@@ -148,8 +147,8 @@ export default function Sidebar({ handleLogout, onNavClick }) {
         ))}
       </nav>
 
-      {/* ── DIVIDER ── */}
-      <div style={{ width: 28, height: 1, background: 'rgba(255,255,255,0.08)', flexShrink: 0 }} />
+      {/* ── Divider ── */}
+      <div style={{ width: 28, height: 1, background: '#E4E7ED', flexShrink: 0 }} />
 
       {/* ── LOGOUT ── */}
       <div
@@ -160,23 +159,24 @@ export default function Sidebar({ handleLogout, onNavClick }) {
         <button
           onClick={handleLogout}
           style={{
-            width: 44, height: 44, borderRadius: 13,
+            width: 44, height: 44, borderRadius: 12,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            background: hovOut ? 'rgba(248,113,113,0.12)' : 'transparent',
-            border: `1.5px solid ${hovOut ? 'rgba(248,113,113,0.28)' : 'transparent'}`,
-            color: hovOut ? '#F87171' : 'rgba(255,255,255,0.3)',
+            background: hovOut ? '#FFF1F1' : 'transparent',
+            border: `1.5px solid ${hovOut ? 'rgba(220,38,38,0.2)' : 'transparent'}`,
+            color: hovOut ? '#DC2626' : '#C4C9D4',
             cursor: 'pointer', transition: 'all 0.15s ease',
             fontSize: 20, lineHeight: 1,
           }}
         >
           <LogoutIcon />
         </button>
+
         {hovOut && (
           <div style={{
             position: 'absolute', left: 'calc(100% + 10px)', top: '50%', transform: 'translateY(-50%)',
-            background: '#1E2333', border: '1px solid rgba(248,113,113,0.2)',
-            borderRadius: 9, padding: '7px 12px', whiteSpace: 'nowrap',
-            pointerEvents: 'none', zIndex: 9999, boxShadow: '0 8px 24px rgba(0,0,0,0.4)',
+            background: '#1C2333', border: '1px solid rgba(220,38,38,0.2)',
+            borderRadius: 9, padding: '8px 13px', whiteSpace: 'nowrap',
+            pointerEvents: 'none', zIndex: 9999, boxShadow: '0 8px 28px rgba(0,0,0,0.22)',
           }}>
             <span style={{ fontSize: 13, fontWeight: 700, color: '#F87171' }}>Déconnexion</span>
           </div>
