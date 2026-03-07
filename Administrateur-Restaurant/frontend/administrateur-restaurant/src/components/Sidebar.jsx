@@ -10,30 +10,27 @@ export default function Sidebar({ handleLogout, onNavClick }) {
     <div style={{
       width: '100%',
       height: '100%',
-      background: '#FFFFFF',
+      background: '#fff',
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
-      fontFamily: "'Plus Jakarta Sans','DM Sans',system-ui,sans-serif",
-      overflowX: 'visible',
+      fontFamily: 'system-ui, sans-serif',
     }}>
 
-      {/* ── NAV ── */}
       <nav style={{
         flex: 1,
         width: '100%',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        padding: '18px 0',
-        gap: 2,
+        paddingTop: 12,
         overflowY: 'auto',
         overflowX: 'visible',
       }}>
         {navItems.map((item, i) => (
           <div
             key={item.to}
-            style={{ position: 'relative', width: '100%', display: 'flex', justifyContent: 'center' }}
+            style={{ position: 'relative', width: '100%' }}
             onMouseEnter={() => setHov(i)}
             onMouseLeave={() => setHov(null)}
           >
@@ -44,13 +41,12 @@ export default function Sidebar({ handleLogout, onNavClick }) {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                width: 42, height: 42,
-                borderRadius: 10,
+                width: '100%',
+                height: 52,
                 textDecoration: 'none',
-                transition: 'background 0.13s ease, color 0.13s ease',
                 position: 'relative',
-                background: isActive ? '#FDF6E8' : hov === i ? '#F4F5F7' : 'transparent',
-                color: isActive ? '#9A6F2E' : hov === i ? '#111827' : '#6B7280',
+                color: isActive ? '#1C1F24' : hov === i ? '#1C1F24' : '#B0B7C3',
+                background: 'transparent',
               })}
             >
               {({ isActive }) => (
@@ -58,9 +54,11 @@ export default function Sidebar({ handleLogout, onNavClick }) {
                   {isActive && (
                     <div style={{
                       position: 'absolute',
-                      left: 0, top: '18%', bottom: '18%',
-                      width: 3, borderRadius: '0 3px 3px 0',
-                      background: '#9A6F2E',
+                      left: 0,
+                      top: '20%',
+                      bottom: '20%',
+                      width: 3,
+                      background: '#1C1F24',
                     }} />
                   )}
                   <span style={{
@@ -69,7 +67,6 @@ export default function Sidebar({ handleLogout, onNavClick }) {
                     justifyContent: 'center',
                     fontSize: 22,
                     lineHeight: 1,
-                    color: 'inherit',
                   }}>
                     {item.icon}
                   </span>
@@ -77,22 +74,21 @@ export default function Sidebar({ handleLogout, onNavClick }) {
               )}
             </NavLink>
 
-            {/* Tooltip */}
             {hov === i && (
               <div style={{
                 position: 'absolute',
                 left: 'calc(100% + 8px)',
-                top: '50%', transform: 'translateY(-50%)',
-                background: '#111827',
-                borderRadius: 8,
-                padding: '6px 12px',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                background: '#1C1F24',
+                borderRadius: 6,
+                padding: '5px 10px',
                 whiteSpace: 'nowrap',
                 pointerEvents: 'none',
                 zIndex: 9999,
-                boxShadow: '0 4px 16px rgba(0,0,0,0.18)',
                 animation: 'tfade .1s ease',
               }}>
-                <span style={{ fontSize: 12, fontWeight: 700, color: '#fff' }}>
+                <span style={{ fontSize: 12, fontWeight: 600, color: '#fff' }}>
                   {item.label}
                 </span>
               </div>
@@ -101,26 +97,25 @@ export default function Sidebar({ handleLogout, onNavClick }) {
         ))}
       </nav>
 
-      {/* ── Divider ── */}
-      <div style={{ width: 24, height: 1, background: '#E4E7ED', flexShrink: 0, margin: '4px 0' }} />
+      {/* Divider */}
+      <div style={{ width: '50%', height: 1, background: '#F0F0F0', margin: '4px 0', flexShrink: 0 }} />
 
-      {/* ── LOGOUT ── */}
+      {/* Logout */}
       <div
-        style={{ padding: '6px 0 24px', width: '100%', display: 'flex', justifyContent: 'center', position: 'relative', flexShrink: 0 }}
+        style={{ paddingBottom: 20, paddingTop: 4, position: 'relative', flexShrink: 0 }}
         onMouseEnter={() => setHovOut(true)}
         onMouseLeave={() => setHovOut(false)}
       >
         <button
           onClick={handleLogout}
           style={{
-            width: 42, height: 42, borderRadius: 10,
+            width: 52, height: 52,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            background: hovOut ? '#FFF1F1' : 'transparent',
+            background: 'transparent',
             border: 'none',
-            color: hovOut ? '#DC2626' : '#9CA3AF',
+            color: hovOut ? '#EF4444' : '#B0B7C3',
             cursor: 'pointer',
-            transition: 'background 0.13s, color 0.13s',
-            fontSize: 22, lineHeight: 1,
+            fontSize: 22,
           }}
         >
           <LogoutIcon />
@@ -128,13 +123,14 @@ export default function Sidebar({ handleLogout, onNavClick }) {
 
         {hovOut && (
           <div style={{
-            position: 'absolute', left: 'calc(100% + 8px)', top: '50%', transform: 'translateY(-50%)',
-            background: '#111827', borderRadius: 8,
-            padding: '6px 12px', whiteSpace: 'nowrap',
+            position: 'absolute',
+            left: 'calc(100% + 8px)',
+            top: '50%', transform: 'translateY(-50%)',
+            background: '#1C1F24', borderRadius: 6,
+            padding: '5px 10px', whiteSpace: 'nowrap',
             pointerEvents: 'none', zIndex: 9999,
-            boxShadow: '0 4px 16px rgba(0,0,0,0.18)',
           }}>
-            <span style={{ fontSize: 12, fontWeight: 700, color: '#F87171' }}>Déconnexion</span>
+            <span style={{ fontSize: 12, fontWeight: 600, color: '#F87171' }}>Déconnexion</span>
           </div>
         )}
       </div>
