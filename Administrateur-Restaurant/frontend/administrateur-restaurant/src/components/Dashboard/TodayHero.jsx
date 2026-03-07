@@ -16,25 +16,6 @@ function PulseDot() {
   )
 }
 
-// Simple number count-up
-function useCountUp(target = 0, duration = 900, delay = 0) {
-  const [val, setVal] = useState(0)
-  useEffect(() => {
-    let start, raf
-    const t = setTimeout(() => {
-      const step = ts => {
-        if (!start) start = ts
-        const p = Math.min((ts - start) / duration, 1)
-        setVal(Math.round(p * target))
-        if (p < 1) raf = requestAnimationFrame(step)
-      }
-      raf = requestAnimationFrame(step)
-    }, delay)
-    return () => { clearTimeout(t); cancelAnimationFrame(raf) }
-  }, [target])
-  return val
-}
-
 export default function TodayHero({ value, onClick }) {
   const [hov, setHov] = useState(false)
   const n = useCountUp(value, 900, 80)
