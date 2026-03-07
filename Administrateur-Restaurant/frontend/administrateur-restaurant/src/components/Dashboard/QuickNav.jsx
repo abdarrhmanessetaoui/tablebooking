@@ -10,88 +10,110 @@ function NavRow({ icon: Icon, iconColor, iconBg, title, sub, onClick, dark = fal
       onMouseEnter={() => setHov(true)}
       onMouseLeave={() => setHov(false)}
       style={{
-        background: dark ? (hov ? B.mid : B.dark) : (hov ? B.tint : B.surface),
-        border: `1.5px solid ${dark ? 'transparent' : (hov ? B.tintBdr : B.border)}`,
-        borderRadius: 13,
-        padding: '17px 18px',
+        background: dark ? (hov ? B.darkHov : B.dark) : (hov ? B.goldLight : B.surface),
+        border: `1.5px solid ${dark ? 'transparent' : (hov ? B.goldBdr : B.border)}`,
+        borderRadius: 14,
+        padding: '17px 20px',
         display: 'flex', alignItems: 'center', gap: 14,
         cursor: 'pointer',
-        transition: 'all 0.16s ease',
+        transition: 'all 0.17s ease',
         boxShadow: dark
-          ? (hov ? `0 6px 20px ${B.dark}70` : `0 3px 10px ${B.dark}50`)
-          : (hov ? `0 4px 14px rgba(160,124,56,0.13)` : '0 1px 4px rgba(0,0,0,0.05)'),
+          ? (hov ? '0 6px 20px rgba(0,0,0,0.22)' : '0 3px 10px rgba(0,0,0,0.16)')
+          : (hov ? '0 4px 16px rgba(154,111,46,0.15)' : '0 1px 4px rgba(0,0,0,0.06)'),
       }}
     >
       <div style={{
-        width: 44, height: 44, borderRadius: 11,
-        background: dark ? 'rgba(255,255,255,0.1)' : iconBg,
+        width: 46, height: 46, borderRadius: 12,
+        background: dark ? 'rgba(255,255,255,0.08)' : iconBg,
+        border: dark ? '1.5px solid rgba(255,255,255,0.06)' : `1.5px solid ${B.border}`,
         display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-        border: dark ? '1px solid rgba(255,255,255,0.08)' : 'none',
       }}>
-        <Icon size={20} color={dark ? B.muted : iconColor} strokeWidth={2} />
+        <Icon size={21} color={dark ? '#E5C97A' : iconColor} strokeWidth={2} />
       </div>
+
       <div style={{ flex: 1, minWidth: 0 }}>
-        <p style={{ margin: 0, fontSize: 15, fontWeight: 800, color: dark ? '#fff' : B.text }}>
+        <p style={{
+          margin: 0, fontSize: 15, fontWeight: 800,
+          color: dark ? '#FFFFFF' : B.text,
+          letterSpacing: '-0.2px',
+        }}>
           {title}
         </p>
         <p style={{
           margin: '3px 0 0', fontSize: 12, fontWeight: 600,
-          color: dark ? 'rgba(255,255,255,0.45)' : B.textMute,
-          whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+          color: dark ? 'rgba(255,255,255,0.42)' : B.textMute,
         }}>
           {sub}
         </p>
       </div>
-      <ChevronRight size={18} color={dark ? 'rgba(255,255,255,0.4)' : (hov ? B.warm : B.textMute)} strokeWidth={2.5} />
+
+      <div style={{
+        width: 30, height: 30, borderRadius: 8,
+        background: dark ? 'rgba(255,255,255,0.07)' : (hov ? B.goldLight : B.bg),
+        border: dark ? '1px solid rgba(255,255,255,0.06)' : `1px solid ${hov ? B.goldBdr : B.border}`,
+        display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+        transition: 'all 0.15s',
+      }}>
+        <ChevronRight size={15}
+          color={dark ? 'rgba(255,255,255,0.4)' : (hov ? B.gold : B.textMute)}
+          strokeWidth={2.5}
+        />
+      </div>
     </div>
   )
 }
 
 export default function QuickNav({ tomorrow, onCalendar, onReservations }) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 11, height: '100%' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, height: '100%' }}>
 
       <NavRow
-        icon={CalendarDays} iconColor={B.warm} iconBg={B.tint}
+        icon={CalendarDays} iconColor={B.gold} iconBg={B.goldLight}
         title="Planning" sub="Voir le calendrier complet"
         onClick={onCalendar}
       />
 
       <NavRow
-        icon={ClipboardList} iconColor={B.muted} iconBg={B.mid}
+        icon={ClipboardList} iconColor="#E5C97A" iconBg="rgba(255,255,255,0.1)"
         title="Réservations" sub="Gérer toutes les réservations"
         onClick={onReservations} dark
       />
 
-      {/* Demain card */}
+      {/* Demain */}
       <div style={{
         background: B.surface,
         border: `1.5px solid ${B.border}`,
-        borderRadius: 13, padding: '17px 18px',
+        borderRadius: 14, padding: '17px 20px',
         display: 'flex', alignItems: 'center', gap: 14,
-        boxShadow: '0 1px 4px rgba(0,0,0,0.05)',
+        boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
         marginTop: 'auto',
       }}>
         <div style={{
-          width: 44, height: 44, borderRadius: 11,
-          background: B.indigoBg,
+          width: 46, height: 46, borderRadius: 12,
+          background: B.indigoBg, border: `1.5px solid ${B.indigoBdr}`,
           display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
         }}>
-          <Sunrise size={20} color={B.indigo} strokeWidth={2} />
+          <Sunrise size={21} color={B.indigo} strokeWidth={2} />
         </div>
         <div style={{ flex: 1 }}>
-          <p style={{ margin: 0, fontSize: 15, fontWeight: 800, color: B.text }}>Demain</p>
-          <p style={{ margin: '3px 0 0', fontSize: 12, fontWeight: 600, color: B.textMute }}>Réservations prévues</p>
+          <p style={{ margin:0, fontSize:15, fontWeight:800, color: B.text }}>Demain</p>
+          <p style={{ margin:'3px 0 0', fontSize:12, fontWeight:600, color: B.textMute }}>Réservations prévues</p>
         </div>
         <div style={{
-          background: B.tint, border: `1.5px solid ${B.tintBdr}`,
-          borderRadius: 10, padding: '6px 14px',
+          background: B.goldLight,
+          border: `1.5px solid ${B.goldBdr}`,
+          borderRadius: 11, padding: '6px 16px',
+          textAlign: 'center',
         }}>
           <span style={{
-            fontSize: 26, fontWeight: 900, color: B.warm,
-            fontVariantNumeric: 'tabular-nums', letterSpacing: '-0.5px',
+            fontSize: 28, fontWeight: 900, color: B.gold,
+            fontVariantNumeric: 'tabular-nums', letterSpacing: '-1px',
+            display: 'block', lineHeight: 1,
           }}>
             {tomorrow}
+          </span>
+          <span style={{ fontSize: 10, fontWeight: 700, color: B.goldBdr, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+            rés.
           </span>
         </div>
       </div>
