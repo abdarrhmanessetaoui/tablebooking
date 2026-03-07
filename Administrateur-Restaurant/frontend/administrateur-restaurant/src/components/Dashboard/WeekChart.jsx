@@ -1,60 +1,80 @@
 import { useState, useEffect } from 'react'
 import { TrendingUp } from 'lucide-react'
 import { B } from '../../utils/brand'
-import Card from './Card'
-import IBox from './IBox'
 
 export default function WeekChart({ todayCount }) {
-  const targets = [35, 58, 42, 75, 50, 88, Math.min(Math.max((todayCount / 10) * 100, 12), 100)]
+  const targets = [42, 61, 38, 78, 55, 90, Math.min(Math.max((todayCount / 10) * 100, 10), 100)]
+  const days    = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim']
   const [h, setH] = useState(targets.map(() => 0))
 
   useEffect(() => {
-    const t = setTimeout(() => setH(targets), 350)
+    const t = setTimeout(() => setH(targets), 300)
     return () => clearTimeout(t)
   }, [todayCount])
 
+  const maxVal = Math.max(...targets)
+
   return (
-    <Card style={{ height: '100%' }}>
-      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 24 }}>
+    <div style={{
+      background: B.surface,
+      border: `1px solid ${B.border}`,
+      borderRadius: 12,
+      padding: '20px 20px 16px',
+      height: '100%',
+      boxSizing: 'border-box',
+      boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+    }}>
+      {/* Header */}
+      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 20 }}>
         <div>
-          <p style={{ margin: 0, fontSize: 15, fontWeight: 900, color: '#111827' }}>Cette semaine</p>
-          <p style={{ margin: '3px 0 0', fontSize: 12, color: '#9CA3AF' }}>Aperçu des 7 derniers jours</p>
+          <p style={{ margin: 0, fontSize: 14, fontWeight: 600, color: B.text }}>Cette semaine</p>
+          <p style={{ margin: '2px 0 0', fontSize: 12, color: B.textMute }}>Aperçu des 7 derniers jours</p>
         </div>
-        <IBox icon={TrendingUp} color={B.mid} bg={B.tint} size={17} />
-      </div>
-
-      <div style={{ display: 'flex', gap: 12 }}>
-        {/* Y-axis labels */}
-        <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', paddingBottom: 28, paddingTop: 2 }}>
-          {['100', '50', '0'].map(l => (
-            <span key={l} style={{ fontSize: 10, color: '#D1D5DB', fontWeight: 600, lineHeight: 1 }}>{l}</span>
-          ))}
-        </div>
-
-        {/* Bars + day labels */}
-        <div style={{ flex: 1 }}>
-          <div style={{ display: 'flex', alignItems: 'flex-end', gap: 8, height: 90, marginBottom: 8 }}>
-            {h.map((val, i) => (
-              <div key={i} style={{ flex: 1, height: '100%', display: 'flex', alignItems: 'flex-end' }}>
-                <div style={{
-                  width: '100%', height: `${val}%`, minHeight: 4,
-                  borderRadius: '5px 5px 3px 3px',
-                  background: i === 6 ? `linear-gradient(180deg, ${B.warm} 0%, ${B.dark} 100%)` : '#EDE8E3',
-                  transition: `height 0.65s cubic-bezier(0.34,1.2,0.64,1) ${i * 50}ms`,
-                  boxShadow: i === 6 ? `0 4px 14px ${B.mid}55` : 'none',
-                }} />
-              </div>
-            ))}
-          </div>
-          <div style={{ display: 'flex', gap: 8 }}>
-            {['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'].map((d, i) => (
-              <div key={i} style={{ flex: 1, textAlign: 'center' }}>
-                <span style={{ fontSize: 11, fontWeight: 700, color: i === 6 ? B.dark : '#D1D5DB' }}>{d}</span>
-              </div>
-            ))}
-          </div>
+        <div style={{
+          display: 'flex', alignItems: 'center', gap: 5,
+          background: B.tint, border: `1px solid #FED7AA`,
+          borderRadius: 8, padding: '5px 10px',
+        }}>
+          <TrendingUp size={13} color={B.warm} strokeWidth={2} />
+          <span style={{ fontSize: 11, fontWeight: 600, color: B.warm }}>+12%</span>
         </div>
       </div>
-    </Card>
+
+      {/* Chart */}
+      <div style={{ display: 'flex', gap: 10, alignItems: 'flex-end', height: 88 }}>
+        {h.map((val, i) => {
+          const isToday = i === 6
+          const heightPct = maxVal > 0 ? (val / maxVal) * 100 : 0
+          return (
+            <div key={i} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, height: '100%', justifyContent: 'flex-end' }}>
+              <div style={{
+                width: '100%',
+                height: `${heightPct}%`,
+                minHeight: 4,
+                borderRadius: '4px 4px 3px 3px',
+                background: isToday
+                  ? `linear-gradient(180deg, ${B.muted} 0%, ${B.mid} 100%)`
+                  : B.bg,
+                border: `1px solid ${isToday ? 'transparent' : B.border}`,
+                transition: `height 0.6s cubic-bezier(0.34,1.2,0.64,1) ${i * 45}ms`,
+                boxShadow: isToday ? `0 3px 10px ${B.warm}40` : 'none',
+              }} />
+            </div>
+          )
+        })}
+      </div>
+
+      {/* Day labels */}
+      <div style={{ display: 'flex', gap: 10, marginTop: 8 }}>
+        {days.map((d, i) => (
+          <div key={i} style={{ flex: 1, textAlign: 'center' }}>
+            <span style={{
+              fontSize: 11, fontWeight: i === 6 ? 700 : 500,
+              color: i === 6 ? B.warm : B.textMute,
+            }}>{d}</span>
+          </div>
+        ))}
+      </div>
+    </div>
   )
 }
