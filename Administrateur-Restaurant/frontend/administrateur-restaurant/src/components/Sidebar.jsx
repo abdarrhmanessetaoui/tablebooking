@@ -53,27 +53,37 @@ export default function Sidebar({ handleLogout, onNavClick }) {
               padding: '13px 16px',
               textDecoration: 'none',
               position: 'relative',
-              transition: 'background 0.13s, color 0.13s',
+              transition: 'background 0.18s, color 0.18s',
               background: isActive
-                ? `rgba(200,169,126,0.15)`
+                ? `rgba(200,169,126,0.18)`
                 : hov === i
-                  ? `rgba(200,169,126,0.07)`
+                  ? `rgba(200,169,126,0.09)`
                   : 'transparent',
               color: isActive ? GOLD : hov === i ? '#fff' : 'rgba(255,255,255,0.45)',
+              transform: hov === i && !isActive ? 'translateX(4px)' : 'translateX(0)',
             })}
           >
             {({ isActive }) => (
               <>
-                {isActive && (
-                  <div style={{
-                    position:'absolute', left:0, top:'15%', bottom:'15%',
-                    width:3, background: GOLD,
-                  }} />
-                )}
-                <span style={{ display:'flex', alignItems:'center', flexShrink:0, color:'inherit' }}>
+                {/* active bar */}
+                <div style={{
+                  position:'absolute', left:0, top:'15%', bottom:'15%',
+                  width: 3, background: GOLD,
+                  transform: isActive ? 'scaleY(1)' : 'scaleY(0)',
+                  transition: 'transform 0.2s cubic-bezier(0.22,1,0.36,1)',
+                  transformOrigin: 'center',
+                }} />
+                {/* icon — scales up on hover */}
+                <span style={{
+                  display:'flex', alignItems:'center', flexShrink:0, color:'inherit',
+                  transform: hov === i ? 'scale(1.18)' : 'scale(1)',
+                  transition: 'transform 0.2s cubic-bezier(0.22,1,0.36,1)',
+                }}>
                   {item.icon}
                 </span>
-                <span style={{ fontSize:14, fontWeight: isActive ? 800 : 600, whiteSpace:'nowrap' }}>
+                <span style={{
+                  fontSize:14, fontWeight: isActive ? 800 : 600, whiteSpace:'nowrap',
+                }}>
                   {item.label}
                 </span>
               </>
@@ -91,14 +101,20 @@ export default function Sidebar({ handleLogout, onNavClick }) {
           style={{
             width:'100%', display:'flex', alignItems:'center', gap:13,
             padding:'13px 16px', marginTop:8,
-            background: hovOut ? 'rgba(200,169,126,0.07)' : 'transparent',
-            border:'none',
+            background: hovOut ? 'rgba(255,100,80,0.12)' : 'transparent',
+            border: 'none',
             color: hovOut ? '#ff8a80' : 'rgba(255,255,255,0.35)',
-            cursor:'pointer', transition:'all 0.13s',
+            cursor:'pointer',
+            transform: hovOut ? 'translateX(4px)' : 'translateX(0)',
+            transition: 'background 0.18s, color 0.18s, transform 0.2s cubic-bezier(0.22,1,0.36,1)',
             fontFamily:'inherit', fontSize:14, fontWeight:600, textAlign:'left',
           }}
         >
-          <span style={{ display:'flex', alignItems:'center', flexShrink:0, color:'inherit' }}>
+          <span style={{
+            display:'flex', alignItems:'center', flexShrink:0, color:'inherit',
+            transform: hovOut ? 'scale(1.18)' : 'scale(1)',
+            transition: 'transform 0.2s cubic-bezier(0.22,1,0.36,1)',
+          }}>
             <LogoutIcon />
           </span>
           Déconnexion
