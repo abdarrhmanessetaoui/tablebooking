@@ -65,25 +65,30 @@ export function exportPDF(stats) {
   /* ══════════════════════════════════════
      SECTION 1 — AUJOURD'HUI TOTAL
   ══════════════════════════════════════ */
-  // section label
+  // big title
   doc.setFont('helvetica', 'bold')
-  doc.setFontSize(7.5)
+  doc.setFontSize(28)
+  setDark()
+  doc.text("Aujourd'hui", PAD, y)
+  // gold subtitle
+  doc.setFont('helvetica', 'bold')
+  doc.setFontSize(11)
   setGold()
-  doc.text("AUJOURD'HUI — TOTAL", PAD, y)
-  y += 3
+  doc.text("Total des réservations du jour", PAD, y + 8)
+  y += 14
 
   // hero number
   doc.setFont('helvetica', 'bold')
   doc.setFontSize(64)
   setDark()
-  doc.text(String(stats.today), PAD, y + 28)
+  doc.text(String(stats.today), PAD, y + 26)
 
-  // sub label
+  // sub text
   doc.setFont('helvetica', 'bold')
   doc.setFontSize(10)
   setGold()
-  doc.text("réservations aujourd'hui", PAD, y + 36)
-  y += 44
+  doc.text("réservations aujourd'hui", PAD, y + 34)
+  y += 42
 
   hline(y, 0.8)
   y += 10
@@ -92,10 +97,14 @@ export function exportPDF(stats) {
      SECTION 2 — DÉTAIL DU JOUR
   ══════════════════════════════════════ */
   doc.setFont('helvetica', 'bold')
-  doc.setFontSize(7.5)
+  doc.setFontSize(28)
+  setDark()
+  doc.text('Détail du jour', PAD, y)
+  doc.setFont('helvetica', 'bold')
+  doc.setFontSize(11)
   setGold()
-  doc.text('DÉTAIL DU JOUR', PAD, y)
-  y += 5
+  doc.text('Confirmées · En attente · Annulées', PAD, y + 8)
+  y += 14
 
   const colW3 = COL / 3
   const day3 = [
@@ -112,7 +121,7 @@ export function exportPDF(stats) {
     doc.text(String(s.v), x, y + 16)
 
     doc.setFont('helvetica', 'bold')
-    doc.setFontSize(9)
+    doc.setFontSize(11)
     setDark()
     doc.text(s.l, x, y + 23)
   })
@@ -125,10 +134,14 @@ export function exportPDF(stats) {
      SECTION 3 — À VENIR
   ══════════════════════════════════════ */
   doc.setFont('helvetica', 'bold')
-  doc.setFontSize(7.5)
+  doc.setFontSize(28)
+  setDark()
+  doc.text('À venir', PAD, y)
+  doc.setFont('helvetica', 'bold')
+  doc.setFontSize(11)
   setGold()
-  doc.text('À VENIR', PAD, y)
-  y += 5
+  doc.text('Demain et total du mois', PAD, y + 8)
+  y += 14
 
   const colW2 = COL / 2
   const ahead2 = [
@@ -144,7 +157,7 @@ export function exportPDF(stats) {
     doc.text(String(s.v), x, y + 16)
 
     doc.setFont('helvetica', 'bold')
-    doc.setFontSize(9)
+    doc.setFontSize(11)
     setDark()
     doc.text(s.l, x, y + 23)
   })
@@ -157,10 +170,14 @@ export function exportPDF(stats) {
      SECTION 4 — CE MOIS DÉTAIL
   ══════════════════════════════════════ */
   doc.setFont('helvetica', 'bold')
-  doc.setFontSize(7.5)
+  doc.setFontSize(28)
+  setDark()
+  doc.text('Ce mois', PAD, y)
+  doc.setFont('helvetica', 'bold')
+  doc.setFontSize(11)
   setGold()
-  doc.text('CE MOIS — DÉTAIL', PAD, y)
-  y += 5
+  doc.text('Bilan mensuel des réservations', PAD, y + 8)
+  y += 14
 
   const month3 = [
     { v: stats.confirmed, l: 'Confirmées',  gold: false },
@@ -176,7 +193,7 @@ export function exportPDF(stats) {
     doc.text(String(s.v), x, y + 16)
 
     doc.setFont('helvetica', 'bold')
-    doc.setFontSize(9)
+    doc.setFontSize(11)
     setDark()
     doc.text(s.l, x, y + 23)
   })
