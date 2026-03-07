@@ -10,12 +10,13 @@ import useDashboardStats from '../hooks/Dashboard/useDashboardStats'
 import useRestaurantInfo from '../hooks/useRestaurantInfo'
 import { B } from '../utils/brand'
 
-import FadeUp      from '../components/Dashboard/FadeUp'
-import Spinner     from '../components/Dashboard/Spinner'
-import Card        from '../components/Dashboard/Card'
-import TodayHero   from '../components/Dashboard/TodayHero'
-import StatusChip  from '../components/Dashboard/StatusChip'
-import StatCard    from '../components/Dashboard/StatCard'
+import FadeUp    from '../components/Dashboard/FadeUp'
+import Spinner   from '../components/Dashboard/Spinner'
+import Card      from '../components/Dashboard/Card'
+import IBox      from '../components/Dashboard/IBox'
+import TodayHero from '../components/Dashboard/TodayHero'
+import StatCard  from '../components/Dashboard/StatCard'
+import useCountUp from '../hooks/Dashboard/useCountUp'
 
 /* ── Live clock ──────────────────────────────────────────────────────── */
 function LiveClock() {
@@ -72,6 +73,29 @@ function Label({ text }) {
   )
 }
 
+/* ── Status chip (inline — no extra file) ────────────────────────────── */
+function StatusChip({ icon, iconColor, iconBg, value, label, delay = 0 }) {
+  const n = useCountUp(value, 750, delay)
+  return (
+    <div style={{ background: iconBg, borderRadius: 16, padding: '20px 22px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
+        <IBox icon={icon} color={iconColor} bg="transparent" size={14} />
+        <span style={{ fontSize: 11, fontWeight: 900, color: iconColor, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+          {label}
+        </span>
+      </div>
+      <p style={{
+        margin: 0, fontSize: 48, fontWeight: 900,
+        color: B.black, lineHeight: 1,
+        fontVariantNumeric: 'tabular-nums', letterSpacing: '-2px',
+        fontFamily: "'Plus Jakarta Sans', 'DM Sans', system-ui",
+      }}>
+        {n}
+      </p>
+    </div>
+  )
+}
+
 /* ── Button ──────────────────────────────────────────────────────────── */
 function Btn({ children, onClick, primary = false }) {
   const [hov, setHov]         = useState(false)
@@ -120,29 +144,24 @@ export default function Dashboard() {
       <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800;900&display=swap" rel="stylesheet" />
 
       <style>{`
-        .wrap   { max-width:1160px; margin:0 auto; padding:clamp(16px,4vw,44px) clamp(16px,3vw,36px); }
-        .topbar { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:12px; }
-        .topbar-btns { display:flex; gap:10px; flex-wrap:wrap; }
-
-        /* Status row: 3 equal chips */
-        .status-row { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
-
-        /* Bottom row: 2 stat cards */
-        .stat-row   { display:grid; grid-template-columns:repeat(2,1fr); gap:14px; }
-
-        @media(max-width:700px) {
-          .status-row { grid-template-columns:repeat(3,1fr); gap:10px; }
-          .stat-row   { grid-template-columns:1fr; }
+        .wrap        { max-width:1160px; margin:0 auto; padding:clamp(16px,4vw,44px) clamp(16px,3vw,36px); }
+        .topbar      { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:12px; }
+        .topbar-btns { display:flex; gap:10px; }
+        .status-row  { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
+        .stat-row    { display:grid; grid-template-columns:repeat(2,1fr); gap:14px; }
+        @media(max-width:640px) {
+          .stat-row  { grid-template-columns:1fr; }
         }
         @media(max-width:480px) {
           .status-row { grid-template-columns:1fr; gap:10px; }
+          .topbar-btns { width:100%; }
           .topbar-btns button { flex:1; justify-content:center; }
         }
       `}</style>
 
       <div className="wrap">
 
-        {/* ── 1. TOP BAR ── */}
+        {/* 1 — TOP BAR */}
         <FadeUp delay={0}>
           <Card padding="18px 26px" style={{ marginBottom: 16 }}>
             <div className="topbar">
@@ -162,10 +181,10 @@ export default function Dashboard() {
           </Card>
         </FadeUp>
 
-        {/* ── 2. SERVICE BANNER (contextual) ── */}
+        {/* 2 — SERVICE BANNER (contextual) */}
         <FadeUp delay={30}><ServiceBanner /></FadeUp>
 
-        {/* ── 3. HERO — single focus: total count ── */}
+        {/* 3 — HERO: big total */}
         <FadeUp delay={70}>
           <div style={{ marginBottom: 14 }}>
             <Label text="Total du jour" />
@@ -176,28 +195,19 @@ export default function Dashboard() {
           </div>
         </FadeUp>
 
-        {/* ── 4. STATUS ROW — breakdown of today ── */}
+        {/* 4 — DETAIL: confirmed / pending / cancelled */}
         <FadeUp delay={140}>
           <div style={{ marginBottom: 24 }}>
             <Label text="Détail" />
             <div className="status-row">
-              <StatusChip
-                icon={CheckCircle2} iconColor={B.black} iconBg="#EFEFEF"
-                value={stats.today_confirmed} label="Confirmées" delay={140}
-              />
-              <StatusChip
-                icon={Clock} iconColor={B.brown} iconBg={B.brownTint}
-                value={stats.today_pending} label="En attente" delay={190}
-              />
-              <StatusChip
-                icon={XCircle} iconColor={B.inkMute} iconBg="#F5F5F5"
-                value={stats.today_cancelled} label="Annulées" delay={240}
-              />
+              <StatusChip icon={CheckCircle2} iconColor={B.black}   iconBg="#EFEFEF"      value={stats.today_confirmed} label="Confirmées" delay={140} />
+              <StatusChip icon={Clock}        iconColor={B.brown}   iconBg={B.brownTint}  value={stats.today_pending}   label="En attente" delay={190} />
+              <StatusChip icon={XCircle}      iconColor={B.inkMute} iconBg="#F5F5F5"      value={stats.today_cancelled} label="Annulées"   delay={240} />
             </div>
           </div>
         </FadeUp>
 
-        {/* ── 5. BOTTOM ROW — forward-looking ── */}
+        {/* 5 — FORWARD: tomorrow + monthly */}
         <FadeUp delay={280}>
           <Label text="À venir" />
           <div className="stat-row">
@@ -215,7 +225,7 @@ export default function Dashboard() {
           </div>
         </FadeUp>
 
-        {/* ── ERROR ── */}
+        {/* ERROR */}
         {error && (
           <div style={{ marginTop: 16, padding: '13px 18px', background: '#F5F5F5', borderRadius: 12, fontSize: 14, fontWeight: 700, color: B.blackSoft }}>
             ⚠️ {error}
