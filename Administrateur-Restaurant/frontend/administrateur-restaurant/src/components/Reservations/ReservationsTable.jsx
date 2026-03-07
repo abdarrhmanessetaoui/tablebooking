@@ -1,50 +1,109 @@
-const statusStyle = {
-  Confirmed: 'bg-green-100 text-green-700',
-  Pending:   'bg-yellow-100 text-yellow-700',
-  Cancelled: 'bg-red-100 text-red-600',
+import { useState } from 'react'
+import { Pencil } from 'lucide-react'
+
+const DARK      = '#2b2118'
+const GOLD      = '#c8a97e'
+const GOLD_DARK = '#a8834e'
+
+const STATUS = {
+  Confirmed: { bg: '#f0f7f0', color: '#2d6a2d', label: 'Confirmée'  },
+  Pending:   { bg: '#fdf6ec', color: '#a8834e', label: 'En attente' },
+  Cancelled: { bg: '#fdf0f0', color: '#b94040', label: 'Annulée'    },
+}
+
+function EditBtn({ onClick }) {
+  const [hov, setHov] = useState(false)
+  return (
+    <button
+      onClick={onClick}
+      onMouseEnter={() => setHov(true)}
+      onMouseLeave={() => setHov(false)}
+      style={{
+        display: 'inline-flex', alignItems: 'center', gap: 6,
+        padding: '7px 14px',
+        background: hov ? DARK : '#f5f0eb',
+        border: 'none', borderRadius: 0,
+        fontSize: 12, fontWeight: 800,
+        color: hov ? GOLD : DARK,
+        cursor: 'pointer', fontFamily: 'inherit',
+        transition: 'background 0.15s, color 0.15s',
+        whiteSpace: 'nowrap',
+      }}
+    >
+      <Pencil size={12} strokeWidth={2.5} />
+      Modifier
+    </button>
+  )
 }
 
 export default function ReservationsTable({ reservations, openEdit }) {
+  const cols = ['Nom', 'Téléphone', 'Date', 'Heure', 'Couverts', 'Service', 'Statut', '']
+
   return (
-    <div className="bg-white rounded-lg shadow-sm overflow-x-auto">
-      <table className="w-full text-sm min-w-[600px]">
+    <div style={{
+      background: '#fff',
+      overflow: 'auto',
+      fontFamily: "'Plus Jakarta Sans','DM Sans',system-ui,sans-serif",
+    }}>
+      <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800;900&display=swap" rel="stylesheet" />
+
+      <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 640 }}>
         <thead>
-          <tr className="text-left text-xs text-gray-400 uppercase border-b border-gray-100">
-            <th className="px-4 sm:px-6 py-3">Name</th>
-            <th className="px-4 sm:px-6 py-3">Phone</th>
-            <th className="px-4 sm:px-6 py-3">Date</th>
-            <th className="px-4 sm:px-6 py-3">Time</th>
-            <th className="px-4 sm:px-6 py-3">Guests</th>
-            <th className="px-4 sm:px-6 py-3">Service</th>
-            <th className="px-4 sm:px-6 py-3">Status</th>
-            <th className="px-4 sm:px-6 py-3">Actions</th>
+          <tr style={{ background: DARK }}>
+            {cols.map(c => (
+              <th key={c} style={{
+                padding: '13px 18px', textAlign: 'left',
+                fontSize: 10, fontWeight: 900, color: GOLD,
+                letterSpacing: '0.14em', textTransform: 'uppercase',
+                whiteSpace: 'nowrap',
+              }}>
+                {c}
+              </th>
+            ))}
           </tr>
         </thead>
         <tbody>
-          {reservations.map(r => (
-            <tr key={r.id} className="border-b border-gray-50 hover:bg-gray-50 transition-colors">
-              <td className="px-4 sm:px-6 py-3 font-medium text-gray-700">{r.name || '—'}</td>
-              <td className="px-4 sm:px-6 py-3 text-gray-500">{r.phone || '—'}</td>
-              <td className="px-4 sm:px-6 py-3 text-gray-500">{r.date || '—'}</td>
-              <td className="px-4 sm:px-6 py-3 text-gray-500">{r.start_time || '—'}</td>
-              <td className="px-4 sm:px-6 py-3 text-gray-500">{r.guests || '—'}</td>
-              <td className="px-4 sm:px-6 py-3 text-gray-500">{r.service || '—'}</td>
-              <td className="px-4 sm:px-6 py-3">
-                <span className={`px-2 py-1 rounded-full text-xs font-medium ${statusStyle[r.status] || 'bg-gray-100 text-gray-600'}`}>
-                  {r.status || '—'}
-                </span>
-              </td>
-              <td className="px-4 sm:px-6 py-3">
-                <button onClick={() => openEdit(r)} className="text-xs text-blue-500 hover:underline">
-                  Edit Status
-                </button>
-              </td>
-            </tr>
-          ))}
+          {reservations.map((r, i) => {
+            const s = STATUS[r.status] || { bg: '#f5f5f5', color: '#888', label: r.status || '—' }
+            return (
+              <tr
+                key={r.id}
+                style={{
+                  background: i % 2 === 0 ? '#fff' : '#faf8f5',
+                  borderBottom: '1px solid #f0ebe4',
+                }}
+              >
+                <td style={{ padding: '14px 18px', fontSize: 14, fontWeight: 800, color: DARK }}>{r.name || '—'}</td>
+                <td style={{ padding: '14px 18px', fontSize: 13, fontWeight: 600, color: '#888' }}>{r.phone || '—'}</td>
+                <td style={{ padding: '14px 18px', fontSize: 13, fontWeight: 700, color: DARK }}>{r.date || '—'}</td>
+                <td style={{ padding: '14px 18px', fontSize: 13, fontWeight: 700, color: DARK }}>{r.start_time || '—'}</td>
+                <td style={{ padding: '14px 18px', fontSize: 13, fontWeight: 700, color: DARK, textAlign: 'center' }}>{r.guests || '—'}</td>
+                <td style={{ padding: '14px 18px', fontSize: 13, fontWeight: 600, color: '#888' }}>{r.service || '—'}</td>
+                <td style={{ padding: '14px 18px' }}>
+                  <span style={{
+                    display: 'inline-block',
+                    padding: '4px 12px',
+                    background: s.bg,
+                    fontSize: 11, fontWeight: 900,
+                    color: s.color, letterSpacing: '0.04em',
+                  }}>
+                    {s.label}
+                  </span>
+                </td>
+                <td style={{ padding: '14px 18px' }}>
+                  <EditBtn onClick={() => openEdit(r)} />
+                </td>
+              </tr>
+            )
+          })}
+
           {reservations.length === 0 && (
             <tr>
-              <td colSpan={8} className="px-6 py-8 text-center text-gray-400 text-sm">
-                No reservations found.
+              <td colSpan={8} style={{
+                padding: '48px 24px', textAlign: 'center',
+                fontSize: 14, fontWeight: 700, color: '#bbb',
+              }}>
+                Aucune réservation trouvée.
               </td>
             </tr>
           )}
