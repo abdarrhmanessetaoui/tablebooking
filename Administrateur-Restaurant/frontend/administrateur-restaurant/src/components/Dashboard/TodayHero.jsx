@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { CheckCircle2, Clock, XCircle, ChevronRight } from 'lucide-react'
 import { B } from '../../utils/brand'
 import Card from './Card'
-import useCountUp from '../../hooks/useCountUp'
+import useCountUp from '../../hooks/Dashboard/useCountUp'
 
 export default function TodayHero({ value, confirmed, pending, cancelled, onClick }) {
   const n  = useCountUp(value,     800, 150)
