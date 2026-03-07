@@ -57,13 +57,18 @@ function SectionHead({ label }) {
 }
 
 function Btn({ children, onClick, primary = false }) {
+  const [hov, setHov] = useState(false)
   return (
     <button
       onClick={onClick}
+      onMouseEnter={() => setHov(true)}
+      onMouseLeave={() => setHov(false)}
       style={{
         display: 'flex', alignItems: 'center', gap: 9,
         padding: '13px 22px',
-        background: primary ? B.brown : B.pageBg,
+        background: primary
+          ? (hov ? B.brownDark : B.brown)
+          : (hov ? '#EBEBEB' : B.pageBg),
         border: 'none',
         borderRadius: 12,
         fontSize: 14, fontWeight: 800,
@@ -71,6 +76,8 @@ function Btn({ children, onClick, primary = false }) {
         cursor: 'pointer',
         whiteSpace: 'nowrap',
         letterSpacing: '-0.1px',
+        transition: 'background 0.15s ease, transform 0.1s ease',
+        transform: hov ? 'translateY(-1px)' : 'none',
       }}
     >
       {children}
@@ -109,16 +116,10 @@ export default function Dashboard() {
             borderRadius: 18, padding: '18px 28px',
           }}>
             <div>
-              <h1 style={{
-                margin: 0, fontSize: 26, fontWeight: 900,
-                color: B.black, letterSpacing: '-0.8px', lineHeight: 1.1,
-              }}>
+              <h1 style={{ margin: 0, fontSize: 26, fontWeight: 900, color: B.black, letterSpacing: '-0.8px' }}>
                 Aujourd'hui
               </h1>
-              <p style={{
-                margin: '4px 0 0', fontSize: 13, fontWeight: 600,
-                color: B.inkMute, textTransform: 'capitalize',
-              }}>
+              <p style={{ margin: '4px 0 0', fontSize: 13, fontWeight: 600, color: B.inkMute, textTransform: 'capitalize' }}>
                 {today}
               </p>
             </div>
@@ -146,8 +147,7 @@ export default function Dashboard() {
         {/* ERROR */}
         {error && (
           <div style={{
-            padding: '14px 20px',
-            background: '#F5F5F5',
+            padding: '14px 20px', background: '#F5F5F5',
             borderRadius: 12, fontSize: 14, fontWeight: 700,
             color: B.blackSoft, marginBottom: 22,
           }}>
@@ -177,7 +177,9 @@ export default function Dashboard() {
               <StatCard
                 icon={CalendarCheck} iconColor={B.brown} iconBg={B.brownTint}
                 value={stats.tomorrow} label="Demain"
-                trend="+8 vs hier" onClick={() => navigate('/calendar')} delay={0}
+                trend="+8 vs hier"
+                actionLabel="Voir le planning"
+                onClick={() => navigate('/calendar')} delay={0}
               />
               <StatCard
                 icon={ClipboardList} iconColor={B.black} iconBg="#EFEFEF"
@@ -187,7 +189,8 @@ export default function Dashboard() {
               <StatCard
                 icon={Users} iconColor={B.black} iconBg="#EFEFEF"
                 value={stats.today_confirmed} label="Confirmées"
-                delay={160}
+                actionLabel="Voir les réservations"
+                onClick={() => navigate('/reservations')} delay={160}
               />
             </div>
           </div>
