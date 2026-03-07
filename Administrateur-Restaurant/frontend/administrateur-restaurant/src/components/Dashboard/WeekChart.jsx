@@ -17,61 +17,65 @@ export default function WeekChart({ todayCount }) {
   return (
     <div style={{
       background: B.surface,
-      border: `1px solid ${B.border}`,
-      borderRadius: 12,
-      padding: '20px 20px 16px',
-      height: '100%',
-      boxSizing: 'border-box',
-      boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+      border: `1.5px solid ${B.border}`,
+      borderRadius: 14,
+      padding: '20px 22px 18px',
+      height: '100%', boxSizing: 'border-box',
+      boxShadow: '0 1px 4px rgba(0,0,0,0.05)',
     }}>
       {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 20 }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 22 }}>
         <div>
-          <p style={{ margin: 0, fontSize: 14, fontWeight: 600, color: B.text }}>Cette semaine</p>
-          <p style={{ margin: '2px 0 0', fontSize: 12, color: B.textMute }}>Aperçu des 7 derniers jours</p>
+          <p style={{ margin: 0, fontSize: 15, fontWeight: 700, color: B.text }}>Cette semaine</p>
+          <p style={{ margin: '3px 0 0', fontSize: 12, fontWeight: 500, color: B.textMute }}>
+            Aperçu des 7 derniers jours
+          </p>
         </div>
         <div style={{
           display: 'flex', alignItems: 'center', gap: 5,
-          background: B.tint, border: `1px solid #FED7AA`,
-          borderRadius: 8, padding: '5px 10px',
+          background: B.tint, border: `1px solid ${B.tintBdr}`,
+          borderRadius: 8, padding: '5px 11px',
         }}>
-          <TrendingUp size={13} color={B.warm} strokeWidth={2} />
-          <span style={{ fontSize: 11, fontWeight: 600, color: B.warm }}>+12%</span>
+          <TrendingUp size={13} color={B.warm} strokeWidth={2.2} />
+          <span style={{ fontSize: 12, fontWeight: 700, color: B.warm }}>+12%</span>
         </div>
       </div>
 
-      {/* Chart */}
-      <div style={{ display: 'flex', gap: 10, alignItems: 'flex-end', height: 88 }}>
+      {/* Bars */}
+      <div style={{ display: 'flex', gap: 8, alignItems: 'flex-end', height: 90 }}>
         {h.map((val, i) => {
           const isToday = i === 6
-          const heightPct = maxVal > 0 ? (val / maxVal) * 100 : 0
+          const pct = maxVal > 0 ? (val / maxVal) * 100 : 0
           return (
-            <div key={i} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, height: '100%', justifyContent: 'flex-end' }}>
+            <div key={i} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 7, height: '100%', justifyContent: 'flex-end' }}>
               <div style={{
                 width: '100%',
-                height: `${heightPct}%`,
-                minHeight: 4,
-                borderRadius: '4px 4px 3px 3px',
+                height: `${pct}%`,
+                minHeight: 5,
+                borderRadius: '5px 5px 3px 3px',
                 background: isToday
                   ? `linear-gradient(180deg, ${B.muted} 0%, ${B.mid} 100%)`
                   : B.bg,
-                border: `1px solid ${isToday ? 'transparent' : B.border}`,
+                border: `1.5px solid ${isToday ? 'transparent' : B.border}`,
                 transition: `height 0.6s cubic-bezier(0.34,1.2,0.64,1) ${i * 45}ms`,
-                boxShadow: isToday ? `0 3px 10px ${B.warm}40` : 'none',
+                boxShadow: isToday ? `0 4px 12px ${B.warm}50` : 'none',
               }} />
             </div>
           )
         })}
       </div>
 
-      {/* Day labels */}
-      <div style={{ display: 'flex', gap: 10, marginTop: 8 }}>
+      {/* Labels */}
+      <div style={{ display: 'flex', gap: 8, marginTop: 9 }}>
         {days.map((d, i) => (
           <div key={i} style={{ flex: 1, textAlign: 'center' }}>
             <span style={{
-              fontSize: 11, fontWeight: i === 6 ? 700 : 500,
+              fontSize: 11,
+              fontWeight: i === 6 ? 800 : 600,
               color: i === 6 ? B.warm : B.textMute,
-            }}>{d}</span>
+            }}>
+              {d}
+            </span>
           </div>
         ))}
       </div>
