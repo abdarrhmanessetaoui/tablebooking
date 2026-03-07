@@ -1,32 +1,39 @@
+// ── TableBooking.ma brand palette ──────────────────────────────────────────
+// Gold extracted from logo: #A07C38
+// Dark extracted from logo background: #0D0D0D
+
 export const B = {
-  // Brand
-  dark:     '#1C0A00',
-  mid:      '#C2410C',
-  warm:     '#EA580C',
-  muted:    '#F97316',
-  tint:     '#FFF7ED',
-  border:   '#E5E7EB',
-  borderHov:'#D1D5DB',
+  // Brand gold
+  dark:      '#0D0D0D',   // logo black
+  mid:       '#7A5C20',   // deep gold
+  warm:      '#A07C38',   // primary gold (logo color)
+  muted:     '#C4A05A',   // light gold
+  tint:      '#FAF5EB',   // warm cream tint
+  tintBdr:   '#E8D9B5',   // cream border
 
-  // Neutral
-  bg:       '#F9FAFB',
-  surface:  '#FFFFFF',
-  text:     '#111827',
-  textSub:  '#6B7280',
-  textMute: '#9CA3AF',
+  // Surfaces
+  bg:        '#F7F7F5',   // off-white, warm-tinted
+  surface:   '#FFFFFF',
+  border:    '#E4E0D8',   // warm gray border
+  borderHov: '#CFC9BC',   // hover border
 
-  // Status
-  green:    '#059669',
-  greenBg:  '#ECFDF5',
-  greenBdr: '#A7F3D0',
-  amber:    '#D97706',
-  amberBg:  '#FFFBEB',
-  amberBdr: '#FDE68A',
-  red:      '#DC2626',
-  redBg:    '#FEF2F2',
-  redBdr:   '#FECACA',
-  blue:     '#2563EB',
-  blueBg:   '#EFF6FF',
-  indigo:   '#4F46E5',
-  indigoBg: '#EEF2FF',
+  // Text — bold & high contrast
+  text:      '#0D0D0D',   // near-black, maximum legibility
+  textSub:   '#3D3730',   // dark warm gray
+  textMute:  '#8C8070',   // muted warm gray
+
+  // Status — kept vivid for clarity
+  green:     '#166534',
+  greenBg:   '#DCFCE7',
+  greenBdr:  '#86EFAC',
+  amber:     '#92400E',
+  amberBg:   '#FEF3C7',
+  amberBdr:  '#FCD34D',
+  red:       '#991B1B',
+  redBg:     '#FEE2E2',
+  redBdr:    '#FCA5A5',
+  blue:      '#1E40AF',
+  blueBg:    '#DBEAFE',
+  indigo:    '#3730A3',
+  indigoBg:  '#E0E7FF',
 }
