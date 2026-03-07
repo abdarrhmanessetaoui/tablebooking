@@ -1,4 +1,4 @@
-import useReservations from '../hooks/useReservations'
+import useReservations from '../hooks/Reservations/useReservations'
 import ReservationsFilters from '../components/Reservations/ReservationsFilters'
 import ReservationsTable from '../components/Reservations/ReservationsTable'
 import ReservationModal from '../components/Reservations/ReservationModal'
