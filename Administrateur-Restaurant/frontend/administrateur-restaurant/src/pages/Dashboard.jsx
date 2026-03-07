@@ -114,7 +114,7 @@ export default function Dashboard() {
                 background: B.dark,
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
               }}>
-                
+                <UtensilsCrossed size={20} color="#E5C97A" strokeWidth={2} />
               </div>
               <div>
                 <h1 style={{ margin: 0, fontSize: 20, fontWeight: 900, color: B.ink, letterSpacing: '-0.5px' }}>Dashboard</h1>
