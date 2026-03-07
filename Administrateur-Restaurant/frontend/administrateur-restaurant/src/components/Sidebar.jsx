@@ -3,7 +3,7 @@ import { navItems, LogoutIcon } from '../data/sidebarItems'
 import { useState } from 'react'
 
 export default function Sidebar({ handleLogout, onNavClick }) {
-  const [hov, setHov]     = useState(null)
+  const [hov, setHov]       = useState(null)
   const [hovOut, setHovOut] = useState(false)
 
   return (
@@ -11,42 +11,12 @@ export default function Sidebar({ handleLogout, onNavClick }) {
       width: '100%',
       height: '100%',
       background: '#FFFFFF',
-      borderRight: '1px solid #E4E7ED',
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
       fontFamily: "'Plus Jakarta Sans','DM Sans',system-ui,sans-serif",
       overflowX: 'visible',
     }}>
-
-      {/* ── LOGO ── */}
-      <div style={{
-        width: '100%',
-        padding: '20px 0 16px',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        borderBottom: '1px solid #F0F2F5',
-        flexShrink: 0,
-      }}>
-        <img
-          src="/images/tablebooking.png"
-          alt="TableBooking.ma"
-          style={{ width: 36, height: 36, objectFit: 'contain' }}
-          onError={e => {
-            e.target.style.display = 'none'
-            e.target.nextSibling.style.display = 'flex'
-          }}
-        />
-        {/* Fallback monogram */}
-        <div style={{
-          display: 'none', width: 38, height: 38,
-          borderRadius: 10, alignItems: 'center', justifyContent: 'center',
-          background: 'linear-gradient(135deg,#9A6F2E,#C49A4A)',
-        }}>
-          <span style={{ fontSize: 13, fontWeight: 900, color: '#fff', letterSpacing: '-0.5px' }}>TB</span>
-        </div>
-      </div>
 
       {/* ── NAV ── */}
       <nav style={{
@@ -55,8 +25,8 @@ export default function Sidebar({ handleLogout, onNavClick }) {
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        padding: '14px 0',
-        gap: 4,
+        padding: '18px 0',
+        gap: 2,
         overflowY: 'auto',
         overflowX: 'visible',
       }}>
@@ -74,37 +44,32 @@ export default function Sidebar({ handleLogout, onNavClick }) {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                width: 44, height: 44,
-                borderRadius: 12,
+                width: 42, height: 42,
+                borderRadius: 10,
                 textDecoration: 'none',
-                transition: 'all 0.15s ease',
+                transition: 'background 0.13s ease, color 0.13s ease',
                 position: 'relative',
-                background: isActive
-                  ? 'linear-gradient(135deg, rgba(154,111,46,0.12), rgba(196,154,74,0.08))'
-                  : hov === i
-                    ? '#F4F5F7'
-                    : 'transparent',
-                border: isActive
-                  ? '1.5px solid rgba(196,154,74,0.35)'
-                  : '1.5px solid transparent',
-                color: isActive ? '#9A6F2E' : hov === i ? '#2D3142' : '#9CA3AF',
+                background: isActive ? '#FDF6E8' : hov === i ? '#F4F5F7' : 'transparent',
+                color: isActive ? '#9A6F2E' : hov === i ? '#111827' : '#6B7280',
               })}
             >
               {({ isActive }) => (
                 <>
-                  {/* Active left bar */}
                   {isActive && (
                     <div style={{
                       position: 'absolute',
-                      left: -1, top: '20%', bottom: '20%',
+                      left: 0, top: '18%', bottom: '18%',
                       width: 3, borderRadius: '0 3px 3px 0',
-                      background: 'linear-gradient(180deg,#C49A4A,#9A6F2E)',
-                      boxShadow: '0 0 8px rgba(196,154,74,0.5)',
+                      background: '#9A6F2E',
                     }} />
                   )}
                   <span style={{
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontSize: 20, color: 'inherit', lineHeight: 1,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: 22,
+                    lineHeight: 1,
+                    color: 'inherit',
                   }}>
                     {item.icon}
                   </span>
@@ -116,31 +81,20 @@ export default function Sidebar({ handleLogout, onNavClick }) {
             {hov === i && (
               <div style={{
                 position: 'absolute',
-                left: 'calc(100% + 10px)',
+                left: 'calc(100% + 8px)',
                 top: '50%', transform: 'translateY(-50%)',
-                background: '#1C2333',
-                border: '1px solid rgba(255,255,255,0.08)',
-                borderRadius: 9,
-                padding: '8px 13px',
+                background: '#111827',
+                borderRadius: 8,
+                padding: '6px 12px',
                 whiteSpace: 'nowrap',
                 pointerEvents: 'none',
                 zIndex: 9999,
-                boxShadow: '0 8px 28px rgba(0,0,0,0.22)',
-                animation: 'tfade .12s ease',
+                boxShadow: '0 4px 16px rgba(0,0,0,0.18)',
+                animation: 'tfade .1s ease',
               }}>
-                <span style={{ fontSize: 13, fontWeight: 700, color: '#fff' }}>
+                <span style={{ fontSize: 12, fontWeight: 700, color: '#fff' }}>
                   {item.label}
                 </span>
-                <span style={{
-                  position: 'absolute',
-                  left: -4, top: '50%',
-                  width: 7, height: 7,
-                  background: '#1C2333',
-                  border: '1px solid rgba(255,255,255,0.08)',
-                  borderRight: 'none', borderTop: 'none',
-                  transform: 'translateY(-50%) rotate(45deg)',
-                  display: 'block',
-                }} />
               </div>
             )}
           </div>
@@ -148,24 +102,25 @@ export default function Sidebar({ handleLogout, onNavClick }) {
       </nav>
 
       {/* ── Divider ── */}
-      <div style={{ width: 28, height: 1, background: '#E4E7ED', flexShrink: 0 }} />
+      <div style={{ width: 24, height: 1, background: '#E4E7ED', flexShrink: 0, margin: '4px 0' }} />
 
       {/* ── LOGOUT ── */}
       <div
-        style={{ padding: '10px 0 22px', width: '100%', display: 'flex', justifyContent: 'center', position: 'relative', flexShrink: 0 }}
+        style={{ padding: '6px 0 24px', width: '100%', display: 'flex', justifyContent: 'center', position: 'relative', flexShrink: 0 }}
         onMouseEnter={() => setHovOut(true)}
         onMouseLeave={() => setHovOut(false)}
       >
         <button
           onClick={handleLogout}
           style={{
-            width: 44, height: 44, borderRadius: 12,
+            width: 42, height: 42, borderRadius: 10,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             background: hovOut ? '#FFF1F1' : 'transparent',
-            border: `1.5px solid ${hovOut ? 'rgba(220,38,38,0.2)' : 'transparent'}`,
-            color: hovOut ? '#DC2626' : '#C4C9D4',
-            cursor: 'pointer', transition: 'all 0.15s ease',
-            fontSize: 20, lineHeight: 1,
+            border: 'none',
+            color: hovOut ? '#DC2626' : '#9CA3AF',
+            cursor: 'pointer',
+            transition: 'background 0.13s, color 0.13s',
+            fontSize: 22, lineHeight: 1,
           }}
         >
           <LogoutIcon />
@@ -173,19 +128,20 @@ export default function Sidebar({ handleLogout, onNavClick }) {
 
         {hovOut && (
           <div style={{
-            position: 'absolute', left: 'calc(100% + 10px)', top: '50%', transform: 'translateY(-50%)',
-            background: '#1C2333', border: '1px solid rgba(220,38,38,0.2)',
-            borderRadius: 9, padding: '8px 13px', whiteSpace: 'nowrap',
-            pointerEvents: 'none', zIndex: 9999, boxShadow: '0 8px 28px rgba(0,0,0,0.22)',
+            position: 'absolute', left: 'calc(100% + 8px)', top: '50%', transform: 'translateY(-50%)',
+            background: '#111827', borderRadius: 8,
+            padding: '6px 12px', whiteSpace: 'nowrap',
+            pointerEvents: 'none', zIndex: 9999,
+            boxShadow: '0 4px 16px rgba(0,0,0,0.18)',
           }}>
-            <span style={{ fontSize: 13, fontWeight: 700, color: '#F87171' }}>Déconnexion</span>
+            <span style={{ fontSize: 12, fontWeight: 700, color: '#F87171' }}>Déconnexion</span>
           </div>
         )}
       </div>
 
       <style>{`
         @keyframes tfade {
-          from { opacity:0; transform:translateY(-50%) translateX(-6px); }
+          from { opacity:0; transform:translateY(-50%) translateX(-4px); }
           to   { opacity:1; transform:translateY(-50%) translateX(0); }
         }
       `}</style>
