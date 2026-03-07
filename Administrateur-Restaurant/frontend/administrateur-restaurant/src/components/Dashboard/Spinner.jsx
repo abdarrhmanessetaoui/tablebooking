@@ -9,7 +9,7 @@ export default function Spinner() {
     }}>
       <div style={{
         width: 34, height: 34,
-        border: `3px solid ${B.border}`,
+        border: `3px solid #F0F0F0`,
         borderTop: `3px solid ${B.gold}`,
         borderRadius: '50%',
         animation: 'sp 0.7s linear infinite',
