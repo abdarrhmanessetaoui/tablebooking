@@ -1,8 +1,10 @@
-import React from 'react'
+import { useRef } from 'react'
 import useLogin from '../hooks/useLogin'
-import '../index.css'
 
-const Login = () => {
+const BROWN      = '#9A6F2E'
+const BROWN_DARK = '#7A5520'
+
+export default function Login() {
   const {
     email, setEmail,
     password, setPassword,
@@ -13,98 +15,224 @@ const Login = () => {
   } = useLogin()
 
   return (
-    <div
-      className="min-h-screen flex flex-col items-center justify-center px-4"
-      style={{ backgroundColor: '#2b2118' }}
-    >
-      <div className="flex items-center justify-center mb-8">
-        <img
-          src="images/tablebooking.png"
-          alt="TableBooking Logo"
-          className="h-12 sm:h-16 object-contain"
-        />
-      </div>
+    <div style={{
+      minHeight: '100vh',
+      display: 'flex',
+      fontFamily: "'Plus Jakarta Sans','DM Sans',system-ui,sans-serif",
+      background: '#fff',
+    }}>
+      <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
 
-      <div className="bg-white rounded shadow-xl px-6 sm:px-8 pt-6 pb-7 w-full max-w-sm">
-
-        {error && (
-          <div className="mb-4 px-3 py-2 bg-red-50 border border-red-200 rounded text-xs text-red-600">
-            {error}
-          </div>
-        )}
-
-        <div className="mb-4">
-          <label className="block text-sm text-gray-700 mb-1" htmlFor="email">
-            Username or Email Address
-          </label>
-          <input
-            id="email"
-            type="text"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            onKeyDown={handleKeyDown}
-            className="w-full border border-gray-300 rounded px-3 py-2 text-sm text-gray-800 focus:outline-none focus:border-gray-400"
+      {/* ── LEFT — branding panel ── */}
+      <div style={{
+        width: '45%',
+        background: BROWN,
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-between',
+        padding: 'clamp(32px,5vw,64px)',
+        flexShrink: 0,
+      }}
+        className="login-left"
+      >
+        {/* Logo */}
+        <div>
+          <img
+            src="images/tablebooking.png"
+            alt="TableBooking.ma"
+            style={{ height: 32, objectFit: 'contain', filter: 'brightness(0) invert(1)', display: 'block' }}
+            onError={e => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'block' }}
           />
+          <span style={{ display: 'none', fontSize: 18, fontWeight: 900, color: '#fff', letterSpacing: '-0.4px' }}>
+            TableBooking.ma
+          </span>
         </div>
 
-        <div className="mb-5">
-          <label className="block text-sm text-gray-700 mb-1" htmlFor="password">
-            Password
-          </label>
-          <div className="relative">
+        {/* Headline */}
+        <div>
+          <p style={{ margin: '0 0 16px', fontSize: 'clamp(32px,3.5vw,52px)', fontWeight: 900, color: '#fff', letterSpacing: '-2px', lineHeight: 1.05 }}>
+            Gérez vos<br />réservations.
+          </p>
+          <p style={{ margin: 0, fontSize: 15, fontWeight: 500, color: 'rgba(255,255,255,0.55)', lineHeight: 1.6 }}>
+            Tableau de bord complet pour<br />les restaurants marocains.
+          </p>
+        </div>
+
+        {/* Footer */}
+        <p style={{ margin: 0, fontSize: 12, fontWeight: 500, color: 'rgba(255,255,255,0.3)' }}>
+          © 2025 TableBooking.ma
+        </p>
+      </div>
+
+      {/* ── RIGHT — form ── */}
+      <div style={{
+        flex: 1,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: 'clamp(24px,4vw,64px)',
+      }}>
+        <div style={{ width: '100%', maxWidth: 380 }}>
+
+          <h1 style={{ margin: '0 0 6px', fontSize: 26, fontWeight: 900, color: '#111', letterSpacing: '-0.8px' }}>
+            Connexion
+          </h1>
+          <p style={{ margin: '0 0 36px', fontSize: 14, fontWeight: 500, color: '#BABABA' }}>
+            Bienvenue. Entrez vos identifiants.
+          </p>
+
+          {/* Error */}
+          {error && (
+            <p style={{ margin: '0 0 20px', fontSize: 13, fontWeight: 600, color: '#C0182B' }}>
+              ⚠ {error}
+            </p>
+          )}
+
+          {/* Email */}
+          <div style={{ marginBottom: 20 }}>
+            <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#888', letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 8 }}>
+              Email
+            </label>
             <input
-              id="password"
+              type="text"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              onKeyDown={handleKeyDown}
+              autoComplete="email"
+              style={{
+                width: '100%', padding: '14px 0',
+                background: 'transparent',
+                border: 'none',
+                borderBottom: '2px solid #E8E8E8',
+                fontSize: 15, fontWeight: 600, color: '#111',
+                outline: 'none',
+                fontFamily: 'inherit',
+                transition: 'border-color 0.15s',
+              }}
+              onFocus={e => e.target.style.borderBottomColor = BROWN}
+              onBlur={e => e.target.style.borderBottomColor = '#E8E8E8'}
+            />
+          </div>
+
+          {/* Password */}
+          <div style={{ marginBottom: 28, position: 'relative' }}>
+            <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#888', letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 8 }}>
+              Mot de passe
+            </label>
+            <input
               type={showPassword ? 'text' : 'password'}
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={e => setPassword(e.target.value)}
               onKeyDown={handleKeyDown}
-              className="w-full border border-gray-300 rounded px-3 py-2 text-sm text-gray-800 focus:outline-none focus:border-gray-400 pr-9"
+              autoComplete="current-password"
+              style={{
+                width: '100%', padding: '14px 36px 14px 0',
+                background: 'transparent',
+                border: 'none',
+                borderBottom: '2px solid #E8E8E8',
+                fontSize: 15, fontWeight: 600, color: '#111',
+                outline: 'none',
+                fontFamily: 'inherit',
+                transition: 'border-color 0.15s',
+              }}
+              onFocus={e => e.target.style.borderBottomColor = BROWN}
+              onBlur={e => e.target.style.borderBottomColor = '#E8E8E8'}
             />
+            {/* Show/hide toggle */}
             <button
               type="button"
-              onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-2 top-1/2 -translate-y-1/2 focus:outline-none"
-              style={{ color: '#c8a97e' }}
               tabIndex={-1}
+              onClick={() => setShowPassword(!showPassword)}
+              style={{
+                position: 'absolute', right: 0, bottom: 14,
+                background: 'none', border: 'none', padding: 0,
+                cursor: 'pointer', color: '#BABABA',
+                display: 'flex', alignItems: 'center',
+              }}
             >
               {showPassword ? (
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+                <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+                  <path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94"/>
+                  <path d="M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19"/>
+                  <line x1="1" y1="1" x2="23" y2="23"/>
                 </svg>
               ) : (
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                  <circle cx="12" cy="12" r="3"/>
                 </svg>
               )}
             </button>
           </div>
-        </div>
 
-        <div className="flex items-center justify-between">
-          <label className="flex items-center gap-2 cursor-pointer select-none">
-            <input
-              type="checkbox"
-              checked={rememberMe}
-              onChange={() => setRememberMe(!rememberMe)}
-              className="w-3.5 h-3.5"
-            />
-            <span className="text-xs text-gray-700">Remember Me</span>
-          </label>
-          <button
-            type="button"
-            onClick={handleLogin}
-            disabled={loading}
-            className="text-white text-sm font-medium px-4 py-1.5 rounded hover:opacity-90 transition-opacity focus:outline-none disabled:opacity-60"
-            style={{ backgroundColor: '#c8a97e' }}
-          >
-            {loading ? 'Logging in...' : 'Log In'}
-          </button>
-        </div>
+          {/* Remember me */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 32 }}>
+            <div
+              onClick={() => setRememberMe(!rememberMe)}
+              style={{
+                width: 18, height: 18, flexShrink: 0,
+                border: `2px solid ${rememberMe ? BROWN : '#D0D0D0'}`,
+                background: rememberMe ? BROWN : 'transparent',
+                cursor: 'pointer',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                transition: 'all 0.13s',
+              }}
+            >
+              {rememberMe && (
+                <svg width="10" height="10" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+                  <polyline points="20 6 9 17 4 12"/>
+                </svg>
+              )}
+            </div>
+            <span
+              onClick={() => setRememberMe(!rememberMe)}
+              style={{ fontSize: 13, fontWeight: 600, color: '#888', cursor: 'pointer', userSelect: 'none' }}
+            >
+              Se souvenir de moi
+            </span>
+          </div>
 
+          {/* Submit */}
+          <LoginButton onClick={handleLogin} loading={loading} />
+
+        </div>
       </div>
+
+      <style>{`
+        @media (max-width: 640px) {
+          .login-left { display: none !important; }
+        }
+        input::placeholder { color: #D0D0D0; }
+      `}</style>
     </div>
   )
 }
 
-export default Login
+function LoginButton({ onClick, loading }) {
+  const [hov, setHov] = [false, () => {}]
+  return (
+    <button
+      onClick={onClick}
+      disabled={loading}
+      onMouseEnter={e => e.currentTarget.style.background = BROWN_DARK}
+      onMouseLeave={e => e.currentTarget.style.background = BROWN}
+      style={{
+        width: '100%',
+        padding: '16px',
+        background: BROWN,
+        border: 'none',
+        color: '#fff',
+        fontSize: 15, fontWeight: 800,
+        cursor: loading ? 'not-allowed' : 'pointer',
+        opacity: loading ? 0.65 : 1,
+        transition: 'background 0.15s',
+        fontFamily: 'inherit',
+        letterSpacing: '-0.2px',
+      }}
+    >
+      {loading ? 'Connexion…' : 'Se connecter'}
+    </button>
+  )
+}
+
+const BROWN_DARK = '#7A5520'
