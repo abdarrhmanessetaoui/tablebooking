@@ -13,134 +13,121 @@ export default function Sidebar({ handleLogout, onNavClick }) {
       background: '#fff',
       display: 'flex',
       flexDirection: 'column',
-      alignItems: 'center',
-      fontFamily: 'system-ui, sans-serif',
+      fontFamily: "'Plus Jakarta Sans','DM Sans',system-ui,sans-serif",
     }}>
 
+      {/* ── NAV ── */}
       <nav style={{
         flex: 1,
         width: '100%',
         display: 'flex',
         flexDirection: 'column',
-        alignItems: 'center',
-        paddingTop: 12,
+        padding: '16px 10px 10px',
+        gap: 2,
         overflowY: 'auto',
-        overflowX: 'visible',
       }}>
         {navItems.map((item, i) => (
-          <div
+          <NavLink
             key={item.to}
-            style={{ position: 'relative', width: '100%' }}
+            to={item.to}
+            onClick={onNavClick}
             onMouseEnter={() => setHov(i)}
             onMouseLeave={() => setHov(null)}
+            style={({ isActive }) => ({
+              display: 'flex',
+              alignItems: 'center',
+              gap: 11,
+              padding: '10px 14px',
+              borderRadius: 10,
+              textDecoration: 'none',
+              position: 'relative',
+              transition: 'background 0.13s',
+              background: isActive
+                ? '#F4F5F7'
+                : hov === i
+                  ? '#F9FAFB'
+                  : 'transparent',
+              color: isActive
+                ? '#111827'
+                : hov === i
+                  ? '#374151'
+                  : '#6B7280',
+            })}
           >
-            <NavLink
-              to={item.to}
-              onClick={onNavClick}
-              style={({ isActive }) => ({
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                width: '100%',
-                height: 52,
-                textDecoration: 'none',
-                position: 'relative',
-                color: isActive ? '#1C1F24' : hov === i ? '#1C1F24' : '#B0B7C3',
-                background: 'transparent',
-              })}
-            >
-              {({ isActive }) => (
-                <>
-                  {isActive && (
-                    <div style={{
-                      position: 'absolute',
-                      left: 0,
-                      top: '20%',
-                      bottom: '20%',
-                      width: 3,
-                      background: '#1C1F24',
-                    }} />
-                  )}
-                  <span style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontSize: 22,
-                    lineHeight: 1,
-                  }}>
-                    {item.icon}
-                  </span>
-                </>
-              )}
-            </NavLink>
+            {({ isActive }) => (
+              <>
+                {/* Active left bar */}
+                {isActive && (
+                  <div style={{
+                    position: 'absolute',
+                    left: 0, top: '18%', bottom: '18%',
+                    width: 3,
+                    borderRadius: '0 3px 3px 0',
+                    background: '#111827',
+                  }} />
+                )}
 
-            {hov === i && (
-              <div style={{
-                position: 'absolute',
-                left: 'calc(100% + 8px)',
-                top: '50%',
-                transform: 'translateY(-50%)',
-                background: '#1C1F24',
-                borderRadius: 6,
-                padding: '5px 10px',
-                whiteSpace: 'nowrap',
-                pointerEvents: 'none',
-                zIndex: 9999,
-                animation: 'tfade .1s ease',
-              }}>
-                <span style={{ fontSize: 12, fontWeight: 600, color: '#fff' }}>
+                {/* Icon */}
+                <span style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: 19,
+                  lineHeight: 1,
+                  flexShrink: 0,
+                  color: 'inherit',
+                }}>
+                  {item.icon}
+                </span>
+
+                {/* Label — always visible */}
+                <span style={{
+                  fontSize: 14,
+                  fontWeight: isActive ? 700 : 600,
+                  color: 'inherit',
+                  whiteSpace: 'nowrap',
+                }}>
                   {item.label}
                 </span>
-              </div>
+              </>
             )}
-          </div>
+          </NavLink>
         ))}
       </nav>
 
-      {/* Divider */}
-      <div style={{ width: '50%', height: 1, background: '#F0F0F0', margin: '4px 0', flexShrink: 0 }} />
+      {/* ── Divider ── */}
+      <div style={{ margin: '0 16px', height: 1, background: '#F0F0F0', flexShrink: 0 }} />
 
-      {/* Logout */}
-      <div
-        style={{ paddingBottom: 20, paddingTop: 4, position: 'relative', flexShrink: 0 }}
-        onMouseEnter={() => setHovOut(true)}
-        onMouseLeave={() => setHovOut(false)}
-      >
+      {/* ── LOGOUT ── */}
+      <div style={{ padding: '10px 10px 22px', flexShrink: 0 }}>
         <button
           onClick={handleLogout}
+          onMouseEnter={() => setHovOut(true)}
+          onMouseLeave={() => setHovOut(false)}
           style={{
-            width: 52, height: 52,
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            background: 'transparent',
+            width: '100%',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 11,
+            padding: '10px 14px',
+            borderRadius: 10,
+            background: hovOut ? '#FFF5F5' : 'transparent',
             border: 'none',
-            color: hovOut ? '#EF4444' : '#B0B7C3',
+            color: hovOut ? '#EF4444' : '#9CA3AF',
             cursor: 'pointer',
-            fontSize: 22,
+            transition: 'background 0.13s, color 0.13s',
+            textAlign: 'left',
           }}
         >
-          <LogoutIcon />
+          <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 19, lineHeight: 1, flexShrink: 0 }}>
+            <LogoutIcon />
+          </span>
+          <span style={{ fontSize: 14, fontWeight: 600, whiteSpace: 'nowrap' }}>
+            Déconnexion
+          </span>
         </button>
-
-        {hovOut && (
-          <div style={{
-            position: 'absolute',
-            left: 'calc(100% + 8px)',
-            top: '50%', transform: 'translateY(-50%)',
-            background: '#1C1F24', borderRadius: 6,
-            padding: '5px 10px', whiteSpace: 'nowrap',
-            pointerEvents: 'none', zIndex: 9999,
-          }}>
-            <span style={{ fontSize: 12, fontWeight: 600, color: '#F87171' }}>Déconnexion</span>
-          </div>
-        )}
       </div>
 
-      <style>{`
-        @keyframes tfade {
-          from { opacity:0; transform:translateY(-50%) translateX(-4px); }
-          to   { opacity:1; transform:translateY(-50%) translateX(0); }
-        }
-      `}</style>
     </div>
   )
 }
