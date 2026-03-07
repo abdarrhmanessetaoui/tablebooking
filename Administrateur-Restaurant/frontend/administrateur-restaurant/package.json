@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "serve": "php artisan serve",
+    "start": "concurrently \"php artisan serve\" \"npm run dev\"",
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview"
