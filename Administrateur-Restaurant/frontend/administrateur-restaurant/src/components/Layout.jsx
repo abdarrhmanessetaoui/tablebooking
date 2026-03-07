@@ -53,7 +53,7 @@ export default function Layout({ children }) {
       {/* Right side */}
       <div className="flex-1 flex flex-col min-w-0">
 
-        {/* Header
+        {/* Header */}
         <header
           className="flex items-center justify-between px-6 sm:px-8 py-4 flex-shrink-0"
           style={{ backgroundColor: '#2b2118' }}
@@ -108,7 +108,7 @@ export default function Layout({ children }) {
               </button> */}
 
             {/* </div> */}
-        </header> */}
+        </header>
 
         {/* Content */}
         <main
