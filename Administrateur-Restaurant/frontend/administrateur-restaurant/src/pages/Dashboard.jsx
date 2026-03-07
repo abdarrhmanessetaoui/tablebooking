@@ -138,7 +138,7 @@ export default function Dashboard() {
 
   return (
     <div style={{
-      minHeight: '100vh', background: B.pageBg,
+      minHeight: '100vh', background: '#EDEEF2',
       fontFamily: "'Plus Jakarta Sans', 'DM Sans', system-ui, sans-serif",
     }}>
       <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800;900&display=swap" rel="stylesheet" />
@@ -227,7 +227,7 @@ export default function Dashboard() {
 
         {/* ERROR */}
         {error && (
-          <div style={{ marginTop: 16, padding: '13px 18px', background: '#F5F5F5', borderRadius: 12, fontSize: 14, fontWeight: 700, color: B.blackSoft }}>
+          <div style={{ marginTop: 16, padding: '13px 18px', background: '#E4E5EA', borderRadius: 12, fontSize: 14, fontWeight: 700, color: B.blackSoft }}>
             ⚠️ {error}
           </div>
         )}
