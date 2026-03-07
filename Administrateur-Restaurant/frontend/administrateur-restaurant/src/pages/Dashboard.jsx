@@ -21,21 +21,21 @@ function ServiceBanner() {
   if (!isLunch && !isDinner) return null
   return (
     <div style={{
-      display: 'flex', alignItems: 'center', gap: 9,
-      padding: '10px 16px',
+      display: 'flex', alignItems: 'center', gap: 10,
+      padding: '14px 20px',
       background: isDinner ? B.black : B.brownTint,
-      borderRadius: 12, marginBottom: 20,
+      borderRadius: 14, marginBottom: 20,
     }}>
-      <Flame size={14} color={isDinner ? B.brownLight : B.brown} strokeWidth={2.5} />
-      <span style={{ fontSize: 13, fontWeight: 700, color: isDinner ? '#fff' : B.brown }}>
+      <Flame size={16} color={isDinner ? B.brownLight : B.brown} strokeWidth={2.5} />
+      <span style={{ fontSize: 14, fontWeight: 800, color: isDinner ? '#fff' : B.brown }}>
         {isDinner ? '🌙 Service du soir en cours' : '☀️ Service du midi en cours'}
       </span>
       <span style={{
-        marginLeft: 'auto', fontSize: 11, fontWeight: 700,
+        marginLeft: 'auto', fontSize: 13, fontWeight: 700,
         color: isDinner ? B.darkMuted : B.brown,
         display: 'flex', alignItems: 'center', gap: 5,
       }}>
-        <Clock4 size={12} strokeWidth={2} />
+        <Clock4 size={13} strokeWidth={2} />
         {new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
       </span>
     </div>
@@ -45,10 +45,10 @@ function ServiceBanner() {
 function SectionHead({ label }) {
   return (
     <p style={{
-      margin: '0 0 10px',
-      fontSize: 10, fontWeight: 800,
+      margin: '0 0 12px',
+      fontSize: 11, fontWeight: 800,
       color: B.inkMute,
-      letterSpacing: '0.13em',
+      letterSpacing: '0.14em',
       textTransform: 'uppercase',
     }}>
       {label}
@@ -61,15 +61,16 @@ function Btn({ children, onClick, primary = false }) {
     <button
       onClick={onClick}
       style={{
-        display: 'flex', alignItems: 'center', gap: 7,
-        padding: '8px 16px',
+        display: 'flex', alignItems: 'center', gap: 9,
+        padding: '13px 22px',
         background: primary ? B.brown : B.pageBg,
         border: 'none',
-        borderRadius: 10,
-        fontSize: 12, fontWeight: 700,
-        color: primary ? '#fff' : B.inkSub,
+        borderRadius: 12,
+        fontSize: 14, fontWeight: 800,
+        color: primary ? '#fff' : B.blackSoft,
         cursor: 'pointer',
         whiteSpace: 'nowrap',
+        letterSpacing: '-0.1px',
       }}
     >
       {children}
@@ -94,7 +95,7 @@ export default function Dashboard() {
       background: B.pageBg,
       fontFamily: "'Plus Jakarta Sans', 'DM Sans', system-ui, -apple-system, sans-serif",
     }}>
-      <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800;900&display=swap" rel="stylesheet" />
+      <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800;900&display=swap" rel="stylesheet" />
 
       <div style={{ maxWidth: 1140, margin: '0 auto', padding: 'clamp(24px,4vw,42px) clamp(16px,3vw,34px)' }}>
 
@@ -103,33 +104,38 @@ export default function Dashboard() {
           <div style={{
             display: 'flex', flexWrap: 'wrap',
             alignItems: 'center', justifyContent: 'space-between',
-            gap: 12, marginBottom: 26,
+            gap: 14, marginBottom: 28,
             background: B.surface,
-            borderRadius: 16, padding: '13px 22px',
+            borderRadius: 18, padding: '18px 28px',
           }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 13 }}>
-              <div>
-                <h1 style={{ margin: 0, fontSize: 20, fontWeight: 900, color: B.black, letterSpacing: '-0.5px' }}>
-                  Aujourd'hui
-                </h1>
-                <p style={{ margin: '2px 0 0', fontSize: 12, fontWeight: 600, color: B.inkMute, textTransform: 'capitalize' }}>
-                  {today}
-                </p>
-              </div>
+            <div>
+              <h1 style={{
+                margin: 0, fontSize: 26, fontWeight: 900,
+                color: B.black, letterSpacing: '-0.8px', lineHeight: 1.1,
+              }}>
+                Aujourd'hui
+              </h1>
+              <p style={{
+                margin: '4px 0 0', fontSize: 13, fontWeight: 600,
+                color: B.inkMute, textTransform: 'capitalize',
+              }}>
+                {today}
+              </p>
             </div>
 
-            <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 8 }}>
+            <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 10 }}>
               {info?.location && (
                 <div style={{
-                  display: 'flex', alignItems: 'center', gap: 6, padding: '7px 13px',
-                  background: B.pageBg, borderRadius: 10,
-                  fontSize: 12, fontWeight: 700, color: B.inkSub,
+                  display: 'flex', alignItems: 'center', gap: 7,
+                  padding: '13px 18px',
+                  background: B.pageBg, borderRadius: 12,
+                  fontSize: 13, fontWeight: 700, color: B.blackSoft,
                 }}>
-                  <MapPin size={12} color={B.inkMute} strokeWidth={2} /> {info.location}
+                  <MapPin size={14} color={B.inkMute} strokeWidth={2} /> {info.location}
                 </div>
               )}
-              <Btn onClick={() => {}}><RefreshCw size={13} strokeWidth={2.5} /> Actualiser</Btn>
-              <Btn primary onClick={() => {}}><Download size={13} strokeWidth={2.5} /> Export CSV</Btn>
+              <Btn onClick={() => {}}><RefreshCw size={15} strokeWidth={2.5} /> Actualiser</Btn>
+              <Btn primary onClick={() => {}}><Download size={15} strokeWidth={2.5} /> Export CSV</Btn>
             </div>
           </div>
         </FadeUp>
@@ -140,9 +146,9 @@ export default function Dashboard() {
         {/* ERROR */}
         {error && (
           <div style={{
-            padding: '12px 16px',
-            background: B.cancelledBg,
-            borderRadius: 12, fontSize: 13, fontWeight: 700,
+            padding: '14px 20px',
+            background: '#F5F5F5',
+            borderRadius: 12, fontSize: 14, fontWeight: 700,
             color: B.blackSoft, marginBottom: 22,
           }}>
             ⚠️ {error}
@@ -151,7 +157,7 @@ export default function Dashboard() {
 
         {/* HERO */}
         <FadeUp delay={80}>
-          <div style={{ marginBottom: 26 }}>
+          <div style={{ marginBottom: 28 }}>
             <SectionHead label="Réservations en temps réel" />
             <TodayHero
               value={stats.today}
@@ -165,12 +171,24 @@ export default function Dashboard() {
 
         {/* STAT CARDS */}
         <FadeUp delay={160}>
-          <div style={{ marginBottom: 26 }}>
+          <div style={{ marginBottom: 28 }}>
             <SectionHead label="Vue d'ensemble" />
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(192px,1fr))', gap: 12 }}>
-              <StatCard icon={CalendarCheck} iconColor={B.brown} iconBg={B.brownTint} value={stats.tomorrow} label="Réservations demain" trend="+8 vs hier" onClick={() => navigate('/calendar')} delay={0} />
-              <StatCard icon={ClipboardList} iconColor={B.black} iconBg="#F0F0F0" value={stats.total} label="Total réservations" trend="ce mois" delay={80} />
-              <StatCard icon={Users} iconColor={B.black} iconBg="#F0F0F0" value={stats.today_confirmed} label="Confirmées aujourd'hui" delay={160} />
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(200px,1fr))', gap: 14 }}>
+              <StatCard
+                icon={CalendarCheck} iconColor={B.brown} iconBg={B.brownTint}
+                value={stats.tomorrow} label="Demain"
+                trend="+8 vs hier" onClick={() => navigate('/calendar')} delay={0}
+              />
+              <StatCard
+                icon={ClipboardList} iconColor={B.black} iconBg="#EFEFEF"
+                value={stats.total} label="Ce mois"
+                trend="total" delay={80}
+              />
+              <StatCard
+                icon={Users} iconColor={B.black} iconBg="#EFEFEF"
+                value={stats.today_confirmed} label="Confirmées"
+                delay={160}
+              />
             </div>
           </div>
         </FadeUp>
