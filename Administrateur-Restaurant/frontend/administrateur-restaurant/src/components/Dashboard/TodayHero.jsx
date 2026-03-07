@@ -3,24 +3,24 @@ import { CheckCircle2, Clock, XCircle, ArrowUpRight, Users } from 'lucide-react'
 import { B } from '../../utils/brand'
 import useCountUp from '../../hooks/Dashboard/useCountUp'
 
-function OccupancyRing({ rate, size = 106 }) {
+function OccupancyRing({ rate, size = 120 }) {
   const [animRate, setAnimRate] = useState(0)
   useEffect(() => {
     const t = setTimeout(() => setAnimRate(rate), 500)
     return () => clearTimeout(t)
   }, [rate])
 
-  const r = 42, cx = size / 2, cy = size / 2
+  const r = 48, cx = size / 2, cy = size / 2
   const circ = 2 * Math.PI * r
   const dash = (animRate / 100) * circ
 
   return (
     <div style={{ position: 'relative', width: size, height: size, flexShrink: 0 }}>
       <svg width={size} height={size} style={{ transform: 'rotate(-90deg)' }}>
-        <circle cx={cx} cy={cy} r={r} fill="none" stroke="#EBEBEB" strokeWidth={8} />
+        <circle cx={cx} cy={cy} r={r} fill="none" stroke="#EBEBEB" strokeWidth={9} />
         <circle
           cx={cx} cy={cy} r={r} fill="none"
-          stroke={B.brown} strokeWidth={8}
+          stroke={B.brown} strokeWidth={9}
           strokeLinecap="round"
           strokeDasharray={`${dash} ${circ}`}
           style={{ transition: 'stroke-dasharray 1.2s cubic-bezier(0.34,1.3,0.64,1)' }}
@@ -29,10 +29,10 @@ function OccupancyRing({ rate, size = 106 }) {
       <div style={{
         position: 'absolute', inset: 0,
         display: 'flex', flexDirection: 'column',
-        alignItems: 'center', justifyContent: 'center', gap: 1,
+        alignItems: 'center', justifyContent: 'center', gap: 2,
       }}>
-        <span style={{ fontSize: 19, fontWeight: 900, color: B.black, lineHeight: 1 }}>{animRate}%</span>
-        <span style={{ fontSize: 9, fontWeight: 700, color: B.inkMute, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+        <span style={{ fontSize: 22, fontWeight: 900, color: B.black, lineHeight: 1 }}>{animRate}%</span>
+        <span style={{ fontSize: 10, fontWeight: 700, color: B.inkMute, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
           confirmé
         </span>
       </div>
@@ -58,38 +58,41 @@ export default function TodayHero({ value, confirmed, pending, cancelled, onClic
       onClick={onClick}
       style={{
         background: B.surface,
-        borderRadius: 16,
+        borderRadius: 18,
         overflow: 'hidden',
         cursor: 'pointer',
       }}
     >
-      <div style={{ padding: '32px 36px 30px' }}>
+      <div style={{ padding: '36px 40px 34px' }}>
 
         {/* Top row */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 32 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <span style={{ width: 8, height: 8, borderRadius: '50%', background: B.brown, display: 'inline-block' }} />
-            <span style={{ fontSize: 11, fontWeight: 700, color: B.inkMute, letterSpacing: '0.12em', textTransform: 'uppercase' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 36 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
+            <span style={{ width: 9, height: 9, borderRadius: '50%', background: B.brown, display: 'inline-block' }} />
+            <span style={{ fontSize: 12, fontWeight: 800, color: B.inkMute, letterSpacing: '0.12em', textTransform: 'uppercase' }}>
               En direct
             </span>
           </div>
-          <div style={{
-            display: 'flex', alignItems: 'center', gap: 6,
-            background: B.brownTint,
-            borderRadius: 10, padding: '7px 14px',
-            fontSize: 12, fontWeight: 700, color: B.brown,
+
+          {/* BIG CTA button */}
+          <button style={{
+            display: 'flex', alignItems: 'center', gap: 9,
+            background: B.brown, border: 'none',
+            borderRadius: 14, padding: '14px 24px',
+            fontSize: 15, fontWeight: 800, color: '#fff',
+            cursor: 'pointer', letterSpacing: '-0.2px',
           }}>
-            Voir les réservations <ArrowUpRight size={13} strokeWidth={2.5} color={B.brown} />
-          </div>
+            Voir les réservations <ArrowUpRight size={16} strokeWidth={2.5} color="#fff" />
+          </button>
         </div>
 
         {/* Main content */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 48, flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 52, flexWrap: 'wrap' }}>
 
           {/* HUGE number */}
           <div style={{ flex: '0 0 auto' }}>
             <span style={{
-              fontSize: 'clamp(120px,16vw,180px)',
+              fontSize: 'clamp(120px,15vw,180px)',
               fontWeight: 900,
               color: B.black,
               lineHeight: 0.85,
@@ -100,12 +103,12 @@ export default function TodayHero({ value, confirmed, pending, cancelled, onClic
             }}>
               {n}
             </span>
-            <p style={{ margin: '16px 0 0', fontSize: 16, fontWeight: 700, color: B.inkSub }}>
+            <p style={{ margin: '18px 0 0', fontSize: 17, fontWeight: 800, color: B.inkSub }}>
               réservations aujourd'hui
             </p>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 7 }}>
-              <Users size={12} color={B.inkMute} strokeWidth={2} />
-              <span style={{ fontSize: 12, fontWeight: 600, color: B.inkMute }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginTop: 8 }}>
+              <Users size={14} color={B.inkMute} strokeWidth={2} />
+              <span style={{ fontSize: 13, fontWeight: 600, color: B.inkMute }}>
                 ~{(value * 2.3).toFixed(0)} couverts estimés
               </span>
             </div>
@@ -115,23 +118,24 @@ export default function TodayHero({ value, confirmed, pending, cancelled, onClic
           <OccupancyRing rate={rate} />
 
           {/* Status chips */}
-          <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', flex: 1, minWidth: 270 }}>
+          <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', flex: 1, minWidth: 280 }}>
             {stats.map(({ Icon, val, label, color, bg }) => (
               <div key={label} style={{
-                flex: '1 1 82px',
+                flex: '1 1 88px',
                 background: bg,
-                borderRadius: 14, padding: '16px 18px',
+                borderRadius: 16, padding: '20px 22px',
               }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 11 }}>
-                  <Icon size={13} color={color} strokeWidth={2.5} />
-                  <span style={{ fontSize: 10, fontWeight: 800, color, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 14 }}>
+                  <Icon size={15} color={color} strokeWidth={2.5} />
+                  <span style={{ fontSize: 11, fontWeight: 800, color, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
                     {label}
                   </span>
                 </div>
                 <p style={{
-                  margin: 0, fontSize: 42, fontWeight: 900,
+                  margin: 0, fontSize: 52, fontWeight: 900,
                   color: B.black, lineHeight: 1,
-                  fontVariantNumeric: 'tabular-nums', letterSpacing: '-1.5px',
+                  fontVariantNumeric: 'tabular-nums', letterSpacing: '-2px',
+                  fontFamily: "'Plus Jakarta Sans', 'DM Sans', system-ui",
                 }}>
                   {val}
                 </p>
