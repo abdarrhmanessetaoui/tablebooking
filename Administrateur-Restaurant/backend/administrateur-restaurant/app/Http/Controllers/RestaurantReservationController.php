@@ -51,19 +51,27 @@ class RestaurantReservationController extends Controller
     
     public function stats()
     {
-        /** @var \Illuminate\Database\Eloquent\Collection<\App\Models\WpMessage> $messages */
         $messages = WpMessage::where('formid', $this->formId())->get();
         $clean    = $messages->map(fn($m) => $m->toCleanArray());
         $today    = now()->toDateString();
+        $tomorrow = now()->addDay()->toDateString();
+        $month    = now()->format('Y-m');  // e.g. "2026-03"
+    
         $todayRes = $clean->filter(fn($r) => $r['date'] === $today);
+        $monthRes = $clean->filter(fn($r) => str_starts_with($r['date'], $month));
     
         return response()->json([
-            'total'             => $clean->count(),
-            'tomorrow'          => $clean->filter(fn($r) => $r['date'] === now()->addDay()->toDateString())->count(),
-            'today'             => $todayRes->count(),
-            'today_confirmed'   => $todayRes->filter(fn($r) => $r['status'] === 'Confirmed')->count(),
-            'today_pending'     => $todayRes->filter(fn($r) => $r['status'] === 'Pending')->count(),
-            'today_cancelled'   => $todayRes->filter(fn($r) => $r['status'] === 'Cancelled')->count(),
+            'today'            => $todayRes->count(),
+            'today_confirmed'  => $todayRes->filter(fn($r) => $r['status'] === 'Confirmed')->count(),
+            'today_pending'    => $todayRes->filter(fn($r) => $r['status'] === 'Pending')->count(),
+            'today_cancelled'  => $todayRes->filter(fn($r) => $r['status'] === 'Cancelled')->count(),
+    
+            'tomorrow'         => $clean->filter(fn($r) => $r['date'] === $tomorrow)->count(),
+    
+            'total'            => $monthRes->count(),
+            'confirmed'        => $monthRes->filter(fn($r) => $r['status'] === 'Confirmed')->count(),
+            'pending'          => $monthRes->filter(fn($r) => $r['status'] === 'Pending')->count(),
+            'cancelled'        => $monthRes->filter(fn($r) => $r['status'] === 'Cancelled')->count(),
         ]);
     }
     
