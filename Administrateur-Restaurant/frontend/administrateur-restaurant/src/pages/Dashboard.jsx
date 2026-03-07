@@ -17,13 +17,11 @@ import StatCard  from '../components/Dashboard/StatCard'
 import WeekChart from '../components/Dashboard/WeekChart'
 import QuickNav  from '../components/Dashboard/QuickNav'
 
-/* ── Service banner ───────────────────────────────────────────────────────── */
 function ServiceBanner() {
   const h = new Date().getHours()
   const isLunch  = h >= 11 && h < 15
   const isDinner = h >= 18 && h < 23
   if (!isLunch && !isDinner) return null
-
   return (
     <div style={{
       display: 'flex', alignItems: 'center', gap: 9,
@@ -47,7 +45,6 @@ function ServiceBanner() {
   )
 }
 
-/* ── Section heading ──────────────────────────────────────────────────────── */
 function SectionHead({ label }) {
   return (
     <p style={{
@@ -62,7 +59,6 @@ function SectionHead({ label }) {
   )
 }
 
-/* ── Action button ────────────────────────────────────────────────────────── */
 function Btn({ children, onClick, primary = false }) {
   return (
     <button
@@ -70,8 +66,8 @@ function Btn({ children, onClick, primary = false }) {
       style={{
         display: 'flex', alignItems: 'center', gap: 7,
         padding: '8px 16px',
-        background: primary ? B.gold : B.surface,
-        border: primary ? 'none' : `1.5px solid ${B.border}`,
+        background: primary ? B.gold : B.pageBg,
+        border: 'none',
         borderRadius: 10,
         fontSize: 12, fontWeight: 700,
         color: primary ? '#fff' : B.inkSub,
@@ -84,7 +80,6 @@ function Btn({ children, onClick, primary = false }) {
   )
 }
 
-/* ── MAIN ─────────────────────────────────────────────────────────────────── */
 export default function Dashboard() {
   const { stats, loading, error } = useDashboardStats()
   const { info }                  = useRestaurantInfo()
@@ -102,54 +97,39 @@ export default function Dashboard() {
       background: B.pageBg,
       fontFamily: "'Plus Jakarta Sans', 'DM Sans', system-ui, -apple-system, sans-serif",
     }}>
-      {/* Fonts */}
       <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800;900&display=swap" rel="stylesheet" />
 
       <div style={{ maxWidth: 1140, margin: '0 auto', padding: 'clamp(24px,4vw,42px) clamp(16px,3vw,34px)' }}>
 
-        {/* ══ TOP BAR ══ */}
+        {/* TOP BAR */}
         <FadeUp delay={0}>
           <div style={{
             display: 'flex', flexWrap: 'wrap',
             alignItems: 'center', justifyContent: 'space-between',
             gap: 12, marginBottom: 26,
             background: B.surface,
-            border: `1.5px solid ${B.border}`,
             borderRadius: 16, padding: '13px 22px',
           }}>
-            {/* Left */}
             <div style={{ display: 'flex', alignItems: 'center', gap: 13 }}>
               <div style={{
                 width: 44, height: 44, borderRadius: 12,
                 background: B.dark,
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                flexShrink: 0,
               }}>
                 <UtensilsCrossed size={20} color="#E5C97A" strokeWidth={2} />
               </div>
               <div>
-                <h1 style={{
-                  margin: 0, fontSize: 20, fontWeight: 900,
-                  color: B.ink, letterSpacing: '-0.5px', lineHeight: 1.1,
-                }}>
-                  Dashboard
-                </h1>
-                <p style={{
-                  margin: '2px 0 0', fontSize: 12, fontWeight: 600,
-                  color: B.inkMute, textTransform: 'capitalize',
-                }}>
-                  {today}
-                </p>
+                <h1 style={{ margin: 0, fontSize: 20, fontWeight: 900, color: B.ink, letterSpacing: '-0.5px' }}>Dashboard</h1>
+                <p style={{ margin: '2px 0 0', fontSize: 12, fontWeight: 600, color: B.inkMute, textTransform: 'capitalize' }}>{today}</p>
               </div>
             </div>
 
-            {/* Right */}
             <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 8 }}>
               {info?.location && (
                 <div style={{
                   display: 'flex', alignItems: 'center', gap: 6, padding: '7px 13px',
-                  background: B.pageBg, border: `1.5px solid ${B.border}`,
-                  borderRadius: 10, fontSize: 12, fontWeight: 700, color: B.inkSub,
+                  background: B.pageBg, borderRadius: 10,
+                  fontSize: 12, fontWeight: 700, color: B.inkSub,
                 }}>
                   <MapPin size={12} color={B.inkMute} strokeWidth={2} /> {info.location}
                 </div>
@@ -160,15 +140,12 @@ export default function Dashboard() {
           </div>
         </FadeUp>
 
-        {/* ══ SERVICE BANNER ══ */}
-        <FadeUp delay={40}>
-          <ServiceBanner />
-        </FadeUp>
+        {/* SERVICE BANNER */}
+        <FadeUp delay={40}><ServiceBanner /></FadeUp>
 
-        {/* ══ ERROR ══ */}
+        {/* ERROR */}
         {error && (
           <div style={{
-            display: 'flex', alignItems: 'center', gap: 9,
             padding: '12px 16px',
             background: B.cancelledBg,
             borderRadius: 12, fontSize: 13, fontWeight: 700,
@@ -178,7 +155,7 @@ export default function Dashboard() {
           </div>
         )}
 
-        {/* ══ HERO ══ */}
+        {/* HERO */}
         <FadeUp delay={80}>
           <div style={{ marginBottom: 26 }}>
             <SectionHead label="Aujourd'hui en temps réel" />
@@ -192,31 +169,19 @@ export default function Dashboard() {
           </div>
         </FadeUp>
 
-        {/* ══ STAT CARDS ══ */}
+        {/* STAT CARDS */}
         <FadeUp delay={160}>
           <div style={{ marginBottom: 26 }}>
             <SectionHead label="Vue d'ensemble" />
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(192px,1fr))', gap: 12 }}>
-              <StatCard
-                icon={CalendarCheck} iconColor={B.indigo} iconBg={B.indigoBg}
-                value={stats.tomorrow} label="Réservations demain"
-                trend="+8 vs hier" onClick={() => navigate('/calendar')} delay={0}
-              />
-              <StatCard
-                icon={ClipboardList} iconColor={B.blue} iconBg={B.blueBg}
-                value={stats.total} label="Total réservations"
-                trend="ce mois" delay={80}
-              />
-              <StatCard
-                icon={Users} iconColor={B.confirmed} iconBg={B.confirmedBg}
-                value={stats.today_confirmed} label="Confirmées aujourd'hui"
-                delay={160}
-              />
+              <StatCard icon={CalendarCheck} iconColor={B.indigo} iconBg={B.indigoBg} value={stats.tomorrow} label="Réservations demain" trend="+8 vs hier" onClick={() => navigate('/calendar')} delay={0} />
+              <StatCard icon={ClipboardList} iconColor={B.blue} iconBg={B.blueBg} value={stats.total} label="Total réservations" trend="ce mois" delay={80} />
+              <StatCard icon={Users} iconColor={B.confirmed} iconBg={B.confirmedBg} value={stats.today_confirmed} label="Confirmées aujourd'hui" delay={160} />
             </div>
           </div>
         </FadeUp>
 
-        {/* ══ BOTTOM ROW ══ */}
+        {/* BOTTOM ROW */}
         <FadeUp delay={240}>
           <SectionHead label="Activité hebdomadaire & Navigation" />
           <div style={{
