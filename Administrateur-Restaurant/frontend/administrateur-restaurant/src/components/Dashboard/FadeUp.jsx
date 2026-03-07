@@ -6,12 +6,11 @@ export default function FadeUp({ children, delay = 0, style = {} }) {
     const t = setTimeout(() => setOn(true), delay)
     return () => clearTimeout(t)
   }, [delay])
-
   return (
     <div style={{
       opacity: on ? 1 : 0,
-      transform: on ? 'translateY(0)' : 'translateY(10px)',
-      transition: 'opacity 0.4s ease, transform 0.4s ease',
+      transform: on ? 'translateY(0px)' : 'translateY(16px)',
+      transition: 'opacity 0.5s cubic-bezier(0.22,1,0.36,1), transform 0.5s cubic-bezier(0.22,1,0.36,1)',
       ...style,
     }}>
       {children}
