@@ -59,7 +59,7 @@ export default function Layout({ children }) {
           style={{ backgroundColor: '#2b2118' }}
         >
           {/* Left — page title */}
-          <div className="flex items-center gap-3">
+          {/* <div className="flex items-center gap-3">
             <button
               className="md:hidden p-1.5 rounded-xl"
               style={{ color: '#c8a97e' }}
@@ -71,7 +71,7 @@ export default function Layout({ children }) {
               <h2 className="text-base font-bold text-white">{pageTitle}</h2>
               <p className="text-xs hidden sm:block capitalize" style={{ color: 'rgba(200,169,126,0.5)' }}>{today}</p>
             </div>
-          </div>
+          </div> */}
         {/* </div> */}
 
           {/* Right — restaurant info */}
