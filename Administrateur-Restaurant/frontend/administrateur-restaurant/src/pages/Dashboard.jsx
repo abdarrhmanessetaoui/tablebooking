@@ -7,18 +7,15 @@ import {
 } from 'lucide-react'
 
 import useDashboardStats from '../hooks/Dashboard/useDashboardStats'
-import useRestaurantInfo from '../hooks/useRestaurantInfo'
 import { B } from '../utils/brand'
 
 import FadeUp    from '../components/Dashboard/FadeUp'
 import Spinner   from '../components/Dashboard/Spinner'
-import Card      from '../components/Dashboard/Card'
 import IBox      from '../components/Dashboard/IBox'
 import TodayHero from '../components/Dashboard/TodayHero'
 import StatCard  from '../components/Dashboard/StatCard'
 import useCountUp from '../hooks/Dashboard/useCountUp'
 
-/* ── Live clock ──────────────────────────────────────────────────────── */
 function LiveClock() {
   const [time, setTime] = useState(new Date())
   useEffect(() => {
@@ -32,7 +29,6 @@ function LiveClock() {
   )
 }
 
-/* ── Service banner ──────────────────────────────────────────────────── */
 function ServiceBanner() {
   const h = new Date().getHours()
   const isLunch  = h >= 11 && h < 15
@@ -41,45 +37,37 @@ function ServiceBanner() {
   return (
     <div style={{
       display: 'flex', alignItems: 'center', gap: 12,
-      padding: '14px 22px',
-      background: isDinner ? B.black : B.brownTint,
-      borderRadius: 14, marginBottom: 16,
+      padding: '12px 0', marginBottom: 8,
     }}>
-      <Flame size={15} color={isDinner ? B.brownLight : B.brown} strokeWidth={2.5} />
-      <span style={{ fontSize: 14, fontWeight: 800, color: isDinner ? '#fff' : B.brown }}>
+      <Flame size={14} color={B.brown} strokeWidth={2.5} />
+      <span style={{ fontSize: 13, fontWeight: 800, color: B.brown }}>
         {isDinner ? '🌙 Service du soir en cours' : '☀️ Service du midi en cours'}
       </span>
-      <span style={{
-        marginLeft: 'auto', fontSize: 13, fontWeight: 700,
-        color: isDinner ? 'rgba(255,255,255,0.45)' : B.brown,
-        display: 'flex', alignItems: 'center', gap: 5,
-      }}>
-        <Clock4 size={13} strokeWidth={2} />
+      <span style={{ marginLeft: 'auto', fontSize: 12, fontWeight: 700, color: B.inkMute, display: 'flex', alignItems: 'center', gap: 5 }}>
+        <Clock4 size={12} strokeWidth={2} />
         <LiveClock />
       </span>
     </div>
   )
 }
 
-/* ── Section label ───────────────────────────────────────────────────── */
 function Label({ text }) {
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 9, marginBottom: 12 }}>
-      <div style={{ width: 4, height: 16, background: B.brown, borderRadius: 2 }} />
-      <span style={{ fontSize: 10, fontWeight: 900, color: B.blackSoft, letterSpacing: '0.18em', textTransform: 'uppercase' }}>
+    <div style={{ display: 'flex', alignItems: 'center', gap: 9, marginBottom: 14 }}>
+      <div style={{ width: 3, height: 14, background: B.brown, borderRadius: 2 }} />
+      <span style={{ fontSize: 10, fontWeight: 900, color: B.inkMute, letterSpacing: '0.18em', textTransform: 'uppercase' }}>
         {text}
       </span>
     </div>
   )
 }
 
-/* ── Status chip (inline — no extra file) ────────────────────────────── */
-function StatusChip({ icon, iconColor, iconBg, value, label, delay = 0 }) {
+function StatusChip({ icon, iconColor, value, label, delay = 0 }) {
   const n = useCountUp(value, 750, delay)
   return (
-    <div style={{ background: iconBg, borderRadius: 16, padding: '20px 22px' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
-        <IBox icon={icon} color={iconColor} bg="transparent" size={14} />
+    <div style={{ padding: '4px 0' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 10 }}>
+        <IBox icon={icon} color={iconColor} bg="transparent" size={13} />
         <span style={{ fontSize: 11, fontWeight: 900, color: iconColor, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
           {label}
         </span>
@@ -96,7 +84,6 @@ function StatusChip({ icon, iconColor, iconBg, value, label, delay = 0 }) {
   )
 }
 
-/* ── Button ──────────────────────────────────────────────────────────── */
 function Btn({ children, onClick, primary = false }) {
   const [hov, setHov]         = useState(false)
   const [pressed, setPressed] = useState(false)
@@ -109,14 +96,15 @@ function Btn({ children, onClick, primary = false }) {
       onMouseUp={() => setPressed(false)}
       style={{
         display: 'flex', alignItems: 'center', gap: 8,
-        padding: '13px 22px',
-        background: primary ? (hov ? B.brownDark : B.brown) : (hov ? '#E4E4E4' : '#EFEFEF'),
-        border: 'none', borderRadius: 13,
-        fontSize: 14, fontWeight: 800,
-        color: primary ? '#fff' : B.blackSoft,
+        padding: '11px 20px',
+        background: primary ? (hov ? B.brownDark : B.brown) : 'transparent',
+        border: primary ? 'none' : `1.5px solid ${hov ? B.brown : '#D0CCC6'}`,
+        borderRadius: 11,
+        fontSize: 13, fontWeight: 800,
+        color: primary ? '#fff' : hov ? B.brown : B.blackSoft,
         cursor: 'pointer', whiteSpace: 'nowrap',
-        transition: 'background 0.15s, transform 0.1s',
-        transform: pressed ? 'scale(0.97)' : hov ? 'translateY(-2px)' : 'none',
+        transition: 'all 0.15s',
+        transform: pressed ? 'scale(0.97)' : 'none',
         userSelect: 'none',
       }}
     >
@@ -125,7 +113,6 @@ function Btn({ children, onClick, primary = false }) {
   )
 }
 
-/* ── MAIN ─────────────────────────────────────────────────────────────── */
 export default function Dashboard() {
   const { stats, loading, error } = useDashboardStats()
   const navigate = useNavigate()
@@ -138,76 +125,73 @@ export default function Dashboard() {
 
   return (
     <div style={{
-      minHeight: '100vh', background: '#EDEEF2',
+      minHeight: '100vh',
+      background: '#EDEEF2',
       fontFamily: "'Plus Jakarta Sans', 'DM Sans', system-ui, sans-serif",
     }}>
       <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800;900&display=swap" rel="stylesheet" />
 
       <style>{`
-        .wrap        { max-width:1160px; margin:0 auto; padding:clamp(16px,4vw,44px) clamp(16px,3vw,36px); }
-        .topbar      { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:12px; }
-        .topbar-btns { display:flex; gap:10px; }
-        .status-row  { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
-        .stat-row    { display:grid; grid-template-columns:repeat(2,1fr); gap:14px; }
-        @media(max-width:640px) {
-          .stat-row  { grid-template-columns:1fr; }
+        .wrap       { max-width:1100px; margin:0 auto; padding:clamp(20px,4vw,48px) clamp(20px,3vw,40px); }
+        .topbar     { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:12px; margin-bottom:32px; }
+        .topbar-btns{ display:flex; gap:8px; }
+        .status-row { display:grid; grid-template-columns:repeat(3,1fr); gap:32px; }
+        .stat-row   { display:grid; grid-template-columns:repeat(2,1fr); gap:32px; }
+        .divider    { height:1px; background:rgba(0,0,0,0.07); margin:28px 0; }
+        @media(max-width:640px){
+          .stat-row  { grid-template-columns:1fr; gap:24px; }
         }
-        @media(max-width:480px) {
-          .status-row { grid-template-columns:1fr; gap:10px; }
-          .topbar-btns { width:100%; }
-          .topbar-btns button { flex:1; justify-content:center; }
+        @media(max-width:480px){
+          .status-row { grid-template-columns:1fr; gap:20px; }
+          .topbar-btns{ width:100%; }
+          .topbar-btns button{ flex:1; justify-content:center; }
         }
       `}</style>
 
       <div className="wrap">
 
-        {/* 1 — TOP BAR */}
+        {/* TOP BAR */}
         <FadeUp delay={0}>
-          <Card padding="18px 26px" style={{ marginBottom: 16 }}>
-            <div className="topbar">
-              <div>
-                <h1 style={{ margin: 0, fontSize: 'clamp(20px,3.5vw,28px)', fontWeight: 900, color: B.black, letterSpacing: '-0.8px', lineHeight: 1 }}>
-                  Aujourd'hui
-                </h1>
-                <p style={{ margin: '4px 0 0', fontSize: 13, fontWeight: 600, color: B.inkMute, textTransform: 'capitalize' }}>
-                  {today}
-                </p>
-              </div>
-              <div className="topbar-btns">
-                <Btn onClick={() => {}}><RefreshCw size={14} strokeWidth={2.5} /> Actualiser</Btn>
-                <Btn primary onClick={() => {}}><Download size={14} strokeWidth={2.5} /> Exporter</Btn>
-              </div>
+          <div className="topbar">
+            <div>
+              <h1 style={{ margin: 0, fontSize: 'clamp(22px,3.5vw,30px)', fontWeight: 900, color: B.black, letterSpacing: '-0.8px', lineHeight: 1 }}>
+                Aujourd'hui
+              </h1>
+              <p style={{ margin: '5px 0 0', fontSize: 13, fontWeight: 600, color: B.inkMute, textTransform: 'capitalize' }}>
+                {today}
+              </p>
             </div>
-          </Card>
+            <div className="topbar-btns">
+              <Btn onClick={() => {}}><RefreshCw size={13} strokeWidth={2.5} /> Actualiser</Btn>
+              <Btn primary onClick={() => {}}><Download size={13} strokeWidth={2.5} /> Exporter</Btn>
+            </div>
+          </div>
         </FadeUp>
 
-        {/* 2 — SERVICE BANNER (contextual) */}
+        {/* SERVICE BANNER */}
         <FadeUp delay={30}><ServiceBanner /></FadeUp>
 
-        {/* 3 — HERO: big total */}
+        {/* HERO */}
         <FadeUp delay={70}>
-          <div style={{ marginBottom: 14 }}>
-            <Label text="Total du jour" />
-            <TodayHero
-              value={stats.today}
-              onClick={() => navigate('/reservations')}
-            />
-          </div>
+          <Label text="Total du jour" />
+          <TodayHero value={stats.today} onClick={() => navigate('/reservations')} />
         </FadeUp>
 
-        {/* 4 — DETAIL: confirmed / pending / cancelled */}
+        <div className="divider" />
+
+        {/* DETAIL */}
         <FadeUp delay={140}>
-          <div style={{ marginBottom: 24 }}>
-            <Label text="Détail" />
-            <div className="status-row">
-              <StatusChip icon={CheckCircle2} iconColor={B.black}   iconBg="#EFEFEF"      value={stats.today_confirmed} label="Confirmées" delay={140} />
-              <StatusChip icon={Clock}        iconColor={B.brown}   iconBg={B.brownTint}  value={stats.today_pending}   label="En attente" delay={190} />
-              <StatusChip icon={XCircle}      iconColor={B.inkMute} iconBg="#F5F5F5"      value={stats.today_cancelled} label="Annulées"   delay={240} />
-            </div>
+          <Label text="Détail" />
+          <div className="status-row">
+            <StatusChip icon={CheckCircle2} iconColor={B.black}   value={stats.today_confirmed} label="Confirmées" delay={140} />
+            <StatusChip icon={Clock}        iconColor={B.brown}   value={stats.today_pending}   label="En attente" delay={190} />
+            <StatusChip icon={XCircle}      iconColor={B.inkMute} value={stats.today_cancelled} label="Annulées"   delay={240} />
           </div>
         </FadeUp>
 
-        {/* 5 — FORWARD: tomorrow + monthly */}
+        <div className="divider" />
+
+        {/* À VENIR */}
         <FadeUp delay={280}>
           <Label text="À venir" />
           <div className="stat-row">
@@ -218,18 +202,15 @@ export default function Dashboard() {
               onClick={() => navigate('/calendar')} delay={0}
             />
             <StatCard
-              icon={ClipboardList} iconColor={B.blackSoft} iconBg="#EFEFEF"
+              icon={ClipboardList} iconColor={B.blackSoft} iconBg="#E8E9EE"
               value={stats.total} label="Total ce mois"
               delay={60}
             />
           </div>
         </FadeUp>
 
-        {/* ERROR */}
         {error && (
-          <div style={{ marginTop: 16, padding: '13px 18px', background: '#E4E5EA', borderRadius: 12, fontSize: 14, fontWeight: 700, color: B.blackSoft }}>
-            ⚠️ {error}
-          </div>
+          <p style={{ marginTop: 20, fontSize: 13, fontWeight: 700, color: B.inkMute }}>⚠️ {error}</p>
         )}
 
       </div>
