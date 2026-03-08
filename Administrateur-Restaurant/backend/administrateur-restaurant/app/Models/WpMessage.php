@@ -15,6 +15,7 @@ class WpMessage extends Model
         'time',
         'ipaddr',
         'notifyto',
+        'data',
         'posted_data',
         'whoadded',
         'reminderstatus',
