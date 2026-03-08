@@ -10,7 +10,7 @@ const headers = () => ({
 })
 
 const EMPTY_FORM = {
-  name: '', email: '', phone: '', date: '', start_time: '', guests: '', status: 'Pending', notes: ''
+  name: '', email: '', phone: '', date: '', start_time: '', guests: '', service: '', status: 'Pending', notes: ''
 }
 
 const CURRENT_MONTH = new Date().toISOString().slice(0, 7) // "2026-03"
@@ -109,7 +109,7 @@ export default function useReservations(initialFilters = {}) {
       const res = await fetch(API, {
         method: 'POST',
         headers: headers(),
-        body: JSON.stringify(form),
+        body: JSON.stringify({ ...form, guests: parseInt(form.guests) || 1 }),
       })
       if (!res.ok) throw new Error()
       const data = await res.json()
