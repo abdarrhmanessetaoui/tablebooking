@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { X, User, Phone, CalendarDays, Clock, Users, Utensils, FileText, Mail, Trash2 } from 'lucide-react'
+import { getToken } from '../../utils/auth'
 
 const DARK      = '#2b2118'
 const GOLD      = '#c8a97e'
@@ -24,7 +25,7 @@ function Field({ label, value, onChange, type = 'text', required }) {
       <p style={{ margin: '0 0 6px', fontSize: 11, fontWeight: 900, color: DARK, letterSpacing: '0.12em', textTransform: 'uppercase' }}>
         {label}{required && <span style={{ color: GOLD }}> *</span>}
       </p>
-      <input type={type} value={value} onChange={e => onChange(e.target.value)}
+      <input type={type} value={value ?? ''} onChange={e => onChange(e.target.value)}
         style={inputStyle} />
     </div>
   )
@@ -46,12 +47,26 @@ function InfoRow({ icon: Icon, label, value }) {
 }
 
 export default function ReservationModal({ modalMode, editing, form, setForm, handleSubmit, handleCreate, handleDelete, setModalMode }) {
-  const [hovSave, setHovSave]     = useState(false)
-  const [hovDel,  setHovDel]      = useState(false)
+  const [hovSave, setHovSave] = useState(false)
+  const [hovDel,  setHovDel]  = useState(false)
+  const [services, setServices] = useState([])
 
   const close = () => setModalMode(null)
 
-  // ── Header title per mode ──
+  // Fetch services from API
+  useEffect(() => {
+    fetch('http://localhost:8000/api/restaurant/services', {
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': `Bearer ${getToken()}`,
+      }
+    })
+      .then(r => r.json())
+      .then(data => Array.isArray(data) ? setServices(data) : setServices([]))
+      .catch(() => setServices([]))
+  }, [])
+
   const titles = { view: 'Détail', edit: 'Modifier le statut', create: 'Nouvelle réservation' }
 
   return (
@@ -86,17 +101,16 @@ export default function ReservationModal({ modalMode, editing, form, setForm, ha
           {modalMode === 'view' && editing && (
             <>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-                <InfoRow icon={User}        label="Nom"      value={editing.name}       />
-                <InfoRow icon={Phone}       label="Tél"      value={editing.phone}      />
-                <InfoRow icon={Mail}        label="Email"    value={editing.email}      />
-                <InfoRow icon={CalendarDays}label="Date"     value={editing.date}       />
-                <InfoRow icon={Clock}       label="Heure"    value={editing.start_time} />
-                <InfoRow icon={Users}       label="Couverts" value={editing.guests}     />
-                <InfoRow icon={Utensils}    label="Service"  value={editing.service}    />
-                <InfoRow icon={FileText}    label="Notes"    value={editing.notes}      />
+                <InfoRow icon={User}         label="Nom"      value={editing.name}       />
+                <InfoRow icon={Phone}        label="Tél"      value={editing.phone}      />
+                <InfoRow icon={Mail}         label="Email"    value={editing.email}      />
+                <InfoRow icon={CalendarDays} label="Date"     value={editing.date}       />
+                <InfoRow icon={Clock}        label="Heure"    value={editing.start_time} />
+                <InfoRow icon={Users}        label="Couverts" value={editing.guests}     />
+                <InfoRow icon={Utensils}     label="Service"  value={editing.service}    />
+                <InfoRow icon={FileText}     label="Notes"    value={editing.notes}      />
               </div>
 
-              {/* Status badge */}
               {editing.status && (() => {
                 const s = STATUS_CONFIG[editing.status] || { bg: '#f5f5f5', color: '#888', label: editing.status }
                 return (
@@ -108,7 +122,6 @@ export default function ReservationModal({ modalMode, editing, form, setForm, ha
 
               <div style={{ height: 2, background: '#f0ebe4' }} />
 
-              {/* Actions */}
               <div style={{ display: 'flex', gap: 8 }}>
                 <button onClick={() => { setForm({ ...editing }); setModalMode('edit') }}
                   style={{ flex: 1, padding: '12px', background: DARK, border: 'none', fontSize: 13, fontWeight: 800, color: GOLD, cursor: 'pointer' }}>
@@ -128,7 +141,6 @@ export default function ReservationModal({ modalMode, editing, form, setForm, ha
           {/* ── EDIT MODE ─────────────────────────────────────── */}
           {modalMode === 'edit' && (
             <>
-              {/* Readonly summary */}
               <div style={{ background: '#faf8f5', padding: '14px 18px', display: 'flex', flexDirection: 'column', gap: 8 }}>
                 {[
                   { l: 'Date',     v: editing?.date       },
@@ -142,7 +154,6 @@ export default function ReservationModal({ modalMode, editing, form, setForm, ha
                 ) : null)}
               </div>
 
-              {/* Status selector */}
               <div>
                 <p style={{ margin: '0 0 10px', fontSize: 11, fontWeight: 900, color: DARK, letterSpacing: '0.14em', textTransform: 'uppercase' }}>Statut</p>
                 <div style={{ display: 'flex', gap: 6 }}>
@@ -176,21 +187,43 @@ export default function ReservationModal({ modalMode, editing, form, setForm, ha
           {modalMode === 'create' && (
             <>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+
+                {/* Nom — full width */}
                 <div style={{ gridColumn: '1/-1' }}>
                   <Field label="Nom" value={form.name} onChange={v => setForm({ ...form, name: v })} required />
                 </div>
+
                 <Field label="Téléphone" value={form.phone} onChange={v => setForm({ ...form, phone: v })} />
-                <Field label="Email" value={form.email} onChange={v => setForm({ ...form, email: v })} type="email" />
-                <Field label="Date" value={form.date} onChange={v => setForm({ ...form, date: v })} type="date" required />
-                <Field label="Heure" value={form.start_time} onChange={v => setForm({ ...form, start_time: v })} type="time" />
-                <Field label="Couverts" value={form.guests} onChange={v => setForm({ ...form, guests: v })} type="number" />
-                <Field label="Service" value={form.service} onChange={v => setForm({ ...form, service: v })} />
+                <Field label="Email"     value={form.email} onChange={v => setForm({ ...form, email: v })} type="email" />
+                <Field label="Date"      value={form.date}  onChange={v => setForm({ ...form, date: v })}  type="date" required />
+                <Field label="Heure"     value={form.start_time} onChange={v => setForm({ ...form, start_time: v })} type="time" />
+                <Field label="Couverts"  value={form.guests} onChange={v => setForm({ ...form, guests: v })} type="number" required />
+
+                {/* Service dropdown */}
+                <div style={{ gridColumn: '1/-1' }}>
+                  <p style={{ margin: '0 0 6px', fontSize: 11, fontWeight: 900, color: DARK, letterSpacing: '0.12em', textTransform: 'uppercase' }}>
+                    Service
+                  </p>
+                  <select
+                    value={form.service ?? ''}
+                    onChange={e => setForm({ ...form, service: e.target.value })}
+                    style={{ ...inputStyle, appearance: 'none', cursor: 'pointer' }}
+                  >
+                    <option value="">— Choisir un service —</option>
+                    {services.map(s => (
+                      <option key={s.name} value={s.name}>
+                        {s.name}{s.price > 0 ? ` — ${s.price} dh` : ''}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
               </div>
 
               {/* Notes */}
               <div>
                 <p style={{ margin: '0 0 6px', fontSize: 11, fontWeight: 900, color: DARK, letterSpacing: '0.12em', textTransform: 'uppercase' }}>Notes</p>
-                <textarea value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })}
+                <textarea value={form.notes ?? ''} onChange={e => setForm({ ...form, notes: e.target.value })}
                   rows={3} style={{ ...inputStyle, resize: 'vertical' }} />
               </div>
 
@@ -214,7 +247,14 @@ export default function ReservationModal({ modalMode, editing, form, setForm, ha
                 <button onClick={close} style={{ flex: 1, padding: '12px', background: '#f5f0eb', border: 'none', fontSize: 13, fontWeight: 800, color: DARK, cursor: 'pointer' }}>
                   Annuler
                 </button>
-                <button onClick={() => { if (!form.name || !form.date || !form.start_time || !form.guests) { alert("Nom, date, heure et couverts sont obligatoires."); return; } handleCreate(); }}
+                <button
+                  onClick={() => {
+                    if (!form.name || !form.date || !form.start_time || !form.guests) {
+                      alert('Nom, date, heure et couverts sont obligatoires.')
+                      return
+                    }
+                    handleCreate()
+                  }}
                   onMouseEnter={() => setHovSave(true)}
                   onMouseLeave={() => setHovSave(false)}
                   style={{ flex: 2, padding: '12px', background: hovSave ? GOLD_DARK : GOLD, border: 'none', fontSize: 14, fontWeight: 900, color: DARK, cursor: 'pointer', transition: 'background 0.15s' }}>
