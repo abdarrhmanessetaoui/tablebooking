@@ -1,28 +1,68 @@
+import { useState } from 'react'
+import { CalendarOff } from 'lucide-react'
+
+const DARK = '#2b2118'
+const GOLD = '#c8a97e'
+
+function Btn({ children, onClick, disabled, icon: Icon }) {
+  const [hov, setHov] = useState(false)
+  return (
+    <button
+      onClick={onClick}
+      disabled={disabled}
+      onMouseEnter={() => setHov(true)}
+      onMouseLeave={() => setHov(false)}
+      style={{
+        display: 'flex', alignItems: 'center', gap: 9,
+        padding: '14px 28px',
+        background: hov ? GOLD : DARK,
+        border: 'none', color: '#fff',
+        fontSize: 14, fontWeight: 800,
+        cursor: disabled ? 'not-allowed' : 'pointer',
+        opacity: disabled ? 0.5 : 1,
+        transition: 'background 0.15s',
+        fontFamily: 'inherit', whiteSpace: 'nowrap',
+      }}
+    >
+      {Icon && <Icon size={15} strokeWidth={2.2} />}
+      {children}
+    </button>
+  )
+}
+
+const inputStyle = {
+  padding: '13px 16px',
+  border: '2px solid #e8e0d6',
+  fontSize: 14, fontWeight: 700, color: DARK,
+  fontFamily: "'Plus Jakarta Sans','DM Sans',system-ui,sans-serif",
+  outline: 'none',
+  background: '#fff',
+  transition: 'border-color 0.15s',
+  width: '100%',
+}
+
 export default function BlockedDateForm({ form, setForm, handleBlock, submitting }) {
   return (
-    <div className="bg-white rounded-lg shadow-sm p-5 mb-6">
-      <h2 className="text-sm font-semibold text-gray-700 mb-4">Block a Date</h2>
-      <div className="flex flex-col sm:flex-row gap-3">
-        <div>
-          <label className="block text-xs text-gray-500 mb-1">Date</label>
-          <input
-            type="date"
-            value={form.date}
-            onChange={e => setForm({ ...form, date: e.target.value })}
-            className="border border-gray-300 rounded px-3 py-2 text-sm text-gray-800 focus:outline-none focus:border-gray-400 bg-white"
-          />
-        </div>
-        <div className="flex items-end">
-          <button
-            onClick={handleBlock}
-            disabled={submitting || !form.date}
-            className="text-white text-sm font-medium px-4 py-2 rounded hover:opacity-90 transition-opacity disabled:opacity-50"
-            style={{ backgroundColor: '#c8a97e' }}
-          >
-            {submitting ? 'Blocking...' : 'Block Date'}
-          </button>
-        </div>
+    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 16, alignItems: 'flex-end' }}>
+
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+        <label style={{ fontSize: 11, fontWeight: 900, color: DARK, letterSpacing: '0.2em', textTransform: 'uppercase' }}>
+          Date
+        </label>
+        <input
+          type="date"
+          value={form.date || ''}
+          onChange={e => setForm({ ...form, date: e.target.value })}
+          style={inputStyle}
+          onFocus={e => e.target.style.borderColor = GOLD}
+          onBlur={e => e.target.style.borderColor = '#e8e0d6'}
+        />
       </div>
+
+      <Btn icon={CalendarOff} onClick={handleBlock} disabled={submitting || !form.date}>
+        {submitting ? 'Enregistrement…' : 'Bloquer la date'}
+      </Btn>
+
     </div>
   )
 }
