@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { RefreshCw, FileDown } from 'lucide-react'
-import useBlockedDates from '../hooks/useBlockedDates'
+import useBlockedDates from '../hooks/BlockedDates/useBlockedDates'
 import BlockedDateForm from '../components/BlockedDates/BlockedDateForm'
 import BlockedDateList from '../components/BlockedDates/BlockedDateList'
 import FadeUp  from '../components/Dashboard/FadeUp'
