@@ -136,6 +136,7 @@ export default function useReservations(initialFilters = {}) {
     filterDate, setFilterDate,
     clearFilters,
     openView,
+    fetchReservations,
     openEdit,
     openCreate,
     handleSubmit,
