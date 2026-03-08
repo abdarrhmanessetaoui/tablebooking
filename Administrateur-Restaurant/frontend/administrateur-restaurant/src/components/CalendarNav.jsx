@@ -1,79 +1,160 @@
+import { useState } from 'react'
+import { ChevronLeft, ChevronRight, CalendarDays } from 'lucide-react'
+
+const DARK = '#2b2118'
+const GOLD = '#c8a97e'
 const VIEWS = ['day', 'week', 'month', 'year']
+const VIEW_LABELS = { day: 'Jour', week: 'Semaine', month: 'Mois', year: 'Année' }
 
-const ChevronLeft = () => (
-  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-    <polyline points="15 18 9 12 15 6"/>
-  </svg>
-)
-
-const ChevronRight = () => (
-  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-    <polyline points="9 18 15 12 9 6"/>
-  </svg>
-)
-
-const CalendarIcon = () => (
-  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <rect x="3" y="4" width="18" height="18" rx="2"/>
-    <line x1="16" y1="2" x2="16" y2="6"/>
-    <line x1="8" y1="2" x2="8" y2="6"/>
-    <line x1="3" y1="10" x2="21" y2="10"/>
-  </svg>
-)
+function NavBtn({ onClick, children, active, gold }) {
+  const [hov, setHov] = useState(false)
+  return (
+    <button
+      onClick={onClick}
+      onMouseEnter={() => setHov(true)}
+      onMouseLeave={() => setHov(false)}
+      style={{
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        padding: '10px 14px',
+        background: gold
+          ? (active ? GOLD : hov ? GOLD : 'transparent')
+          : (hov ? 'rgba(200,169,126,0.08)' : 'transparent'),
+        border: gold ? 'none' : `1.5px solid ${hov ? 'rgba(200,169,126,0.3)' : 'rgba(43,33,24,0.12)'}`,
+        color: gold
+          ? (active ? DARK : hov ? DARK : 'rgba(43,33,24,0.35)')
+          : (hov ? GOLD : DARK),
+        cursor: 'pointer',
+        transition: 'all 0.13s',
+        fontFamily: 'inherit',
+        fontSize: 12, fontWeight: 800,
+      }}
+    >
+      {children}
+    </button>
+  )
+}
 
 export default function CalendarNav({ view, setView, navLabel, navigate, goToday, currentDate }) {
   const isToday = new Date().toDateString() === currentDate.toDateString()
+  const [hovPrev, setHovPrev] = useState(false)
+  const [hovNext, setHovNext] = useState(false)
 
   return (
-    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
+    <div style={{
+      display: 'flex', flexWrap: 'wrap',
+      alignItems: 'center', justifyContent: 'space-between',
+      gap: 12, marginBottom: 32,
+    }}>
 
-      {/* Left — nav controls */}
-      <div className="flex items-center gap-2">
+      {/* Left — navigation */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+
+        {/* Prev */}
         <button
           onClick={() => navigate('prev')}
-          className="p-2 rounded-lg bg-white border border-gray-200 hover:border-gray-300 text-gray-500 transition-colors"
+          onMouseEnter={() => setHovPrev(true)}
+          onMouseLeave={() => setHovPrev(false)}
+          style={{
+            width: 38, height: 38, display: 'flex', alignItems: 'center', justifyContent: 'center',
+            background: hovPrev ? DARK : '#fff',
+            border: `1.5px solid ${hovPrev ? DARK : 'rgba(43,33,24,0.15)'}`,
+            color: hovPrev ? '#fff' : DARK,
+            cursor: 'pointer', transition: 'all 0.13s',
+          }}
         >
-          <ChevronLeft />
+          <ChevronLeft size={16} strokeWidth={2.5} />
         </button>
 
-        <div className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-white border border-gray-200 min-w-[180px] justify-center">
-          <span style={{ color: '#c8a97e' }}><CalendarIcon /></span>
-          <span className="text-sm font-semibold text-gray-700">{navLabel()}</span>
+        {/* Label */}
+        <div style={{
+          display: 'flex', alignItems: 'center', gap: 8,
+          padding: '9px 18px',
+          border: '1.5px solid rgba(43,33,24,0.12)',
+          background: '#fff',
+          minWidth: 200, justifyContent: 'center',
+        }}>
+          <CalendarDays size={14} strokeWidth={2} color={GOLD} />
+          <span style={{ fontSize: 14, fontWeight: 800, color: DARK, letterSpacing: '-0.3px' }}>
+            {navLabel()}
+          </span>
         </div>
 
+        {/* Next */}
         <button
           onClick={() => navigate('next')}
-          className="p-2 rounded-lg bg-white border border-gray-200 hover:border-gray-300 text-gray-500 transition-colors"
+          onMouseEnter={() => setHovNext(true)}
+          onMouseLeave={() => setHovNext(false)}
+          style={{
+            width: 38, height: 38, display: 'flex', alignItems: 'center', justifyContent: 'center',
+            background: hovNext ? DARK : '#fff',
+            border: `1.5px solid ${hovNext ? DARK : 'rgba(43,33,24,0.15)'}`,
+            color: hovNext ? '#fff' : DARK,
+            cursor: 'pointer', transition: 'all 0.13s',
+          }}
         >
-          <ChevronRight />
+          <ChevronRight size={16} strokeWidth={2.5} />
         </button>
 
-        {!isToday && (
-          <button
-            onClick={goToday}
-            className="text-xs font-medium px-3 py-2 rounded-lg bg-white border border-gray-200 hover:bg-gray-50 text-gray-600 transition-colors"
-          >
-            Today
-          </button>
-        )}
+        {/* Today */}
+        {!isToday && (() => {
+          const [h, setH] = useState(false)
+          return (
+            <button
+              onClick={goToday}
+              onMouseEnter={() => setH(true)}
+              onMouseLeave={() => setH(false)}
+              style={{
+                padding: '9px 16px',
+                background: h ? DARK : '#fff',
+                border: `1.5px solid ${h ? DARK : 'rgba(43,33,24,0.15)'}`,
+                color: h ? '#fff' : DARK,
+                fontSize: 12, fontWeight: 800,
+                cursor: 'pointer', transition: 'all 0.13s',
+                fontFamily: 'inherit',
+              }}
+            >
+              Aujourd'hui
+            </button>
+          )
+        })()}
       </div>
 
       {/* Right — view switcher */}
-      <div className="flex items-center gap-1 bg-white border border-gray-200 rounded-lg p-1">
-        {VIEWS.map(v => (
-          <button
-            key={v}
-            onClick={() => setView(v)}
-            className="text-xs font-semibold px-3 py-1.5 rounded-md capitalize transition-all"
-            style={{
-              backgroundColor: view === v ? '#c8a97e' : 'transparent',
-              color: view === v ? '#fff' : '#6b7280',
-            }}
-          >
-            {v}
-          </button>
-        ))}
+      <div style={{
+        display: 'flex', alignItems: 'center',
+        border: '1.5px solid rgba(43,33,24,0.12)',
+        background: '#fff',
+        overflow: 'hidden',
+      }}>
+        {VIEWS.map((v, i) => {
+          const [h, setH] = useState(false)
+          const active = view === v
+          return (
+            <button
+              key={v}
+              onClick={() => setView(v)}
+              onMouseEnter={() => setH(true)}
+              onMouseLeave={() => setH(false)}
+              style={{
+                padding: '9px 16px',
+                background: active ? DARK : h ? 'rgba(43,33,24,0.05)' : 'transparent',
+                color: active ? '#fff' : h ? DARK : 'rgba(43,33,24,0.45)',
+                fontSize: 12, fontWeight: 800,
+                border: 'none',
+                borderLeft: i > 0 ? '1px solid rgba(43,33,24,0.1)' : 'none',
+                cursor: 'pointer',
+                transition: 'all 0.13s',
+                fontFamily: 'inherit',
+                letterSpacing: '0.02em',
+                textTransform: 'uppercase',
+              }}
+            >
+              {VIEW_LABELS[v]}
+            </button>
+          )
+        })}
       </div>
+
     </div>
   )
 }
