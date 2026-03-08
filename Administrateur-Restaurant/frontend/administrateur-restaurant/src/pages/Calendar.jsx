@@ -1,6 +1,13 @@
-import useCalendar from '../hooks/useCalendar'
-import CalendarNav from '../components/CalendarNav'
-import CalendarWeek from '../components/CalendarWeek'
+import { useState } from 'react'
+import { CalendarDays } from 'lucide-react'
+import useCalendar  from '../hooks/useCalendar'
+import CalendarNav  from '../components/Calendar/CalendarNav'
+import CalendarWeek from '../components/Calendar/CalendarWeek'
+import FadeUp  from '../components/Dashboard/FadeUp'
+import Spinner from '../components/Dashboard/Spinner'
+
+const DARK = '#2b2118'
+const GOLD = '#c8a97e'
 
 export default function Calendar() {
   const {
@@ -14,39 +21,60 @@ export default function Calendar() {
   } = useCalendar()
 
   return (
-    <div className="p-4 sm:p-8">
-      <div className="mb-6">
-        <h1 className="text-xl sm:text-2xl font-semibold text-gray-800">Timeline</h1>
-        <p className="text-sm text-gray-400 mt-1">Manage your reservations by day, week, month or year</p>
+    <div style={{
+      minHeight: '100vh', background: '#fff',
+      fontFamily: "'Plus Jakarta Sans','DM Sans',system-ui,sans-serif",
+    }}>
+      <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800;900&display=swap" rel="stylesheet" />
+      <style>{`* { box-sizing: border-box; } .cal-wrap { max-width: 1200px; margin: 0 auto; padding: clamp(28px,4vw,56px) clamp(20px,3.5vw,48px); }`}</style>
+
+      <div className="cal-wrap">
+
+        {/* PAGE TITLE */}
+        <FadeUp delay={0}>
+          <div style={{ marginBottom: 20 }}>
+            <h1 style={{ margin: '0 0 7px', fontSize: 'clamp(26px,4vw,40px)', fontWeight: 900, color: DARK, letterSpacing: '-2px', lineHeight: 1 }}>
+              Planning
+            </h1>
+            <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: GOLD }}>
+              Gérez vos réservations par jour, semaine, mois ou année
+            </p>
+          </div>
+          <div style={{ height: 2, background: DARK, margin: '20px 0 40px' }} />
+        </FadeUp>
+
+        {error && (
+          <FadeUp delay={10}>
+            <div style={{ marginBottom: 32, padding: '13px 18px', borderLeft: `3px solid #b94040`, background: '#fdf0f0', fontSize: 13, fontWeight: 700, color: '#b94040' }}>
+              {error}
+            </div>
+          </FadeUp>
+        )}
+
+        {/* NAV */}
+        <FadeUp delay={20}>
+          <CalendarNav
+            view={view} setView={setView}
+            navLabel={navLabel}
+            navigate={navigate} goToday={goToday}
+            currentDate={currentDate}
+          />
+        </FadeUp>
+
+        {/* CONTENT */}
+        <FadeUp delay={40}>
+          {loading
+            ? <Spinner />
+            : <CalendarWeek
+                view={view} setView={setView}
+                weekDays={weekDays} monthDays={monthDays}
+                currentDate={currentDate} setCurrentDate={setCurrentDate}
+                getByDate={getByDate} getByMonth={getByMonth}
+              />
+          }
+        </FadeUp>
+
       </div>
-
-      {error && (
-        <div className="mb-4 px-3 py-2 bg-red-50 border border-red-200 rounded text-xs text-red-600">{error}</div>
-      )}
-
-      <CalendarNav
-        view={view}
-        setView={setView}
-        navLabel={navLabel}
-        navigate={navigate}
-        goToday={goToday}
-        currentDate={currentDate}
-      />
-
-      {loading ? (
-        <div className="text-sm text-gray-400">Loading...</div>
-      ) : (
-        <CalendarWeek
-          view={view}
-          setView={setView}
-          weekDays={weekDays}
-          monthDays={monthDays}
-          currentDate={currentDate}
-          setCurrentDate={setCurrentDate}
-          getByDate={getByDate}
-          getByMonth={getByMonth}
-        />
-      )}
     </div>
   )
 }
