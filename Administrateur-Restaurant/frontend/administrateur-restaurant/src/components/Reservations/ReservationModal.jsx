@@ -214,7 +214,7 @@ export default function ReservationModal({ modalMode, editing, form, setForm, ha
                 <button onClick={close} style={{ flex: 1, padding: '12px', background: '#f5f0eb', border: 'none', fontSize: 13, fontWeight: 800, color: DARK, cursor: 'pointer' }}>
                   Annuler
                 </button>
-                <button onClick={handleCreate}
+                <button onClick={() => { if (!form.name || !form.date || !form.start_time || !form.guests) { alert("Nom, date, heure et couverts sont obligatoires."); return; } handleCreate(); }}
                   onMouseEnter={() => setHovSave(true)}
                   onMouseLeave={() => setHovSave(false)}
                   style={{ flex: 2, padding: '12px', background: hovSave ? GOLD_DARK : GOLD, border: 'none', fontSize: 14, fontWeight: 900, color: DARK, cursor: 'pointer', transition: 'background 0.15s' }}>
