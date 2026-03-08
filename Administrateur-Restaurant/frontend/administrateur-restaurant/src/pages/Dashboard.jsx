@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { RefreshCw, FileDown, CheckCircle, Clock, XCircle, ClipboardList, ArrowRight, MapPin, Mail } from 'lucide-react'
+import { RefreshCw, FileDown, CheckCircle, Clock, XCircle, ArrowRight } from 'lucide-react'
 
 import useDashboardStats  from '../hooks/Dashboard/useDashboardStats'
 import useRestaurantInfo  from '../hooks/useRestaurantInfo'
@@ -31,18 +31,15 @@ function Donut({ c, p, a, size = 120 }) {
   const r = 13, circ = 2 * Math.PI * r
   const [on, setOn] = useState(false)
   useEffect(() => { const id = setTimeout(() => setOn(true), 300); return () => clearTimeout(id) }, [total])
-
   const segs = [ { v:c, color:DARK }, { v:p, color:GOLD }, { v:a, color:'#c8b49a' } ]
   let off = 0
-
   return (
     <div style={{ position:'relative', width:size, height:size, flexShrink:0 }}>
       <svg width={size} height={size} viewBox="0 0 36 36" style={{ transform:'rotate(-90deg)' }}>
         <circle cx="18" cy="18" r={r} fill="none" stroke="#e8e0d6" strokeWidth="4.5" />
         {total > 0 && segs.map((s, i) => {
           if (!s.v) { off += (s.v/total)*circ; return null }
-          const arc  = (s.v / total) * circ
-          const dash = on ? arc : 0
+          const arc = (s.v / total) * circ
           const el = <circle key={i} cx="18" cy="18" r={r} fill="none"
             stroke={s.color} strokeWidth="4.5"
             strokeDasharray={`${(s.v/total)*circ} ${circ}`}
@@ -116,6 +113,16 @@ function Btn({ children, onClick, primary, disabled, icon:Icon, small }) {
   )
 }
 
+/* ── Section heading ── */
+function SectionHead({ title, sub }) {
+  return (
+    <div style={{ marginBottom:32 }}>
+      <h2 style={{ margin:0, fontSize:'clamp(20px,2.5vw,28px)', fontWeight:900, color:DARK, letterSpacing:'-0.8px' }}>{title}</h2>
+      <p style={{ margin:'5px 0 0', fontSize:12, fontWeight:700, color:GOLD }}>{sub}</p>
+    </div>
+  )
+}
+
 export default function Dashboard() {
   const { stats, loading, error, refetch } = useDashboardStats()
   const { info }                           = useRestaurantInfo()
@@ -142,8 +149,8 @@ export default function Dashboard() {
       <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800;900&display=swap" rel="stylesheet" />
       <style>{`
         * { box-sizing: border-box; }
-        .db-wrap { max-width:1020px; margin:0 auto; padding:clamp(28px,4vw,56px) clamp(20px,3.5vw,48px); }
-        .db-hr   { height:2px; background:${DARK}; margin:52px 0; }
+        .db-wrap    { max-width:1020px; margin:0 auto; padding:clamp(28px,4vw,56px) clamp(20px,3.5vw,48px); }
+        .db-hr      { height:2px; background:${DARK}; margin:52px 0; }
         .db-section { display:grid; grid-template-columns:280px 1fr; gap:48px; align-items:start; }
         .db-cards   { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
         @media(max-width:780px){ .db-section { grid-template-columns:1fr; gap:28px; } }
@@ -153,30 +160,30 @@ export default function Dashboard() {
 
       <div className="db-wrap">
 
-        {/* ── Topbar ── */}
+        {/* ── PAGE TITLE ── */}
         <FadeUp delay={0}>
-          <div style={{ display:'flex', flexWrap:'wrap', alignItems:'flex-end', justifyContent:'space-between', gap:16, marginBottom: info ? 20 : 52 }}>
+          <div style={{ display:'flex', flexWrap:'wrap', alignItems:'flex-end', justifyContent:'space-between', gap:16, marginBottom:20 }}>
             <div>
-              <h1 style={{ margin:0, fontSize:'clamp(26px,4vw,40px)', fontWeight:900, color:DARK, letterSpacing:'-2px', lineHeight:1 }}>Tableau de bord</h1>
-              <p style={{ margin:'7px 0 0', fontSize:13, fontWeight:700, color:GOLD, textTransform:'capitalize' }}>{today}&nbsp;·&nbsp;<LiveClock /></p>
+              <h1 style={{ margin:0, fontSize:'clamp(26px,4vw,40px)', fontWeight:900, color:DARK, letterSpacing:'-2px', lineHeight:1 }}>
+                Tableau de bord
+              </h1>
+              <p style={{ margin:'7px 0 0', fontSize:13, fontWeight:700, color:GOLD, textTransform:'capitalize' }}>
+                {today}&nbsp;·&nbsp;<LiveClock />
+              </p>
             </div>
             <div className="db-topbtns" style={{ display:'flex', gap:3 }}>
               <Btn icon={RefreshCw} onClick={handleRefresh} disabled={refreshing}>{refreshing?'Actualisation…':'Actualiser'}</Btn>
               <Btn icon={FileDown} primary onClick={handleExportPDF} disabled={exporting}>{exporting?'Génération…':'Exporter PDF'}</Btn>
             </div>
           </div>
+          {/* ← line only under the page h1 */}
+          <div style={{ height:2, background:DARK, margin:'20px 0 52px' }} />
         </FadeUp>
-
-
 
         {/* ── AUJOURD'HUI ── */}
         <FadeUp delay={50}>
-          <div style={{ marginBottom:28 }}>
-            <h2 style={{ margin:0, fontSize:'clamp(20px,2.5vw,28px)', fontWeight:900, color:DARK, letterSpacing:'-0.8px' }}>Aujourd'hui</h2>
-            <p style={{ margin:'3px 0 0', fontSize:12, fontWeight:700, color:GOLD }}>Réservations du jour</p>
-          </div>
+          <SectionHead title="Aujourd'hui" sub="Réservations du jour" />
           <div className="db-section">
-            {/* Left */}
             <div>
               <Hero value={stats.today} delay={70} />
               <p style={{ margin:'10px 0 24px', fontSize:13, fontWeight:800, color:'#888' }}>réservations aujourd'hui</p>
@@ -193,7 +200,6 @@ export default function Dashboard() {
               </div>
               <Btn icon={ArrowRight} primary onClick={() => go({filterDate:TODAY_DATE})}>Voir aujourd'hui</Btn>
             </div>
-            {/* Right */}
             <div className="db-cards">
               <StatCard icon={CheckCircle} value={stats.today_confirmed} label="Confirmées" delay={100} total={stats.today} />
               <StatCard icon={Clock}       value={stats.today_pending}   label="En attente" gold delay={130} total={stats.today} />
@@ -206,10 +212,7 @@ export default function Dashboard() {
 
         {/* ── DEMAIN ── */}
         <FadeUp delay={200}>
-          <div style={{ marginBottom:28 }}>
-            <h2 style={{ margin:0, fontSize:'clamp(20px,2.5vw,28px)', fontWeight:900, color:DARK, letterSpacing:'-0.8px' }}>Demain</h2>
-            <p style={{ margin:'3px 0 0', fontSize:12, fontWeight:700, color:GOLD }}>Planning du lendemain</p>
-          </div>
+          <SectionHead title="Demain" sub="Planning du lendemain" />
           <div className="db-section">
             <div>
               <Hero value={stats.tomorrow} delay={220} />
@@ -239,10 +242,7 @@ export default function Dashboard() {
 
         {/* ── CE MOIS ── */}
         <FadeUp delay={360}>
-          <div style={{ marginBottom:28 }}>
-            <h2 style={{ margin:0, fontSize:'clamp(20px,2.5vw,28px)', fontWeight:900, color:DARK, letterSpacing:'-0.8px' }}>Ce mois</h2>
-            <p style={{ margin:'3px 0 0', fontSize:12, fontWeight:700, color:GOLD }}>Bilan mensuel des réservations</p>
-          </div>
+          <SectionHead title="Ce mois" sub="Bilan mensuel des réservations" />
           <div className="db-section">
             <div>
               <Hero value={stats.total} delay={380} />
@@ -260,9 +260,9 @@ export default function Dashboard() {
               </div>
             </div>
             <div className="db-cards">
-              <StatCard icon={CheckCircle}  value={stats.confirmed} label="Confirmées"      delay={400} total={stats.total} />
-              <StatCard icon={Clock}        value={stats.pending}   label="En attente" gold delay={430} total={stats.total} />
-              <StatCard icon={XCircle}      value={stats.cancelled} label="Annulées"         delay={460} total={stats.total} />
+              <StatCard icon={CheckCircle} value={stats.confirmed} label="Confirmées"      delay={400} total={stats.total} />
+              <StatCard icon={Clock}       value={stats.pending}   label="En attente" gold delay={430} total={stats.total} />
+              <StatCard icon={XCircle}     value={stats.cancelled} label="Annulées"         delay={460} total={stats.total} />
             </div>
           </div>
         </FadeUp>
