@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useLocation } from 'react-router-dom'
 import useReservations from '../hooks/Reservations/useReservations'
 import ReservationsFilters from '../components/Reservations/ReservationsFilters'
 import ReservationsTable   from '../components/Reservations/ReservationsTable'
@@ -9,6 +10,7 @@ const DARK = '#2b2118'
 const GOLD = '#c8a97e'
 
 export default function Reservations() {
+  const location = useLocation()
   const {
     filtered, loading, error,
     showModal, setShowModal,
@@ -20,7 +22,7 @@ export default function Reservations() {
     clearFilters,
     openEdit,
     handleSubmit,
-  } = useReservations()
+  } = useReservations(location.state)
 
   if (loading) return (
     <div style={{
