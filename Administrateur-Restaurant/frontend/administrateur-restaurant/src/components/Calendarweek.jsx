@@ -1,178 +1,223 @@
-const DAYS_SHORT = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN']
-const DAYS_FULL  = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
-const MONTHS     = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-const MONTHS_FULL = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+import { useState } from 'react'
+import { Clock, Users } from 'lucide-react'
+
+const DARK  = '#2b2118'
+const GOLD  = '#c8a97e'
+const CREAM = '#faf8f5'
+
+const DAYS_SHORT  = ['LUN', 'MAR', 'MER', 'JEU', 'VEN', 'SAM', 'DIM']
+const DAYS_FULL   = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche']
+const MONTHS_FULL = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre']
 
 const STATUS = {
-  Confirmed: { border: '#86efac', bg: '#f0fdf4', text: '#16a34a', dot: '#22c55e' },
-  Pending:   { border: '#fde68a', bg: '#fffbeb', text: '#d97706', dot: '#f59e0b' },
-  Cancelled: { border: '#fecaca', bg: '#fef2f2', text: '#dc2626', dot: '#ef4444' },
+  Confirmed: { border: '#2b2118', bg: '#f0f0ed', text: '#2b2118', dot: '#2b2118' },
+  Pending:   { border: GOLD,      bg: '#fdf6ec', text: '#a8834e', dot: GOLD      },
+  Cancelled: { border: '#d4b8a0', bg: '#faf8f5', text: '#9a8070', dot: '#c8b49a' },
 }
 
-const ClockIcon = () => (
-  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-    <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
-  </svg>
-)
-
-const UserIcon = () => (
-  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
-  </svg>
-)
+function StatusBadge({ status }) {
+  const s = STATUS[status] || STATUS.Pending
+  const LABELS = { Confirmed: 'Confirmée', Pending: 'En attente', Cancelled: 'Annulée' }
+  return (
+    <span style={{
+      display: 'inline-flex', alignItems: 'center', gap: 4,
+      padding: '2px 8px',
+      background: s.bg, border: `1px solid ${s.border}`,
+      fontSize: 9, fontWeight: 800, color: s.text,
+      textTransform: 'uppercase', letterSpacing: '0.1em',
+    }}>
+      <span style={{ width: 5, height: 5, borderRadius: '50%', background: s.dot, flexShrink: 0 }} />
+      {LABELS[status] || status}
+    </span>
+  )
+}
 
 function ReservationCard({ r, compact = false }) {
   const s = STATUS[r.status] || STATUS.Pending
   if (compact) {
     return (
-      <div className="rounded px-1.5 py-1 border truncate" style={{ background: s.bg, borderColor: s.border }}>
-        <div className="flex items-center gap-1">
-          <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: s.dot }} />
-          <span className="text-xs font-semibold truncate" style={{ color: s.text }}>{r.start_time} {r.name}</span>
+      <div style={{
+        padding: '4px 8px',
+        background: s.bg,
+        borderLeft: `2px solid ${s.dot}`,
+        overflow: 'hidden',
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+          <span style={{ fontSize: 10, fontWeight: 800, color: s.text, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+            {r.start_time} · {r.name}
+          </span>
         </div>
       </div>
     )
   }
   return (
-    <div className="rounded-lg px-3 py-2.5 border" style={{ background: s.bg, borderColor: s.border }}>
-      <div className="flex items-center justify-between mb-1.5">
-        <div className="flex items-center gap-1.5">
-          <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: s.dot }} />
-          <span className="text-xs font-bold" style={{ color: s.text }}>{r.status}</span>
-        </div>
-        <div className="flex items-center gap-1 text-gray-400">
-          <ClockIcon />
-          <span className="text-xs font-semibold">{r.start_time}</span>
+    <div style={{
+      padding: '14px 16px',
+      background: s.bg,
+      borderLeft: `3px solid ${s.dot}`,
+    }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+        <StatusBadge status={r.status} />
+        <div style={{ display: 'flex', alignItems: 'center', gap: 5, color: '#aaa' }}>
+          <Clock size={11} strokeWidth={2.5} />
+          <span style={{ fontSize: 11, fontWeight: 700 }}>{r.start_time}</span>
         </div>
       </div>
-      <div className="text-sm font-semibold text-gray-800 truncate mb-1">{r.name}</div>
-      <div className="flex items-center gap-1 text-gray-400">
-        <UserIcon />
-        <span className="text-xs">{r.guests} guests</span>
+      <div style={{ fontSize: 14, fontWeight: 800, color: DARK, marginBottom: 6, letterSpacing: '-0.2px' }}>
+        {r.name}
+      </div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 5, color: '#aaa' }}>
+        <Users size={11} strokeWidth={2.5} />
+        <span style={{ fontSize: 11, fontWeight: 600 }}>{r.guests} personne{r.guests !== 1 ? 's' : ''}</span>
       </div>
     </div>
   )
 }
 
-// DAY VIEW
+/* ── DAY ── */
 function DayView({ date, getByDate }) {
   const reservations = getByDate(date)
-  const hours = Array.from({ length: 8 }, (_, i) => `${18 + i}:00`)
+  const hours = Array.from({ length: 10 }, (_, i) => `${(i + 10).toString().padStart(2, '0')}:00`)
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-      <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
+    <div style={{ background: '#fff', border: `1.5px solid rgba(43,33,24,0.1)` }}>
+      {/* Header */}
+      <div style={{
+        padding: '18px 24px',
+        borderBottom: `2px solid ${DARK}`,
+        display: 'flex', alignItems: 'baseline', justifyContent: 'space-between',
+      }}>
         <div>
-          <div className="text-lg font-bold text-gray-800">
-            {date.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
-          </div>
-          <div className="text-sm text-gray-400 mt-0.5">
-            {reservations.length} reservation{reservations.length !== 1 ? 's' : ''}
-          </div>
+          <h3 style={{ margin: 0, fontSize: 18, fontWeight: 900, color: DARK, letterSpacing: '-0.5px' }}>
+            {date.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })}
+          </h3>
         </div>
+        <span style={{ fontSize: 12, fontWeight: 700, color: GOLD }}>
+          {reservations.length} réservation{reservations.length !== 1 ? 's' : ''}
+        </span>
       </div>
-      <div className="divide-y divide-gray-50">
-        {hours.map(hour => {
-          const slotRes = reservations.filter(r => r.start_time && r.start_time.startsWith(hour.slice(0, 2)))
-          return (
-            <div key={hour} className="flex gap-4 px-5 py-3 hover:bg-gray-50 transition-colors">
-              <div className="w-14 flex-shrink-0 text-xs font-semibold text-gray-300 pt-0.5">{hour}</div>
-              <div className="flex-1 flex flex-col gap-1.5">
-                {slotRes.length === 0 ? (
-                  <div className="h-6" />
-                ) : (
-                  slotRes.map(r => <ReservationCard key={r.id} r={r} />)
-                )}
-              </div>
+
+      {/* Time slots */}
+      {hours.map(hour => {
+        const slotRes = reservations.filter(r => r.start_time?.startsWith(hour.slice(0, 2)))
+        return (
+          <div key={hour} style={{
+            display: 'flex', gap: 20,
+            padding: '12px 24px',
+            borderBottom: '1px solid rgba(43,33,24,0.06)',
+          }}>
+            <div style={{ width: 48, flexShrink: 0, fontSize: 11, fontWeight: 700, color: 'rgba(43,33,24,0.3)', paddingTop: 2 }}>
+              {hour}
             </div>
-          )
-        })}
-      </div>
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 6 }}>
+              {slotRes.length === 0
+                ? <div style={{ height: 24 }} />
+                : slotRes.map(r => <ReservationCard key={r.id} r={r} />)
+              }
+            </div>
+          </div>
+        )
+      })}
     </div>
   )
 }
 
-// WEEK VIEW
+/* ── WEEK ── */
 function WeekView({ weekDays, getByDate }) {
+  const today = new Date().toDateString()
   const [activeDay, setActiveDay] = useState(() => {
-    const today = new Date().toDateString()
     const i = weekDays.findIndex(d => d.toDateString() === today)
     return i >= 0 ? i : 0
   })
-  const today = new Date().toDateString()
 
   return (
     <>
+      <style>{`
+        @media(min-width:768px){ .wk-grid { display: grid !important; } .wk-mobile { display: none !important; } }
+        @media(max-width:767px){ .wk-grid { display: none !important; } .wk-mobile { display: block !important; } }
+      `}</style>
+
       {/* Mobile */}
-      <div className="block md:hidden">
-        <div className="flex gap-1 mb-4 overflow-x-auto pb-1">
+      <div className="wk-mobile">
+        <div style={{ display: 'flex', gap: 4, marginBottom: 16, overflowX: 'auto', paddingBottom: 4 }}>
           {weekDays.map((day, i) => {
             const isToday = day.toDateString() === today
             const count   = getByDate(day).length
             const active  = activeDay === i
             return (
-              <button
-                key={i}
-                onClick={() => setActiveDay(i)}
-                className="flex-shrink-0 flex flex-col items-center px-3 py-2 rounded-xl border transition-all"
-                style={{
-                  borderColor: active ? '#c8a97e' : '#e5e7eb',
-                  backgroundColor: active ? 'rgba(200,169,126,0.08)' : '#fff',
-                }}
-              >
-                <span className="text-xs font-bold tracking-wider" style={{ color: active || isToday ? '#c8a97e' : '#9ca3af' }}>
-                  {DAYS_SHORT[i]}
-                </span>
-                <span className="text-xl font-bold" style={{ color: active || isToday ? '#c8a97e' : '#1f2937' }}>
-                  {day.getDate()}
-                </span>
+              <button key={i} onClick={() => setActiveDay(i)} style={{
+                flexShrink: 0,
+                display: 'flex', flexDirection: 'column', alignItems: 'center',
+                padding: '10px 14px',
+                background: active ? DARK : '#fff',
+                border: `1.5px solid ${active ? DARK : isToday ? GOLD : 'rgba(43,33,24,0.12)'}`,
+                color: active ? '#fff' : isToday ? GOLD : DARK,
+                cursor: 'pointer', transition: 'all 0.13s',
+                fontFamily: 'inherit',
+              }}>
+                <span style={{ fontSize: 9, fontWeight: 900, letterSpacing: '0.15em', marginBottom: 4 }}>{DAYS_SHORT[i]}</span>
+                <span style={{ fontSize: 20, fontWeight: 900, lineHeight: 1 }}>{day.getDate()}</span>
                 {count > 0 && (
-                  <span className="w-4 h-4 rounded-full text-xs font-bold flex items-center justify-center mt-0.5"
-                    style={{ background: active ? '#c8a97e' : '#f3f4f6', color: active ? '#fff' : '#6b7280' }}>
-                    {count}
-                  </span>
+                  <span style={{
+                    marginTop: 5, width: 18, height: 18,
+                    background: active ? GOLD : 'rgba(43,33,24,0.08)',
+                    color: active ? DARK : DARK,
+                    fontSize: 9, fontWeight: 900,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    borderRadius: '50%',
+                  }}>{count}</span>
                 )}
               </button>
             )
           })}
         </div>
-        <div className="bg-white rounded-xl border border-gray-200 p-4">
-          <div className="text-sm font-semibold text-gray-600 mb-3">
-            {DAYS_FULL[activeDay]}, {weekDays[activeDay]?.toLocaleDateString('en-US', { month: 'long', day: 'numeric' })}
+        <div style={{ border: `1.5px solid rgba(43,33,24,0.1)` }}>
+          <div style={{ padding: '14px 20px', borderBottom: `2px solid ${DARK}` }}>
+            <span style={{ fontSize: 13, fontWeight: 800, color: DARK }}>
+              {DAYS_FULL[activeDay]}, {weekDays[activeDay]?.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' })}
+            </span>
           </div>
-          {(() => {
-            const res = getByDate(weekDays[activeDay])
-            return res.length === 0
-              ? <div className="text-sm text-gray-300 text-center py-10">No reservations</div>
-              : <div className="flex flex-col gap-2">{res.map(r => <ReservationCard key={r.id} r={r} />)}</div>
-          })()}
+          <div style={{ padding: 16 }}>
+            {(() => {
+              const res = getByDate(weekDays[activeDay])
+              return res.length === 0
+                ? <div style={{ textAlign: 'center', padding: '40px 0', fontSize: 13, fontWeight: 700, color: 'rgba(43,33,24,0.2)' }}>Aucune réservation</div>
+                : <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>{res.map(r => <ReservationCard key={r.id} r={r} />)}</div>
+            })()}
+          </div>
         </div>
       </div>
 
       {/* Desktop */}
-      <div className="hidden md:grid gap-2" style={{ gridTemplateColumns: 'repeat(7, 1fr)' }}>
+      <div className="wk-grid" style={{ gridTemplateColumns: 'repeat(7, 1fr)', gap: 4 }}>
         {weekDays.map((day, i) => {
           const isToday      = day.toDateString() === today
           const reservations = getByDate(day)
           return (
-            <div key={i} className="rounded-xl border bg-white"
-              style={{ borderColor: isToday ? '#c8a97e' : '#e5e7eb', borderWidth: isToday ? '2px' : '1px' }}>
-              <div className="px-3 py-3 border-b" style={{ borderColor: isToday ? '#c8a97e' : '#f3f4f6' }}>
-                <div className="text-xs font-bold tracking-widest mb-1" style={{ color: isToday ? '#c8a97e' : '#9ca3af' }}>
+            <div key={i} style={{
+              border: `${isToday ? 2 : 1}px solid ${isToday ? GOLD : 'rgba(43,33,24,0.1)'}`,
+              background: '#fff',
+            }}>
+              <div style={{
+                padding: '12px',
+                borderBottom: `${isToday ? 2 : 1}px solid ${isToday ? GOLD : 'rgba(43,33,24,0.06)'}`,
+                background: isToday ? '#fdf6ec' : '#fff',
+              }}>
+                <div style={{ fontSize: 9, fontWeight: 900, letterSpacing: '0.18em', color: isToday ? GOLD : 'rgba(43,33,24,0.3)', marginBottom: 4 }}>
                   {DAYS_SHORT[i]}
                 </div>
-                <div className="text-2xl font-bold leading-none" style={{ color: isToday ? '#c8a97e' : '#1f2937' }}>
+                <div style={{ fontSize: 22, fontWeight: 900, color: isToday ? GOLD : DARK, lineHeight: 1 }}>
                   {day.getDate()}
                 </div>
                 {reservations.length > 0 && (
-                  <div className="mt-1.5 text-xs font-semibold" style={{ color: isToday ? '#c8a97e' : '#6b7280' }}>
-                    {reservations.length} booking{reservations.length !== 1 ? 's' : ''}
+                  <div style={{ marginTop: 4, fontSize: 10, fontWeight: 700, color: isToday ? GOLD : 'rgba(43,33,24,0.4)' }}>
+                    {reservations.length} rés.
                   </div>
                 )}
               </div>
-              <div className="p-2 flex flex-col gap-1.5" style={{ minHeight: '180px' }}>
+              <div style={{ padding: 6, display: 'flex', flexDirection: 'column', gap: 4, minHeight: 160 }}>
                 {reservations.length === 0
-                  ? <div className="flex items-center justify-center" style={{ minHeight: '80px' }}><span className="text-xs text-gray-300">—</span></div>
+                  ? <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 1, fontSize: 18, color: 'rgba(43,33,24,0.1)', fontWeight: 900 }}>—</div>
                   : reservations.map(r => <ReservationCard key={r.id} r={r} compact />)
                 }
               </div>
@@ -184,47 +229,51 @@ function WeekView({ weekDays, getByDate }) {
   )
 }
 
-// MONTH VIEW
+/* ── MONTH ── */
 function MonthView({ monthDays, currentDate, getByDate, setCurrentDate, setView }) {
   const today = new Date().toDateString()
-
   return (
-    <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-      <div className="grid grid-cols-7 border-b border-gray-100">
+    <div style={{ border: `1.5px solid rgba(43,33,24,0.1)`, background: '#fff' }}>
+      {/* Day headers */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', borderBottom: `2px solid ${DARK}` }}>
         {DAYS_SHORT.map(d => (
-          <div key={d} className="py-2 text-center text-xs font-bold tracking-wider text-gray-400">{d}</div>
+          <div key={d} style={{
+            padding: '12px 8px', textAlign: 'center',
+            fontSize: 9, fontWeight: 900, color: 'rgba(43,33,24,0.4)', letterSpacing: '0.18em',
+          }}>{d}</div>
         ))}
       </div>
-      <div className="grid grid-cols-7">
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)' }}>
         {monthDays.map(({ date, current }, i) => {
           const isToday      = date.toDateString() === today
           const reservations = getByDate(date)
           return (
-            <div
-              key={i}
-              onClick={() => { setCurrentDate(date); setView('day') }}
-              className="border-b border-r border-gray-50 p-2 cursor-pointer hover:bg-gray-50 transition-colors"
-              style={{
-                minHeight: '90px',
-                opacity: current ? 1 : 0.35,
-                backgroundColor: isToday ? 'rgba(200,169,126,0.06)' : undefined,
-              }}
+            <div key={i} onClick={() => { setCurrentDate(date); setView('day') }} style={{
+              borderBottom: '1px solid rgba(43,33,24,0.06)',
+              borderRight: '1px solid rgba(43,33,24,0.06)',
+              padding: 8, minHeight: 100, cursor: 'pointer',
+              opacity: current ? 1 : 0.3,
+              background: isToday ? '#fdf6ec' : '#fff',
+              transition: 'background 0.12s',
+            }}
+            onMouseEnter={e => { if (!isToday) e.currentTarget.style.background = CREAM }}
+            onMouseLeave={e => { e.currentTarget.style.background = isToday ? '#fdf6ec' : '#fff' }}
             >
-              <div
-                className="w-7 h-7 rounded-full flex items-center justify-center text-sm font-semibold mb-1.5 mx-auto"
-                style={{
-                  backgroundColor: isToday ? '#c8a97e' : 'transparent',
-                  color: isToday ? '#fff' : current ? '#1f2937' : '#9ca3af',
-                }}
-              >
+              <div style={{
+                width: 26, height: 26, borderRadius: '50%', marginBottom: 6,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                background: isToday ? GOLD : 'transparent',
+                fontSize: 12, fontWeight: 800,
+                color: isToday ? '#fff' : current ? DARK : '#aaa',
+              }}>
                 {date.getDate()}
               </div>
-              <div className="flex flex-col gap-0.5">
-                {reservations.slice(0, 2).map(r => (
-                  <ReservationCard key={r.id} r={r} compact />
-                ))}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+                {reservations.slice(0, 2).map(r => <ReservationCard key={r.id} r={r} compact />)}
                 {reservations.length > 2 && (
-                  <div className="text-xs text-gray-400 font-medium pl-1">+{reservations.length - 2} more</div>
+                  <span style={{ fontSize: 9, fontWeight: 800, color: GOLD, paddingLeft: 4 }}>
+                    +{reservations.length - 2} de plus
+                  </span>
                 )}
               </div>
             </div>
@@ -235,38 +284,53 @@ function MonthView({ monthDays, currentDate, getByDate, setCurrentDate, setView 
   )
 }
 
-// YEAR VIEW
+/* ── YEAR ── */
 function YearView({ currentDate, getByMonth, setCurrentDate, setView }) {
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 8 }}>
       {MONTHS_FULL.map((month, i) => {
-        const reservations = getByMonth(currentDate.getFullYear(), i)
-        const isCurrentMonth = new Date().getMonth() === i && new Date().getFullYear() === currentDate.getFullYear()
+        const reservations    = getByMonth(currentDate.getFullYear(), i)
+        const isCurrentMonth  = new Date().getMonth() === i && new Date().getFullYear() === currentDate.getFullYear()
+        const [hov, setHov]   = useState(false)
+        const confirmed = reservations.filter(r => r.status === 'Confirmed').length
+        const pending   = reservations.filter(r => r.status === 'Pending').length
+        const cancelled = reservations.filter(r => r.status === 'Cancelled').length
+
         return (
-          <div
-            key={i}
+          <div key={i}
             onClick={() => { setCurrentDate(new Date(currentDate.getFullYear(), i, 1)); setView('month') }}
-            className="bg-white rounded-xl border p-4 cursor-pointer hover:shadow-sm transition-all"
-            style={{ borderColor: isCurrentMonth ? '#c8a97e' : '#e5e7eb', borderWidth: isCurrentMonth ? '2px' : '1px' }}
+            onMouseEnter={() => setHov(true)}
+            onMouseLeave={() => setHov(false)}
+            style={{
+              padding: '20px',
+              border: `${isCurrentMonth ? 2 : 1}px solid ${isCurrentMonth ? GOLD : hov ? 'rgba(43,33,24,0.2)' : 'rgba(43,33,24,0.1)'}`,
+              background: hov ? CREAM : '#fff',
+              cursor: 'pointer', transition: 'all 0.13s',
+            }}
           >
-            <div className="text-sm font-bold mb-1" style={{ color: isCurrentMonth ? '#c8a97e' : '#1f2937' }}>
+            <div style={{ fontSize: 11, fontWeight: 900, color: isCurrentMonth ? GOLD : 'rgba(43,33,24,0.4)', letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: 8 }}>
               {month}
             </div>
-            <div className="text-2xl font-bold text-gray-800 mb-2">{reservations.length}</div>
-            <div className="text-xs text-gray-400">reservation{reservations.length !== 1 ? 's' : ''}</div>
+            <div style={{ fontSize: 36, fontWeight: 900, color: DARK, lineHeight: 1, letterSpacing: '-2px', marginBottom: 8 }}>
+              {reservations.length}
+            </div>
+            <div style={{ fontSize: 11, fontWeight: 700, color: 'rgba(43,33,24,0.4)', marginBottom: 12 }}>
+              réservation{reservations.length !== 1 ? 's' : ''}
+            </div>
             {reservations.length > 0 && (
-              <div className="mt-2 flex gap-1 flex-wrap">
-                {['Confirmed', 'Pending', 'Cancelled'].map(status => {
-                  const count = reservations.filter(r => r.status === status).length
-                  if (!count) return null
-                  const s = STATUS[status]
-                  return (
-                    <span key={status} className="text-xs px-1.5 py-0.5 rounded font-medium"
-                      style={{ background: s.bg, color: s.text }}>
-                      {count} {status.slice(0, 4)}
-                    </span>
-                  )
-                })}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                {confirmed > 0 && <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, fontWeight: 700 }}>
+                  <span style={{ color: 'rgba(43,33,24,0.5)' }}>Confirmées</span>
+                  <span style={{ color: DARK, fontWeight: 900 }}>{confirmed}</span>
+                </div>}
+                {pending > 0 && <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, fontWeight: 700 }}>
+                  <span style={{ color: 'rgba(43,33,24,0.5)' }}>En attente</span>
+                  <span style={{ color: GOLD, fontWeight: 900 }}>{pending}</span>
+                </div>}
+                {cancelled > 0 && <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, fontWeight: 700 }}>
+                  <span style={{ color: 'rgba(43,33,24,0.5)' }}>Annulées</span>
+                  <span style={{ color: '#c8b49a', fontWeight: 900 }}>{cancelled}</span>
+                </div>}
               </div>
             )}
           </div>
@@ -276,9 +340,7 @@ function YearView({ currentDate, getByMonth, setCurrentDate, setView }) {
   )
 }
 
-// MAIN EXPORT
-import { useState } from 'react'
-
+/* ── MAIN ── */
 export default function CalendarWeek({ view, weekDays, monthDays, currentDate, setCurrentDate, setView, getByDate, getByMonth }) {
   return (
     <div>
