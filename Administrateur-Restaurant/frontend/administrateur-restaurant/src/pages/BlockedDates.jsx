@@ -31,12 +31,13 @@ export default function BlockedDates() {
 
         {/* PAGE TITLE */}
         <FadeUp delay={0}>
-          <h1 style={{ margin:'0 0 6px', fontSize:'clamp(28px,4vw,42px)', fontWeight:900, color:DARK, letterSpacing:'-2px', lineHeight:1 }}>
+          <h1 style={{ margin:'0 0 8px', fontSize:'clamp(28px,4vw,42px)', fontWeight:900, color:DARK, letterSpacing:'-2px', lineHeight:1 }}>
             Dates bloquées
           </h1>
-          <p style={{ margin:'0 0 52px', fontSize:13, fontWeight:700, color:GOLD }}>
+          <p style={{ margin:'0 0 24px', fontSize:13, fontWeight:700, color:GOLD }}>
             Les dates bloquées ne peuvent pas être réservées par les clients.
           </p>
+          <div style={{ height:2, background:DARK, marginBottom:52 }} />
         </FadeUp>
 
         {error && (
@@ -49,10 +50,10 @@ export default function BlockedDates() {
 
         {/* FORM SECTION */}
         <FadeUp delay={30}>
-          <h2 style={{ margin:'0 0 4px', fontSize:'clamp(20px,2.5vw,30px)', fontWeight:900, color:DARK, letterSpacing:'-1px' }}>
+          <h2 style={{ margin:'0 0 6px', fontSize:'clamp(20px,2.5vw,30px)', fontWeight:900, color:DARK, letterSpacing:'-1px' }}>
             Bloquer une date
           </h2>
-          <p style={{ margin:'0 0 28px', fontSize:12, fontWeight:700, color:GOLD }}>
+          <p style={{ margin:'0 0 32px', fontSize:12, fontWeight:700, color:GOLD }}>
             Sélectionnez une date à bloquer pour les clients
           </p>
           <BlockedDateForm form={form} setForm={setForm} handleBlock={handleBlock} submitting={submitting} />
@@ -60,20 +61,18 @@ export default function BlockedDates() {
 
         {/* DIVIDER */}
         <FadeUp delay={50}>
-          <div style={{ height:2, background:DARK, margin:'52px 0' }} />
+          <div style={{ height:2, background:DARK, margin:'56px 0' }} />
         </FadeUp>
 
         {/* LIST SECTION */}
         <FadeUp delay={70}>
-          <div style={{ display:'flex', alignItems:'baseline', justifyContent:'space-between', gap:16, marginBottom:28, flexWrap:'wrap' }}>
-            <div>
-              <h2 style={{ margin:'0 0 4px', fontSize:'clamp(20px,2.5vw,30px)', fontWeight:900, color:DARK, letterSpacing:'-1px' }}>
-                Dates bloquées
-              </h2>
-              <p style={{ margin:0, fontSize:12, fontWeight:700, color:GOLD }}>
-                {blockedDates.length} date{blockedDates.length !== 1 ? 's' : ''} bloquée{blockedDates.length !== 1 ? 's' : ''}
-              </p>
-            </div>
+          <div style={{ marginBottom:32 }}>
+            <h2 style={{ margin:'0 0 6px', fontSize:'clamp(20px,2.5vw,30px)', fontWeight:900, color:DARK, letterSpacing:'-1px' }}>
+              Dates bloquées
+            </h2>
+            <p style={{ margin:0, fontSize:12, fontWeight:700, color:GOLD }}>
+              {blockedDates.length} date{blockedDates.length !== 1 ? 's' : ''} bloquée{blockedDates.length !== 1 ? 's' : ''}
+            </p>
           </div>
           <BlockedDateList blockedDates={blockedDates} handleUnblock={handleUnblock} />
         </FadeUp>
