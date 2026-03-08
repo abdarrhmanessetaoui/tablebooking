@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
-  RefreshCw, FileDown, CheckCircle, Clock,
-  XCircle, CalendarDays, ClipboardList, ArrowRight,
+  RefreshCw, FileDown, CheckCircle, Clock, XCircle,
+  CalendarDays, ClipboardList, ArrowRight, TrendingUp,
 } from 'lucide-react'
 
 import useDashboardStats from '../hooks/Dashboard/useDashboardStats'
-import FadeUp    from '../components/Dashboard/FadeUp'
-import Spinner   from '../components/Dashboard/Spinner'
+import FadeUp     from '../components/Dashboard/FadeUp'
+import Spinner    from '../components/Dashboard/Spinner'
 import useCountUp from '../hooks/Dashboard/useCountUp'
 import { exportPDF } from '../utils/exportPDF'
 
@@ -31,65 +31,74 @@ function LiveClock() {
   )
 }
 
-function Label({ text, sub }) {
-  return (
-    <div style={{ marginBottom: 32 }}>
-      <h2 style={{
-        margin: 0, fontSize: 'clamp(28px,3.5vw,42px)', fontWeight: 900,
-        color: DARK, letterSpacing: '-1.2px', lineHeight: 1,
-        fontFamily: "'Plus Jakarta Sans','DM Sans',system-ui",
-      }}>
-        {text}
-      </h2>
-      {sub && <p style={{ margin:'8px 0 0', fontSize:13, fontWeight:700, color:GOLD }}>{sub}</p>}
-    </div>
-  )
-}
-
 function HeroNum({ value }) {
   const n = useCountUp(value, 900, 60)
   return (
     <p style={{
-      margin:0, fontSize:'clamp(96px,13vw,196px)', fontWeight:900,
-      color:DARK, lineHeight:0.85, fontVariantNumeric:'tabular-nums',
-      letterSpacing:'-6px', fontFamily:"'Plus Jakarta Sans','DM Sans',system-ui",
+      margin: 0,
+      fontSize: 'clamp(80px,11vw,160px)',
+      fontWeight: 900,
+      color: DARK,
+      lineHeight: 0.85,
+      fontVariantNumeric: 'tabular-nums',
+      letterSpacing: '-5px',
+      fontFamily: "'Plus Jakarta Sans','DM Sans',system-ui",
     }}>
       {n}
     </p>
   )
 }
 
-function Stat({ value, label, gold=false, delay=0, icon:Icon }) {
+// Compact horizontal stat pill
+function StatPill({ icon: Icon, value, label, gold = false, delay = 0 }) {
   const n = useCountUp(value, 750, delay)
   return (
-    <div>
-      {Icon && <Icon size={30} strokeWidth={2} color={gold ? GOLD : DARK} style={{ marginBottom:16, display:'block' }} />}
-      <p style={{
-        margin:0, fontSize:'clamp(48px,5.5vw,76px)', fontWeight:900,
-        color: gold ? GOLD : DARK, lineHeight:1,
-        fontVariantNumeric:'tabular-nums', letterSpacing:'-2.5px',
-        fontFamily:"'Plus Jakarta Sans','DM Sans',system-ui",
-      }}>
-        {n}
-      </p>
-      <p style={{ margin:'12px 0 0', fontSize:16, fontWeight:800, color:DARK, letterSpacing:'-0.3px' }}>{label}</p>
+    <div style={{
+      display: 'flex', alignItems: 'center', gap: 14,
+      padding: '16px 20px',
+      background: gold ? '#fdf6ec' : '#faf8f5',
+      borderLeft: `3px solid ${gold ? GOLD : DARK}`,
+    }}>
+      <Icon size={18} strokeWidth={2} color={gold ? GOLD_DARK : DARK} style={{ flexShrink: 0 }} />
+      <div>
+        <p style={{
+          margin: 0,
+          fontSize: 'clamp(28px,3vw,40px)',
+          fontWeight: 900,
+          color: gold ? GOLD_DARK : DARK,
+          lineHeight: 1,
+          fontVariantNumeric: 'tabular-nums',
+          letterSpacing: '-1.5px',
+          fontFamily: "'Plus Jakarta Sans','DM Sans',system-ui",
+        }}>
+          {n}
+        </p>
+        <p style={{ margin: '3px 0 0', fontSize: 11, fontWeight: 800, color: '#aaa', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+          {label}
+        </p>
+      </div>
     </div>
   )
 }
 
-// Big hero stat for confirmed this month
-function HeroStat({ value, label, delay=0 }) {
+// Big hero stat (for confirmed this month)
+function HeroStat({ value, label, delay = 0 }) {
   const n = useCountUp(value, 750, delay)
   return (
     <div>
       <p style={{
-        margin:0, fontSize:'clamp(72px,9vw,128px)', fontWeight:900,
-        color:DARK, lineHeight:0.9, fontVariantNumeric:'tabular-nums',
-        letterSpacing:'-4px', fontFamily:"'Plus Jakarta Sans','DM Sans',system-ui",
+        margin: 0,
+        fontSize: 'clamp(64px,8vw,112px)',
+        fontWeight: 900,
+        color: DARK,
+        lineHeight: 0.9,
+        fontVariantNumeric: 'tabular-nums',
+        letterSpacing: '-3px',
+        fontFamily: "'Plus Jakarta Sans','DM Sans',system-ui",
       }}>
         {n}
       </p>
-      <p style={{ margin:'12px 0 0', fontSize:18, fontWeight:800, color:GOLD, letterSpacing:'-0.3px' }}>{label}</p>
+      <p style={{ margin: '12px 0 0', fontSize: 14, fontWeight: 800, color: GOLD_DARK, letterSpacing: '-0.2px' }}>{label}</p>
     </div>
   )
 }
@@ -102,18 +111,33 @@ function Btn({ children, onClick, primary, disabled, icon: Icon }) {
     <button onClick={onClick} disabled={disabled}
       onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
       style={{
-        display:'flex', alignItems:'center', gap:9, padding:'14px 28px',
-        background:bg, border:'none', color,
-        fontSize:14, fontWeight:800,
+        display: 'flex', alignItems: 'center', gap: 9, padding: '13px 24px',
+        background: bg, border: 'none', color,
+        fontSize: 13, fontWeight: 800,
         cursor: disabled ? 'not-allowed' : 'pointer',
         opacity: disabled ? 0.5 : 1,
-        transition:'background 0.15s, color 0.15s',
-        fontFamily:'inherit', letterSpacing:'-0.2px', whiteSpace:'nowrap',
+        transition: 'background 0.15s, color 0.15s',
+        fontFamily: 'inherit', letterSpacing: '-0.2px', whiteSpace: 'nowrap',
       }}
     >
-      {Icon && <Icon size={16} strokeWidth={2.2} />}
+      {Icon && <Icon size={15} strokeWidth={2.2} />}
       {children}
     </button>
+  )
+}
+
+function SectionTitle({ text, sub }) {
+  return (
+    <div style={{ marginBottom: 28 }}>
+      <h2 style={{
+        margin: 0, fontSize: 'clamp(22px,2.8vw,32px)', fontWeight: 900,
+        color: DARK, letterSpacing: '-1px', lineHeight: 1,
+        fontFamily: "'Plus Jakarta Sans','DM Sans',system-ui",
+      }}>
+        {text}
+      </h2>
+      {sub && <p style={{ margin: '6px 0 0', fontSize: 12, fontWeight: 700, color: GOLD }}>{sub}</p>}
+    </div>
   )
 }
 
@@ -123,7 +147,7 @@ export default function Dashboard() {
   const [refreshing, setRefreshing]        = useState(false)
   const [exporting,  setExporting]         = useState(false)
 
-  const today = new Date().toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'long' })
+  const today = new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })
 
   async function handleRefresh() {
     setRefreshing(true)
@@ -151,37 +175,30 @@ export default function Dashboard() {
   if (loading) return <Spinner />
 
   return (
-    <div style={{ minHeight:'100vh', background:'#fff', fontFamily:"'Plus Jakarta Sans','DM Sans',system-ui,sans-serif" }}>
+    <div style={{ minHeight: '100vh', background: '#fff', fontFamily: "'Plus Jakarta Sans','DM Sans',system-ui,sans-serif" }}>
       <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800;900&display=swap" rel="stylesheet" />
 
       <style>{`
-        .wrap   { max-width:1060px; margin:0 auto; padding:clamp(32px,5vw,64px) clamp(28px,4vw,56px); }
-        .topbar { display:flex; flex-wrap:wrap; align-items:flex-end; justify-content:space-between; gap:16px; margin-bottom:56px; }
-        .tbtns  { display:flex; gap:3px; }
-        .three  { display:grid; grid-template-columns:repeat(3,1fr); gap:0; }
-        .two    { display:grid; grid-template-columns:repeat(2,1fr); gap:0; }
-        .hr     { height:2px; background:${DARK}; margin:48px 0; }
-        @media(max-width:680px){ .two { grid-template-columns:1fr; } .two > * { margin-bottom:32px; } }
-        @media(max-width:520px){
-          .three { grid-template-columns:1fr; } .three > * { margin-bottom:32px; }
-          .tbtns { width:100%; } .tbtns button { flex:1; justify-content:center; }
-        }
+        .wrap { max-width:1000px; margin:0 auto; padding:clamp(28px,4vw,56px) clamp(24px,3.5vw,48px); }
+        .hr   { height:2px; background:${DARK}; margin:44px 0; }
+        .pills { display:flex; flex-direction:column; gap:8px; }
+        @media(max-width:560px){ .day-grid { flex-direction:column !important; } }
       `}</style>
 
       <div className="wrap">
 
-        {/* ── Top bar ── */}
+        {/* ── Topbar ── */}
         <FadeUp delay={0}>
-          <div className="topbar">
+          <div style={{ display:'flex', flexWrap:'wrap', alignItems:'flex-end', justifyContent:'space-between', gap:16, marginBottom:52 }}>
             <div>
-              <h1 style={{ margin:0, fontSize:'clamp(30px,4.5vw,48px)', fontWeight:900, color:DARK, letterSpacing:'-2px', lineHeight:1 }}>
+              <h1 style={{ margin:0, fontSize:'clamp(28px,4vw,44px)', fontWeight:900, color:DARK, letterSpacing:'-2px', lineHeight:1 }}>
                 Tableau de bord
               </h1>
-              <p style={{ margin:'10px 0 0', fontSize:15, fontWeight:700, color:GOLD, textTransform:'capitalize' }}>
+              <p style={{ margin:'8px 0 0', fontSize:14, fontWeight:700, color:GOLD, textTransform:'capitalize' }}>
                 {today}&nbsp;·&nbsp;<LiveClock />
               </p>
             </div>
-            <div className="tbtns">
+            <div style={{ display:'flex', gap:3 }}>
               <Btn icon={RefreshCw} onClick={handleRefresh} disabled={refreshing}>
                 {refreshing ? 'Actualisation…' : 'Actualiser'}
               </Btn>
@@ -192,72 +209,76 @@ export default function Dashboard() {
           </div>
         </FadeUp>
 
-        {/* ── Aujourd'hui — hero + détail côte à côte ── */}
+        {/* ── AUJOURD'HUI ── */}
         <FadeUp delay={40}>
-          <Label text="Aujourd'hui" sub="Total des réservations du jour" />
-          <div className="two" style={{ alignItems:'flex-start' }}>
-            {/* Gauche : grand chiffre + bouton */}
-            <div>
+          <SectionTitle text="Aujourd'hui" sub="Réservations du jour" />
+          <div className="day-grid" style={{ display:'flex', gap:48, alignItems:'flex-start' }}>
+            {/* Left: hero */}
+            <div style={{ flexShrink:0 }}>
               <HeroNum value={stats.today} />
-              <p style={{ margin:'18px 0 0', fontSize:17, fontWeight:800, color:DARK, letterSpacing:'-0.3px' }}>
+              <p style={{ margin:'14px 0 20px', fontSize:15, fontWeight:800, color:DARK, letterSpacing:'-0.2px' }}>
                 réservations aujourd'hui
               </p>
-              <div style={{ marginTop:28 }}>
-                <Btn icon={ArrowRight} primary onClick={() => go({ filterDate: TODAY_DATE })}>
-                  Voir les réservations d'aujourd'hui
-                </Btn>
-              </div>
+              <Btn icon={ArrowRight} primary onClick={() => go({ filterDate: TODAY_DATE })}>
+                Voir aujourd'hui
+              </Btn>
             </div>
-            {/* Droite : détail statuts */}
-            <div style={{ display:'flex', flexDirection:'column', gap:32, paddingTop:8 }}>
-              <Stat icon={CheckCircle} value={stats.today_confirmed} label="Confirmées" delay={110} />
-              <Stat icon={Clock}       value={stats.today_pending}   label="En attente" gold delay={145} />
-              <Stat icon={XCircle}     value={stats.today_cancelled} label="Annulées"   delay={180} />
+            {/* Right: pills */}
+            <div className="pills" style={{ flex:1, paddingTop:6 }}>
+              <StatPill icon={CheckCircle} value={stats.today_confirmed} label="Confirmées"  delay={100} />
+              <StatPill icon={Clock}       value={stats.today_pending}   label="En attente"  gold delay={130} />
+              <StatPill icon={XCircle}     value={stats.today_cancelled} label="Annulées"    delay={160} />
             </div>
           </div>
         </FadeUp>
 
         <div className="hr" />
 
-        {/* ── Demain — avec détail ── */}
-        <FadeUp delay={230}>
-          <Label text="Demain" sub="Planning du lendemain" />
-          <div className="two" style={{ marginBottom:36 }}>
-            <div>
-              <Stat icon={CalendarDays} value={stats.tomorrow} label="Total demain" gold delay={230} />
-              <div style={{ marginTop:28 }}>
-                <Btn icon={ArrowRight} primary onClick={() => go({ filterDate: TOMORROW_DATE })}>
-                  Voir les réservations de demain
-                </Btn>
-              </div>
+        {/* ── DEMAIN ── */}
+        <FadeUp delay={200}>
+          <SectionTitle text="Demain" sub="Planning du lendemain" />
+          <div className="day-grid" style={{ display:'flex', gap:48, alignItems:'flex-start' }}>
+            {/* Left: hero */}
+            <div style={{ flexShrink:0 }}>
+              <HeroNum value={stats.tomorrow} />
+              <p style={{ margin:'14px 0 20px', fontSize:15, fontWeight:800, color:DARK, letterSpacing:'-0.2px' }}>
+                réservations demain
+              </p>
+              <Btn icon={ArrowRight} primary onClick={() => go({ filterDate: TOMORROW_DATE })}>
+                Voir demain
+              </Btn>
             </div>
-            {/* Détail demain */}
-            <div style={{ display:'flex', flexDirection:'column', gap:28 }}>
-              <Stat icon={CheckCircle} value={stats.tomorrow_confirmed ?? 0} label="Confirmées demain"  delay={250} />
-              <Stat icon={Clock}       value={stats.tomorrow_pending   ?? 0} label="En attente demain" gold delay={280} />
-              <Stat icon={XCircle}     value={stats.tomorrow_cancelled ?? 0} label="Annulées demain"    delay={310} />
+            {/* Right: pills */}
+            <div className="pills" style={{ flex:1, paddingTop:6 }}>
+              <StatPill icon={CheckCircle} value={stats.tomorrow_confirmed ?? 0} label="Confirmées"  delay={220} />
+              <StatPill icon={Clock}       value={stats.tomorrow_pending   ?? 0} label="En attente"  gold delay={250} />
+              <StatPill icon={XCircle}     value={stats.tomorrow_cancelled ?? 0} label="Annulées"    delay={280} />
             </div>
           </div>
         </FadeUp>
 
         <div className="hr" />
 
-        {/* ── Ce mois — confirmed hero + totaux ── */}
-        <FadeUp delay={310}>
-          <Label text="Ce mois" sub="Bilan mensuel — réservations confirmées" />
-          <div className="two">
-            <div>
-              <HeroStat value={stats.confirmed} label="Confirmées ce mois" delay={310} />
+        {/* ── CE MOIS ── */}
+        <FadeUp delay={330}>
+          <SectionTitle text="Ce mois" sub="Bilan mensuel des réservations" />
+          <div className="day-grid" style={{ display:'flex', gap:48, alignItems:'flex-start' }}>
+            {/* Left: confirmed hero */}
+            <div style={{ flexShrink:0 }}>
+              <HeroStat value={stats.confirmed} label="Confirmées ce mois" delay={330} />
             </div>
-            <div style={{ display:'flex', flexDirection:'column', gap:28 }}>
-              <Stat icon={ClipboardList} value={stats.total}     label="Total ce mois"     delay={330} />
-              <Stat icon={Clock}         value={stats.pending}   label="En attente ce mois" gold delay={350} />
-              <Stat icon={XCircle}       value={stats.cancelled} label="Annulées ce mois"   delay={370} />
+            {/* Right: pills */}
+            <div className="pills" style={{ flex:1, paddingTop:6 }}>
+              <StatPill icon={ClipboardList} value={stats.total}     label="Total ce mois"      delay={350} />
+              <StatPill icon={Clock}         value={stats.pending}   label="En attente ce mois" gold delay={375} />
+              <StatPill icon={XCircle}       value={stats.cancelled} label="Annulées ce mois"   delay={400} />
             </div>
           </div>
         </FadeUp>
 
-        {error && <p style={{ marginTop:32, fontSize:14, fontWeight:700, color:GOLD }}>Erreur — {error}</p>}
+        {error && (
+          <p style={{ marginTop:32, fontSize:13, fontWeight:700, color:GOLD }}>Erreur — {error}</p>
+        )}
       </div>
     </div>
   )
