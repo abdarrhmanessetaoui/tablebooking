@@ -9,18 +9,23 @@ const headers = () => ({
   'Authorization': `Bearer ${getToken()}`,
 })
 
+const EMPTY_FORM = {
+  name: '', email: '', phone: '', date: '', start_time: '', guests: '', status: 'Pending', notes: ''
+}
+
 export default function useReservations(initialFilters = {}) {
   const [reservations, setReservations] = useState([])
   const [loading, setLoading]           = useState(true)
   const [error, setError]               = useState('')
-  const [showModal, setShowModal]       = useState(false)
-  const [editing, setEditing]           = useState(null)
-  const [search, setSearch]             = useState('')
+
+  // modal modes: null | 'edit' | 'create' | 'view'
+  const [modalMode, setModalMode]   = useState(null)
+  const [editing, setEditing]       = useState(null)
+  const [form, setForm]             = useState(EMPTY_FORM)
+
+  const [search,       setSearch]       = useState('')
   const [filterStatus, setFilterStatus] = useState(initialFilters?.filterStatus || 'all')
-  const [filterDate, setFilterDate]     = useState(initialFilters?.filterDate   || '')
-  const [form, setForm] = useState({
-    name: '', email: '', phone: '', date: '', start_time: '', guests: '', status: 'Pending', notes: ''
-  })
+  const [filterDate,   setFilterDate]   = useState(initialFilters?.filterDate   || '')
 
   useEffect(() => { fetchReservations() }, [])
 
@@ -31,7 +36,7 @@ export default function useReservations(initialFilters = {}) {
       const data = await res.json()
       setReservations(Array.isArray(data) ? data : [])
     } catch {
-      setError('Failed to load reservations.')
+      setError('Impossible de charger les réservations.')
       setReservations([])
     } finally {
       setLoading(false)
@@ -50,10 +55,17 @@ export default function useReservations(initialFilters = {}) {
     })
   }, [reservations, search, filterStatus, filterDate])
 
+  // ── View ──────────────────────────────────────────────────────────────
+  const openView = (reservation) => {
+    setEditing(reservation)
+    setModalMode('view')
+  }
+
+  // ── Edit status ───────────────────────────────────────────────────────
   const openEdit = (reservation) => {
     setEditing(reservation)
     setForm({ ...reservation })
-    setShowModal(true)
+    setModalMode('edit')
   }
 
   const handleSubmit = async () => {
@@ -66,12 +78,48 @@ export default function useReservations(initialFilters = {}) {
       })
       const data = await res.json()
       setReservations(prev => prev.map(r => r.id === editing.id ? data : r))
-      setShowModal(false)
+      setModalMode(null)
     } catch {
-      setError('Failed to update reservation.')
+      setError('Impossible de modifier le statut.')
     }
   }
 
+  // ── Create ────────────────────────────────────────────────────────────
+  const openCreate = () => {
+    setEditing(null)
+    setForm(EMPTY_FORM)
+    setModalMode('create')
+  }
+
+  const handleCreate = async () => {
+    try {
+      const res = await fetch(API, {
+        method: 'POST',
+        headers: headers(),
+        body: JSON.stringify(form),
+      })
+      if (!res.ok) throw new Error()
+      const data = await res.json()
+      setReservations(prev => [data, ...prev])
+      setModalMode(null)
+    } catch {
+      setError('Impossible de créer la réservation.')
+    }
+  }
+
+  // ── Delete ────────────────────────────────────────────────────────────
+  const handleDelete = async (id) => {
+    if (!window.confirm('Supprimer cette réservation ?')) return
+    try {
+      await fetch(`${API}/${id}`, { method: 'DELETE', headers: headers() })
+      setReservations(prev => prev.filter(r => r.id !== id))
+      if (modalMode !== null) setModalMode(null)
+    } catch {
+      setError('Impossible de supprimer la réservation.')
+    }
+  }
+
+  // ── Filters ───────────────────────────────────────────────────────────
   const clearFilters = () => {
     setSearch('')
     setFilterStatus('all')
@@ -80,14 +128,18 @@ export default function useReservations(initialFilters = {}) {
 
   return {
     filtered, loading, error,
-    showModal, setShowModal,
+    modalMode, setModalMode,
     form, setForm,
     editing,
     search, setSearch,
     filterStatus, setFilterStatus,
     filterDate, setFilterDate,
     clearFilters,
+    openView,
     openEdit,
+    openCreate,
     handleSubmit,
+    handleCreate,
+    handleDelete,
   }
 }
