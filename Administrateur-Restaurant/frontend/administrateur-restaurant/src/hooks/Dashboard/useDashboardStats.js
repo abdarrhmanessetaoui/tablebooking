@@ -3,7 +3,8 @@ import { getToken } from '../../utils/auth'
 
 const DEFAULTS = {
   today: 0, today_confirmed: 0, today_pending: 0, today_cancelled: 0,
-  tomorrow: 0, total: 0, confirmed: 0, pending: 0, cancelled: 0,
+  tomorrow: 0, tomorrow_confirmed: 0, tomorrow_pending: 0, tomorrow_cancelled: 0,
+  total: 0, confirmed: 0, pending: 0, cancelled: 0,
 }
 
 function sanitize(data) {
