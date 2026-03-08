@@ -195,7 +195,19 @@ export default function ReservationModal({ modalMode, editing, form, setForm, ha
 
                 <Field label="Téléphone" value={form.phone} onChange={v => setForm({ ...form, phone: v })} />
                 <Field label="Email"     value={form.email} onChange={v => setForm({ ...form, email: v })} type="email" />
-                <Field label="Date"      value={form.date}  onChange={v => setForm({ ...form, date: v })}  type="date" required />
+                {/* Date — min = today, impossible de choisir une date passée */}
+                <div>
+                  <p style={{ margin: '0 0 6px', fontSize: 11, fontWeight: 900, color: DARK, letterSpacing: '0.12em', textTransform: 'uppercase' }}>
+                    Date <span style={{ color: GOLD }}>*</span>
+                  </p>
+                  <input
+                    type="date"
+                    value={form.date ?? ''}
+                    min={new Date().toISOString().slice(0, 10)}
+                    onChange={e => setForm({ ...form, date: e.target.value })}
+                    style={inputStyle}
+                  />
+                </div>
                 <Field label="Heure"     value={form.start_time} onChange={v => setForm({ ...form, start_time: v })} type="time" />
                 <Field label="Couverts"  value={form.guests} onChange={v => setForm({ ...form, guests: v })} type="number" required />
 
