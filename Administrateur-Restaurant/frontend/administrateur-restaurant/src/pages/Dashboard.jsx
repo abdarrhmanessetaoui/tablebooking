@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { RefreshCw, FileDown, CheckCircle, Clock, XCircle, ClipboardList, ArrowRight, MapPin, Mail } from 'lucide-react'
 
 import useDashboardStats  from '../hooks/Dashboard/useDashboardStats'
+import useRestaurantInfo  from '../hooks/useRestaurantInfo'
 import FadeUp             from '../components/Dashboard/FadeUp'
 import Spinner            from '../components/Dashboard/Spinner'
 import useCountUp         from '../hooks/Dashboard/useCountUp'
@@ -116,6 +118,7 @@ function Btn({ children, onClick, primary, disabled, icon:Icon, small }) {
 
 export default function Dashboard() {
   const { stats, loading, error, refetch } = useDashboardStats()
+  const { info }                           = useRestaurantInfo()
   const navigate                           = useNavigate()
   const [refreshing, setRefreshing] = useState(false)
   const [exporting,  setExporting]  = useState(false)
@@ -152,7 +155,7 @@ export default function Dashboard() {
 
         {/* ── Topbar ── */}
         <FadeUp delay={0}>
-          <div style={{ display:'flex', flexWrap:'wrap', alignItems:'flex-end', justifyContent:'space-between', gap:16, marginBottom: 52 }}>
+          <div style={{ display:'flex', flexWrap:'wrap', alignItems:'flex-end', justifyContent:'space-between', gap:16, marginBottom: info ? 20 : 52 }}>
             <div>
               <h1 style={{ margin:0, fontSize:'clamp(26px,4vw,40px)', fontWeight:900, color:DARK, letterSpacing:'-2px', lineHeight:1 }}>Tableau de bord</h1>
               <p style={{ margin:'7px 0 0', fontSize:13, fontWeight:700, color:GOLD, textTransform:'capitalize' }}>{today}&nbsp;·&nbsp;<LiveClock /></p>
@@ -163,6 +166,35 @@ export default function Dashboard() {
             </div>
           </div>
         </FadeUp>
+
+        {/* ── Restaurant banner ── */}
+        {info && (
+          <FadeUp delay={15}>
+            <div style={{ display:'flex', flexWrap:'wrap', alignItems:'center', justifyContent:'space-between', gap:12, padding:'14px 20px', background:DARK, marginBottom:52 }}>
+              <div style={{ display:'flex', alignItems:'center', gap:14 }}>
+                <div style={{ width:38, height:38, background:GOLD, display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+                  <span style={{ fontSize:16, fontWeight:900, color:DARK }}>{info.name?.charAt(0)}</span>
+                </div>
+                <div>
+                  <p style={{ margin:0, fontSize:15, fontWeight:900, color:'#fff', letterSpacing:'-0.3px' }}>{info.name}</p>
+                  {info.location && <p style={{ margin:'2px 0 0', fontSize:11, fontWeight:700, color:GOLD, display:'flex', alignItems:'center', gap:4 }}><MapPin size={10} color={GOLD} />{info.location}</p>}
+                </div>
+              </div>
+              <div style={{ display:'flex', flexWrap:'wrap', gap:6 }}>
+                {info.email && (
+                  <span style={{ display:'flex', alignItems:'center', gap:5, padding:'5px 11px', background:'rgba(200,169,126,0.18)', fontSize:11, fontWeight:700, color:GOLD }}>
+                    <Mail size={10} color={GOLD} />{info.email}
+                  </span>
+                )}
+                {info.default_status && (
+                  <span style={{ padding:'5px 11px', background:'rgba(255,255,255,0.08)', fontSize:11, fontWeight:700, color:'rgba(255,255,255,0.7)' }}>
+                    Défaut : <span style={{ color:'#fff' }}>{info.default_status}</span>
+                  </span>
+                )}
+              </div>
+            </div>
+          </FadeUp>
+        )}
 
         {/* ── AUJOURD'HUI ── */}
         <FadeUp delay={50}>
