@@ -19,6 +19,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/stats',                                      [RestaurantReservationController::class, 'stats']);
     Route::get('/reservations/by-date',                       [RestaurantReservationController::class, 'byDate']);
     Route::get('/reports',                                    [RestaurantReservationController::class, 'reports']);
+    Route::get('/restaurant/services',                           [RestaurantReservationController::class, 'services']);
     Route::get('/restaurant/info',                            [RestaurantReservationController::class, 'info']);
     Route::get('/restaurant/reservations',                    [RestaurantReservationController::class, 'index']);
     Route::get('/restaurant/reservations/{id}',               [RestaurantReservationController::class, 'show']);
