@@ -234,27 +234,9 @@ export default function Dashboard() {
             </div>
             {/* Détail demain */}
             <div style={{ display:'flex', flexDirection:'column', gap:28 }}>
-              <div>
-                <CheckCircle size={22} strokeWidth={2} color={DARK} style={{ marginBottom:10, display:'block' }} />
-                <p style={{ margin:0, fontSize:'clamp(32px,4vw,52px)', fontWeight:900, color:DARK, letterSpacing:'-2px', fontVariantNumeric:'tabular-nums' }}>
-                  {useCountUp(stats.tomorrow_confirmed ?? 0, 750, 250)}
-                </p>
-                <p style={{ margin:'8px 0 0', fontSize:14, fontWeight:800, color:DARK }}>Confirmées demain</p>
-              </div>
-              <div>
-                <Clock size={22} strokeWidth={2} color={GOLD} style={{ marginBottom:10, display:'block' }} />
-                <p style={{ margin:0, fontSize:'clamp(32px,4vw,52px)', fontWeight:900, color:GOLD, letterSpacing:'-2px', fontVariantNumeric:'tabular-nums' }}>
-                  {useCountUp(stats.tomorrow_pending ?? 0, 750, 280)}
-                </p>
-                <p style={{ margin:'8px 0 0', fontSize:14, fontWeight:800, color:DARK }}>En attente demain</p>
-              </div>
-              <div>
-                <XCircle size={22} strokeWidth={2} color={DARK} style={{ marginBottom:10, display:'block' }} />
-                <p style={{ margin:0, fontSize:'clamp(32px,4vw,52px)', fontWeight:900, color:DARK, letterSpacing:'-2px', fontVariantNumeric:'tabular-nums' }}>
-                  {useCountUp(stats.tomorrow_cancelled ?? 0, 750, 310)}
-                </p>
-                <p style={{ margin:'8px 0 0', fontSize:14, fontWeight:800, color:DARK }}>Annulées demain</p>
-              </div>
+              <Stat icon={CheckCircle} value={stats.tomorrow_confirmed ?? 0} label="Confirmées demain"  delay={250} />
+              <Stat icon={Clock}       value={stats.tomorrow_pending   ?? 0} label="En attente demain" gold delay={280} />
+              <Stat icon={XCircle}     value={stats.tomorrow_cancelled ?? 0} label="Annulées demain"    delay={310} />
             </div>
           </div>
         </FadeUp>
