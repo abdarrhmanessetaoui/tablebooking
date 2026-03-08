@@ -18,9 +18,30 @@ class RestaurantReservationController extends Controller
         return is_array($data) ? ($data['app_status_1'] ?? 'Pending') : 'Pending';
     }
 
+    // ── NOUVEAU : annule automatiquement les Pending dépassés ──────────
+    private function cancelExpiredPending(): void
+    {
+        $today    = now()->toDateString();
+        $messages = WpMessage::where('formid', $this->formId())->get();
+
+        foreach ($messages as $message) {
+            $clean = $message->toCleanArray();
+
+            if ($clean['status'] !== 'Pending') continue;
+            if (!$clean['date'] || $clean['date'] >= $today) continue;
+
+            $data = @unserialize($message->posted_data);
+            if (!is_array($data)) continue;
+
+            $data['app_status_1'] = 'Cancelled';
+            $message->posted_data = serialize($data);
+            $message->save();
+        }
+    }
+    // ───────────────────────────────────────────────────────────────────
+
     public function index(Request $request)
     {
-        /** @var \Illuminate\Database\Eloquent\Collection<\App\Models\WpMessage> $messages */
         $messages = WpMessage::where('formid', $this->formId())
             ->orderByDesc('time')
             ->get();
@@ -38,7 +59,6 @@ class RestaurantReservationController extends Controller
     {
         $date = $request->query('date', now()->toDateString());
     
-        /** @var \Illuminate\Database\Eloquent\Collection<\App\Models\WpMessage> $messages */
         $messages = WpMessage::where('formid', $this->formId())->get();
     
         $filtered = $messages
@@ -51,23 +71,25 @@ class RestaurantReservationController extends Controller
     
     public function stats()
     {
+        $this->cancelExpiredPending(); // ← annule les Pending passés avant de calculer
+
         $messages = WpMessage::where('formid', $this->formId())->get();
         $clean    = $messages->map(fn($m) => $m->toCleanArray());
         $today    = now()->toDateString();
         $tomorrow = now()->addDay()->toDateString();
-        $month    = now()->format('Y-m');  // e.g. "2026-03"
+        $month    = now()->format('Y-m');
     
         $todayRes = $clean->filter(fn($r) => $r['date'] === $today);
-        $monthRes = $clean->filter(fn($r) => str_starts_with($r['date'], $month));
+        $monthRes = $clean->filter(fn($r) => str_starts_with($r['date'] ?? '', $month));
     
         return response()->json([
             'today'            => $todayRes->count(),
             'today_confirmed'  => $todayRes->filter(fn($r) => $r['status'] === 'Confirmed')->count(),
             'today_pending'    => $todayRes->filter(fn($r) => $r['status'] === 'Pending')->count(),
             'today_cancelled'  => $todayRes->filter(fn($r) => $r['status'] === 'Cancelled')->count(),
-    
+
             'tomorrow'         => $clean->filter(fn($r) => $r['date'] === $tomorrow)->count(),
-    
+
             'total'            => $monthRes->count(),
             'confirmed'        => $monthRes->filter(fn($r) => $r['status'] === 'Confirmed')->count(),
             'pending'          => $monthRes->filter(fn($r) => $r['status'] === 'Pending')->count(),
@@ -77,7 +99,6 @@ class RestaurantReservationController extends Controller
     
     public function reports()
     {
-        /** @var \Illuminate\Database\Eloquent\Collection<\App\Models\WpMessage> $messages */
         $messages = WpMessage::where('formid', $this->formId())->get();
         $clean    = $messages->map(fn($m) => $m->toCleanArray());
     
@@ -109,7 +130,6 @@ class RestaurantReservationController extends Controller
             'status' => 'required|in:Pending,Confirmed,Cancelled',
         ]);
     
-        /** @var \App\Models\WpMessage $message */
         $message = WpMessage::where('formid', $this->formId())->findOrFail($id);
     
         $data = @unserialize($message->posted_data);
@@ -122,28 +142,28 @@ class RestaurantReservationController extends Controller
     
         return response()->json($message->toCleanArray());
     }
+
     public function info()
-{
-    $form = \Illuminate\Support\Facades\DB::table('wpjn_cpappbk_forms')
-        ->where('id', $this->formId())
-        ->first();
+    {
+        $form = \Illuminate\Support\Facades\DB::table('wpjn_cpappbk_forms')
+            ->where('id', $this->formId())
+            ->first();
 
-    if (!$form) return response()->json([]);
+        if (!$form) return response()->json([]);
 
-    $parts    = explode(' - ', $form->form_name);
-    $name     = trim($parts[0] ?? $form->form_name);
-    $location = trim($parts[1] ?? '');
+        $parts    = explode(' - ', $form->form_name);
+        $name     = trim($parts[0] ?? $form->form_name);
+        $location = trim($parts[1] ?? '');
 
-    return response()->json([
-        'name'           => $name,
-        'location'       => $location,
-        'form_name'      => $form->form_name,
-        'email'          => $form->fp_from_email,
-        'contact_name'   => $form->fp_from_name,
-        'dest_emails'    => $form->fp_destination_emails,
-        'language'       => $form->calendar_language,
-        'default_status' => $form->defaultstatus,
-    ]);
-}
-    
+        return response()->json([
+            'name'           => $name,
+            'location'       => $location,
+            'form_name'      => $form->form_name,
+            'email'          => $form->fp_from_email,
+            'contact_name'   => $form->fp_from_name,
+            'dest_emails'    => $form->fp_destination_emails,
+            'language'       => $form->calendar_language,
+            'default_status' => $form->defaultstatus,
+        ]);
+    }
 }
