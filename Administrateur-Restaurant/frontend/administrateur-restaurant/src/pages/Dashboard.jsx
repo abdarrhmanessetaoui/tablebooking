@@ -1,9 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import {
-  RefreshCw, FileDown, CheckCircle, Clock, XCircle,
-  ClipboardList, ArrowRight,
-} from 'lucide-react'
+import { RefreshCw, FileDown, CheckCircle, Clock, XCircle, ClipboardList, ArrowRight } from 'lucide-react'
 
 import useDashboardStats from '../hooks/Dashboard/useDashboardStats'
 import FadeUp     from '../components/Dashboard/FadeUp'
@@ -14,143 +11,133 @@ import { exportPDF } from '../utils/exportPDF'
 const DARK      = '#2b2118'
 const GOLD      = '#c8a97e'
 const GOLD_DARK = '#a8834e'
+const GREEN     = '#4a7c59'
+const GREEN_BG  = '#f0f7f2'
+const AMBER     = '#c8a97e'
+const AMBER_BG  = '#fdf6ec'
+const RED       = '#b94040'
+const RED_BG    = '#fdf0f0'
 
 const TODAY_DATE    = new Date().toISOString().slice(0, 10)
 const TOMORROW_DATE = new Date(Date.now() + 86400000).toISOString().slice(0, 10)
 
-/* ── Live clock ── */
 function LiveClock() {
   const [time, setTime] = useState(new Date())
   useEffect(() => {
     const t = setInterval(() => setTime(new Date()), 1000)
     return () => clearInterval(t)
   }, [])
-  return (
-    <span style={{ fontVariantNumeric: 'tabular-nums' }}>
-      {time.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
-    </span>
-  )
+  return <span style={{ fontVariantNumeric:'tabular-nums' }}>{time.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit',second:'2-digit'})}</span>
 }
 
-/* ── Donut chart (SVG) ── */
-function DonutChart({ confirmed, pending, cancelled, size = 110 }) {
+/* ── Donut ── */
+function Donut({ confirmed, pending, cancelled, size=100 }) {
   const total = confirmed + pending + cancelled
-  if (total === 0) return (
-    <svg width={size} height={size} viewBox="0 0 36 36">
-      <circle cx="18" cy="18" r="14" fill="none" stroke="#f0ebe4" strokeWidth="5" />
-    </svg>
-  )
-
-  const r = 14
-  const circ = 2 * Math.PI * r
-  const pct = (v) => (v / total) * circ
-
+  const r = 15, circ = 2 * Math.PI * r
+  const pct = v => (v / Math.max(total,1)) * circ
   const slices = [
-    { value: confirmed, color: DARK,      offset: 0 },
-    { value: pending,   color: GOLD,      offset: pct(confirmed) },
-    { value: cancelled, color: '#e0b0b0', offset: pct(confirmed) + pct(pending) },
+    { v: confirmed, color: GREEN  },
+    { v: pending,   color: AMBER  },
+    { v: cancelled, color: RED    },
   ]
-
+  let offset = 0
   return (
-    <svg width={size} height={size} viewBox="0 0 36 36" style={{ transform: 'rotate(-90deg)' }}>
-      <circle cx="18" cy="18" r={r} fill="none" stroke="#f0ebe4" strokeWidth="5" />
-      {slices.map((s, i) => s.value > 0 && (
-        <circle key={i} cx="18" cy="18" r={r} fill="none"
-          stroke={s.color} strokeWidth="5"
-          strokeDasharray={`${pct(s.value)} ${circ - pct(s.value)}`}
-          strokeDashoffset={-s.offset}
-          strokeLinecap="butt"
-        />
-      ))}
-    </svg>
-  )
-}
-
-/* ── Sparkline (SVG) — last 7 days trend simulation ── */
-function Sparkline({ value, color = DARK, width = 80, height = 32 }) {
-  // Generate a plausible sparkline based on value
-  const seed = value || 1
-  const points = Array.from({ length: 7 }, (_, i) => {
-    const v = Math.max(0, seed * (0.4 + 0.6 * Math.sin(i * 1.3 + seed) * 0.5 + 0.5 * Math.random()))
-    return Math.round(v)
-  })
-  points[6] = seed
-
-  const max = Math.max(...points, 1)
-  const pts = points.map((v, i) => {
-    const x = (i / (points.length - 1)) * width
-    const y = height - (v / max) * (height - 4) - 2
-    return `${x},${y}`
-  }).join(' ')
-
-  return (
-    <svg width={width} height={height} style={{ display: 'block' }}>
-      <polyline points={pts} fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" opacity="0.6" />
-      {/* Last point dot */}
-      {(() => {
-        const lastX = width
-        const lastY = height - (seed / max) * (height - 4) - 2
-        return <circle cx={lastX} cy={lastY} r="2.5" fill={color} />
-      })()}
-    </svg>
-  )
-}
-
-/* ── Progress bar ── */
-function ProgressBar({ value, total, color = DARK }) {
-  const pct = total > 0 ? Math.round((value / total) * 100) : 0
-  const [width, setWidth] = useState(0)
-  useEffect(() => {
-    const t = setTimeout(() => setWidth(pct), 200)
-    return () => clearTimeout(t)
-  }, [pct])
-  return (
-    <div style={{ marginTop: 8 }}>
-      <div style={{ height: 3, background: '#f0ebe4', borderRadius: 2, overflow: 'hidden' }}>
-        <div style={{
-          height: '100%', width: `${width}%`,
-          background: color, borderRadius: 2,
-          transition: 'width 0.8s cubic-bezier(0.4,0,0.2,1)',
-        }} />
+    <div style={{ position:'relative', width:size, height:size, flexShrink:0 }}>
+      <svg width={size} height={size} viewBox="0 0 36 36" style={{ transform:'rotate(-90deg)' }}>
+        <circle cx="18" cy="18" r={r} fill="none" stroke="#ede8e2" strokeWidth="5.5" />
+        {total === 0
+          ? <circle cx="18" cy="18" r={r} fill="none" stroke="#ede8e2" strokeWidth="5.5" />
+          : slices.map((s,i) => {
+              if (s.v === 0) return null
+              const el = (
+                <circle key={i} cx="18" cy="18" r={r} fill="none"
+                  stroke={s.color} strokeWidth="5.5"
+                  strokeDasharray={`${pct(s.v)} ${circ - pct(s.v)}`}
+                  strokeDashoffset={-offset}
+                />
+              )
+              offset += pct(s.v)
+              return el
+            })
+        }
+      </svg>
+      {/* Centre label */}
+      <div style={{ position:'absolute', inset:0, display:'flex', alignItems:'center', justifyContent:'center' }}>
+        <span style={{ fontSize:13, fontWeight:900, color:DARK, fontVariantNumeric:'tabular-nums' }}>{total}</span>
       </div>
-      <p style={{ margin: '3px 0 0', fontSize: 10, fontWeight: 700, color: '#bbb' }}>{pct}%</p>
     </div>
   )
 }
 
-/* ── Stat pill with progress ── */
-function StatPill({ icon: Icon, value, label, gold = false, delay = 0, total = 0 }) {
-  const n = useCountUp(value, 750, delay)
+/* ── Bar chart (horizontal) ── */
+function BarGroup({ confirmed, pending, cancelled }) {
+  const total = Math.max(confirmed + pending + cancelled, 1)
+  const bars = [
+    { label:'Confirmées', value:confirmed, color:GREEN,  bg:GREEN_BG },
+    { label:'En attente', value:pending,   color:AMBER,  bg:AMBER_BG },
+    { label:'Annulées',   value:cancelled, color:RED,    bg:RED_BG   },
+  ]
   return (
-    <div style={{
-      padding: '14px 18px',
-      background: gold ? '#fdf6ec' : '#faf8f5',
-      borderLeft: `3px solid ${gold ? GOLD : DARK}`,
-    }}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <Icon size={16} strokeWidth={2} color={gold ? GOLD_DARK : DARK} style={{ flexShrink: 0 }} />
-          <div>
-            <p style={{
-              margin: 0,
-              fontSize: 'clamp(24px,2.8vw,36px)',
-              fontWeight: 900,
-              color: gold ? GOLD_DARK : DARK,
-              lineHeight: 1,
-              fontVariantNumeric: 'tabular-nums',
-              letterSpacing: '-1px',
-              fontFamily: "'Plus Jakarta Sans','DM Sans',system-ui",
-            }}>
-              {n}
-            </p>
-            <p style={{ margin: '3px 0 0', fontSize: 10, fontWeight: 800, color: '#aaa', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
-              {label}
-            </p>
+    <div style={{ display:'flex', flexDirection:'column', gap:10, flex:1 }}>
+      {bars.map(b => {
+        const pct = Math.round((b.value / total) * 100)
+        return (
+          <div key={b.label}>
+            <div style={{ display:'flex', justifyContent:'space-between', marginBottom:5 }}>
+              <span style={{ fontSize:11, fontWeight:800, color:b.color, textTransform:'uppercase', letterSpacing:'0.08em' }}>{b.label}</span>
+              <span style={{ fontSize:11, fontWeight:900, color:DARK, fontVariantNumeric:'tabular-nums' }}>{b.value}</span>
+            </div>
+            <div style={{ height:6, background:'#f0ebe4', borderRadius:3, overflow:'hidden' }}>
+              <ProgressBar pct={pct} color={b.color} />
+            </div>
           </div>
+        )
+      })}
+    </div>
+  )
+}
+
+function ProgressBar({ pct, color }) {
+  const [w, setW] = useState(0)
+  useEffect(() => { const t = setTimeout(() => setW(pct), 300); return () => clearTimeout(t) }, [pct])
+  return <div style={{ height:'100%', width:`${w}%`, background:color, borderRadius:3, transition:'width 0.9s cubic-bezier(0.4,0,0.2,1)' }} />
+}
+
+/* ── Tiny sparkline ── */
+function Spark({ value, color = DARK, w = 72, h = 28 }) {
+  const seed = Math.max(value, 1)
+  const raw  = Array.from({length:7},(_,i) => Math.max(0, seed * (0.5 + 0.5 * Math.sin(i * 1.7 + seed % 5))))
+  raw[6] = seed
+  const max = Math.max(...raw, 1)
+  const pts = raw.map((v,i) => `${(i/(raw.length-1))*w},${h - (v/max)*(h-5)-2}`).join(' ')
+  const lastX = w, lastY = h - (seed/max)*(h-5)-2
+  return (
+    <svg width={w} height={h} style={{ display:'block', flexShrink:0 }}>
+      <polyline points={pts} fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" opacity="0.5" />
+      <circle cx={lastX} cy={lastY} r="2.8" fill={color} />
+    </svg>
+  )
+}
+
+/* ── Stat card ── */
+function StatCard({ icon:Icon, value, label, color, bg, delay=0, total=0, spark=true }) {
+  const n   = useCountUp(value, 750, delay)
+  const pct = total > 0 ? Math.round((value/total)*100) : null
+  return (
+    <div style={{ background:bg, padding:'16px 20px', borderRadius:2, borderTop:`3px solid ${color}` }}>
+      <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between' }}>
+        <div style={{ display:'flex', alignItems:'center', gap:10 }}>
+          <Icon size={16} strokeWidth={2.2} color={color} />
+          <span style={{ fontSize:11, fontWeight:800, color, textTransform:'uppercase', letterSpacing:'0.1em' }}>{label}</span>
         </div>
-        <Sparkline value={value} color={gold ? GOLD : DARK} />
+        {spark && <Spark value={value} color={color} />}
       </div>
-      {total > 0 && <ProgressBar value={value} total={total} color={gold ? GOLD : DARK} />}
+      <p style={{ margin:'10px 0 0', fontSize:'clamp(32px,3.5vw,48px)', fontWeight:900, color:DARK, letterSpacing:'-2px', fontVariantNumeric:'tabular-nums', lineHeight:1, fontFamily:"'Plus Jakarta Sans',system-ui" }}>{n}</p>
+      {pct !== null && (
+        <div style={{ marginTop:8, height:3, background:'#e8e0d8', borderRadius:2, overflow:'hidden' }}>
+          <ProgressBar pct={pct} color={color} />
+        </div>
+      )}
     </div>
   )
 }
@@ -158,223 +145,144 @@ function StatPill({ icon: Icon, value, label, gold = false, delay = 0, total = 0
 function HeroNum({ value }) {
   const n = useCountUp(value, 900, 60)
   return (
-    <p style={{
-      margin: 0, fontSize: 'clamp(80px,11vw,148px)', fontWeight: 900,
-      color: DARK, lineHeight: 0.85, fontVariantNumeric: 'tabular-nums',
-      letterSpacing: '-5px', fontFamily: "'Plus Jakarta Sans','DM Sans',system-ui",
-    }}>
-      {n}
-    </p>
+    <p style={{ margin:0, fontSize:'clamp(72px,10vw,140px)', fontWeight:900, color:DARK, lineHeight:0.85, fontVariantNumeric:'tabular-nums', letterSpacing:'-5px', fontFamily:"'Plus Jakarta Sans',system-ui" }}>{n}</p>
   )
 }
 
-function HeroStat({ value, label, delay = 0 }) {
-  const n = useCountUp(value, 750, delay)
-  return (
-    <div>
-      <p style={{
-        margin: 0, fontSize: 'clamp(64px,8vw,112px)', fontWeight: 900,
-        color: DARK, lineHeight: 0.9, fontVariantNumeric: 'tabular-nums',
-        letterSpacing: '-3px', fontFamily: "'Plus Jakarta Sans','DM Sans',system-ui",
-      }}>
-        {n}
-      </p>
-      <p style={{ margin: '10px 0 0', fontSize: 13, fontWeight: 800, color: GOLD_DARK }}>{label}</p>
-    </div>
-  )
-}
-
-function Btn({ children, onClick, primary, disabled, icon: Icon }) {
+function Btn({ children, onClick, primary, disabled, icon:Icon }) {
   const [hov, setHov] = useState(false)
-  const bg    = primary ? (hov ? DARK : GOLD) : (hov ? GOLD : DARK)
-  const color = primary ? (hov ? GOLD : DARK) : '#fff'
+  const bg    = primary ? (hov?DARK:GOLD) : (hov?GOLD:DARK)
+  const color = primary ? (hov?GOLD:DARK) : '#fff'
   return (
     <button onClick={onClick} disabled={disabled}
-      onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
-      style={{
-        display: 'flex', alignItems: 'center', gap: 9, padding: '13px 24px',
-        background: bg, border: 'none', color,
-        fontSize: 13, fontWeight: 800, cursor: disabled ? 'not-allowed' : 'pointer',
-        opacity: disabled ? 0.5 : 1, transition: 'background 0.15s, color 0.15s',
-        fontFamily: 'inherit', letterSpacing: '-0.2px', whiteSpace: 'nowrap',
-      }}
+      onMouseEnter={()=>setHov(true)} onMouseLeave={()=>setHov(false)}
+      style={{ display:'flex', alignItems:'center', gap:8, padding:'12px 22px', background:bg, border:'none', color, fontSize:13, fontWeight:800, cursor:disabled?'not-allowed':'pointer', opacity:disabled?0.5:1, transition:'background 0.15s,color 0.15s', fontFamily:'inherit', letterSpacing:'-0.2px', whiteSpace:'nowrap' }}
     >
-      {Icon && <Icon size={15} strokeWidth={2.2} />}
+      {Icon && <Icon size={14} strokeWidth={2.5} />}
       {children}
     </button>
   )
 }
 
-function SectionTitle({ text, sub }) {
+function Section({ text, sub }) {
   return (
-    <div style={{ marginBottom: 28 }}>
-      <h2 style={{
-        margin: 0, fontSize: 'clamp(22px,2.8vw,32px)', fontWeight: 900,
-        color: DARK, letterSpacing: '-1px', lineHeight: 1,
-        fontFamily: "'Plus Jakarta Sans','DM Sans',system-ui",
-      }}>
-        {text}
-      </h2>
-      {sub && <p style={{ margin: '5px 0 0', fontSize: 12, fontWeight: 700, color: GOLD }}>{sub}</p>}
+    <div style={{ marginBottom:24 }}>
+      <h2 style={{ margin:0, fontSize:'clamp(20px,2.5vw,30px)', fontWeight:900, color:DARK, letterSpacing:'-1px', fontFamily:"'Plus Jakarta Sans',system-ui" }}>{text}</h2>
+      {sub && <p style={{ margin:'4px 0 0', fontSize:12, fontWeight:700, color:GOLD }}>{sub}</p>}
     </div>
   )
 }
 
-/* ── Legend dot ── */
-function Dot({ color }) {
-  return <span style={{ width: 8, height: 8, borderRadius: '50%', background: color, display: 'inline-block', marginRight: 5 }} />
+/* ── Day block: hero + donut + bars + cards ── */
+function DayBlock({ total, confirmed, pending, cancelled, label, btnLabel, onBtn, delay=0 }) {
+  const n = useCountUp(total, 900, delay)
+  return (
+    <div>
+      {/* Row 1: big number + donut + bar chart */}
+      <div style={{ display:'flex', flexWrap:'wrap', gap:32, alignItems:'center', marginBottom:24 }}>
+        {/* Hero */}
+        <div style={{ minWidth:120 }}>
+          <p style={{ margin:0, fontSize:'clamp(64px,9vw,120px)', fontWeight:900, color:DARK, lineHeight:0.85, fontVariantNumeric:'tabular-nums', letterSpacing:'-4px', fontFamily:"'Plus Jakarta Sans',system-ui" }}>{n}</p>
+          <p style={{ margin:'10px 0 16px', fontSize:13, fontWeight:800, color:DARK }}>{label}</p>
+          <Btn icon={ArrowRight} primary onClick={onBtn}>{btnLabel}</Btn>
+        </div>
+        {/* Donut */}
+        <Donut confirmed={confirmed} pending={pending} cancelled={cancelled} size={90} />
+        {/* Bar chart */}
+        <BarGroup confirmed={confirmed} pending={pending} cancelled={cancelled} />
+      </div>
+      {/* Row 2: stat cards */}
+      <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:8 }}>
+        <StatCard icon={CheckCircle} value={confirmed} label="Confirmées" color={GREEN} bg={GREEN_BG} delay={delay+40}  total={total} />
+        <StatCard icon={Clock}       value={pending}   label="En attente" color={AMBER} bg={AMBER_BG} delay={delay+70}  total={total} />
+        <StatCard icon={XCircle}     value={cancelled} label="Annulées"   color={RED}   bg={RED_BG}   delay={delay+100} total={total} />
+      </div>
+    </div>
+  )
 }
 
 export default function Dashboard() {
   const { stats, loading, error, refetch } = useDashboardStats()
   const navigate                           = useNavigate()
-  const [refreshing, setRefreshing]        = useState(false)
-  const [exporting,  setExporting]         = useState(false)
+  const [refreshing, setRefreshing] = useState(false)
+  const [exporting,  setExporting]  = useState(false)
 
-  const today = new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })
+  const today = new Date().toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'})
+  const go    = f => navigate('/reservations',{state:f})
 
-  async function handleRefresh() {
-    setRefreshing(true)
-    try { await refetch() } finally { setRefreshing(false) }
-  }
-
+  async function handleRefresh() { setRefreshing(true); try{await refetch()}finally{setRefreshing(false)} }
   async function handleExportPDF() {
     setExporting(true)
     try {
-      if (!window.jspdf) {
-        await new Promise((resolve, reject) => {
-          const s = document.createElement('script')
-          s.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js'
-          s.onload = resolve; s.onerror = reject
-          document.head.appendChild(s)
-        })
-      }
+      if (!window.jspdf) await new Promise((res,rej)=>{ const s=document.createElement('script'); s.src='https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js'; s.onload=res; s.onerror=rej; document.head.appendChild(s) })
       exportPDF(stats)
-    } catch(e) { console.error('PDF error:', e) }
-    finally { setExporting(false) }
+    } catch(e){console.error(e)} finally{setExporting(false)}
   }
-
-  const go = (filters) => navigate('/reservations', { state: filters })
 
   if (loading) return <Spinner />
 
   return (
-    <div style={{ minHeight: '100vh', background: '#fff', fontFamily: "'Plus Jakarta Sans','DM Sans',system-ui,sans-serif" }}>
-      <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800;900&display=swap" rel="stylesheet" />
-
+    <div style={{ minHeight:'100vh', background:'#fff', fontFamily:"'Plus Jakarta Sans','DM Sans',system-ui,sans-serif" }}>
+      <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800;900&display=swap" rel="stylesheet" />
       <style>{`
-        .wrap { max-width:1000px; margin:0 auto; padding:clamp(24px,4vw,52px) clamp(20px,3.5vw,44px); }
+        .wrap { max-width:980px; margin:0 auto; padding:clamp(24px,4vw,52px) clamp(20px,3.5vw,44px); }
         .hr   { height:2px; background:${DARK}; margin:44px 0; }
-        .pills { display:flex; flex-direction:column; gap:8px; }
-        @media(max-width:580px){ .day-grid { flex-direction:column !important; } .day-grid .left { min-width:unset !important; } }
+        @media(max-width:500px){ .cards-3 { grid-template-columns:1fr !important; } }
+        @media(max-width:640px){ .cards-3 { grid-template-columns:repeat(2,1fr) !important; } }
+        @media(max-width:420px){ .month-grid { flex-direction:column !important; } }
       `}</style>
 
       <div className="wrap">
 
-        {/* ── Topbar ── */}
+        {/* Topbar */}
         <FadeUp delay={0}>
-          <div style={{ display:'flex', flexWrap:'wrap', alignItems:'flex-end', justifyContent:'space-between', gap:16, marginBottom:52 }}>
+          <div style={{ display:'flex', flexWrap:'wrap', alignItems:'flex-end', justifyContent:'space-between', gap:16, marginBottom:48 }}>
             <div>
-              <h1 style={{ margin:0, fontSize:'clamp(28px,4vw,44px)', fontWeight:900, color:DARK, letterSpacing:'-2px', lineHeight:1 }}>
-                Tableau de bord
-              </h1>
-              <p style={{ margin:'8px 0 0', fontSize:14, fontWeight:700, color:GOLD, textTransform:'capitalize' }}>
-                {today}&nbsp;·&nbsp;<LiveClock />
-              </p>
+              <h1 style={{ margin:0, fontSize:'clamp(26px,4vw,42px)', fontWeight:900, color:DARK, letterSpacing:'-2px', lineHeight:1 }}>Tableau de bord</h1>
+              <p style={{ margin:'7px 0 0', fontSize:13, fontWeight:700, color:GOLD, textTransform:'capitalize' }}>{today}&nbsp;·&nbsp;<LiveClock /></p>
             </div>
             <div style={{ display:'flex', gap:3 }}>
-              <Btn icon={RefreshCw} onClick={handleRefresh} disabled={refreshing}>
-                {refreshing ? 'Actualisation…' : 'Actualiser'}
-              </Btn>
-              <Btn icon={FileDown} primary onClick={handleExportPDF} disabled={exporting}>
-                {exporting ? 'Génération…' : 'Exporter PDF'}
-              </Btn>
+              <Btn icon={RefreshCw} onClick={handleRefresh} disabled={refreshing}>{refreshing?'Actualisation…':'Actualiser'}</Btn>
+              <Btn icon={FileDown} primary onClick={handleExportPDF} disabled={exporting}>{exporting?'Génération…':'Exporter PDF'}</Btn>
             </div>
           </div>
         </FadeUp>
 
-        {/* ── AUJOURD'HUI ── */}
+        {/* Aujourd'hui */}
         <FadeUp delay={40}>
-          <SectionTitle text="Aujourd'hui" sub="Réservations du jour" />
-          <div className="day-grid" style={{ display:'flex', gap:40, alignItems:'flex-start' }}>
-            {/* Left */}
-            <div className="left" style={{ flexShrink:0, minWidth:200 }}>
-              <HeroNum value={stats.today} />
-              <p style={{ margin:'12px 0 18px', fontSize:14, fontWeight:800, color:DARK }}>réservations aujourd'hui</p>
-              {/* Donut */}
-              <div style={{ display:'flex', alignItems:'center', gap:16, marginBottom:20 }}>
-                <DonutChart confirmed={stats.today_confirmed} pending={stats.today_pending} cancelled={stats.today_cancelled} />
-                <div style={{ display:'flex', flexDirection:'column', gap:6 }}>
-                  <p style={{ margin:0, fontSize:11, fontWeight:700, color:DARK }}><Dot color={DARK} />Confirmées</p>
-                  <p style={{ margin:0, fontSize:11, fontWeight:700, color:GOLD_DARK }}><Dot color={GOLD} />En attente</p>
-                  <p style={{ margin:0, fontSize:11, fontWeight:700, color:'#b06060' }}><Dot color="#e0b0b0" />Annulées</p>
-                </div>
-              </div>
-              <Btn icon={ArrowRight} primary onClick={() => go({ filterDate: TODAY_DATE })}>
-                Voir aujourd'hui
-              </Btn>
-            </div>
-            {/* Right: pills */}
-            <div className="pills" style={{ flex:1, paddingTop:4 }}>
-              <StatPill icon={CheckCircle} value={stats.today_confirmed} label="Confirmées" delay={100} total={stats.today} />
-              <StatPill icon={Clock}       value={stats.today_pending}   label="En attente" gold delay={130} total={stats.today} />
-              <StatPill icon={XCircle}     value={stats.today_cancelled} label="Annulées"   delay={160} total={stats.today} />
-            </div>
-          </div>
+          <Section text="Aujourd'hui" sub="Réservations du jour" />
+          <DayBlock
+            total={stats.today} confirmed={stats.today_confirmed}
+            pending={stats.today_pending} cancelled={stats.today_cancelled}
+            label="réservations aujourd'hui" btnLabel="Voir aujourd'hui"
+            onBtn={() => go({filterDate:TODAY_DATE})} delay={60}
+          />
         </FadeUp>
 
         <div className="hr" />
 
-        {/* ── DEMAIN ── */}
+        {/* Demain */}
         <FadeUp delay={200}>
-          <SectionTitle text="Demain" sub="Planning du lendemain" />
-          <div className="day-grid" style={{ display:'flex', gap:40, alignItems:'flex-start' }}>
-            <div className="left" style={{ flexShrink:0, minWidth:200 }}>
-              <HeroNum value={stats.tomorrow} />
-              <p style={{ margin:'12px 0 18px', fontSize:14, fontWeight:800, color:DARK }}>réservations demain</p>
-              <div style={{ display:'flex', alignItems:'center', gap:16, marginBottom:20 }}>
-                <DonutChart confirmed={stats.tomorrow_confirmed ?? 0} pending={stats.tomorrow_pending ?? 0} cancelled={stats.tomorrow_cancelled ?? 0} />
-                <div style={{ display:'flex', flexDirection:'column', gap:6 }}>
-                  <p style={{ margin:0, fontSize:11, fontWeight:700, color:DARK }}><Dot color={DARK} />Confirmées</p>
-                  <p style={{ margin:0, fontSize:11, fontWeight:700, color:GOLD_DARK }}><Dot color={GOLD} />En attente</p>
-                  <p style={{ margin:0, fontSize:11, fontWeight:700, color:'#b06060' }}><Dot color="#e0b0b0" />Annulées</p>
-                </div>
-              </div>
-              <Btn icon={ArrowRight} primary onClick={() => go({ filterDate: TOMORROW_DATE })}>
-                Voir demain
-              </Btn>
-            </div>
-            <div className="pills" style={{ flex:1, paddingTop:4 }}>
-              <StatPill icon={CheckCircle} value={stats.tomorrow_confirmed ?? 0} label="Confirmées" delay={220} total={stats.tomorrow} />
-              <StatPill icon={Clock}       value={stats.tomorrow_pending   ?? 0} label="En attente" gold delay={250} total={stats.tomorrow} />
-              <StatPill icon={XCircle}     value={stats.tomorrow_cancelled ?? 0} label="Annulées"   delay={280} total={stats.tomorrow} />
-            </div>
-          </div>
+          <Section text="Demain" sub="Planning du lendemain" />
+          <DayBlock
+            total={stats.tomorrow} confirmed={stats.tomorrow_confirmed??0}
+            pending={stats.tomorrow_pending??0} cancelled={stats.tomorrow_cancelled??0}
+            label="réservations demain" btnLabel="Voir demain"
+            onBtn={() => go({filterDate:TOMORROW_DATE})} delay={220}
+          />
         </FadeUp>
 
         <div className="hr" />
 
-        {/* ── CE MOIS ── */}
-        <FadeUp delay={330}>
-          <SectionTitle text="Ce mois" sub="Bilan mensuel des réservations" />
-          <div className="day-grid" style={{ display:'flex', gap:40, alignItems:'flex-start' }}>
-            <div className="left" style={{ flexShrink:0, minWidth:200 }}>
-              <HeroStat value={stats.confirmed} label="Confirmées ce mois" delay={330} />
-              <div style={{ marginTop:20 }}>
-                <DonutChart confirmed={stats.confirmed} pending={stats.pending} cancelled={stats.cancelled} />
-              </div>
-              <div style={{ display:'flex', flexDirection:'column', gap:5, marginTop:10 }}>
-                <p style={{ margin:0, fontSize:11, fontWeight:700, color:DARK }}><Dot color={DARK} />Confirmées</p>
-                <p style={{ margin:0, fontSize:11, fontWeight:700, color:GOLD_DARK }}><Dot color={GOLD} />En attente</p>
-                <p style={{ margin:0, fontSize:11, fontWeight:700, color:'#b06060' }}><Dot color="#e0b0b0" />Annulées</p>
-              </div>
-            </div>
-            <div className="pills" style={{ flex:1, paddingTop:4 }}>
-              <StatPill icon={ClipboardList} value={stats.total}     label="Total ce mois"      delay={350} />
-              <StatPill icon={Clock}         value={stats.pending}   label="En attente ce mois" gold delay={375} total={stats.total} />
-              <StatPill icon={XCircle}       value={stats.cancelled} label="Annulées ce mois"   delay={400} total={stats.total} />
-            </div>
-          </div>
+        {/* Ce mois */}
+        <FadeUp delay={360}>
+          <Section text="Ce mois" sub="Bilan mensuel des réservations" />
+          <DayBlock
+            total={stats.total} confirmed={stats.confirmed}
+            pending={stats.pending} cancelled={stats.cancelled}
+            label="réservations ce mois" btnLabel="Voir tout le mois"
+            onBtn={() => go({})} delay={380}
+          />
         </FadeUp>
 
         {error && <p style={{ marginTop:32, fontSize:13, fontWeight:700, color:GOLD }}>Erreur — {error}</p>}
