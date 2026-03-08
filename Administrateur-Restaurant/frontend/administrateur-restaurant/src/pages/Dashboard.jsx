@@ -192,29 +192,28 @@ export default function Dashboard() {
           </div>
         </FadeUp>
 
-        {/* ── Aujourd'hui — hero ── */}
+        {/* ── Aujourd'hui — hero + détail côte à côte ── */}
         <FadeUp delay={40}>
           <Label text="Aujourd'hui" sub="Total des réservations du jour" />
-          <HeroNum value={stats.today} />
-          <p style={{ margin:'18px 0 0', fontSize:17, fontWeight:800, color:DARK, letterSpacing:'-0.3px' }}>
-            réservations aujourd'hui
-          </p>
-          <div style={{ marginTop:28 }}>
-            <Btn icon={ArrowRight} primary onClick={() => go({ filterDate: TODAY_DATE })}>
-              Voir les réservations d'aujourd'hui
-            </Btn>
-          </div>
-        </FadeUp>
-
-        <div className="hr" />
-
-        {/* ── Détail du jour ── */}
-        <FadeUp delay={110}>
-          <Label text="Détail du jour" sub="Confirmées · En attente · Annulées" />
-          <div className="three">
-            <Stat icon={CheckCircle} value={stats.today_confirmed} label="Confirmées" delay={110} />
-            <Stat icon={Clock}       value={stats.today_pending}   label="En attente" gold delay={145} />
-            <Stat icon={XCircle}     value={stats.today_cancelled} label="Annulées"   delay={180} />
+          <div className="two" style={{ alignItems:'flex-start' }}>
+            {/* Gauche : grand chiffre + bouton */}
+            <div>
+              <HeroNum value={stats.today} />
+              <p style={{ margin:'18px 0 0', fontSize:17, fontWeight:800, color:DARK, letterSpacing:'-0.3px' }}>
+                réservations aujourd'hui
+              </p>
+              <div style={{ marginTop:28 }}>
+                <Btn icon={ArrowRight} primary onClick={() => go({ filterDate: TODAY_DATE })}>
+                  Voir les réservations d'aujourd'hui
+                </Btn>
+              </div>
+            </div>
+            {/* Droite : détail statuts */}
+            <div style={{ display:'flex', flexDirection:'column', gap:32, paddingTop:8 }}>
+              <Stat icon={CheckCircle} value={stats.today_confirmed} label="Confirmées" delay={110} />
+              <Stat icon={Clock}       value={stats.today_pending}   label="En attente" gold delay={145} />
+              <Stat icon={XCircle}     value={stats.today_cancelled} label="Annulées"   delay={180} />
+            </div>
           </div>
         </FadeUp>
 
