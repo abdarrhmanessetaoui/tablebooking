@@ -50,6 +50,7 @@ export default function ReservationModal({ modalMode, editing, form, setForm, ha
   const [hovSave, setHovSave] = useState(false)
   const [hovDel,  setHovDel]  = useState(false)
   const [services, setServices] = useState([])
+  const [blockedDates, setBlockedDates] = useState([])
 
   const close = () => setModalMode(null)
 
@@ -65,6 +66,14 @@ export default function ReservationModal({ modalMode, editing, form, setForm, ha
       .then(r => r.json())
       .then(data => Array.isArray(data) ? setServices(data) : setServices([]))
       .catch(() => setServices([]))
+  }, [])
+
+  // Fetch blocked dates
+  useEffect(() => {
+    fetch('http://localhost:8000/api/blocked-dates')
+      .then(r => r.json())
+      .then(data => setBlockedDates(Array.isArray(data) ? data.map(d => d.date) : []))
+      .catch(() => setBlockedDates([]))
   }, [])
 
   const titles = { view: 'Détail', edit: 'Modifier le statut', create: 'Nouvelle réservation' }
@@ -195,7 +204,7 @@ export default function ReservationModal({ modalMode, editing, form, setForm, ha
 
                 <Field label="Téléphone" value={form.phone} onChange={v => setForm({ ...form, phone: v })} />
                 <Field label="Email"     value={form.email} onChange={v => setForm({ ...form, email: v })} type="email" />
-                {/* Date — min = today, impossible de choisir une date passée */}
+                {/* Date — bloque les dates passées et les dates bloquées */}
                 <div>
                   <p style={{ margin: '0 0 6px', fontSize: 11, fontWeight: 900, color: DARK, letterSpacing: '0.12em', textTransform: 'uppercase' }}>
                     Date <span style={{ color: GOLD }}>*</span>
@@ -204,9 +213,19 @@ export default function ReservationModal({ modalMode, editing, form, setForm, ha
                     type="date"
                     value={form.date ?? ''}
                     min={new Date().toISOString().slice(0, 10)}
-                    onChange={e => setForm({ ...form, date: e.target.value })}
-                    style={inputStyle}
+                    onChange={e => {
+                      const val = e.target.value
+                      if (blockedDates.includes(val)) {
+                        alert('Cette date est bloquée par l\'administrateur.')
+                        return
+                      }
+                      setForm({ ...form, date: val })
+                    }}
+                    style={{ ...inputStyle, colorScheme: 'light' }}
                   />
+                  {form.date && blockedDates.includes(form.date) && (
+                    <p style={{ margin: '4px 0 0', fontSize: 11, fontWeight: 700, color: '#b94040' }}>⚠️ Date bloquée</p>
+                  )}
                 </div>
                 <Field label="Heure"     value={form.start_time} onChange={v => setForm({ ...form, start_time: v })} type="time" />
                 <Field label="Couverts"  value={form.guests} onChange={v => setForm({ ...form, guests: v })} type="number" required />
