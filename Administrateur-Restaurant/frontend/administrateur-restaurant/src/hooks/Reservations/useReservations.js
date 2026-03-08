@@ -13,19 +13,26 @@ const EMPTY_FORM = {
   name: '', email: '', phone: '', date: '', start_time: '', guests: '', status: 'Pending', notes: ''
 }
 
+const CURRENT_MONTH = new Date().toISOString().slice(0, 7) // "2026-03"
+
 export default function useReservations(initialFilters = {}) {
   const [reservations, setReservations] = useState([])
   const [loading, setLoading]           = useState(true)
   const [error, setError]               = useState('')
 
-  // modal modes: null | 'edit' | 'create' | 'view'
-  const [modalMode, setModalMode]   = useState(null)
-  const [editing, setEditing]       = useState(null)
-  const [form, setForm]             = useState(EMPTY_FORM)
+  const [modalMode, setModalMode] = useState(null)
+  const [editing, setEditing]     = useState(null)
+  const [form, setForm]           = useState(EMPTY_FORM)
 
   const [search,       setSearch]       = useState('')
   const [filterStatus, setFilterStatus] = useState(initialFilters?.filterStatus || 'all')
   const [filterDate,   setFilterDate]   = useState(initialFilters?.filterDate   || '')
+
+  // If navigated from dashboard with a specific date → no month filter
+  // Otherwise default to current month
+  const [filterMonth, setFilterMonth] = useState(
+    initialFilters?.filterDate ? '' : CURRENT_MONTH
+  )
 
   useEffect(() => { fetchReservations() }, [])
 
@@ -45,23 +52,30 @@ export default function useReservations(initialFilters = {}) {
 
   const filtered = useMemo(() => {
     if (!Array.isArray(reservations)) return []
-    return reservations.filter(r => {
-      const matchSearch = search === '' ||
-        (r.name  && r.name.toLowerCase().includes(search.toLowerCase())) ||
-        (r.phone && r.phone.includes(search))
-      const matchStatus = filterStatus === 'all' || r.status === filterStatus
-      const matchDate   = filterDate === '' || r.date === filterDate
-      return matchSearch && matchStatus && matchDate
-    })
-  }, [reservations, search, filterStatus, filterDate])
 
-  // ── View ──────────────────────────────────────────────────────────────
+    return reservations
+      .filter(r => {
+        const matchSearch = search === '' ||
+          (r.name  && r.name.toLowerCase().includes(search.toLowerCase())) ||
+          (r.phone && r.phone.includes(search))
+        const matchStatus = filterStatus === 'all' || r.status === filterStatus
+        const matchDate   = filterDate === '' || r.date === filterDate
+        const matchMonth  = filterMonth === '' || (r.date && r.date.startsWith(filterMonth))
+        return matchSearch && matchStatus && matchDate && matchMonth
+      })
+      // Sort by date desc, then start_time desc
+      .sort((a, b) => {
+        const dateDiff = (b.date || '').localeCompare(a.date || '')
+        if (dateDiff !== 0) return dateDiff
+        return (b.start_time || '').localeCompare(a.start_time || '')
+      })
+  }, [reservations, search, filterStatus, filterDate, filterMonth])
+
   const openView = (reservation) => {
     setEditing(reservation)
     setModalMode('view')
   }
 
-  // ── Edit status ───────────────────────────────────────────────────────
   const openEdit = (reservation) => {
     setEditing(reservation)
     setForm({ ...reservation })
@@ -84,7 +98,6 @@ export default function useReservations(initialFilters = {}) {
     }
   }
 
-  // ── Create ────────────────────────────────────────────────────────────
   const openCreate = () => {
     setEditing(null)
     setForm(EMPTY_FORM)
@@ -107,7 +120,6 @@ export default function useReservations(initialFilters = {}) {
     }
   }
 
-  // ── Delete ────────────────────────────────────────────────────────────
   const handleDelete = async (id) => {
     if (!window.confirm('Supprimer cette réservation ?')) return
     try {
@@ -119,11 +131,11 @@ export default function useReservations(initialFilters = {}) {
     }
   }
 
-  // ── Filters ───────────────────────────────────────────────────────────
   const clearFilters = () => {
     setSearch('')
     setFilterStatus('all')
     setFilterDate('')
+    setFilterMonth(CURRENT_MONTH) // reset to current month
   }
 
   return {
@@ -134,13 +146,14 @@ export default function useReservations(initialFilters = {}) {
     search, setSearch,
     filterStatus, setFilterStatus,
     filterDate, setFilterDate,
+    filterMonth, setFilterMonth,
     clearFilters,
     openView,
-    fetchReservations,
     openEdit,
     openCreate,
     handleSubmit,
     handleCreate,
     handleDelete,
+    fetchReservations,
   }
 }
