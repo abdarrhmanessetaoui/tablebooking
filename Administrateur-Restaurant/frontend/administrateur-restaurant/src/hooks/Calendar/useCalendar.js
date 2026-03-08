@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { getToken } from '../utils/auth'
+import { getToken } from '../../utils/auth'
 
 const toDateString = (date) => date.toISOString().split('T')[0]
 

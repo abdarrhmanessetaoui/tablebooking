@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { CalendarDays } from 'lucide-react'
-import useCalendar  from '../hooks/useCalendar'
+import useCalendar  from '../hooks/Calendar/useCalendar'
 import CalendarNav  from '../components/Calendar/CalendarNav'
 import CalendarWeek from '../components/Calendar/CalendarWeek'
 import FadeUp  from '../components/Dashboard/FadeUp'
