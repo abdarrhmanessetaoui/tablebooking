@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Pencil } from 'lucide-react'
+import { Eye, Pencil, Trash2 } from 'lucide-react'
 
 const DARK      = '#2b2118'
 const GOLD      = '#c8a97e'
@@ -11,7 +11,7 @@ const STATUS = {
   Cancelled: { bg: '#fdf0f0', color: '#b94040', label: 'Annulée'    },
 }
 
-function EditBtn({ onClick }) {
+function ActionBtn({ onClick, icon: Icon, danger }) {
   const [hov, setHov] = useState(false)
   return (
     <button
@@ -19,44 +19,31 @@ function EditBtn({ onClick }) {
       onMouseEnter={() => setHov(true)}
       onMouseLeave={() => setHov(false)}
       style={{
-        display: 'inline-flex', alignItems: 'center', gap: 6,
-        padding: '7px 14px',
-        background: hov ? DARK : '#f5f0eb',
-        border: 'none', borderRadius: 0,
-        fontSize: 12, fontWeight: 800,
-        color: hov ? GOLD : DARK,
-        cursor: 'pointer', fontFamily: 'inherit',
-        transition: 'background 0.15s, color 0.15s',
-        whiteSpace: 'nowrap',
+        width: 32, height: 32,
+        display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+        background: danger
+          ? (hov ? '#b94040' : '#fdf0f0')
+          : (hov ? DARK : '#f5f0eb'),
+        border: 'none', cursor: 'pointer',
+        transition: 'background 0.15s',
       }}
     >
-      <Pencil size={12} strokeWidth={2.5} />
-      Modifier
+      <Icon size={14} strokeWidth={2.5}
+        color={danger ? (hov ? '#fff' : '#b94040') : (hov ? GOLD : DARK)} />
     </button>
   )
 }
 
-export default function ReservationsTable({ reservations, openEdit }) {
-  const cols = ['Nom', 'Téléphone', 'Date', 'Heure', 'Couverts', 'Service', 'Statut', '']
+export default function ReservationsTable({ reservations, openView, openEdit, handleDelete }) {
+  const cols = ['Nom', 'Téléphone', 'Date', 'Heure', 'Couverts', 'Service', 'Statut', 'Actions']
 
   return (
-    <div style={{
-      background: '#fff',
-      overflow: 'auto',
-      fontFamily: "'Plus Jakarta Sans','DM Sans',system-ui,sans-serif",
-    }}>
-      <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800;900&display=swap" rel="stylesheet" />
-
-      <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 640 }}>
+    <div style={{ background: '#fff', overflow: 'auto', fontFamily: "'Plus Jakarta Sans','DM Sans',system-ui,sans-serif" }}>
+      <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 680 }}>
         <thead>
           <tr style={{ background: DARK }}>
             {cols.map(c => (
-              <th key={c} style={{
-                padding: '13px 18px', textAlign: 'left',
-                fontSize: 10, fontWeight: 900, color: GOLD,
-                letterSpacing: '0.14em', textTransform: 'uppercase',
-                whiteSpace: 'nowrap',
-              }}>
+              <th key={c} style={{ padding: '13px 16px', textAlign: 'left', fontSize: 10, fontWeight: 900, color: GOLD, letterSpacing: '0.14em', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>
                 {c}
               </th>
             ))}
@@ -66,43 +53,31 @@ export default function ReservationsTable({ reservations, openEdit }) {
           {reservations.map((r, i) => {
             const s = STATUS[r.status] || { bg: '#f5f5f5', color: '#888', label: r.status || '—' }
             return (
-              <tr
-                key={r.id}
-                style={{
-                  background: i % 2 === 0 ? '#fff' : '#faf8f5',
-                  borderBottom: '1px solid #f0ebe4',
-                }}
-              >
-                <td style={{ padding: '14px 18px', fontSize: 14, fontWeight: 800, color: DARK }}>{r.name || '—'}</td>
-                <td style={{ padding: '14px 18px', fontSize: 13, fontWeight: 600, color: '#888' }}>{r.phone || '—'}</td>
-                <td style={{ padding: '14px 18px', fontSize: 13, fontWeight: 700, color: DARK }}>{r.date || '—'}</td>
-                <td style={{ padding: '14px 18px', fontSize: 13, fontWeight: 700, color: DARK }}>{r.start_time || '—'}</td>
-                <td style={{ padding: '14px 18px', fontSize: 13, fontWeight: 700, color: DARK, textAlign: 'center' }}>{r.guests || '—'}</td>
-                <td style={{ padding: '14px 18px', fontSize: 13, fontWeight: 600, color: '#888' }}>{r.service || '—'}</td>
-                <td style={{ padding: '14px 18px' }}>
-                  <span style={{
-                    display: 'inline-block',
-                    padding: '4px 12px',
-                    background: s.bg,
-                    fontSize: 11, fontWeight: 900,
-                    color: s.color, letterSpacing: '0.04em',
-                  }}>
+              <tr key={r.id} style={{ background: i % 2 === 0 ? '#fff' : '#faf8f5', borderBottom: '1px solid #f0ebe4' }}>
+                <td style={{ padding: '13px 16px', fontSize: 14, fontWeight: 800, color: DARK }}>{r.name || '—'}</td>
+                <td style={{ padding: '13px 16px', fontSize: 13, fontWeight: 600, color: '#888' }}>{r.phone || '—'}</td>
+                <td style={{ padding: '13px 16px', fontSize: 13, fontWeight: 700, color: DARK }}>{r.date || '—'}</td>
+                <td style={{ padding: '13px 16px', fontSize: 13, fontWeight: 700, color: DARK }}>{r.start_time || '—'}</td>
+                <td style={{ padding: '13px 16px', fontSize: 13, fontWeight: 700, color: DARK, textAlign: 'center' }}>{r.guests || '—'}</td>
+                <td style={{ padding: '13px 16px', fontSize: 13, fontWeight: 600, color: '#888' }}>{r.service || '—'}</td>
+                <td style={{ padding: '13px 16px' }}>
+                  <span style={{ display: 'inline-block', padding: '4px 10px', background: s.bg, fontSize: 11, fontWeight: 900, color: s.color }}>
                     {s.label}
                   </span>
                 </td>
-                <td style={{ padding: '14px 18px' }}>
-                  <EditBtn onClick={() => openEdit(r)} />
+                <td style={{ padding: '13px 16px' }}>
+                  <div style={{ display: 'flex', gap: 4 }}>
+                    <ActionBtn icon={Eye}    onClick={() => openView(r)} />
+                    <ActionBtn icon={Pencil} onClick={() => openEdit(r)} />
+                    <ActionBtn icon={Trash2} onClick={() => handleDelete(r.id)} danger />
+                  </div>
                 </td>
               </tr>
             )
           })}
-
           {reservations.length === 0 && (
             <tr>
-              <td colSpan={8} style={{
-                padding: '48px 24px', textAlign: 'center',
-                fontSize: 14, fontWeight: 700, color: '#bbb',
-              }}>
+              <td colSpan={8} style={{ padding: '48px 24px', textAlign: 'center', fontSize: 14, fontWeight: 700, color: '#bbb' }}>
                 Aucune réservation trouvée.
               </td>
             </tr>
