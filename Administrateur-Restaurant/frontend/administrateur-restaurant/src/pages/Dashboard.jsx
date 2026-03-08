@@ -68,21 +68,10 @@ function HeroNum({ value }) {
   )
 }
 
-function Stat({ value, label, gold=false, delay=0, icon:Icon, onClick }) {
-  const [hov, setHov] = useState(false)
+function Stat({ value, label, gold=false, delay=0, icon:Icon }) {
   const n = useCountUp(value, 750, delay)
   return (
-    <div
-      onClick={onClick}
-      onMouseEnter={() => onClick && setHov(true)}
-      onMouseLeave={() => setHov(false)}
-      style={{
-        cursor: onClick ? 'pointer' : 'default',
-        userSelect: 'none',
-        opacity: hov ? 0.75 : 1,
-        transition: 'opacity 0.15s',
-      }}
-    >
+    <div>
       {Icon && <Icon size={30} strokeWidth={2} color={gold ? GOLD : DARK} style={{ marginBottom:16, display:'block' }} />}
       <p style={{
         margin:0, fontSize:'clamp(48px,5.5vw,76px)', fontWeight:900,
@@ -94,30 +83,6 @@ function Stat({ value, label, gold=false, delay=0, icon:Icon, onClick }) {
       </p>
       <p style={{ margin:'12px 0 0', fontSize:16, fontWeight:800, color:DARK, letterSpacing:'-0.3px' }}>{label}</p>
     </div>
-  )
-}
-
-function Link({ children, onClick }) {
-  const [hov, setHov] = useState(false)
-  return (
-    <button
-      onClick={onClick}
-      onMouseEnter={() => setHov(true)}
-      onMouseLeave={() => setHov(false)}
-      style={{
-        display: 'inline-flex', alignItems: 'center', gap: 8,
-        padding: '10px 18px',
-        background: hov ? GOLD : 'transparent',
-        border: `2px solid ${GOLD}`,
-        color: hov ? DARK : GOLD,
-        fontSize: 14, fontWeight: 800,
-        cursor: 'pointer', fontFamily: 'inherit',
-        transition: 'background 0.15s, color 0.15s',
-      }}
-    >
-      {children}
-      <ArrowRight size={15} strokeWidth={2.5} />
-    </button>
   )
 }
 
@@ -239,7 +204,7 @@ export default function Dashboard() {
           </p>
           <div style={{ marginTop: 28 }}>
             <Btn icon={ArrowRight} primary onClick={() => go({ filterDate: TODAY_DATE })}>
-              Voir toutes les réservations d'aujourd'hui
+              Voir les réservations d'aujourd'hui
             </Btn>
           </div>
         </FadeUp>
@@ -252,17 +217,6 @@ export default function Dashboard() {
             <Stat icon={CheckCircle} value={stats.today_confirmed} label="Confirmées" delay={110} />
             <Stat icon={Clock}       value={stats.today_pending}   label="En attente" gold delay={145} />
             <Stat icon={XCircle}     value={stats.today_cancelled} label="Annulées"   delay={180} />
-          </div>
-          <div style={{ marginTop: 36, display: 'flex', gap: 3, flexWrap: 'wrap' }}>
-            <Btn icon={CheckCircle} onClick={() => go({ filterDate: TODAY_DATE, filterStatus: 'Confirmed' })}>
-              Confirmées
-            </Btn>
-            <Btn icon={Clock} onClick={() => go({ filterDate: TODAY_DATE, filterStatus: 'Pending' })}>
-              En attente
-            </Btn>
-            <Btn icon={XCircle} onClick={() => go({ filterDate: TODAY_DATE, filterStatus: 'Cancelled' })}>
-              Annulées
-            </Btn>
           </div>
         </FadeUp>
 
@@ -291,17 +245,6 @@ export default function Dashboard() {
             <Stat icon={CheckCircle} value={stats.confirmed} label="Confirmées" delay={310} />
             <Stat icon={Clock}       value={stats.pending}   label="En attente" gold delay={340} />
             <Stat icon={XCircle}     value={stats.cancelled} label="Annulées"   delay={370} />
-          </div>
-          <div style={{ marginTop: 36, display: 'flex', gap: 3, flexWrap: 'wrap' }}>
-            <Btn icon={CheckCircle} onClick={() => go({ filterStatus: 'Confirmed' })}>
-              Confirmées ce mois
-            </Btn>
-            <Btn icon={Clock} onClick={() => go({ filterStatus: 'Pending' })}>
-              En attente ce mois
-            </Btn>
-            <Btn icon={XCircle} onClick={() => go({ filterStatus: 'Cancelled' })}>
-              Annulées ce mois
-            </Btn>
           </div>
         </FadeUp>
 
