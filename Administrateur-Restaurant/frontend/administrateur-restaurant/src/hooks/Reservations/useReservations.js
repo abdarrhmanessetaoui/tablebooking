@@ -9,15 +9,15 @@ const headers = () => ({
   'Authorization': `Bearer ${getToken()}`,
 })
 
-export default function useReservations() {
+export default function useReservations(initialFilters = {}) {
   const [reservations, setReservations] = useState([])
   const [loading, setLoading]           = useState(true)
   const [error, setError]               = useState('')
   const [showModal, setShowModal]       = useState(false)
   const [editing, setEditing]           = useState(null)
   const [search, setSearch]             = useState('')
-  const [filterStatus, setFilterStatus] = useState('all')
-  const [filterDate, setFilterDate]     = useState('')
+  const [filterStatus, setFilterStatus] = useState(initialFilters?.filterStatus || 'all')
+  const [filterDate, setFilterDate]     = useState(initialFilters?.filterDate   || '')
   const [form, setForm] = useState({
     name: '', email: '', phone: '', date: '', start_time: '', guests: '', status: 'Pending', notes: ''
   })
