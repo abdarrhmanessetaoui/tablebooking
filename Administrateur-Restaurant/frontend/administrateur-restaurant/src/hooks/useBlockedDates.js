@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { getToken } from '../utils/auth'
 
-const API = 'http://localhost:8000/api/blocked-dates'
+const API = 'http://localhost:8000/api/admin/blocked-dates'
 
 const headers = () => ({
   'Content-Type': 'application/json',
