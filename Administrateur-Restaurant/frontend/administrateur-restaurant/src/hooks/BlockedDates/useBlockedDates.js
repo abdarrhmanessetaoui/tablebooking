@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react'
-import { getToken } from '../utils/auth'
+import { getToken } from '../../utils/auth'
 
-const API_GET    = 'http://localhost:8000/api/admin/blocked-dates'
-const API_WRITE  = 'http://localhost:8000/api/blocked-dates'
+const API = 'http://localhost:8000/api/admin/blocked-dates'
 
 const headers = () => ({
   'Content-Type': 'application/json',
@@ -22,7 +21,7 @@ export default function useBlockedDates() {
   const fetchBlockedDates = async () => {
     setLoading(true)
     try {
-      const res  = await fetch(API_GET, { headers: headers() })
+      const res  = await fetch(API, { headers: headers() })
       const data = await res.json()
       setBlockedDates(Array.isArray(data) ? data : [])
     } catch {
@@ -38,7 +37,7 @@ export default function useBlockedDates() {
     setSubmitting(true)
     setError('')
     try {
-      const res  = await fetch(API_WRITE, { method: 'POST', headers: headers(), body: JSON.stringify({ date: form.date }) })
+      const res  = await fetch(API, { method: 'POST', headers: headers(), body: JSON.stringify({ date: form.date }) })
       const data = await res.json()
       if (!res.ok) { setError(data.message || 'Failed to block date.'); return }
       setBlockedDates(prev => [...prev, data].sort((a, b) => a.date.localeCompare(b.date)))
@@ -53,7 +52,7 @@ export default function useBlockedDates() {
   const handleUnblock = async (date) => {
     if (!window.confirm('Unblock this date?')) return
     try {
-      await fetch(`${API_WRITE}/${date}`, { method: 'DELETE', headers: headers() })
+      await fetch(`${API}/${date}`, { method: 'DELETE', headers: headers() })
       setBlockedDates(prev => prev.filter(d => d.date !== date))
     } catch {
       setError('Failed to unblock date.')
