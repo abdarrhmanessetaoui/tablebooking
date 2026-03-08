@@ -219,7 +219,7 @@ export default function ReservationModal({ modalMode, editing, form, setForm, ha
   }, [])
 
   useEffect(() => {
-    fetch('http://localhost:8000/api/blocked-dates', {
+    fetch('http://localhost:8000/api/admin/blocked-dates', {
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
