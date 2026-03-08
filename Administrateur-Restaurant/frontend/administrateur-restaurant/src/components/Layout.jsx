@@ -40,10 +40,10 @@ export default function Layout({ children }) {
         .l-aside {
           flex-shrink: 0;
           position: sticky; top: 0; height: 100vh;
-          overflow: visible;
+          overflow: hidden;
           z-index: 20;
-          transition: width 0.24s cubic-bezier(0.4,0,0.2,1);
-          border-right: 1px solid rgba(200,169,126,0.13);
+          transition: width 0.22s cubic-bezier(0.4,0,0.2,1);
+          border-right: 1px solid rgba(200,169,126,0.12);
         }
         .l-main {
           flex: 1; min-width: 0; background: #fff;
