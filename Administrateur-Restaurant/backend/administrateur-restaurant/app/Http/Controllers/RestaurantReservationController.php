@@ -1,204 +1,62 @@
 <?php
+// Remplace la méthode store() dans RestaurantReservationController.php
 
-namespace App\Http\Controllers;
-
-use App\Models\WpMessage;
-use Illuminate\Http\Request;
-
-class RestaurantReservationController extends Controller
+public function store(Request $request)
 {
-    private function formId(): int
-    {
-        return auth()->user()->restaurant_form_id;
-    }
+    $request->validate([
+        'name'       => 'required|string',
+        'date'       => 'required|date',        // reçoit Y-m-d depuis le frontend
+        'start_time' => 'required|string',
+        'guests'     => 'required|integer|min:1',
+        'status'     => 'in:Pending,Confirmed,Cancelled',
+    ]);
 
-    private function parseStatus(string $postedData): string
-    {
-        $data = @unserialize($postedData);
-        return is_array($data) ? ($data['app_status_1'] ?? 'Pending') : 'Pending';
-    }
+    $status     = $request->status     ?? 'Pending';
+    $service    = $request->service    ?? '';
+    $guests     = $request->guests;
+    $startTime  = $request->start_time;
 
-    private function cancelExpiredPending(): void
-    {
-        $today    = now()->toDateString();
-        $messages = WpMessage::where('formid', $this->formId())->get();
+    // Convertir Y-m-d → d/m/Y (format attendu par toCleanArray)
+    $dateObj    = \DateTime::createFromFormat('Y-m-d', $request->date);
+    $dateFr     = $dateObj ? $dateObj->format('d/m/Y') : $request->date;
+    $dateIso    = $dateObj ? $dateObj->format('Y-m-d') : $request->date;
 
-        foreach ($messages as $message) {
-            $clean = $message->toCleanArray();
-            if ($clean['status'] !== 'Pending') continue;
-            if (!$clean['date'] || $clean['date'] >= $today) continue;
-            $data = @unserialize($message->posted_data);
-            if (!is_array($data)) continue;
-            $data['app_status_1'] = 'Cancelled';
-            $message->posted_data = serialize($data);
-            $message->save();
-        }
-    }
+    // Calculer end_time (+1h par défaut)
+    $endTime = date('H:i', strtotime($startTime) + 3600);
 
-    public function index(Request $request)
-    {
-        $messages = WpMessage::where('formid', $this->formId())
-            ->orderByDesc('time')
-            ->get();
+    $posted_data = serialize([
+        // Champs identiques au format WordPress
+        'apps' => [
+            0 => [
+                'id'        => 1,
+                'cancelled' => $status,      // ← utilisé par updateStatus()
+                'service'   => $service,
+                'date'      => $dateIso,
+                'slot'      => $startTime . '/' . $endTime,
+                'quant'     => (string) $guests,
+            ]
+        ],
+        'app_service_1'   => $service,
+        'app_status_1'    => $status,         // ← lu par toCleanArray()
+        'app_date_1'      => $dateFr,         // ← lu par toCleanArray() en d/m/Y
+        'app_starttime_1' => $startTime,
+        'app_endtime_1'   => $endTime,
+        'app_quantity_1'  => (string) $guests,
+        'fieldname3'      => $request->name,
+        'fieldname6'      => $request->phone  ?? '',
+        'email'           => $request->email  ?? '',
+        'fieldname8'      => $request->notes  ?? '',
+        'formid'          => $this->formId(),
+        'request_timestamp' => now()->format('d/m/Y H:i:s'),
+    ]);
 
-        $clean = $messages->map(fn($m) => $m->toCleanArray());
+    $message = WpMessage::create([
+        'formid'      => $this->formId(),
+        'time'        => now()->toDateTimeString(),
+        'ipaddr'      => $request->ip(),
+        'whoadded'    => auth()->user()->name ?? 'admin',
+        'posted_data' => $posted_data,
+    ]);
 
-        if ($request->has('date')) {
-            $clean = $clean->filter(fn($r) => $r['date'] === $request->date)->values();
-        }
-
-        return response()->json($clean);
-    }
-
-    public function byDate(Request $request)
-    {
-        $date = $request->query('date', now()->toDateString());
-
-        $messages = WpMessage::where('formid', $this->formId())->get();
-
-        $filtered = $messages
-            ->map(fn($m) => $m->toCleanArray())
-            ->filter(fn($r) => $r['date'] === $date)
-            ->values();
-
-        return response()->json($filtered);
-    }
-
-    public function stats()
-    {
-        $this->cancelExpiredPending();
-
-        $messages = WpMessage::where('formid', $this->formId())->get();
-        $clean    = $messages->map(fn($m) => $m->toCleanArray());
-        $today    = now()->toDateString();
-        $tomorrow = now()->addDay()->toDateString();
-        $month    = now()->format('Y-m');
-
-        $todayRes = $clean->filter(fn($r) => $r['date'] === $today);
-        $monthRes = $clean->filter(fn($r) => str_starts_with($r['date'] ?? '', $month));
-
-        return response()->json([
-            'today'           => $todayRes->count(),
-            'today_confirmed' => $todayRes->filter(fn($r) => $r['status'] === 'Confirmed')->count(),
-            'today_pending'   => $todayRes->filter(fn($r) => $r['status'] === 'Pending')->count(),
-            'today_cancelled' => $todayRes->filter(fn($r) => $r['status'] === 'Cancelled')->count(),
-            'tomorrow'        => $clean->filter(fn($r) => $r['date'] === $tomorrow)->count(),
-            'total'           => $monthRes->count(),
-            'confirmed'       => $monthRes->filter(fn($r) => $r['status'] === 'Confirmed')->count(),
-            'pending'         => $monthRes->filter(fn($r) => $r['status'] === 'Pending')->count(),
-            'cancelled'       => $monthRes->filter(fn($r) => $r['status'] === 'Cancelled')->count(),
-        ]);
-    }
-
-    public function store(Request $request)
-    {
-        $request->validate([
-            'name'       => 'required|string',
-            'date'       => 'required|date',
-            'start_time' => 'required|string',
-            'guests'     => 'required|integer|min:1',
-            'status'     => 'in:Pending,Confirmed,Cancelled',
-        ]);
-
-        $date = \DateTime::createFromFormat('Y-m-d', $request->date);
-
-        $posted_data = serialize([
-            'fieldname3'      => $request->name,
-            'fieldname6'      => $request->phone      ?? '',
-            'email'           => $request->email      ?? '',
-            'app_date_1'      => $date ? $date->format('d/m/Y') : $request->date,
-            'app_starttime_1' => $request->start_time,
-            'app_endtime_1'   => '',
-            'app_quantity_1'  => $request->guests,
-            'app_service_1'   => $request->service    ?? '',
-            'app_status_1'    => $request->status     ?? 'Pending',
-            'fieldname8'      => $request->notes      ?? '',
-        ]);
-
-        $message = WpMessage::create([
-            'formid'      => $this->formId(),
-            'time'        => now()->toDateTimeString(),
-            'ipaddr'      => $request->ip(),
-            'posted_data' => $posted_data,
-        ]);
-
-        return response()->json($message->toCleanArray(), 201);
-    }
-
-    public function destroy(int $id)
-    {
-        $message = WpMessage::where('formid', $this->formId())->findOrFail($id);
-        $message->delete();
-        return response()->json(['deleted' => true]);
-    }
-
-    public function reports()
-    {
-        $messages = WpMessage::where('formid', $this->formId())->get();
-        $clean    = $messages->map(fn($m) => $m->toCleanArray());
-
-        $byHour = $clean->groupBy(fn($r) => $r['start_time'] ? substr($r['start_time'], 0, 5) : null)
-            ->filter(fn($g, $k) => $k !== null)
-            ->map(fn($g) => $g->count())
-            ->sortKeys();
-
-        $days  = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-        $byDay = ['Mon' => 0, 'Tue' => 0, 'Wed' => 0, 'Thu' => 0, 'Fri' => 0, 'Sat' => 0, 'Sun' => 0];
-
-        $clean->each(function ($r) use (&$byDay, $days) {
-            if (!$r['date']) return;
-            try {
-                $day         = $days[date('w', strtotime($r['date']))];
-                $byDay[$day] = ($byDay[$day] ?? 0) + 1;
-            } catch (\Exception $e) {}
-        });
-
-        return response()->json([
-            'by_hour' => $byHour,
-            'by_day'  => $byDay,
-        ]);
-    }
-
-    public function updateStatus(Request $request, int $id)
-    {
-        $request->validate([
-            'status' => 'required|in:Pending,Confirmed,Cancelled',
-        ]);
-
-        $message = WpMessage::where('formid', $this->formId())->findOrFail($id);
-
-        $data = @unserialize($message->posted_data);
-        if (is_array($data)) {
-            $data['app_status_1']         = $request->status;
-            $data['apps'][0]['cancelled'] = $request->status;
-            $message->posted_data         = serialize($data);
-            $message->save();
-        }
-
-        return response()->json($message->toCleanArray());
-    }
-
-    public function info()
-    {
-        $form = \Illuminate\Support\Facades\DB::table('wpjn_cpappbk_forms')
-            ->where('id', $this->formId())
-            ->first();
-
-        if (!$form) return response()->json([]);
-
-        $parts    = explode(' - ', $form->form_name);
-        $name     = trim($parts[0] ?? $form->form_name);
-        $location = trim($parts[1] ?? '');
-
-        return response()->json([
-            'name'           => $name,
-            'location'       => $location,
-            'form_name'      => $form->form_name,
-            'email'          => $form->fp_from_email,
-            'contact_name'   => $form->fp_from_name,
-            'dest_emails'    => $form->fp_destination_emails,
-            'language'       => $form->calendar_language,
-            'default_status' => $form->defaultstatus,
-        ]);
-    }
+    return response()->json($message->toCleanArray(), 201);
 }
