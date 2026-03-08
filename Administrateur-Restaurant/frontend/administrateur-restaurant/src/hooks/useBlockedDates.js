@@ -40,7 +40,6 @@ export default function useBlockedDates() {
       const res  = await fetch(API, { method: 'POST', headers: headers(), body: JSON.stringify({ date: form.date }) })
       const data = await res.json()
       if (!res.ok) { setError(data.message || 'Failed to block date.'); return }
-      // data = { date: 'Y-m-d' }
       setBlockedDates(prev => [...prev, data].sort((a, b) => a.date.localeCompare(b.date)))
       setForm({ date: '' })
     } catch {
@@ -50,7 +49,6 @@ export default function useBlockedDates() {
     }
   }
 
-  // unblock by date string (Y-m-d) — no more id
   const handleUnblock = async (date) => {
     if (!window.confirm('Unblock this date?')) return
     try {
@@ -65,5 +63,6 @@ export default function useBlockedDates() {
     blockedDates, loading, error,
     form, setForm, submitting,
     handleBlock, handleUnblock,
+    refetch: fetchBlockedDates,   // ← added
   }
 }
