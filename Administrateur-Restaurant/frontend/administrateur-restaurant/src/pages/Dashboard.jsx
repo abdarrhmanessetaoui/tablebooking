@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { RefreshCw, FileDown, CheckCircle, Clock, XCircle, ClipboardList, ArrowRight } from 'lucide-react'
 
-import useDashboardStats from '../hooks/Dashboard/useDashboardStats'
+import useDashboardStats    from '../hooks/Dashboard/useDashboardStats'
+import useRestaurantInfo   from '../hooks/Dashboard/useRestaurantInfo'
 import FadeUp     from '../components/Dashboard/FadeUp'
 import Spinner    from '../components/Dashboard/Spinner'
 import useCountUp from '../hooks/Dashboard/useCountUp'
@@ -179,6 +180,7 @@ function Dot({ color }) {
 
 export default function Dashboard() {
   const { stats, loading, error, refetch } = useDashboardStats()
+  const { info }                           = useRestaurantInfo()
   const navigate                           = useNavigate()
   const [refreshing, setRefreshing] = useState(false)
   const [exporting,  setExporting]  = useState(false)
@@ -258,6 +260,53 @@ export default function Dashboard() {
             </div>
           </div>
         </FadeUp>
+
+        {/* ── Restaurant info banner ── */}
+        {info && (
+          <FadeUp delay={20}>
+            <div style={{
+              display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between',
+              gap: 16, padding: '18px 24px', background: DARK, marginBottom: 48,
+            }}>
+              {/* Left: name + location */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+                <div style={{ width: 42, height: 42, background: GOLD, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  <span style={{ fontSize: 18, fontWeight: 900, color: DARK, lineHeight: 1 }}>
+                    {info.name?.charAt(0) ?? '?'}
+                  </span>
+                </div>
+                <div>
+                  <p style={{ margin: 0, fontSize: 16, fontWeight: 900, color: '#fff', letterSpacing: '-0.4px' }}>
+                    {info.name}
+                  </p>
+                  {info.location && (
+                    <p style={{ margin: '2px 0 0', fontSize: 12, fontWeight: 700, color: GOLD }}>
+                      📍 {info.location}
+                    </p>
+                  )}
+                </div>
+              </div>
+              {/* Right: meta pills */}
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                {info.email && (
+                  <span style={{ padding: '5px 12px', background: 'rgba(200,169,126,0.15)', fontSize: 12, fontWeight: 700, color: GOLD, letterSpacing: '-0.1px' }}>
+                    ✉ {info.email}
+                  </span>
+                )}
+                {info.default_status && (
+                  <span style={{ padding: '5px 12px', background: 'rgba(255,255,255,0.08)', fontSize: 12, fontWeight: 700, color: '#fff' }}>
+                    Statut par défaut : {info.default_status}
+                  </span>
+                )}
+                {info.language && (
+                  <span style={{ padding: '5px 12px', background: 'rgba(255,255,255,0.08)', fontSize: 12, fontWeight: 700, color: '#fff' }}>
+                    🌐 {info.language}
+                  </span>
+                )}
+              </div>
+            </div>
+          </FadeUp>
+        )}
 
         {/* ── AUJOURD'HUI ── */}
         <FadeUp delay={40}>
