@@ -15,6 +15,9 @@ const DARK      = '#2b2118'
 const GOLD      = '#c8a97e'
 const GOLD_DARK = '#a8834e'
 
+const TODAY_DATE    = new Date().toISOString().slice(0, 10)
+const TOMORROW_DATE = new Date(Date.now() + 86400000).toISOString().slice(0, 10)
+
 /* ── Live clock ── */
 function LiveClock() {
   const [time, setTime] = useState(new Date())
@@ -65,10 +68,21 @@ function HeroNum({ value }) {
   )
 }
 
-function Stat({ value, label, gold=false, delay=0, icon:Icon }) {
+function Stat({ value, label, gold=false, delay=0, icon:Icon, onClick }) {
+  const [hov, setHov] = useState(false)
   const n = useCountUp(value, 750, delay)
   return (
-    <div>
+    <div
+      onClick={onClick}
+      onMouseEnter={() => onClick && setHov(true)}
+      onMouseLeave={() => setHov(false)}
+      style={{
+        cursor: onClick ? 'pointer' : 'default',
+        userSelect: 'none',
+        opacity: hov ? 0.75 : 1,
+        transition: 'opacity 0.15s',
+      }}
+    >
       {Icon && <Icon size={30} strokeWidth={2} color={gold ? GOLD : DARK} style={{ marginBottom:16, display:'block' }} />}
       <p style={{
         margin:0, fontSize:'clamp(48px,5.5vw,76px)', fontWeight:900,
@@ -109,8 +123,6 @@ function Link({ children, onClick }) {
 
 function Btn({ children, onClick, primary, disabled, icon: Icon }) {
   const [hov, setHov] = useState(false)
-  // default: DARK bg → GOLD bg on hover
-  // primary: GOLD bg → DARK bg on hover
   const bg    = primary ? (hov ? DARK : GOLD)      : (hov ? GOLD : DARK)
   const color = primary ? (hov ? GOLD : DARK)      : '#fff'
   return (
@@ -156,7 +168,6 @@ export default function Dashboard() {
   async function handleExportPDF() {
     setExporting(true)
     try {
-      // Load jsPDF dynamically if not already loaded
       if (!window.jspdf) {
         await new Promise((resolve, reject) => {
           const s = document.createElement('script')
@@ -173,6 +184,9 @@ export default function Dashboard() {
       setExporting(false)
     }
   }
+
+  // Helper to navigate to reservations with pre-applied filters
+  const go = (filters) => navigate('/reservations', { state: filters })
 
   if (loading) return <Spinner />
 
@@ -222,7 +236,7 @@ export default function Dashboard() {
           <HeroNum value={stats.today} />
           <p style={{ margin:'18px 0 0', fontSize:17, fontWeight:800, color:DARK, letterSpacing:'-0.3px' }}>
             réservations aujourd'hui&emsp;
-            <Link onClick={() => navigate('/reservations')}>Voir tout</Link>
+            <Link onClick={() => go({ filterDate: TODAY_DATE })}>Voir tout</Link>
           </p>
         </FadeUp>
 
@@ -231,9 +245,12 @@ export default function Dashboard() {
         <FadeUp delay={110}>
           <Label text="Détail du jour" sub="Confirmées · En attente · Annulées" />
           <div className="three">
-            <Stat icon={CheckCircle} value={stats.today_confirmed} label="Confirmées"  delay={110} />
-            <Stat icon={Clock}       value={stats.today_pending}   label="En attente"  gold delay={145} />
-            <Stat icon={XCircle}     value={stats.today_cancelled} label="Annulées"    delay={180} />
+            <Stat icon={CheckCircle} value={stats.today_confirmed} label="Confirmées" delay={110}
+              onClick={() => go({ filterDate: TODAY_DATE, filterStatus: 'Confirmed' })} />
+            <Stat icon={Clock}       value={stats.today_pending}   label="En attente" gold delay={145}
+              onClick={() => go({ filterDate: TODAY_DATE, filterStatus: 'Pending' })} />
+            <Stat icon={XCircle}     value={stats.today_cancelled} label="Annulées"   delay={180}
+              onClick={() => go({ filterDate: TODAY_DATE, filterStatus: 'Cancelled' })} />
           </div>
         </FadeUp>
 
@@ -243,9 +260,10 @@ export default function Dashboard() {
           <Label text="À venir" sub="Demain et total du mois" />
           <div className="two">
             <div>
-              <Stat icon={CalendarDays} value={stats.tomorrow} label="Demain" gold delay={230} />
+              <Stat icon={CalendarDays} value={stats.tomorrow} label="Demain" gold delay={230}
+                onClick={() => go({ filterDate: TOMORROW_DATE })} />
               <div style={{ marginTop:18 }}>
-                <Link onClick={() => navigate('/calendar')}>Voir le planning</Link>
+                <Link onClick={() => go({ filterDate: TOMORROW_DATE })}>Voir le planning</Link>
               </div>
             </div>
             <Stat icon={ClipboardList} value={stats.total} label="Total ce mois" delay={265} />
@@ -257,9 +275,12 @@ export default function Dashboard() {
         <FadeUp delay={310}>
           <Label text="Ce mois" sub="Bilan mensuel des réservations" />
           <div className="three">
-            <Stat icon={CheckCircle} value={stats.confirmed} label="Confirmées"  delay={310} />
-            <Stat icon={Clock}       value={stats.pending}   label="En attente"  gold delay={340} />
-            <Stat icon={XCircle}     value={stats.cancelled} label="Annulées"    delay={370} />
+            <Stat icon={CheckCircle} value={stats.confirmed} label="Confirmées" delay={310}
+              onClick={() => go({ filterStatus: 'Confirmed' })} />
+            <Stat icon={Clock}       value={stats.pending}   label="En attente" gold delay={340}
+              onClick={() => go({ filterStatus: 'Pending' })} />
+            <Stat icon={XCircle}     value={stats.cancelled} label="Annulées"   delay={370}
+              onClick={() => go({ filterStatus: 'Cancelled' })} />
           </div>
         </FadeUp>
 
