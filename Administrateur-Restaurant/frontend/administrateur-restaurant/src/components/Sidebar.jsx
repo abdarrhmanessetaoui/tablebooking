@@ -1,10 +1,12 @@
 import { NavLink } from 'react-router-dom'
 import { navItems, LogoutIcon } from '../data/sidebarItems'
 import { useState } from 'react'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { PanelLeftClose, PanelLeftOpen } from 'lucide-react'
 
-const DARK = '#2b2118'
-const GOLD = '#c8a97e'
+const DARK   = '#2b2118'
+const DARK2  = '#231b13'
+const GOLD   = '#c8a97e'
+const GOLD2  = '#e8c99e'
 
 export default function Sidebar({ handleLogout, onNavClick, collapsed, onToggle }) {
   const [hov, setHov]       = useState(null)
@@ -17,58 +19,99 @@ export default function Sidebar({ handleLogout, onNavClick, collapsed, onToggle 
       display: 'flex', flexDirection: 'column',
       fontFamily: "'Plus Jakarta Sans','DM Sans',system-ui,sans-serif",
       overflow: 'hidden',
+      position: 'relative',
     }}>
 
-      {/* LOGO + TOGGLE */}
+      {/* subtle texture overlay */}
       <div style={{
-        padding: collapsed ? '28px 0 24px' : '28px 24px 24px',
-        borderBottom: `1px solid rgba(200,169,126,0.18)`,
+        position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 0,
+        background: `
+          radial-gradient(ellipse 180% 60% at 50% -10%, rgba(200,169,126,0.07) 0%, transparent 60%),
+          radial-gradient(ellipse 100% 40% at 50% 110%, rgba(0,0,0,0.25) 0%, transparent 60%)
+        `,
+      }} />
+
+      {/* LOGO ZONE */}
+      <div style={{
+        position: 'relative', zIndex: 1,
+        padding: collapsed ? '22px 0 20px' : '22px 20px 20px',
+        borderBottom: `1px solid rgba(200,169,126,0.12)`,
         flexShrink: 0,
         display: 'flex', alignItems: 'center',
         justifyContent: collapsed ? 'center' : 'space-between',
         gap: 8,
       }}>
         {!collapsed && (
-          <>
+          <div style={{ display:'flex', alignItems:'center', gap:0, minWidth:0, overflow:'hidden' }}>
             <img
               src="/images/tablebooking.png"
               alt="TableBooking.ma"
-              style={{ height: 36, objectFit: 'contain', display: 'block', minWidth: 0 }}
-              onError={e => { e.target.style.display='none'; e.target.nextSibling.style.display='block' }}
+              style={{ height:34, objectFit:'contain', display:'block', maxWidth:140 }}
+              onError={e => {
+                e.target.style.display='none'
+                e.target.nextSibling.style.display='flex'
+              }}
             />
-            <span style={{ display:'none', fontSize:16, fontWeight:900, color: GOLD, letterSpacing:'-0.3px', whiteSpace:'nowrap' }}>
-              TableBooking.ma
+            <span style={{
+              display:'none', alignItems:'center', gap:0,
+              fontSize:15, fontWeight:900, color:GOLD, letterSpacing:'-0.5px',
+            }}>
+              Table<span style={{ color:'#fff' }}>Booking</span>
+              <span style={{ fontSize:9, fontWeight:800, color:GOLD, opacity:0.7, marginLeft:1, alignSelf:'flex-end', marginBottom:1 }}>.ma</span>
             </span>
-          </>
+          </div>
         )}
 
-        {/* Toggle button */}
+        {/* collapse toggle */}
         <button
           onClick={onToggle}
-          title={collapsed ? 'Agrandir' : 'Réduire'}
+          title={collapsed ? 'Agrandir le menu' : 'Réduire le menu'}
           style={{
-            width: 28, height: 28, flexShrink: 0,
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            background: 'rgba(200,169,126,0.15)',
-            border: 'none', color: GOLD, cursor: 'pointer',
-            transition: 'background 0.15s',
+            width:30, height:30, flexShrink:0,
+            display:'flex', alignItems:'center', justifyContent:'center',
+            background:'rgba(200,169,126,0.1)',
+            border:'1px solid rgba(200,169,126,0.18)',
+            color:'rgba(200,169,126,0.6)',
+            cursor:'pointer',
+            transition:'all 0.15s',
+            borderRadius: 0,
           }}
-          onMouseEnter={e => e.currentTarget.style.background='rgba(200,169,126,0.3)'}
-          onMouseLeave={e => e.currentTarget.style.background='rgba(200,169,126,0.15)'}
+          onMouseEnter={e => {
+            e.currentTarget.style.background='rgba(200,169,126,0.2)'
+            e.currentTarget.style.color=GOLD
+            e.currentTarget.style.borderColor='rgba(200,169,126,0.4)'
+          }}
+          onMouseLeave={e => {
+            e.currentTarget.style.background='rgba(200,169,126,0.1)'
+            e.currentTarget.style.color='rgba(200,169,126,0.6)'
+            e.currentTarget.style.borderColor='rgba(200,169,126,0.18)'
+          }}
         >
           {collapsed
-            ? <ChevronRight size={15} strokeWidth={2.5} />
-            : <ChevronLeft  size={15} strokeWidth={2.5} />
+            ? <PanelLeftOpen  size={14} strokeWidth={2} />
+            : <PanelLeftClose size={14} strokeWidth={2} />
           }
         </button>
       </div>
 
+      {/* NAV LABEL */}
+      {!collapsed && (
+        <div style={{
+          position:'relative', zIndex:1,
+          padding:'16px 20px 6px',
+          fontSize:9, fontWeight:900, color:'rgba(200,169,126,0.35)',
+          letterSpacing:'0.22em', textTransform:'uppercase',
+        }}>
+          Navigation
+        </div>
+      )}
+
       {/* NAV */}
       <nav style={{
-        flex: 1,
-        padding: collapsed ? '16px 8px' : '16px 12px',
-        display: 'flex', flexDirection: 'column', gap: 2,
-        overflowY: 'auto', overflowX: 'hidden',
+        flex:1, zIndex:1, position:'relative',
+        padding: collapsed ? '8px 10px' : '4px 10px 8px',
+        display:'flex', flexDirection:'column', gap:2,
+        overflowY:'auto', overflowX:'hidden',
       }}>
         {navItems.map((item, i) => (
           <NavLink
@@ -79,25 +122,61 @@ export default function Sidebar({ handleLogout, onNavClick, collapsed, onToggle 
             onMouseLeave={() => setHov(null)}
             title={collapsed ? item.label : undefined}
             style={({ isActive }) => ({
-              display: 'flex', alignItems: 'center',
-              gap: collapsed ? 0 : 13,
-              padding: collapsed ? '13px 0' : '13px 16px',
+              display:'flex', alignItems:'center',
+              gap: collapsed ? 0 : 12,
+              padding: collapsed ? '12px 0' : '11px 14px',
               justifyContent: collapsed ? 'center' : 'flex-start',
-              textDecoration: 'none',
-              transition: 'background 0.15s, color 0.15s',
-              background: isActive ? GOLD : hov === i ? 'rgba(200,169,126,0.15)' : 'transparent',
-              color: isActive ? DARK : hov === i ? GOLD : 'rgba(255,255,255,0.5)',
+              textDecoration:'none',
+              position:'relative',
+              transition:'background 0.15s, color 0.15s',
+              background: isActive
+                ? GOLD
+                : hov === i
+                  ? 'rgba(200,169,126,0.12)'
+                  : 'transparent',
+              color: isActive
+                ? DARK
+                : hov === i
+                  ? GOLD2
+                  : 'rgba(255,255,255,0.45)',
             })}
           >
             {({ isActive }) => (
               <>
-                <span style={{ display:'flex', alignItems:'center', flexShrink:0, color:'inherit' }}>
+                {/* active left bar */}
+                {isActive && !collapsed && (
+                  <span style={{
+                    position:'absolute', left:0, top:6, bottom:6,
+                    width:3, background:DARK2,
+                  }} />
+                )}
+
+                <span style={{
+                  display:'flex', alignItems:'center', flexShrink:0,
+                  color:'inherit',
+                  filter: isActive ? 'none' : hov === i ? 'none' : 'none',
+                }}>
                   {item.icon}
                 </span>
+
                 {!collapsed && (
-                  <span style={{ fontSize:14, fontWeight: isActive ? 900 : 600, whiteSpace:'nowrap', overflow:'hidden' }}>
+                  <span style={{
+                    fontSize:13, fontWeight: isActive ? 800 : 600,
+                    whiteSpace:'nowrap', overflow:'hidden',
+                    letterSpacing: isActive ? '-0.2px' : '0',
+                  }}>
                     {item.label}
                   </span>
+                )}
+
+                {/* hover dot when collapsed */}
+                {collapsed && hov === i && (
+                  <span style={{
+                    position:'absolute', right:6, top:'50%',
+                    transform:'translateY(-50%)',
+                    width:4, height:4, borderRadius:'50%',
+                    background: GOLD, opacity:0.7,
+                  }} />
                 )}
               </>
             )}
@@ -105,10 +184,18 @@ export default function Sidebar({ handleLogout, onNavClick, collapsed, onToggle 
         ))}
       </nav>
 
+      {/* DIVIDER */}
+      <div style={{
+        position:'relative', zIndex:1,
+        height:1, margin: collapsed ? '0 10px' : '0 10px',
+        background:'rgba(200,169,126,0.12)',
+        flexShrink:0,
+      }} />
+
       {/* LOGOUT */}
       <div style={{
-        padding: collapsed ? '10px 8px 28px' : '10px 12px 28px',
-        borderTop:`1px solid rgba(200,169,126,0.18)`,
+        position:'relative', zIndex:1,
+        padding: collapsed ? '8px 10px 24px' : '8px 10px 24px',
         flexShrink:0,
       }}>
         <button
@@ -118,16 +205,15 @@ export default function Sidebar({ handleLogout, onNavClick, collapsed, onToggle 
           title={collapsed ? 'Déconnexion' : undefined}
           style={{
             width:'100%', display:'flex', alignItems:'center',
-            gap: collapsed ? 0 : 13,
+            gap: collapsed ? 0 : 12,
             justifyContent: collapsed ? 'center' : 'flex-start',
-            padding: collapsed ? '13px 0' : '13px 16px',
-            marginTop:8,
-            background: hovOut ? 'rgba(255,80,80,0.18)' : 'transparent',
-            border: 'none',
-            color: hovOut ? '#ff6b6b' : 'rgba(255,255,255,0.4)',
+            padding: collapsed ? '12px 0' : '11px 14px',
+            background: hovOut ? 'rgba(239,68,68,0.12)' : 'transparent',
+            border:'none',
+            color: hovOut ? '#f87171' : 'rgba(255,255,255,0.3)',
             cursor:'pointer',
-            transition: 'background 0.15s, color 0.15s',
-            fontFamily:'inherit', fontSize:14, fontWeight:600, textAlign:'left',
+            transition:'background 0.15s, color 0.15s',
+            fontFamily:'inherit', fontSize:13, fontWeight:600, textAlign:'left',
           }}
         >
           <span style={{ display:'flex', alignItems:'center', flexShrink:0, color:'inherit' }}>
@@ -136,6 +222,7 @@ export default function Sidebar({ handleLogout, onNavClick, collapsed, onToggle 
           {!collapsed && 'Déconnexion'}
         </button>
       </div>
+
     </div>
   )
 }
