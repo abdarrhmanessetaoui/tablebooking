@@ -25,40 +25,6 @@ function LiveClock() {
   return <span style={{ fontVariantNumeric:'tabular-nums' }}>{t.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit',second:'2-digit'})}</span>
 }
 
-/* ── Donut ── */
-function Donut({ c, p, a, size = 120 }) {
-  const total = c + p + a
-  const r = 13, circ = 2 * Math.PI * r
-  const [on, setOn] = useState(false)
-  useEffect(() => { const id = setTimeout(() => setOn(true), 300); return () => clearTimeout(id) }, [total])
-
-  const segs = [ { v:c, color:DARK }, { v:p, color:GOLD }, { v:a, color:'#c8b49a' } ]
-  let off = 0
-
-  return (
-    <div style={{ position:'relative', width:size, height:size, flexShrink:0 }}>
-      <svg width={size} height={size} viewBox="0 0 36 36" style={{ transform:'rotate(-90deg)' }}>
-        <circle cx="18" cy="18" r={r} fill="none" stroke="#e8e0d6" strokeWidth="4.5" />
-        {total > 0 && segs.map((s, i) => {
-          if (!s.v) { off += (s.v/total)*circ; return null }
-          const arc  = (s.v / total) * circ
-          const dash = on ? arc : 0
-          const el = <circle key={i} cx="18" cy="18" r={r} fill="none"
-            stroke={s.color} strokeWidth="4.5"
-            strokeDasharray={`${(s.v/total)*circ} ${circ}`}
-            strokeDashoffset={-off}
-            style={{ transition:`stroke-dasharray 0.9s ease ${i*0.1}s` }}
-          />
-          off += arc; return el
-        })}
-      </svg>
-      <div style={{ position:'absolute', inset:0, display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', gap:1 }}>
-        <span style={{ fontSize:12, fontWeight:900, color:DARK, lineHeight:1 }}>{total}</span>
-        <span style={{ fontSize:7, fontWeight:800, color:GOLD_DARK, textTransform:'uppercase', letterSpacing:'0.06em' }}>total</span>
-      </div>
-    </div>
-  )
-}
 
 /* ── Animated bar ── */
 function AnimBar({ pct, color }) {
