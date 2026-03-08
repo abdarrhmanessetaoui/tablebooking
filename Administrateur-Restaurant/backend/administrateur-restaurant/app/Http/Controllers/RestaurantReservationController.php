@@ -94,7 +94,7 @@ class RestaurantReservationController extends Controller
     {
         $request->validate([
             'name'       => 'required|string',
-            'date'       => 'required|date',
+            'date'       => 'required|date|after_or_equal:today',
             'start_time' => 'required|string',
             'guests'     => 'required|integer|min:1',
             'status'     => 'in:Pending,Confirmed,Cancelled',
