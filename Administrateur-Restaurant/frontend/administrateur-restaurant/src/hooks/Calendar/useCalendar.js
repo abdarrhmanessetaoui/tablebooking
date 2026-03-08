@@ -61,7 +61,7 @@ export default function useCalendar() {
       const data = await res.json()
       setReservations(Array.isArray(data) ? data : [])
     } catch {
-      setError('Failed to load reservations.')
+      setError('Impossible de charger les réservations.')
       setReservations([])
     } finally {
       setLoading(false)
@@ -101,15 +101,17 @@ export default function useCalendar() {
     })
 
   const navLabel = () => {
-    const opts = { month: 'long', year: 'numeric' }
-    if (view === 'day')   return currentDate.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })
+    if (view === 'day')
+      return currentDate.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
     if (view === 'week') {
-      const start = weekDays[0].toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
-      const end   = weekDays[6].toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+      const start = weekDays[0].toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })
+      const end   = weekDays[6].toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' })
       return `${start} — ${end}`
     }
-    if (view === 'month') return currentDate.toLocaleDateString('en-US', opts)
-    if (view === 'year')  return currentDate.getFullYear().toString()
+    if (view === 'month')
+      return currentDate.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })
+    if (view === 'year')
+      return currentDate.getFullYear().toString()
     return ''
   }
 
@@ -121,5 +123,7 @@ export default function useCalendar() {
     navigate, goToday,
     getByDate, getByMonth, getByYear,
     navLabel,
+    reservations,             // ← for PDF export
+    refetch: fetchReservations, // ← for Actualiser button
   }
 }
