@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { RefreshCw, FileDown, CheckCircle, Clock, XCircle, ClipboardList, ArrowRight } from 'lucide-react'
 
 import useDashboardStats    from '../hooks/Dashboard/useDashboardStats'
-import useRestaurantInfo   from '../hooks/Dashboard/useRestaurantInfo'
+import useRestaurantInfo   from '../hooks/useRestaurantInfo'
 import FadeUp     from '../components/Dashboard/FadeUp'
 import Spinner    from '../components/Dashboard/Spinner'
 import useCountUp from '../hooks/Dashboard/useCountUp'
