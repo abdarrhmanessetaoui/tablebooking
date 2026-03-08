@@ -1,21 +1,24 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
-  RefreshCw, FileDown, CheckCircle, Clock,
-  XCircle, CalendarDays, ClipboardList, ArrowRight,
+  CalendarCheck, ClipboardList,
+  CheckCircle2, Clock, XCircle,
+  Download, RefreshCw, Clock4, Flame,
 } from 'lucide-react'
 
 import useDashboardStats from '../hooks/Dashboard/useDashboardStats'
+import useRestaurantInfo from '../hooks/useRestaurantInfo'
+import { B } from '../utils/brand'
+
 import FadeUp    from '../components/Dashboard/FadeUp'
 import Spinner   from '../components/Dashboard/Spinner'
+import Card      from '../components/Dashboard/Card'
+import IBox      from '../components/Dashboard/IBox'
+import TodayHero from '../components/Dashboard/TodayHero'
+import StatCard  from '../components/Dashboard/StatCard'
 import useCountUp from '../hooks/Dashboard/useCountUp'
-import { exportPDF } from '../utils/exportPDF'
 
-const DARK      = '#2b2118'
-const GOLD      = '#c8a97e'
-const GOLD_DARK = '#a8834e'
-
-/* ── Live clock ── */
+/* ── Live clock ──────────────────────────────────────────────────────── */
 function LiveClock() {
   const [time, setTime] = useState(new Date())
   useEffect(() => {
@@ -29,241 +32,223 @@ function LiveClock() {
   )
 }
 
-function Label({ text, sub }) {
+/* ── Service banner ──────────────────────────────────────────────────── */
+function ServiceBanner() {
+  const h = new Date().getHours()
+  const isLunch  = h >= 11 && h < 15
+  const isDinner = h >= 18 && h < 23
+  if (!isLunch && !isDinner) return null
   return (
-    <div style={{ marginBottom: 32 }}>
-      <h2 style={{
-        margin: 0,
-        fontSize: 'clamp(28px,3.5vw,42px)',
-        fontWeight: 900,
-        color: DARK,
-        letterSpacing: '-1.2px',
-        lineHeight: 1,
-        fontFamily: "'Plus Jakarta Sans','DM Sans',system-ui",
+    <div style={{
+      display: 'flex', alignItems: 'center', gap: 12,
+      padding: '14px 22px',
+      background: isDinner ? B.black : B.brownTint,
+      borderRadius: 14, marginBottom: 16,
+    }}>
+      <Flame size={15} color={isDinner ? B.brownLight : B.brown} strokeWidth={2.5} />
+      <span style={{ fontSize: 14, fontWeight: 800, color: isDinner ? '#fff' : B.brown }}>
+        {isDinner ? '🌙 Service du soir en cours' : '☀️ Service du midi en cours'}
+      </span>
+      <span style={{
+        marginLeft: 'auto', fontSize: 13, fontWeight: 700,
+        color: isDinner ? 'rgba(255,255,255,0.45)' : B.brown,
+        display: 'flex', alignItems: 'center', gap: 5,
       }}>
-        {text}
-      </h2>
-      {sub && (
-        <p style={{ margin:'8px 0 0', fontSize:13, fontWeight:700, color:GOLD, letterSpacing:'-0.1px' }}>
-          {sub}
-        </p>
-      )}
+        <Clock4 size={13} strokeWidth={2} />
+        <LiveClock />
+      </span>
     </div>
   )
 }
 
-function HeroNum({ value }) {
-  const n = useCountUp(value, 900, 60)
+/* ── Section label ───────────────────────────────────────────────────── */
+function Label({ text }) {
   return (
-    <p style={{
-      margin:0, fontSize:'clamp(96px,13vw,196px)', fontWeight:900,
-      color:DARK, lineHeight:0.85, fontVariantNumeric:'tabular-nums',
-      letterSpacing:'-6px', fontFamily:"'Plus Jakarta Sans','DM Sans',system-ui",
-    }}>
-      {n}
-    </p>
+    <div style={{ display: 'flex', alignItems: 'center', gap: 9, marginBottom: 12 }}>
+      <div style={{ width: 4, height: 16, background: B.brown, borderRadius: 2 }} />
+      <span style={{ fontSize: 10, fontWeight: 900, color: B.blackSoft, letterSpacing: '0.18em', textTransform: 'uppercase' }}>
+        {text}
+      </span>
+    </div>
   )
 }
 
-function Stat({ value, label, gold=false, delay=0, icon:Icon }) {
+/* ── Status chip (inline — no extra file) ────────────────────────────── */
+function StatusChip({ icon, iconColor, iconBg, value, label, delay = 0, onClick }) {
+  const [hov, setHov] = useState(false)
   const n = useCountUp(value, 750, delay)
   return (
-    <div>
-      {Icon && <Icon size={30} strokeWidth={2} color={gold ? GOLD : DARK} style={{ marginBottom:16, display:'block' }} />}
+    <div
+      onClick={onClick}
+      onMouseEnter={() => onClick && setHov(true)}
+      onMouseLeave={() => setHov(false)}
+      style={{
+        background: hov ? iconBg : iconBg,
+        borderRadius: 16, padding: '20px 22px',
+        cursor: onClick ? 'pointer' : 'default',
+        outline: hov ? `2px solid ${iconColor}` : '2px solid transparent',
+        transition: 'outline 0.15s, transform 0.12s',
+        transform: hov ? 'translateY(-2px)' : 'none',
+        userSelect: 'none',
+      }}
+    >
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
+        <IBox icon={icon} color={iconColor} bg="transparent" size={14} />
+        <span style={{ fontSize: 11, fontWeight: 900, color: iconColor, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+          {label}
+        </span>
+      </div>
       <p style={{
-        margin:0, fontSize:'clamp(48px,5.5vw,76px)', fontWeight:900,
-        color: gold ? GOLD : DARK, lineHeight:1,
-        fontVariantNumeric:'tabular-nums', letterSpacing:'-2.5px',
-        fontFamily:"'Plus Jakarta Sans','DM Sans',system-ui",
+        margin: 0, fontSize: 48, fontWeight: 900,
+        color: B.black, lineHeight: 1,
+        fontVariantNumeric: 'tabular-nums', letterSpacing: '-2px',
+        fontFamily: "'Plus Jakarta Sans', 'DM Sans', system-ui",
       }}>
         {n}
       </p>
-      <p style={{ margin:'12px 0 0', fontSize:16, fontWeight:800, color:DARK, letterSpacing:'-0.3px' }}>{label}</p>
     </div>
   )
 }
 
-function Link({ children, onClick }) {
-  const [hov, setHov] = useState(false)
+/* ── Button ──────────────────────────────────────────────────────────── */
+function Btn({ children, onClick, primary = false }) {
+  const [hov, setHov]         = useState(false)
+  const [pressed, setPressed] = useState(false)
   return (
     <button
       onClick={onClick}
       onMouseEnter={() => setHov(true)}
-      onMouseLeave={() => setHov(false)}
+      onMouseLeave={() => { setHov(false); setPressed(false) }}
+      onMouseDown={() => setPressed(true)}
+      onMouseUp={() => setPressed(false)}
       style={{
-        display: 'inline-flex', alignItems: 'center', gap: 8,
-        padding: '10px 18px',
-        background: hov ? GOLD : 'transparent',
-        border: `2px solid ${GOLD}`,
-        color: hov ? DARK : GOLD,
+        display: 'flex', alignItems: 'center', gap: 8,
+        padding: '13px 22px',
+        background: primary ? (hov ? B.brownDark : B.brown) : (hov ? '#E4E4E4' : '#EFEFEF'),
+        border: 'none', borderRadius: 13,
         fontSize: 14, fontWeight: 800,
-        cursor: 'pointer', fontFamily: 'inherit',
-        transition: 'background 0.15s, color 0.15s',
+        color: primary ? '#fff' : B.blackSoft,
+        cursor: 'pointer', whiteSpace: 'nowrap',
+        transition: 'background 0.15s, transform 0.1s',
+        transform: pressed ? 'scale(0.97)' : hov ? 'translateY(-2px)' : 'none',
+        userSelect: 'none',
       }}
     >
-      {children}
-      <ArrowRight size={15} strokeWidth={2.5} />
-    </button>
-  )
-}
-
-function Btn({ children, onClick, primary, disabled, icon: Icon }) {
-  const [hov, setHov] = useState(false)
-  // default: DARK bg → GOLD bg on hover
-  // primary: GOLD bg → DARK bg on hover
-  const bg    = primary ? (hov ? DARK : GOLD)      : (hov ? GOLD : DARK)
-  const color = primary ? (hov ? GOLD : DARK)      : '#fff'
-  return (
-    <button
-      onClick={onClick}
-      disabled={disabled}
-      onMouseEnter={() => setHov(true)}
-      onMouseLeave={() => setHov(false)}
-      style={{
-        display: 'flex', alignItems: 'center', gap: 9,
-        padding: '14px 28px',
-        background: bg,
-        border: 'none',
-        color,
-        fontSize: 14, fontWeight: 800,
-        cursor: disabled ? 'not-allowed' : 'pointer',
-        opacity: disabled ? 0.5 : 1,
-        transition: 'background 0.15s, color 0.15s',
-        fontFamily: 'inherit', letterSpacing: '-0.2px', whiteSpace: 'nowrap',
-      }}
-    >
-      {Icon && <Icon size={16} strokeWidth={2.2} />}
       {children}
     </button>
   )
 }
 
+/* ── MAIN ─────────────────────────────────────────────────────────────── */
 export default function Dashboard() {
-  const { stats, loading, error, refetch } = useDashboardStats()
-  const navigate                           = useNavigate()
-  const [refreshing, setRefreshing]        = useState(false)
-  const [exporting,  setExporting]         = useState(false)
+  const { stats, loading, error } = useDashboardStats()
+  const navigate = useNavigate()
 
   const today = new Date().toLocaleDateString('fr-FR', {
-    weekday:'long', day:'numeric', month:'long',
+    weekday: 'long', day: 'numeric', month: 'long',
   })
-
-  async function handleRefresh() {
-    setRefreshing(true)
-    try { await refetch() } finally { setRefreshing(false) }
-  }
-
-  async function handleExportPDF() {
-    setExporting(true)
-    try {
-      // Load jsPDF dynamically if not already loaded
-      if (!window.jspdf) {
-        await new Promise((resolve, reject) => {
-          const s = document.createElement('script')
-          s.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js'
-          s.onload = resolve
-          s.onerror = reject
-          document.head.appendChild(s)
-        })
-      }
-      exportPDF(stats)
-    } catch(e) {
-      console.error('PDF error:', e)
-    } finally {
-      setExporting(false)
-    }
-  }
 
   if (loading) return <Spinner />
 
   return (
-    <div style={{ minHeight:'100vh', background:'#fff', fontFamily:"'Plus Jakarta Sans','DM Sans',system-ui,sans-serif" }}>
-      <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800;900&display=swap" rel="stylesheet" />
+    <div style={{
+      minHeight: '100vh', background: B.pageBg,
+      fontFamily: "'Plus Jakarta Sans', 'DM Sans', system-ui, sans-serif",
+    }}>
+      <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800;900&display=swap" rel="stylesheet" />
 
       <style>{`
-        .wrap   { max-width:1060px; margin:0 auto; padding:clamp(32px,5vw,64px) clamp(28px,4vw,56px); }
-        .topbar { display:flex; flex-wrap:wrap; align-items:flex-end; justify-content:space-between; gap:16px; margin-bottom:56px; }
-        .tbtns  { display:flex; gap:3px; }
-        .three  { display:grid; grid-template-columns:repeat(3,1fr); gap:0; }
-        .two    { display:grid; grid-template-columns:repeat(2,1fr); gap:0; }
-        .hr     { height:2px; background:${DARK}; margin:48px 0; }
-        @media(max-width:680px){ .two { grid-template-columns:1fr; } .two > * { margin-bottom:32px; } }
-        @media(max-width:520px){
-          .three { grid-template-columns:1fr; } .three > * { margin-bottom:32px; }
-          .tbtns { width:100%; } .tbtns button { flex:1; justify-content:center; }
+        .wrap        { max-width:1160px; margin:0 auto; padding:clamp(16px,4vw,44px) clamp(16px,3vw,36px); }
+        .topbar      { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:12px; }
+        .topbar-btns { display:flex; gap:10px; }
+        .status-row  { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
+        .stat-row    { display:grid; grid-template-columns:repeat(2,1fr); gap:14px; }
+        @media(max-width:640px) {
+          .stat-row  { grid-template-columns:1fr; }
+        }
+        @media(max-width:480px) {
+          .status-row { grid-template-columns:1fr; gap:10px; }
+          .topbar-btns { width:100%; }
+          .topbar-btns button { flex:1; justify-content:center; }
         }
       `}</style>
 
       <div className="wrap">
 
+        {/* 1 — TOP BAR */}
         <FadeUp delay={0}>
-          <div className="topbar">
-            <div>
-              <h1 style={{ margin:0, fontSize:'clamp(30px,4.5vw,48px)', fontWeight:900, color:DARK, letterSpacing:'-2px', lineHeight:1 }}>
-                Tableau de bord
-              </h1>
-              <p style={{ margin:'10px 0 0', fontSize:15, fontWeight:700, color:GOLD, textTransform:'capitalize' }}>
-                {today}&nbsp;·&nbsp;<LiveClock />
-              </p>
-            </div>
-            <div className="tbtns">
-              <Btn icon={RefreshCw} onClick={handleRefresh} disabled={refreshing}>
-                {refreshing ? 'Actualisation…' : 'Actualiser'}
-              </Btn>
-              <Btn icon={FileDown} primary onClick={handleExportPDF} disabled={exporting}>
-                {exporting ? 'Génération…' : 'Exporter PDF'}
-              </Btn>
-            </div>
-          </div>
-        </FadeUp>
-
-        <FadeUp delay={40}>
-          <Label text="Aujourd'hui" sub="Total des réservations du jour" />
-          <HeroNum value={stats.today} />
-          <p style={{ margin:'18px 0 0', fontSize:17, fontWeight:800, color:DARK, letterSpacing:'-0.3px' }}>
-            réservations aujourd'hui&emsp;
-            <Link onClick={() => navigate('/reservations')}>Voir tout</Link>
-          </p>
-        </FadeUp>
-
-        <div className="hr" />
-
-        <FadeUp delay={110}>
-          <Label text="Détail du jour" sub="Confirmées · En attente · Annulées" />
-          <div className="three">
-            <Stat icon={CheckCircle} value={stats.today_confirmed} label="Confirmées"  delay={110} />
-            <Stat icon={Clock}       value={stats.today_pending}   label="En attente"  gold delay={145} />
-            <Stat icon={XCircle}     value={stats.today_cancelled} label="Annulées"    delay={180} />
-          </div>
-        </FadeUp>
-
-        <div className="hr" />
-
-        <FadeUp delay={230}>
-          <Label text="À venir" sub="Demain et total du mois" />
-          <div className="two">
-            <div>
-              <Stat icon={CalendarDays} value={stats.tomorrow} label="Demain" gold delay={230} />
-              <div style={{ marginTop:18 }}>
-                <Link onClick={() => navigate('/calendar')}>Voir le planning</Link>
+          <Card padding="18px 26px" style={{ marginBottom: 16 }}>
+            <div className="topbar">
+              <div>
+                <h1 style={{ margin: 0, fontSize: 'clamp(20px,3.5vw,28px)', fontWeight: 900, color: B.black, letterSpacing: '-0.8px', lineHeight: 1 }}>
+                  Aujourd'hui
+                </h1>
+                <p style={{ margin: '4px 0 0', fontSize: 13, fontWeight: 600, color: B.inkMute, textTransform: 'capitalize' }}>
+                  {today}
+                </p>
+              </div>
+              <div className="topbar-btns">
+                <Btn onClick={() => {}}><RefreshCw size={14} strokeWidth={2.5} /> Actualiser</Btn>
+                <Btn primary onClick={() => {}}><Download size={14} strokeWidth={2.5} /> Exporter</Btn>
               </div>
             </div>
-            <Stat icon={ClipboardList} value={stats.total} label="Total ce mois" delay={265} />
+          </Card>
+        </FadeUp>
+
+        {/* 2 — SERVICE BANNER (contextual) */}
+        <FadeUp delay={30}><ServiceBanner /></FadeUp>
+
+        {/* 3 — HERO: big total */}
+        <FadeUp delay={70}>
+          <div style={{ marginBottom: 14 }}>
+            <Label text="Total du jour" />
+            <TodayHero
+              value={stats.today}
+              onClick={() => navigate('/reservations', { state: { filterDate: new Date().toISOString().slice(0,10) } })}
+            />
           </div>
         </FadeUp>
 
-        <div className="hr" />
-
-        <FadeUp delay={310}>
-          <Label text="Ce mois" sub="Bilan mensuel des réservations" />
-          <div className="three">
-            <Stat icon={CheckCircle} value={stats.confirmed} label="Confirmées"  delay={310} />
-            <Stat icon={Clock}       value={stats.pending}   label="En attente"  gold delay={340} />
-            <Stat icon={XCircle}     value={stats.cancelled} label="Annulées"    delay={370} />
+        {/* 4 — DETAIL: confirmed / pending / cancelled */}
+        <FadeUp delay={140}>
+          <div style={{ marginBottom: 24 }}>
+            <Label text="Détail" />
+            <div className="status-row">
+              <StatusChip icon={CheckCircle2} iconColor={B.black}   iconBg="#EFEFEF"      value={stats.today_confirmed} label="Confirmées" delay={140}
+                onClick={() => navigate('/reservations', { state: { filterDate: new Date().toISOString().slice(0,10), filterStatus: 'Confirmed' } })} />
+              <StatusChip icon={Clock}        iconColor={B.brown}   iconBg={B.brownTint}  value={stats.today_pending}   label="En attente" delay={190}
+                onClick={() => navigate('/reservations', { state: { filterDate: new Date().toISOString().slice(0,10), filterStatus: 'Pending' } })} />
+              <StatusChip icon={XCircle}      iconColor={B.inkMute} iconBg="#F5F5F5"      value={stats.today_cancelled} label="Annulées"   delay={240}
+                onClick={() => navigate('/reservations', { state: { filterDate: new Date().toISOString().slice(0,10), filterStatus: 'Cancelled' } })} />
+            </div>
           </div>
         </FadeUp>
 
-        {error && <p style={{ marginTop:32, fontSize:14, fontWeight:700, color:GOLD }}>Erreur — {error}</p>}
+        {/* 5 — FORWARD: tomorrow + monthly */}
+        <FadeUp delay={280}>
+          <Label text="À venir" />
+          <div className="stat-row">
+            <StatCard
+              icon={CalendarCheck} iconColor={B.brown} iconBg={B.brownTint}
+              value={stats.tomorrow} label="Réservations demain"
+              trend="+8 vs hier" actionLabel="Voir le planning"
+              onClick={() => navigate('/reservations', { state: { filterDate: new Date(Date.now() + 86400000).toISOString().slice(0,10) } })} delay={0}
+            />
+            <StatCard
+              icon={ClipboardList} iconColor={B.blackSoft} iconBg="#EFEFEF"
+              value={stats.total} label="Total ce mois"
+              delay={60}
+            />
+          </div>
+        </FadeUp>
+
+        {/* ERROR */}
+        {error && (
+          <div style={{ marginTop: 16, padding: '13px 18px', background: '#F5F5F5', borderRadius: 12, fontSize: 14, fontWeight: 700, color: B.blackSoft }}>
+            ⚠️ {error}
+          </div>
+        )}
+
       </div>
     </div>
   )
