@@ -65,7 +65,7 @@ function AnimBar({ pct, color }) {
   const [w, setW] = useState(0)
   useEffect(() => { const id = setTimeout(() => setW(pct), 500); return () => clearTimeout(id) }, [pct])
   return (
-    <div style={{ height:3, background:'#e8e0d6', borderRadius:2, overflow:'hidden', marginTop:6 }}>
+    <div style={{ height:12, background:'#e8e0d6', borderRadius:3, overflow:'hidden', marginTop:10 }}>
       <div style={{ height:'100%', width:`${w}%`, background:color, transition:'width 1s ease' }} />
     </div>
   )
