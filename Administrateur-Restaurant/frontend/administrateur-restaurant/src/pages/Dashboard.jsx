@@ -18,7 +18,6 @@ const GOLD_DARK = '#a8834e'
 const TODAY_DATE    = new Date().toISOString().slice(0, 10)
 const TOMORROW_DATE = new Date(Date.now() + 86400000).toISOString().slice(0, 10)
 
-/* ── Live clock ── */
 function LiveClock() {
   const [time, setTime] = useState(new Date())
   useEffect(() => {
@@ -36,21 +35,13 @@ function Label({ text, sub }) {
   return (
     <div style={{ marginBottom: 32 }}>
       <h2 style={{
-        margin: 0,
-        fontSize: 'clamp(28px,3.5vw,42px)',
-        fontWeight: 900,
-        color: DARK,
-        letterSpacing: '-1.2px',
-        lineHeight: 1,
+        margin: 0, fontSize: 'clamp(28px,3.5vw,42px)', fontWeight: 900,
+        color: DARK, letterSpacing: '-1.2px', lineHeight: 1,
         fontFamily: "'Plus Jakarta Sans','DM Sans',system-ui",
       }}>
         {text}
       </h2>
-      {sub && (
-        <p style={{ margin:'8px 0 0', fontSize:13, fontWeight:700, color:GOLD, letterSpacing:'-0.1px' }}>
-          {sub}
-        </p>
-      )}
+      {sub && <p style={{ margin:'8px 0 0', fontSize:13, fontWeight:700, color:GOLD }}>{sub}</p>}
     </div>
   )
 }
@@ -86,27 +77,38 @@ function Stat({ value, label, gold=false, delay=0, icon:Icon }) {
   )
 }
 
+// Big hero stat for confirmed this month
+function HeroStat({ value, label, delay=0 }) {
+  const n = useCountUp(value, 750, delay)
+  return (
+    <div>
+      <p style={{
+        margin:0, fontSize:'clamp(72px,9vw,128px)', fontWeight:900,
+        color:DARK, lineHeight:0.9, fontVariantNumeric:'tabular-nums',
+        letterSpacing:'-4px', fontFamily:"'Plus Jakarta Sans','DM Sans',system-ui",
+      }}>
+        {n}
+      </p>
+      <p style={{ margin:'12px 0 0', fontSize:18, fontWeight:800, color:GOLD, letterSpacing:'-0.3px' }}>{label}</p>
+    </div>
+  )
+}
+
 function Btn({ children, onClick, primary, disabled, icon: Icon }) {
   const [hov, setHov] = useState(false)
-  const bg    = primary ? (hov ? DARK : GOLD)      : (hov ? GOLD : DARK)
-  const color = primary ? (hov ? GOLD : DARK)      : '#fff'
+  const bg    = primary ? (hov ? DARK : GOLD) : (hov ? GOLD : DARK)
+  const color = primary ? (hov ? GOLD : DARK) : '#fff'
   return (
-    <button
-      onClick={onClick}
-      disabled={disabled}
-      onMouseEnter={() => setHov(true)}
-      onMouseLeave={() => setHov(false)}
+    <button onClick={onClick} disabled={disabled}
+      onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
       style={{
-        display: 'flex', alignItems: 'center', gap: 9,
-        padding: '14px 28px',
-        background: bg,
-        border: 'none',
-        color,
-        fontSize: 14, fontWeight: 800,
+        display:'flex', alignItems:'center', gap:9, padding:'14px 28px',
+        background:bg, border:'none', color,
+        fontSize:14, fontWeight:800,
         cursor: disabled ? 'not-allowed' : 'pointer',
         opacity: disabled ? 0.5 : 1,
-        transition: 'background 0.15s, color 0.15s',
-        fontFamily: 'inherit', letterSpacing: '-0.2px', whiteSpace: 'nowrap',
+        transition:'background 0.15s, color 0.15s',
+        fontFamily:'inherit', letterSpacing:'-0.2px', whiteSpace:'nowrap',
       }}
     >
       {Icon && <Icon size={16} strokeWidth={2.2} />}
@@ -121,9 +123,7 @@ export default function Dashboard() {
   const [refreshing, setRefreshing]        = useState(false)
   const [exporting,  setExporting]         = useState(false)
 
-  const today = new Date().toLocaleDateString('fr-FR', {
-    weekday:'long', day:'numeric', month:'long',
-  })
+  const today = new Date().toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'long' })
 
   async function handleRefresh() {
     setRefreshing(true)
@@ -137,20 +137,15 @@ export default function Dashboard() {
         await new Promise((resolve, reject) => {
           const s = document.createElement('script')
           s.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js'
-          s.onload = resolve
-          s.onerror = reject
+          s.onload = resolve; s.onerror = reject
           document.head.appendChild(s)
         })
       }
       exportPDF(stats)
-    } catch(e) {
-      console.error('PDF error:', e)
-    } finally {
-      setExporting(false)
-    }
+    } catch(e) { console.error('PDF error:', e) }
+    finally { setExporting(false) }
   }
 
-  // Helper to navigate to reservations with pre-applied filters
   const go = (filters) => navigate('/reservations', { state: filters })
 
   if (loading) return <Spinner />
@@ -175,6 +170,7 @@ export default function Dashboard() {
 
       <div className="wrap">
 
+        {/* ── Top bar ── */}
         <FadeUp delay={0}>
           <div className="topbar">
             <div>
@@ -196,13 +192,14 @@ export default function Dashboard() {
           </div>
         </FadeUp>
 
+        {/* ── Aujourd'hui — hero ── */}
         <FadeUp delay={40}>
           <Label text="Aujourd'hui" sub="Total des réservations du jour" />
           <HeroNum value={stats.today} />
           <p style={{ margin:'18px 0 0', fontSize:17, fontWeight:800, color:DARK, letterSpacing:'-0.3px' }}>
             réservations aujourd'hui
           </p>
-          <div style={{ marginTop: 28 }}>
+          <div style={{ marginTop:28 }}>
             <Btn icon={ArrowRight} primary onClick={() => go({ filterDate: TODAY_DATE })}>
               Voir les réservations d'aujourd'hui
             </Btn>
@@ -211,6 +208,7 @@ export default function Dashboard() {
 
         <div className="hr" />
 
+        {/* ── Détail du jour ── */}
         <FadeUp delay={110}>
           <Label text="Détail du jour" sub="Confirmées · En attente · Annulées" />
           <div className="three">
@@ -222,29 +220,59 @@ export default function Dashboard() {
 
         <div className="hr" />
 
+        {/* ── Demain — avec détail ── */}
         <FadeUp delay={230}>
-          <Label text="À venir" sub="Demain et total du mois" />
-          <div className="two">
+          <Label text="Demain" sub="Planning du lendemain" />
+          <div className="two" style={{ marginBottom:36 }}>
             <div>
-              <Stat icon={CalendarDays} value={stats.tomorrow} label="Demain" gold delay={230} />
-              <div style={{ marginTop: 28 }}>
+              <Stat icon={CalendarDays} value={stats.tomorrow} label="Total demain" gold delay={230} />
+              <div style={{ marginTop:28 }}>
                 <Btn icon={ArrowRight} primary onClick={() => go({ filterDate: TOMORROW_DATE })}>
                   Voir les réservations de demain
                 </Btn>
               </div>
             </div>
-            <Stat icon={ClipboardList} value={stats.total} label="Total ce mois" delay={265} />
+            {/* Détail demain */}
+            <div style={{ display:'flex', flexDirection:'column', gap:28 }}>
+              <div>
+                <CheckCircle size={22} strokeWidth={2} color={DARK} style={{ marginBottom:10, display:'block' }} />
+                <p style={{ margin:0, fontSize:'clamp(32px,4vw,52px)', fontWeight:900, color:DARK, letterSpacing:'-2px', fontVariantNumeric:'tabular-nums' }}>
+                  {useCountUp(stats.tomorrow_confirmed ?? 0, 750, 250)}
+                </p>
+                <p style={{ margin:'8px 0 0', fontSize:14, fontWeight:800, color:DARK }}>Confirmées demain</p>
+              </div>
+              <div>
+                <Clock size={22} strokeWidth={2} color={GOLD} style={{ marginBottom:10, display:'block' }} />
+                <p style={{ margin:0, fontSize:'clamp(32px,4vw,52px)', fontWeight:900, color:GOLD, letterSpacing:'-2px', fontVariantNumeric:'tabular-nums' }}>
+                  {useCountUp(stats.tomorrow_pending ?? 0, 750, 280)}
+                </p>
+                <p style={{ margin:'8px 0 0', fontSize:14, fontWeight:800, color:DARK }}>En attente demain</p>
+              </div>
+              <div>
+                <XCircle size={22} strokeWidth={2} color={DARK} style={{ marginBottom:10, display:'block' }} />
+                <p style={{ margin:0, fontSize:'clamp(32px,4vw,52px)', fontWeight:900, color:DARK, letterSpacing:'-2px', fontVariantNumeric:'tabular-nums' }}>
+                  {useCountUp(stats.tomorrow_cancelled ?? 0, 750, 310)}
+                </p>
+                <p style={{ margin:'8px 0 0', fontSize:14, fontWeight:800, color:DARK }}>Annulées demain</p>
+              </div>
+            </div>
           </div>
         </FadeUp>
 
         <div className="hr" />
 
+        {/* ── Ce mois — confirmed hero + totaux ── */}
         <FadeUp delay={310}>
-          <Label text="Ce mois" sub="Bilan mensuel des réservations" />
-          <div className="three">
-            <Stat icon={CheckCircle} value={stats.confirmed} label="Confirmées" delay={310} />
-            <Stat icon={Clock}       value={stats.pending}   label="En attente" gold delay={340} />
-            <Stat icon={XCircle}     value={stats.cancelled} label="Annulées"   delay={370} />
+          <Label text="Ce mois" sub="Bilan mensuel — réservations confirmées" />
+          <div className="two">
+            <div>
+              <HeroStat value={stats.confirmed} label="Confirmées ce mois" delay={310} />
+            </div>
+            <div style={{ display:'flex', flexDirection:'column', gap:28 }}>
+              <Stat icon={ClipboardList} value={stats.total}     label="Total ce mois"     delay={330} />
+              <Stat icon={Clock}         value={stats.pending}   label="En attente ce mois" gold delay={350} />
+              <Stat icon={XCircle}       value={stats.cancelled} label="Annulées ce mois"   delay={370} />
+            </div>
           </div>
         </FadeUp>
 
