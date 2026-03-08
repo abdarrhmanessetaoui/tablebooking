@@ -75,7 +75,7 @@ export default function BlockedDateList({ blockedDates, handleUnblock }) {
 
       {/* Rows */}
       {blockedDates.map((bd, i) => {
-        if (i === 0) console.log('🔍 BlockedDate API fields:', Object.keys(bd), bd)
+        if (i === 0) console.log('🔍 RAW blocked date object:', JSON.stringify(bd, null, 2))
         const start  = formatDate(getStartDate(bd))
         const end    = formatDate(getEndDate(bd)) || start
         const reason = getReason(bd)
