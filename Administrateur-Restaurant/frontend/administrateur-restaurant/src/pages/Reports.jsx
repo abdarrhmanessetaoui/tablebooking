@@ -1,5 +1,5 @@
 import useReports from '../hooks/useReports'
-import BarChart from '../components/BarChart'
+import BarChart from '../components/Reports/BarChart'
 
 export default function Reports() {
   const { data, loading, error } = useReports()
