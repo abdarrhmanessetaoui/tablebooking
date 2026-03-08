@@ -40,7 +40,8 @@ export default function Layout({ children }) {
         .l-aside {
           flex-shrink: 0;
           position: sticky; top: 0; height: 100vh;
-          overflow-y: auto; z-index: 20;
+          overflow: visible;
+          z-index: 20;
           transition: width 0.24s cubic-bezier(0.4,0,0.2,1);
           border-right: 1px solid rgba(200,169,126,0.13);
         }
