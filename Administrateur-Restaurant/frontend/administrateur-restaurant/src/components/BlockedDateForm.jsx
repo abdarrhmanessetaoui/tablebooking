@@ -8,52 +8,50 @@ function Btn({ children, onClick, disabled, icon: Icon }) {
   const [hov, setHov] = useState(false)
   return (
     <button
-      onClick={onClick}
-      disabled={disabled}
-      onMouseEnter={() => setHov(true)}
-      onMouseLeave={() => setHov(false)}
+      onClick={onClick} disabled={disabled}
+      onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
       style={{
         display: 'flex', alignItems: 'center', gap: 9,
-        padding: '14px 28px',
+        padding: '13px 24px',
         background: hov ? GOLD : DARK,
         border: 'none', color: '#fff',
-        fontSize: 14, fontWeight: 800,
+        fontSize: 13, fontWeight: 800,
         cursor: disabled ? 'not-allowed' : 'pointer',
         opacity: disabled ? 0.5 : 1,
-        transition: 'background 0.15s',
+        transition: 'background 0.15s, color 0.15s',
         fontFamily: 'inherit', whiteSpace: 'nowrap',
       }}
     >
-      {Icon && <Icon size={15} strokeWidth={2.2} />}
+      {Icon && <Icon size={14} strokeWidth={2.5} />}
       {children}
     </button>
   )
 }
 
-const inputStyle = {
-  padding: '13px 16px',
-  border: '2px solid #e8e0d6',
-  fontSize: 14, fontWeight: 700, color: DARK,
-  fontFamily: "'Plus Jakarta Sans','DM Sans',system-ui,sans-serif",
-  outline: 'none',
-  background: '#fff',
-  transition: 'border-color 0.15s',
-  width: '100%',
-}
-
 export default function BlockedDateForm({ form, setForm, handleBlock, submitting }) {
   return (
-    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 16, alignItems: 'flex-end' }}>
+    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, alignItems: 'flex-end' }}>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-        <label style={{ fontSize: 11, fontWeight: 900, color: DARK, letterSpacing: '0.2em', textTransform: 'uppercase' }}>
+        <label style={{
+          fontSize: 11, fontWeight: 900, color: DARK,
+          letterSpacing: '0.2em', textTransform: 'uppercase',
+        }}>
           Date
         </label>
         <input
           type="date"
           value={form.date || ''}
           onChange={e => setForm({ ...form, date: e.target.value })}
-          style={inputStyle}
+          style={{
+            padding: '13px 16px',
+            border: '2px solid #e8e0d6',
+            fontSize: 14, fontWeight: 700, color: DARK,
+            fontFamily: 'inherit',
+            outline: 'none', background: '#fff',
+            transition: 'border-color 0.15s',
+            minWidth: 200,
+          }}
           onFocus={e => e.target.style.borderColor = GOLD}
           onBlur={e => e.target.style.borderColor = '#e8e0d6'}
         />
