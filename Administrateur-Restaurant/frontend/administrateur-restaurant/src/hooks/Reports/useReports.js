@@ -1,27 +1,39 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { getToken } from '../../utils/auth'
 
-export default function useReports() {
-  const [data, setData]       = useState(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError]     = useState('')
+const DEFAULT = {
+  by_hour:   {},
+  by_day:    {},
+  by_week:   {},
+  by_month:  {},
+  by_year:   {},
+  by_guests: {},
+  summary:   { total: 0, confirmed: 0, pending: 0, cancelled: 0, avg_guests: 0 },
+}
 
-  useEffect(() => {
-    const fetch_ = async () => {
-      try {
-        const res  = await fetch('http://localhost:8000/api/reports', {
-          headers: { 'Accept': 'application/json', 'Authorization': `Bearer ${getToken()}` }
-        })
-        const json = await res.json()
-        setData(json)
-      } catch {
-        setError('Failed to load reports.')
-      } finally {
-        setLoading(false)
-      }
+export default function useReports() {
+  const [data,    setData]    = useState(DEFAULT)
+  const [loading, setLoading] = useState(true)
+  const [error,   setError]   = useState('')
+
+  const fetchReports = useCallback(async () => {
+    setLoading(true)
+    setError('')
+    try {
+      const res  = await fetch('http://localhost:8000/api/reports', {
+        headers: { 'Accept': 'application/json', 'Authorization': `Bearer ${getToken()}` }
+      })
+      if (!res.ok) throw new Error(`Erreur ${res.status}`)
+      const json = await res.json()
+      setData({ ...DEFAULT, ...json })
+    } catch (e) {
+      setError(e.message || 'Impossible de charger les rapports.')
+    } finally {
+      setLoading(false)
     }
-    fetch_()
   }, [])
 
-  return { data, loading, error }
+  useEffect(() => { fetchReports() }, [fetchReports])
+
+  return { data, loading, error, refetch: fetchReports }
 }
