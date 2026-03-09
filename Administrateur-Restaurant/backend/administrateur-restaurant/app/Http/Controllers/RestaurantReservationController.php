@@ -64,102 +64,6 @@ class RestaurantReservationController extends Controller
         return response()->json($filtered);
     }
 
-    public function reports()
-    {
-        $messages = WpMessage::where('formid', $this->formId())->get();
-        $clean    = $messages->map(fn($m) => $m->toCleanArray());
-
-        // ── Par heure ──────────────────────────────────────────────
-        $byHour = $clean
-            ->filter(fn($r) => !empty($r['start_time']))
-            ->groupBy(fn($r) => substr($r['start_time'], 0, 5))
-            ->map(fn($g) => $g->count())
-            ->sortKeys();
-
-        // ── Par jour de la semaine (FR, Lun→Dim) ───────────────────
-        $dayMap = [0=>'Dim', 1=>'Lun', 2=>'Mar', 3=>'Mer', 4=>'Jeu', 5=>'Ven', 6=>'Sam'];
-        $byDay  = ['Lun'=>0,'Mar'=>0,'Mer'=>0,'Jeu'=>0,'Ven'=>0,'Sam'=>0,'Dim'=>0];
-
-        $clean
-            ->filter(fn($r) => !empty($r['date']))
-            ->each(function ($r) use (&$byDay, $dayMap) {
-                $dow = date('w', strtotime($r['date']));
-                $key = $dayMap[$dow];
-                $byDay[$key]++;
-            });
-
-        // ── Par semaine (ISO 8601) ──────────────────────────────────
-        $byWeek = $clean
-            ->filter(fn($r) => !empty($r['date']))
-            ->groupBy(fn($r) => date('Y-\WW', strtotime($r['date'])))
-            ->map(fn($g) => $g->count())
-            ->sortKeys();
-
-        // ── Par mois ───────────────────────────────────────────────
-        $monthNames = [
-            '01'=>'Jan','02'=>'Fév','03'=>'Mar','04'=>'Avr',
-            '05'=>'Mai','06'=>'Juin','07'=>'Juil','08'=>'Août',
-            '09'=>'Sep','10'=>'Oct','11'=>'Nov','12'=>'Déc',
-        ];
-
-        $byMonth = $clean
-            ->filter(fn($r) => !empty($r['date']))
-            ->groupBy(fn($r) => substr($r['date'], 0, 7))   // Y-m
-            ->map(fn($g) => $g->count())
-            ->sortKeys()
-            ->mapWithKeys(function ($count, $ym) use ($monthNames) {
-                [$y, $m] = explode('-', $ym);
-                $label   = ($monthNames[$m] ?? $m).' '.$y;
-                return [$label => $count];
-            });
-
-        // ── Par année ──────────────────────────────────────────────
-        $byYear = $clean
-            ->filter(fn($r) => !empty($r['date']))
-            ->groupBy(fn($r) => substr($r['date'], 0, 4))
-            ->map(fn($g) => $g->count())
-            ->sortKeys();
-
-        // ── Par nombre de personnes ────────────────────────────────
-        $byGuests = $clean
-            ->filter(fn($r) => !empty($r['guests']))
-            ->groupBy(fn($r) => (string) intval($r['guests']))
-            ->map(fn($g) => $g->count())
-            ->sortKeys()
-            ->mapWithKeys(fn($count, $n) => [$n.' pers.' => $count]);
-
-        // ── Résumé global ──────────────────────────────────────────
-        $total     = $clean->count();
-        $confirmed = $clean->filter(fn($r) => $r['status'] === 'Confirmed')->count();
-        $pending   = $clean->filter(fn($r) => $r['status'] === 'Pending')->count();
-        $cancelled = $clean->filter(fn($r) => $r['status'] === 'Cancelled')->count();
-
-        $guestValues = $clean
-            ->filter(fn($r) => !empty($r['guests']))
-            ->pluck('guests')
-            ->map(fn($g) => intval($g));
-
-        $avgGuests = $guestValues->count() > 0
-            ? round($guestValues->sum() / $guestValues->count(), 1)
-            : 0;
-
-        return response()->json([
-            'by_hour'   => $byHour,
-            'by_day'    => $byDay,
-            'by_week'   => $byWeek,
-            'by_month'  => $byMonth,
-            'by_year'   => $byYear,
-            'by_guests' => $byGuests,
-            'summary'   => [
-                'total'      => $total,
-                'confirmed'  => $confirmed,
-                'pending'    => $pending,
-                'cancelled'  => $cancelled,
-                'avg_guests' => $avgGuests,
-            ],
-        ]);
-    }
-
     public function stats()
     {
         $this->cancelExpiredPending();
@@ -174,18 +78,18 @@ class RestaurantReservationController extends Controller
         $monthRes = $clean->filter(fn($r) => str_starts_with($r['date'] ?? '', $month));
 
         return response()->json([
-            'today'           => $todayRes->count(),
-            'today_confirmed' => $todayRes->filter(fn($r) => $r['status'] === 'Confirmed')->count(),
-            'today_pending'   => $todayRes->filter(fn($r) => $r['status'] === 'Pending')->count(),
-            'today_cancelled' => $todayRes->filter(fn($r) => $r['status'] === 'Cancelled')->count(),
-            'tomorrow'            => $clean->filter(fn($r) => $r['date'] === $tomorrow)->count(),
-            'tomorrow_confirmed'  => $clean->filter(fn($r) => $r['date'] === $tomorrow && $r['status'] === 'Confirmed')->count(),
-            'tomorrow_pending'    => $clean->filter(fn($r) => $r['date'] === $tomorrow && $r['status'] === 'Pending')->count(),
-            'tomorrow_cancelled'  => $clean->filter(fn($r) => $r['date'] === $tomorrow && $r['status'] === 'Cancelled')->count(),
-            'total'           => $monthRes->count(),
-            'confirmed'       => $monthRes->filter(fn($r) => $r['status'] === 'Confirmed')->count(),
-            'pending'         => $monthRes->filter(fn($r) => $r['status'] === 'Pending')->count(),
-            'cancelled'       => $monthRes->filter(fn($r) => $r['status'] === 'Cancelled')->count(),
+            'today'              => $todayRes->count(),
+            'today_confirmed'    => $todayRes->filter(fn($r) => $r['status'] === 'Confirmed')->count(),
+            'today_pending'      => $todayRes->filter(fn($r) => $r['status'] === 'Pending')->count(),
+            'today_cancelled'    => $todayRes->filter(fn($r) => $r['status'] === 'Cancelled')->count(),
+            'tomorrow'           => $clean->filter(fn($r) => $r['date'] === $tomorrow)->count(),
+            'tomorrow_confirmed' => $clean->filter(fn($r) => $r['date'] === $tomorrow && $r['status'] === 'Confirmed')->count(),
+            'tomorrow_pending'   => $clean->filter(fn($r) => $r['date'] === $tomorrow && $r['status'] === 'Pending')->count(),
+            'tomorrow_cancelled' => $clean->filter(fn($r) => $r['date'] === $tomorrow && $r['status'] === 'Cancelled')->count(),
+            'total'              => $monthRes->count(),
+            'confirmed'          => $monthRes->filter(fn($r) => $r['status'] === 'Confirmed')->count(),
+            'pending'            => $monthRes->filter(fn($r) => $r['status'] === 'Pending')->count(),
+            'cancelled'          => $monthRes->filter(fn($r) => $r['status'] === 'Cancelled')->count(),
         ]);
     }
 
@@ -236,25 +140,94 @@ class RestaurantReservationController extends Controller
         $messages = WpMessage::where('formid', $this->formId())->get();
         $clean    = $messages->map(fn($m) => $m->toCleanArray());
 
-        $byHour = $clean->groupBy(fn($r) => $r['start_time'] ? substr($r['start_time'], 0, 5) : null)
-            ->filter(fn($g, $k) => $k !== null)
+        // ── Par heure ──────────────────────────────────────────────
+        $byHour = $clean
+            ->filter(fn($r) => !empty($r['start_time']))
+            ->groupBy(fn($r) => substr($r['start_time'], 0, 5))
             ->map(fn($g) => $g->count())
             ->sortKeys();
 
-        $days  = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-        $byDay = ['Mon' => 0, 'Tue' => 0, 'Wed' => 0, 'Thu' => 0, 'Fri' => 0, 'Sat' => 0, 'Sun' => 0];
+        // ── Par jour de la semaine (FR, Lun→Dim) ───────────────────
+        $dayMap = [0 => 'Dim', 1 => 'Lun', 2 => 'Mar', 3 => 'Mer', 4 => 'Jeu', 5 => 'Ven', 6 => 'Sam'];
+        $byDay  = ['Lun' => 0, 'Mar' => 0, 'Mer' => 0, 'Jeu' => 0, 'Ven' => 0, 'Sam' => 0, 'Dim' => 0];
 
-        $clean->each(function ($r) use (&$byDay, $days) {
-            if (!$r['date']) return;
-            try {
-                $day         = $days[date('w', strtotime($r['date']))];
-                $byDay[$day] = ($byDay[$day] ?? 0) + 1;
-            } catch (\Exception $e) {}
-        });
+        $clean
+            ->filter(fn($r) => !empty($r['date']))
+            ->each(function ($r) use (&$byDay, $dayMap) {
+                $dow        = date('w', strtotime($r['date']));
+                $key        = $dayMap[$dow];
+                $byDay[$key]++;
+            });
+
+        // ── Par semaine (ISO 8601) ──────────────────────────────────
+        $byWeek = $clean
+            ->filter(fn($r) => !empty($r['date']))
+            ->groupBy(fn($r) => date('Y-\WW', strtotime($r['date'])))
+            ->map(fn($g) => $g->count())
+            ->sortKeys();
+
+        // ── Par mois ───────────────────────────────────────────────
+        $monthNames = [
+            '01' => 'Jan', '02' => 'Fév', '03' => 'Mar', '04' => 'Avr',
+            '05' => 'Mai', '06' => 'Juin', '07' => 'Juil', '08' => 'Août',
+            '09' => 'Sep', '10' => 'Oct', '11' => 'Nov', '12' => 'Déc',
+        ];
+
+        $byMonth = $clean
+            ->filter(fn($r) => !empty($r['date']))
+            ->groupBy(fn($r) => substr($r['date'], 0, 7))
+            ->map(fn($g) => $g->count())
+            ->sortKeys()
+            ->mapWithKeys(function ($count, $ym) use ($monthNames) {
+                [$y, $m] = explode('-', $ym);
+                $label   = ($monthNames[$m] ?? $m) . ' ' . $y;
+                return [$label => $count];
+            });
+
+        // ── Par année ──────────────────────────────────────────────
+        $byYear = $clean
+            ->filter(fn($r) => !empty($r['date']))
+            ->groupBy(fn($r) => substr($r['date'], 0, 4))
+            ->map(fn($g) => $g->count())
+            ->sortKeys();
+
+        // ── Par nombre de personnes ────────────────────────────────
+        $byGuests = $clean
+            ->filter(fn($r) => !empty($r['guests']))
+            ->groupBy(fn($r) => (string) intval($r['guests']))
+            ->map(fn($g) => $g->count())
+            ->sortKeys()
+            ->mapWithKeys(fn($count, $n) => [$n . ' pers.' => $count]);
+
+        // ── Résumé global ──────────────────────────────────────────
+        $total     = $clean->count();
+        $confirmed = $clean->filter(fn($r) => $r['status'] === 'Confirmed')->count();
+        $pending   = $clean->filter(fn($r) => $r['status'] === 'Pending')->count();
+        $cancelled = $clean->filter(fn($r) => $r['status'] === 'Cancelled')->count();
+
+        $guestValues = $clean
+            ->filter(fn($r) => !empty($r['guests']))
+            ->pluck('guests')
+            ->map(fn($g) => intval($g));
+
+        $avgGuests = $guestValues->count() > 0
+            ? round($guestValues->sum() / $guestValues->count(), 1)
+            : 0;
 
         return response()->json([
-            'by_hour' => $byHour,
-            'by_day'  => $byDay,
+            'by_hour'   => $byHour,
+            'by_day'    => $byDay,
+            'by_week'   => $byWeek,
+            'by_month'  => $byMonth,
+            'by_year'   => $byYear,
+            'by_guests' => $byGuests,
+            'summary'   => [
+                'total'      => $total,
+                'confirmed'  => $confirmed,
+                'pending'    => $pending,
+                'cancelled'  => $cancelled,
+                'avg_guests' => $avgGuests,
+            ],
         ]);
     }
 
@@ -274,6 +247,12 @@ class RestaurantReservationController extends Controller
             $message->save();
         }
 
+        return response()->json($message->toCleanArray());
+    }
+
+    public function show(int $id)
+    {
+        $message = WpMessage::where('formid', $this->formId())->findOrFail($id);
         return response()->json($message->toCleanArray());
     }
 
@@ -327,5 +306,4 @@ class RestaurantReservationController extends Controller
 
         return response()->json($services);
     }
-
 }
