@@ -111,24 +111,24 @@ function MobileCard({ r, selected, onToggle, openView, openEdit, handleDelete })
 
       {/* Row 2: date + time + guests + service */}
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 10 }}>
-        {[
-          { label: '📅', value: r.date       },
-          { label: '🕐', value: r.start_time },
-          { label: '👥', value: r.guests ? `${r.guests} pers.` : '—' },
-          { label: '',   value: r.service, gold: true },
-        ].map((item, i) => item.value ? (
-          <span key={i} style={{
-            display: 'inline-flex', alignItems: 'center', gap: 4,
-            padding: '3px 9px', borderRadius: 6,
-            background: item.gold ? '#f5f0eb' : CREAM,
-            fontSize: 11, fontWeight: 700,
-            color: item.gold ? GOLD_DARK : DARK,
-          }}>
-            {item.label && <span>{item.label}</span>}
-            {item.value}
-          </span>
-        ) : null)}
-      </div>
+  {[
+    { Icon: CalendarDays, value: r.date,       gold: false },
+    { Icon: Clock3,       value: r.start_time, gold: false },
+    { Icon: Users,        value: r.guests ? `${r.guests} pers.` : null, gold: false },
+    { Icon: Utensils,     value: r.service,    gold: true  },
+  ].filter(item => item.value).map((item, i) => (
+    <span key={i} style={{
+      display: 'inline-flex', alignItems: 'center', gap: 5,
+      padding: '4px 9px', borderRadius: 6,
+      background: item.gold ? '#f5f0eb' : '#f3f0ec',
+      fontSize: 11, fontWeight: 700,
+      color: item.gold ? GOLD_DARK : DARK,
+    }}>
+      <item.Icon size={11} strokeWidth={2.5} color={item.gold ? GOLD_DARK : '#999'} />
+      {item.value}
+    </span>
+  ))}
+</div>
 
       {/* Row 3: actions */}
       <div style={{ display: 'flex', gap: 6 }}>
