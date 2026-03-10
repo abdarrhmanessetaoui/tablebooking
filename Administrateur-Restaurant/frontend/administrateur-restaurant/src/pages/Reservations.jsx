@@ -5,6 +5,7 @@ import {
   Clock, XCircle, X
 } from 'lucide-react'
 import useReservations from '../hooks/Reservations/useReservations'
+import useServices     from '../hooks/Reservations/useServices'
 import ReservationsFilters from '../components/Reservations/ReservationsFilters'
 import ReservationsTable   from '../components/Reservations/ReservationsTable'
 import ReservationModal    from '../components/Reservations/ReservationModal'
@@ -220,6 +221,8 @@ export default function Reservations() {
   const [exporting,   setExporting]   = useState(false)
   const [selectedIds, setSelectedIds] = useState([])
 
+  const { services } = useServices()   // ← dynamic services from API
+
   const {
     filtered, loading, error,
     modalMode, setModalMode,
@@ -372,6 +375,7 @@ export default function Reservations() {
             filterService={filterService} setFilterService={setFilterService}
             filterDate={filterDate}       setFilterDate={setFilterDate}
             clearFilters={clearFilters}
+            services={services}           // ← dynamic list from API
           />
         </FadeUp>
 
@@ -419,6 +423,7 @@ export default function Reservations() {
             handleCreate={handleCreate}
             handleDelete={handleDelete}
             setModalMode={setModalMode}
+            services={services}           // ← also pass to modal for create/edit form
           />
         )}
       </div>
