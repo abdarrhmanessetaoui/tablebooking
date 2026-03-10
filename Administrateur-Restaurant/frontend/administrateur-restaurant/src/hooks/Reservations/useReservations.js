@@ -1,5 +1,7 @@
 import { useState, useEffect, useMemo } from 'react'
 import { getToken } from '../../utils/auth'
+import { toast }    from '../../components/UI/Toast'
+import { confirm }  from '../../components/UI/ConfirmDialog'
 
 const API = 'http://localhost:8000/api/restaurant/reservations'
 
@@ -10,7 +12,8 @@ const headers = () => ({
 })
 
 const EMPTY_FORM = {
-  name: '', email: '', phone: '', date: '', start_time: '', guests: '', service: '', status: 'Pending', notes: ''
+  name: '', email: '', phone: '', date: '', start_time: '',
+  guests: '', service: '', status: 'Pending', notes: ''
 }
 
 const CURRENT_MONTH = new Date().toISOString().slice(0, 7)
@@ -27,26 +30,32 @@ export default function useReservations(initialFilters = {}) {
   const [search,        setSearch]        = useState('')
   const [filterStatus,  setFilterStatus]  = useState(initialFilters?.filterStatus || 'all')
   const [filterService, setFilterService] = useState('all')
-  const [filterDate,    setFilterDate]    = useState(initialFilters?.filterDate   || '')
+  const [filterDate,    setFilterDate]    = useState(initialFilters?.filterDate || '')
   const [filterMonth,   setFilterMonth]   = useState(
     initialFilters?.filterDate ? '' : CURRENT_MONTH
   )
 
-  useEffect(() => { fetchReservations() }, [])
-
-  const fetchReservations = async () => {
-    setLoading(true)
+  const fetchReservations = async (silent = false) => {
+    if (!silent) setLoading(true)
     try {
       const res  = await fetch(API, { headers: headers() })
       const data = await res.json()
       setReservations(Array.isArray(data) ? data : [])
     } catch {
-      setError('Impossible de charger les réservations.')
-      setReservations([])
+      if (!silent) setError('Impossible de charger les réservations.')
     } finally {
-      setLoading(false)
+      if (!silent) setLoading(false)
     }
   }
+
+  // Initial load
+  useEffect(() => { fetchReservations() }, [])
+
+  // Auto-refresh every 30s (silent — no spinner)
+  useEffect(() => {
+    const id = setInterval(() => fetchReservations(true), 30000)
+    return () => clearInterval(id)
+  }, [])
 
   const filtered = useMemo(() => {
     if (!Array.isArray(reservations)) return []
@@ -62,9 +71,8 @@ export default function useReservations(initialFilters = {}) {
         return matchSearch && matchStatus && matchService && matchDate && matchMonth
       })
       .sort((a, b) => {
-        const dateDiff = (b.date || '').localeCompare(a.date || '')
-        if (dateDiff !== 0) return dateDiff
-        return (b.start_time || '').localeCompare(a.start_time || '')
+        const d = (b.date || '').localeCompare(a.date || '')
+        return d !== 0 ? d : (b.start_time || '').localeCompare(a.start_time || '')
       })
   }, [reservations, search, filterStatus, filterService, filterDate, filterMonth])
 
@@ -82,8 +90,9 @@ export default function useReservations(initialFilters = {}) {
       const data = await res.json()
       setReservations(prev => prev.map(r => r.id === editing.id ? data : r))
       setModalMode(null)
+      toast('Statut mis à jour avec succès', 'success')
     } catch {
-      setError('Impossible de modifier le statut.')
+      toast('Impossible de modifier le statut', 'error')
     }
   }
 
@@ -97,19 +106,29 @@ export default function useReservations(initialFilters = {}) {
       const data = await res.json()
       setReservations(prev => [data, ...prev])
       setModalMode(null)
+      toast(`Réservation créée pour ${form.name}`, 'success')
     } catch {
-      setError('Impossible de créer la réservation.')
+      toast('Impossible de créer la réservation', 'error')
     }
   }
 
   const handleDelete = async (id) => {
-    if (!window.confirm('Supprimer cette réservation ?')) return
+    const r = reservations.find(x => x.id === id)
+    const ok = await confirm({
+      title:        'Supprimer la réservation',
+      message:      `Voulez-vous supprimer la réservation de ${r?.name || 'ce client'} ?`,
+      sub:          'Cette action est irréversible.',
+      confirmLabel: 'Supprimer',
+      type:         'danger',
+    })
+    if (!ok) return
     try {
       await fetch(`${API}/${id}`, { method: 'DELETE', headers: headers() })
       setReservations(prev => prev.filter(r => r.id !== id))
       if (modalMode !== null) setModalMode(null)
+      toast('Réservation supprimée', 'warning')
     } catch {
-      setError('Impossible de supprimer la réservation.')
+      toast('Impossible de supprimer la réservation', 'error')
     }
   }
 
@@ -124,8 +143,7 @@ export default function useReservations(initialFilters = {}) {
   return {
     filtered, loading, error,
     modalMode, setModalMode,
-    form, setForm,
-    editing,
+    form, setForm, editing,
     search,        setSearch,
     filterStatus,  setFilterStatus,
     filterService, setFilterService,
@@ -135,7 +153,6 @@ export default function useReservations(initialFilters = {}) {
     openView, openEdit, openCreate,
     handleSubmit, handleCreate, handleDelete,
     fetchReservations,
-    reservations,
-    setReservations,
+    reservations, setReservations,
   }
 }
