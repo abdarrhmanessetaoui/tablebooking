@@ -5,7 +5,7 @@ import {
   Clock, XCircle, X
 } from 'lucide-react'
 import useReservations from '../hooks/Reservations/useReservations'
-import useServices     from  '../hooks/Reservations/seservices'
+import useServices     from  '../hooks/Reservations/useservicesseservices'
 import ReservationsFilters from '../components/Reservations/ReservationsFilters'
 import ReservationsTable   from '../components/Reservations/ReservationsTable'
 import ReservationModal    from '../components/Reservations/ReservationModal'
