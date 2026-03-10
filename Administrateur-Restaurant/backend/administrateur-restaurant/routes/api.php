@@ -29,5 +29,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/admin/blocked-dates',                        [BlockedDateController::class, 'index']);
     Route::post('/blocked-dates',                             [BlockedDateController::class, 'store']);
     Route::delete('/blocked-dates/{date}',                    [BlockedDateController::class, 'destroy']);
+    Route::post('/blocked-dates/bulk', [BlockedDateController::class, 'storeBulk']);
     Route::put('/time-slots',                                 [TimeSlotController::class,   'update']);
 });
