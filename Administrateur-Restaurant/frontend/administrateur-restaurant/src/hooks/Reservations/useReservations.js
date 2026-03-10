@@ -13,7 +13,7 @@ const EMPTY_FORM = {
   name: '', email: '', phone: '', date: '', start_time: '', guests: '', service: '', status: 'Pending', notes: ''
 }
 
-const CURRENT_MONTH = new Date().toISOString().slice(0, 7) // "2026-03"
+const CURRENT_MONTH = new Date().toISOString().slice(0, 7)
 
 export default function useReservations(initialFilters = {}) {
   const [reservations, setReservations] = useState([])
@@ -24,13 +24,11 @@ export default function useReservations(initialFilters = {}) {
   const [editing, setEditing]     = useState(null)
   const [form, setForm]           = useState(EMPTY_FORM)
 
-  const [search,       setSearch]       = useState('')
-  const [filterStatus, setFilterStatus] = useState(initialFilters?.filterStatus || 'all')
-  const [filterDate,   setFilterDate]   = useState(initialFilters?.filterDate   || '')
-
-  // If navigated from dashboard with a specific date → no month filter
-  // Otherwise default to current month
-  const [filterMonth, setFilterMonth] = useState(
+  const [search,         setSearch]         = useState('')
+  const [filterStatus,   setFilterStatus]   = useState(initialFilters?.filterStatus || 'all')
+  const [filterService,  setFilterService]  = useState('all')
+  const [filterDate,     setFilterDate]     = useState(initialFilters?.filterDate   || '')
+  const [filterMonth,    setFilterMonth]    = useState(
     initialFilters?.filterDate ? '' : CURRENT_MONTH
   )
 
@@ -52,42 +50,33 @@ export default function useReservations(initialFilters = {}) {
 
   const filtered = useMemo(() => {
     if (!Array.isArray(reservations)) return []
-
     return reservations
       .filter(r => {
-        const matchSearch = search === '' ||
+        const matchSearch  = search === '' ||
           (r.name  && r.name.toLowerCase().includes(search.toLowerCase())) ||
           (r.phone && r.phone.includes(search))
-        const matchStatus = filterStatus === 'all' || r.status === filterStatus
-        const matchDate   = filterDate === '' || r.date === filterDate
-        const matchMonth  = filterMonth === '' || (r.date && r.date.startsWith(filterMonth))
-        return matchSearch && matchStatus && matchDate && matchMonth
+        const matchStatus  = filterStatus  === 'all' || r.status  === filterStatus
+        const matchService = filterService === 'all' || r.service === filterService
+        const matchDate    = filterDate    === ''    || r.date    === filterDate
+        const matchMonth   = filterMonth   === ''    || (r.date && r.date.startsWith(filterMonth))
+        return matchSearch && matchStatus && matchService && matchDate && matchMonth
       })
-      // Sort by date desc, then start_time desc
       .sort((a, b) => {
         const dateDiff = (b.date || '').localeCompare(a.date || '')
         if (dateDiff !== 0) return dateDiff
         return (b.start_time || '').localeCompare(a.start_time || '')
       })
-  }, [reservations, search, filterStatus, filterDate, filterMonth])
+  }, [reservations, search, filterStatus, filterService, filterDate, filterMonth])
 
-  const openView = (reservation) => {
-    setEditing(reservation)
-    setModalMode('view')
-  }
-
-  const openEdit = (reservation) => {
-    setEditing(reservation)
-    setForm({ ...reservation })
-    setModalMode('edit')
-  }
+  const openView   = (r) => { setEditing(r); setModalMode('view') }
+  const openEdit   = (r) => { setEditing(r); setForm({ ...r }); setModalMode('edit') }
+  const openCreate = ()  => { setEditing(null); setForm(EMPTY_FORM); setModalMode('create') }
 
   const handleSubmit = async () => {
     if (!editing) return
     try {
-      const res = await fetch(`${API}/${editing.id}/status`, {
-        method: 'PATCH',
-        headers: headers(),
+      const res  = await fetch(`${API}/${editing.id}/status`, {
+        method: 'PATCH', headers: headers(),
         body: JSON.stringify({ status: form.status }),
       })
       const data = await res.json()
@@ -98,17 +87,10 @@ export default function useReservations(initialFilters = {}) {
     }
   }
 
-  const openCreate = () => {
-    setEditing(null)
-    setForm(EMPTY_FORM)
-    setModalMode('create')
-  }
-
   const handleCreate = async () => {
     try {
-      const res = await fetch(API, {
-        method: 'POST',
-        headers: headers(),
+      const res  = await fetch(API, {
+        method: 'POST', headers: headers(),
         body: JSON.stringify({ ...form, guests: parseInt(form.guests) || 1 }),
       })
       if (!res.ok) throw new Error()
@@ -134,8 +116,9 @@ export default function useReservations(initialFilters = {}) {
   const clearFilters = () => {
     setSearch('')
     setFilterStatus('all')
+    setFilterService('all')
     setFilterDate('')
-    setFilterMonth(CURRENT_MONTH) // reset to current month
+    setFilterMonth(CURRENT_MONTH)
   }
 
   return {
@@ -143,17 +126,14 @@ export default function useReservations(initialFilters = {}) {
     modalMode, setModalMode,
     form, setForm,
     editing,
-    search, setSearch,
-    filterStatus, setFilterStatus,
-    filterDate, setFilterDate,
-    filterMonth, setFilterMonth,
+    search,        setSearch,
+    filterStatus,  setFilterStatus,
+    filterService, setFilterService,
+    filterDate,    setFilterDate,
+    filterMonth,   setFilterMonth,
     clearFilters,
-    openView,
-    openEdit,
-    openCreate,
-    handleSubmit,
-    handleCreate,
-    handleDelete,
+    openView, openEdit, openCreate,
+    handleSubmit, handleCreate, handleDelete,
     fetchReservations,
   }
 }
