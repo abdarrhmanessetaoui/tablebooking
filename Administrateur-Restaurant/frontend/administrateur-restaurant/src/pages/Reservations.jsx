@@ -1,12 +1,13 @@
 import { useLocation } from 'react-router-dom'
 import { useState } from 'react'
-import { Plus, RefreshCw, FileDown } from 'lucide-react'
+import { Plus, RefreshCw, FileDown, Trash2, CheckCircle, Clock, XCircle, X } from 'lucide-react'
 import useReservations from '../hooks/Reservations/useReservations'
 import ReservationsFilters from '../components/Reservations/ReservationsFilters'
 import ReservationsTable   from '../components/Reservations/ReservationsTable'
 import ReservationModal    from '../components/Reservations/ReservationModal'
 import FadeUp from '../components/Dashboard/FadeUp'
 import Spinner from '../components/Dashboard/Spinner'
+import { getToken } from '../utils/auth'
 
 const DARK      = '#2b2118'
 const GOLD      = '#c8a97e'
@@ -17,15 +18,11 @@ function Btn({ children, onClick, primary, disabled, icon: Icon }) {
   const bg    = primary ? (hov ? DARK : GOLD) : (hov ? GOLD : DARK)
   const color = primary ? (hov ? GOLD : DARK) : '#fff'
   return (
-    <button
-      onClick={onClick}
-      disabled={disabled}
-      onMouseEnter={() => setHov(true)}
-      onMouseLeave={() => setHov(false)}
+    <button onClick={onClick} disabled={disabled}
+      onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
       style={{
         display: 'flex', alignItems: 'center', gap: 9,
-        padding: '13px 24px',
-        background: bg, border: 'none', color,
+        padding: '13px 24px', background: bg, border: 'none', color,
         fontSize: 14, fontWeight: 800,
         cursor: disabled ? 'not-allowed' : 'pointer',
         opacity: disabled ? 0.5 : 1,
@@ -39,9 +36,104 @@ function Btn({ children, onClick, primary, disabled, icon: Icon }) {
   )
 }
 
+/* ── Bulk action bar ── */
+function BulkBar({ count, onDelete, onStatus, onClear }) {
+  const [hovDel, setHovDel] = useState(false)
+  return (
+    <div style={{
+      position: 'sticky', top: 12, zIndex: 30,
+      display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap',
+      padding: '12px 18px',
+      background: DARK,
+      boxShadow: '0 4px 20px rgba(43,33,24,0.25)',
+      marginBottom: 12,
+      animation: 'slideDown 0.2s ease',
+    }}>
+      <style>{`@keyframes slideDown { from{opacity:0;transform:translateY(-8px)} to{opacity:1;transform:translateY(0)} }`}</style>
+
+      {/* Count badge */}
+      <span style={{
+        display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+        minWidth: 28, height: 28, borderRadius: 8,
+        background: GOLD, color: DARK,
+        fontSize: 13, fontWeight: 900, padding: '0 8px',
+      }}>{count}</span>
+      <span style={{ fontSize: 13, fontWeight: 700, color: 'rgba(255,255,255,0.7)', marginRight: 4 }}>
+        sélectionné{count > 1 ? 's' : ''}
+      </span>
+
+      {/* Divider */}
+      <div style={{ width: 1, height: 24, background: 'rgba(255,255,255,0.15)', margin: '0 4px' }} />
+
+      {/* Status actions */}
+      {[
+        { status: 'Confirmed', label: 'Confirmer',  icon: CheckCircle, color: '#4ade80' },
+        { status: 'Pending',   label: 'En attente', icon: Clock,       color: GOLD      },
+        { status: 'Cancelled', label: 'Annuler',    icon: XCircle,     color: '#f87171' },
+      ].map(({ status, label, icon: Icon, color }) => (
+        <button key={status} onClick={() => onStatus(status)}
+          style={{
+            display: 'flex', alignItems: 'center', gap: 6,
+            padding: '7px 14px', borderRadius: 8,
+            background: 'rgba(255,255,255,0.08)',
+            border: '1px solid rgba(255,255,255,0.12)',
+            color, fontSize: 12, fontWeight: 700,
+            cursor: 'pointer', fontFamily: 'inherit',
+            transition: 'background 0.15s',
+          }}
+          onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.16)'}
+          onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,255,255,0.08)'}
+        >
+          <Icon size={13} strokeWidth={2.5} />
+          {label}
+        </button>
+      ))}
+
+      {/* Divider */}
+      <div style={{ width: 1, height: 24, background: 'rgba(255,255,255,0.15)', margin: '0 4px' }} />
+
+      {/* Delete */}
+      <button onClick={onDelete}
+        onMouseEnter={() => setHovDel(true)} onMouseLeave={() => setHovDel(false)}
+        style={{
+          display: 'flex', alignItems: 'center', gap: 6,
+          padding: '7px 14px', borderRadius: 8,
+          background: hovDel ? '#ef4444' : 'rgba(239,68,68,0.15)',
+          border: '1px solid rgba(239,68,68,0.3)',
+          color: hovDel ? '#fff' : '#f87171',
+          fontSize: 12, fontWeight: 700,
+          cursor: 'pointer', fontFamily: 'inherit',
+          transition: 'all 0.15s',
+        }}
+      >
+        <Trash2 size={13} strokeWidth={2.5} />
+        Supprimer
+      </button>
+
+      {/* Clear selection — pushed right */}
+      <button onClick={onClear}
+        style={{
+          marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 5,
+          padding: '7px 12px', borderRadius: 8,
+          background: 'none', border: '1px solid rgba(255,255,255,0.15)',
+          color: 'rgba(255,255,255,0.5)',
+          fontSize: 12, fontWeight: 700,
+          cursor: 'pointer', fontFamily: 'inherit',
+          transition: 'all 0.15s',
+        }}
+        onMouseEnter={e => e.currentTarget.style.color = '#fff'}
+        onMouseLeave={e => e.currentTarget.style.color = 'rgba(255,255,255,0.5)'}
+      >
+        <X size={13} strokeWidth={2.5} />
+        Désélectionner
+      </button>
+    </div>
+  )
+}
+
 function exportReservationsPDF(reservations) {
   const { jsPDF } = window.jspdf
-  const doc       = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' })
+  const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' })
   const W = 210, PAD = 20
   let y = 0
 
@@ -87,15 +179,10 @@ function exportReservationsPDF(reservations) {
   })
   y += 8
 
-  const STATUS_COLORS = {
-    Confirmed: [45, 106, 45],
-    Pending:   [168, 131, 78],
-    Cancelled: [185, 64, 64],
-  }
-
+  const STATUS_COLORS = { Confirmed: [45,106,45], Pending: [168,131,78], Cancelled: [185,64,64] }
   reservations.forEach((r, i) => {
     if (y > 270) { doc.addPage(); y = 20 }
-    const rowBg = i % 2 === 0 ? [255, 255, 255] : [250, 248, 245]
+    const rowBg = i % 2 === 0 ? [255,255,255] : [250,248,245]
     doc.setFillColor(...rowBg)
     doc.rect(PAD, y, W - PAD * 2, 8, 'F')
     doc.setFontSize(8.5)
@@ -104,11 +191,11 @@ function exportReservationsPDF(reservations) {
     let rx = PAD + 3
     const vals   = [r.name||'—', r.phone||'—', r.date||'—', r.start_time||'—', r.guests||'—']
     const widths = [42, 32, 26, 22, 22]
-    vals.forEach((v, vi) => { doc.text(String(v).substring(0, 18), rx, y + 5.5); rx += widths[vi] })
-    const sc = STATUS_COLORS[r.status] || [120, 120, 120]
+    vals.forEach((v, vi) => { doc.text(String(v).substring(0,18), rx, y+5.5); rx += widths[vi] })
+    const sc = STATUS_COLORS[r.status] || [120,120,120]
     doc.setTextColor(...sc)
     doc.setFont('helvetica', 'bold')
-    doc.text(r.status === 'Confirmed' ? 'Confirmée' : r.status === 'Pending' ? 'En attente' : 'Annulée', rx, y + 5.5)
+    doc.text(r.status === 'Confirmed' ? 'Confirmée' : r.status === 'Pending' ? 'En attente' : 'Annulée', rx, y+5.5)
     y += 8
   })
 
@@ -120,14 +207,14 @@ function exportReservationsPDF(reservations) {
   doc.setTextColor(200, 169, 126)
   doc.text('TableBooking.ma', PAD, 292)
   doc.text(`Exporté le ${now}`, W - PAD, 292, { align: 'right' })
-
   doc.save(`reservations-${new Date().toISOString().slice(0,10)}.pdf`)
 }
 
 export default function Reservations() {
   const location = useLocation()
-  const [refreshing, setRefreshing] = useState(false)
-  const [exporting,  setExporting]  = useState(false)
+  const [refreshing,   setRefreshing]   = useState(false)
+  const [exporting,    setExporting]    = useState(false)
+  const [selectedIds,  setSelectedIds]  = useState([])
 
   const {
     filtered, loading, error,
@@ -139,17 +226,16 @@ export default function Reservations() {
     filterService, setFilterService,
     filterDate,    setFilterDate,
     clearFilters,
-    openView,
-    openEdit,
-    openCreate,
-    handleSubmit,
-    handleCreate,
-    handleDelete,
+    openView, openEdit, openCreate,
+    handleSubmit, handleCreate, handleDelete,
     fetchReservations,
+    setReservations,
+    reservations,
   } = useReservations(location.state)
 
   async function handleRefresh() {
     setRefreshing(true)
+    setSelectedIds([])
     try { await fetchReservations() } finally { setRefreshing(false) }
   }
 
@@ -165,11 +251,32 @@ export default function Reservations() {
         })
       }
       exportReservationsPDF(filtered)
-    } catch(e) {
-      console.error('PDF error:', e)
-    } finally {
-      setExporting(false)
-    }
+    } catch(e) { console.error('PDF error:', e) }
+    finally { setExporting(false) }
+  }
+
+  /* ── Bulk delete ── */
+  async function handleBulkDelete() {
+    if (!window.confirm(`Supprimer ${selectedIds.length} réservation(s) ?`)) return
+    const headers = { 'Content-Type': 'application/json', 'Accept': 'application/json', 'Authorization': `Bearer ${getToken()}` }
+    await Promise.all(selectedIds.map(id =>
+      fetch(`http://localhost:8000/api/restaurant/reservations/${id}`, { method: 'DELETE', headers })
+    ))
+    setReservations(prev => prev.filter(r => !selectedIds.includes(r.id)))
+    setSelectedIds([])
+  }
+
+  /* ── Bulk status ── */
+  async function handleBulkStatus(status) {
+    const headers = { 'Content-Type': 'application/json', 'Accept': 'application/json', 'Authorization': `Bearer ${getToken()}` }
+    await Promise.all(selectedIds.map(id =>
+      fetch(`http://localhost:8000/api/restaurant/reservations/${id}/status`, {
+        method: 'PATCH', headers,
+        body: JSON.stringify({ status }),
+      })
+    ))
+    setReservations(prev => prev.map(r => selectedIds.includes(r.id) ? { ...r, status } : r))
+    setSelectedIds([])
   }
 
   if (loading) return <Spinner />
@@ -207,12 +314,10 @@ export default function Reservations() {
         </div>
       </FadeUp>
 
-      {/* Divider */}
       <FadeUp delay={20}>
         <div style={{ height: 2, background: DARK, marginBottom: 36 }} />
       </FadeUp>
 
-      {/* Error */}
       {error && (
         <FadeUp delay={30}>
           <div style={{ marginBottom: 20, padding: '12px 18px', background: '#fdf0f0', borderLeft: '3px solid #b94040', fontSize: 13, fontWeight: 700, color: '#b94040' }}>
@@ -221,7 +326,6 @@ export default function Reservations() {
         </FadeUp>
       )}
 
-      {/* Filters */}
       <FadeUp delay={40}>
         <ReservationsFilters
           search={search}               setSearch={setSearch}
@@ -232,24 +336,33 @@ export default function Reservations() {
         />
       </FadeUp>
 
-      {/* Count */}
       <FadeUp delay={70}>
         <p style={{ margin: '0 0 12px', fontSize: 12, fontWeight: 800, color: '#aaa', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
           {filtered.length} réservation{filtered.length !== 1 ? 's' : ''}
         </p>
       </FadeUp>
 
-      {/* Table */}
+      {/* Bulk action bar — shows when items selected */}
+      {selectedIds.length > 0 && (
+        <BulkBar
+          count={selectedIds.length}
+          onDelete={handleBulkDelete}
+          onStatus={handleBulkStatus}
+          onClear={() => setSelectedIds([])}
+        />
+      )}
+
       <FadeUp delay={100}>
         <ReservationsTable
           reservations={filtered}
           openView={openView}
           openEdit={openEdit}
           handleDelete={handleDelete}
+          selectedIds={selectedIds}
+          setSelectedIds={setSelectedIds}
         />
       </FadeUp>
 
-      {/* Modal */}
       {modalMode && (
         <ReservationModal
           modalMode={modalMode}
