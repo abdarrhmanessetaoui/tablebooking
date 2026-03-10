@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Eye, Pencil, Trash2, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Users } from 'lucide-react'
-
+import { Eye, Pencil, Trash2, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, CalendarDays, Clock3, Users, Utensils } from 'lucide-react'
 const DARK      = '#2b2118'
 const GOLD      = '#c8a97e'
 const GOLD_DARK = '#a8834e'
