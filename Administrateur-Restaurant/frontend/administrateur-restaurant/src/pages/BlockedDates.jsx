@@ -40,6 +40,7 @@ export default function BlockedDates() {
     form, setForm,
     submitting,
     handleBlock, handleUnblock,
+    getDatesToBlock,
     refetch,
   } = useBlockedDates()
 
@@ -161,7 +162,13 @@ export default function BlockedDates() {
           <p className="page-subtitle" style={{ margin: '0 0 20px', fontSize: 12, fontWeight: 700, color: GOLD_DK }}>
             Sélectionnez une date à bloquer pour les clients
           </p>
-          <BlockedDateForm form={form} setForm={setForm} handleBlock={handleBlock} submitting={submitting} getDatesToBlock={getDatesToBlock} />
+          <BlockedDateForm
+            form={form}
+            setForm={setForm}
+            handleBlock={handleBlock}
+            submitting={submitting}
+            getDatesToBlock={getDatesToBlock}
+          />
         </FadeUp>
 
         {/* SECTION DIVIDER */}
