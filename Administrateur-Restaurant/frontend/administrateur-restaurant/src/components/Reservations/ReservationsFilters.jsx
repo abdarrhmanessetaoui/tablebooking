@@ -18,8 +18,7 @@ export default function ReservationsFilters({
 
   const base = {
     background: '#fff',
-    border: '1.5px solid #e8e0d8',
-    borderRadius: 10,
+    border: '2px solid #e8e0d8',
     padding: '10px 14px',
     fontSize: 13, fontWeight: 600,
     color: DARK, fontFamily: 'inherit',
@@ -36,24 +35,22 @@ export default function ReservationsFilters({
           gap: 8px;
           margin-bottom: 14px;
         }
-        .filters-search {
-          grid-column: 1 / -1;
-        }
-        .filters-date {
-          grid-column: 1 / -1;
-        }
+        .filters-search { grid-column: 1 / -1; }
+        .filters-date   { grid-column: 1 / -1; }
+        .filters-clear  { grid-column: 1 / -1; }
         @media (min-width: 640px) {
           .filters-wrap {
             grid-template-columns: 1fr 1fr 1fr auto auto;
           }
           .filters-search { grid-column: auto; }
           .filters-date   { grid-column: auto; }
+          .filters-clear  { grid-column: auto; }
         }
       `}</style>
 
       <div className="filters-wrap">
 
-        {/* Search — full width on mobile */}
+        {/* Search */}
         <div className="filters-search" style={{ position: 'relative' }}>
           <Search size={14} color="#bbb" strokeWidth={2.5} style={{
             position: 'absolute', left: 12, top: '50%',
@@ -99,7 +96,7 @@ export default function ReservationsFilters({
           {SERVICES.map(s => <option key={s} value={s}>{s}</option>)}
         </select>
 
-        {/* Date — full width on mobile */}
+        {/* Date */}
         <div className="filters-date">
           <input
             type="date"
@@ -111,20 +108,19 @@ export default function ReservationsFilters({
 
         {/* Clear */}
         {hasFilters && (
-          <button
-            onClick={clearFilters}
-            style={{
+          <div className="filters-clear">
+            <button onClick={clearFilters} style={{
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-              padding: '10px 14px', borderRadius: 10,
+              padding: '10px 14px', width: '100%',
               background: DARK, border: 'none',
               fontSize: 12, fontWeight: 800, color: GOLD,
               cursor: 'pointer', fontFamily: 'inherit',
-              whiteSpace: 'nowrap', width: '100%',
-            }}
-          >
-            <X size={13} strokeWidth={2.5} />
-            Effacer
-          </button>
+              whiteSpace: 'nowrap',
+            }}>
+              <X size={13} strokeWidth={2.5} />
+              Effacer les filtres
+            </button>
+          </div>
         )}
       </div>
     </>
