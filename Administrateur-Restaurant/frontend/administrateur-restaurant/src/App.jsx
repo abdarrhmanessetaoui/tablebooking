@@ -8,8 +8,8 @@ import Reports      from './pages/Reports'
 import Settings     from './pages/Settings'
 import ProtectedRoute from './components/ProtectedRoute'
 import Layout         from './components/Layout'
-import ToastContainer from './components/UI/Toast'
-import ConfirmDialog  from './components/UI/ConfirmDialog'
+import ToastContainer from './components/ui/Toast'
+import ConfirmDialog  from './components/ui/ConfirmDialog'
 
 function App() {
   return (
