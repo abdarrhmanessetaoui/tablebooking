@@ -1,18 +1,15 @@
-import { useState } from 'react'
 import { Search, X } from 'lucide-react'
 
-const DARK      = '#2b2118'
-const GOLD      = '#c8a97e'
-const GOLD_DARK = '#a8834e'
-
-const SERVICES = ['A la Carte', 'Dîner', 'Déjeuner', 'Brunch', 'Formule Midi']
+const DARK = '#2b2118'
+const GOLD = '#c8a97e'
 
 export default function ReservationsFilters({
   search, setSearch,
   filterStatus, setFilterStatus,
   filterService, setFilterService,
   filterDate, setFilterDate,
-  clearFilters
+  clearFilters,
+  services = [],   // ← dynamic list passed from parent
 }) {
   const hasFilters = search || filterStatus !== 'all' || filterDate || (filterService && filterService !== 'all')
 
@@ -39,9 +36,7 @@ export default function ReservationsFilters({
         .filters-date   { grid-column: 1 / -1; }
         .filters-clear  { grid-column: 1 / -1; }
         @media (min-width: 640px) {
-          .filters-wrap {
-            grid-template-columns: 1fr 1fr 1fr auto auto;
-          }
+          .filters-wrap { grid-template-columns: 1fr 1fr 1fr auto auto; }
           .filters-search { grid-column: auto; }
           .filters-date   { grid-column: auto; }
           .filters-clear  { grid-column: auto; }
@@ -57,17 +52,15 @@ export default function ReservationsFilters({
             transform: 'translateY(-50%)', pointerEvents: 'none',
           }} />
           <input
-            type="text"
-            placeholder="Rechercher…"
-            value={search}
-            onChange={e => setSearch(e.target.value)}
+            type="text" placeholder="Rechercher…"
+            value={search} onChange={e => setSearch(e.target.value)}
             style={{ ...base, paddingLeft: 34 }}
           />
           {search && (
             <button onClick={() => setSearch('')} style={{
               position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)',
-              background: 'none', border: 'none', cursor: 'pointer',
-              padding: 4, display: 'flex', alignItems: 'center',
+              background: 'none', border: 'none', cursor: 'pointer', padding: 4,
+              display: 'flex', alignItems: 'center',
             }}>
               <X size={12} color="#bbb" strokeWidth={2.5} />
             </button>
@@ -75,35 +68,24 @@ export default function ReservationsFilters({
         </div>
 
         {/* Status */}
-        <select
-          value={filterStatus}
-          onChange={e => setFilterStatus(e.target.value)}
-          style={{ ...base, cursor: 'pointer' }}
-        >
+        <select value={filterStatus} onChange={e => setFilterStatus(e.target.value)} style={{ ...base, cursor: 'pointer' }}>
           <option value="all">Tous les statuts</option>
           <option value="Pending">En attente</option>
           <option value="Confirmed">Confirmées</option>
           <option value="Cancelled">Annulées</option>
         </select>
 
-        {/* Service */}
-        <select
-          value={filterService ?? 'all'}
-          onChange={e => setFilterService(e.target.value)}
-          style={{ ...base, cursor: 'pointer' }}
-        >
+        {/* Service — built from dynamic list */}
+        <select value={filterService ?? 'all'} onChange={e => setFilterService(e.target.value)} style={{ ...base, cursor: 'pointer' }}>
           <option value="all">Tous les services</option>
-          {SERVICES.map(s => <option key={s} value={s}>{s}</option>)}
+          {services.map(s => (
+            <option key={s} value={s}>{s}</option>
+          ))}
         </select>
 
         {/* Date */}
         <div className="filters-date">
-          <input
-            type="date"
-            value={filterDate}
-            onChange={e => setFilterDate(e.target.value)}
-            style={{ ...base, cursor: 'pointer' }}
-          />
+          <input type="date" value={filterDate} onChange={e => setFilterDate(e.target.value)} style={{ ...base, cursor: 'pointer' }} />
         </div>
 
         {/* Clear */}
@@ -114,8 +96,7 @@ export default function ReservationsFilters({
               padding: '10px 14px', width: '100%',
               background: DARK, border: 'none',
               fontSize: 12, fontWeight: 800, color: GOLD,
-              cursor: 'pointer', fontFamily: 'inherit',
-              whiteSpace: 'nowrap',
+              cursor: 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap',
             }}>
               <X size={13} strokeWidth={2.5} />
               Effacer les filtres
