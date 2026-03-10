@@ -45,7 +45,6 @@ function exportReservationsPDF(reservations) {
   const W = 210, PAD = 20
   let y = 0
 
-  // Header bar
   doc.setFillColor(43, 33, 24)
   doc.rect(0, 0, W, 26, 'F')
   doc.setFont('helvetica', 'bold')
@@ -60,7 +59,6 @@ function exportReservationsPDF(reservations) {
   doc.text(now, W - PAD, 17, { align: 'right' })
   y = 38
 
-  // Title
   doc.setFontSize(22)
   doc.setFont('helvetica', 'bold')
   doc.setTextColor(43, 33, 24)
@@ -70,15 +68,13 @@ function exportReservationsPDF(reservations) {
   doc.rect(PAD, y, W - PAD * 2, 0.5, 'F')
   y += 10
 
-  // Count
   doc.setFontSize(10)
   doc.setFont('helvetica', 'normal')
   doc.setTextColor(120, 100, 80)
   doc.text(`${reservations.length} réservation${reservations.length !== 1 ? 's' : ''}`, PAD, y)
   y += 10
 
-  // Table header
-  const cols  = [['Nom', 42], ['Téléphone', 32], ['Date', 26], ['Heure', 22], ['Couverts', 22], ['Statut', 26]]
+  const cols = [['Nom', 42], ['Téléphone', 32], ['Date', 26], ['Heure', 22], ['Couverts', 22], ['Statut', 26]]
   doc.setFillColor(43, 33, 24)
   doc.rect(PAD, y, W - PAD * 2, 8, 'F')
   doc.setFontSize(8)
@@ -91,7 +87,6 @@ function exportReservationsPDF(reservations) {
   })
   y += 8
 
-  // Rows
   const STATUS_COLORS = {
     Confirmed: [45, 106, 45],
     Pending:   [168, 131, 78],
@@ -99,10 +94,7 @@ function exportReservationsPDF(reservations) {
   }
 
   reservations.forEach((r, i) => {
-    if (y > 270) {
-      doc.addPage()
-      y = 20
-    }
+    if (y > 270) { doc.addPage(); y = 20 }
     const rowBg = i % 2 === 0 ? [255, 255, 255] : [250, 248, 245]
     doc.setFillColor(...rowBg)
     doc.rect(PAD, y, W - PAD * 2, 8, 'F')
@@ -110,13 +102,9 @@ function exportReservationsPDF(reservations) {
     doc.setFont('helvetica', 'normal')
     doc.setTextColor(43, 33, 24)
     let rx = PAD + 3
-    const vals = [r.name||'—', r.phone||'—', r.date||'—', r.start_time||'—', r.guests||'—']
+    const vals   = [r.name||'—', r.phone||'—', r.date||'—', r.start_time||'—', r.guests||'—']
     const widths = [42, 32, 26, 22, 22]
-    vals.forEach((v, vi) => {
-      doc.text(String(v).substring(0, 18), rx, y + 5.5)
-      rx += widths[vi]
-    })
-    // Status badge color
+    vals.forEach((v, vi) => { doc.text(String(v).substring(0, 18), rx, y + 5.5); rx += widths[vi] })
     const sc = STATUS_COLORS[r.status] || [120, 120, 120]
     doc.setTextColor(...sc)
     doc.setFont('helvetica', 'bold')
@@ -124,7 +112,6 @@ function exportReservationsPDF(reservations) {
     y += 8
   })
 
-  // Footer
   doc.setDrawColor(200, 169, 126)
   doc.setLineWidth(0.5)
   doc.line(PAD, 287, W - PAD, 287)
@@ -147,9 +134,10 @@ export default function Reservations() {
     modalMode, setModalMode,
     form, setForm,
     editing,
-    search, setSearch,
-    filterStatus, setFilterStatus,
-    filterDate, setFilterDate,
+    search,        setSearch,
+    filterStatus,  setFilterStatus,
+    filterService, setFilterService,
+    filterDate,    setFilterDate,
     clearFilters,
     openView,
     openEdit,
@@ -205,7 +193,6 @@ export default function Reservations() {
               Gérez et modifiez les réservations
             </p>
           </div>
-          {/* Action buttons — same style as Dashboard */}
           <div style={{ display: 'flex', gap: 3, flexWrap: 'wrap' }}>
             <Btn icon={RefreshCw} onClick={handleRefresh} disabled={refreshing}>
               {refreshing ? 'Actualisation…' : 'Actualiser'}
@@ -228,7 +215,7 @@ export default function Reservations() {
       {/* Error */}
       {error && (
         <FadeUp delay={30}>
-          <div style={{ marginBottom: 20, padding: '12px 18px', background: '#fdf0f0', borderLeft: `3px solid #b94040`, fontSize: 13, fontWeight: 700, color: '#b94040' }}>
+          <div style={{ marginBottom: 20, padding: '12px 18px', background: '#fdf0f0', borderLeft: '3px solid #b94040', fontSize: 13, fontWeight: 700, color: '#b94040' }}>
             ⚠️ {error}
           </div>
         </FadeUp>
@@ -237,9 +224,10 @@ export default function Reservations() {
       {/* Filters */}
       <FadeUp delay={40}>
         <ReservationsFilters
-          search={search} setSearch={setSearch}
-          filterStatus={filterStatus} setFilterStatus={setFilterStatus}
-          filterDate={filterDate} setFilterDate={setFilterDate}
+          search={search}               setSearch={setSearch}
+          filterStatus={filterStatus}   setFilterStatus={setFilterStatus}
+          filterService={filterService} setFilterService={setFilterService}
+          filterDate={filterDate}       setFilterDate={setFilterDate}
           clearFilters={clearFilters}
         />
       </FadeUp>
