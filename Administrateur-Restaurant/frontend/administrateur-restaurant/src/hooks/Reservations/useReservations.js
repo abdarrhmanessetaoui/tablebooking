@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react'
 import { getToken } from '../../utils/auth'
-import { toast }    from '../../components/ui/Toast'
-import { confirm }  from '../../components/ui/ConfirmDialog'
+import { toast }   from '../../components/ui/Toast'
+import { confirm } from '../../components/ui/ConfirmDialog'
 
 const API = 'http://localhost:8000/api/restaurant/reservations'
 
