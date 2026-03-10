@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { RefreshCw, FileDown, CheckCircle, Clock, XCircle, CalendarDays, ArrowRight } from 'lucide-react'
+import { RefreshCw, FileDown, CheckCircle, Clock, XCircle, CalendarDays, ArrowRight, Users, MapPin } from 'lucide-react'
 
 import useDashboardStats from '../hooks/Dashboard/useDashboardStats'
 import useRestaurantInfo from '../hooks/useRestaurantInfo'
@@ -161,9 +161,17 @@ function ResCardMobile({ r, i }) {
         <Badge status={r.status} />
       </div>
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12 }}>
-        <span style={{ fontSize: 12, fontWeight: 900, color: DARK }}>🕐 {r.start_time}</span>
-        <span style={{ fontSize: 12, fontWeight: 900, color: DARK }}>👥 {r.guests} pers.</span>
-        {r.service && <span style={{ fontSize: 11, fontWeight: 700, color: MUTED }}>{r.service}</span>}
+        <span style={{ fontSize: 12, fontWeight: 900, color: DARK, display: 'flex', alignItems: 'center', gap: 5 }}>
+          <Clock size={12} strokeWidth={2.5} color={MUTED} />{r.start_time}
+        </span>
+        <span style={{ fontSize: 12, fontWeight: 900, color: DARK, display: 'flex', alignItems: 'center', gap: 5 }}>
+          <Users size={12} strokeWidth={2.5} color={MUTED} />{r.guests} pers.
+        </span>
+        {r.service && (
+          <span style={{ fontSize: 11, fontWeight: 700, color: MUTED, display: 'flex', alignItems: 'center', gap: 5 }}>
+            <MapPin size={12} strokeWidth={2.5} color={MUTED} />{r.service}
+          </span>
+        )}
       </div>
     </div>
   )
