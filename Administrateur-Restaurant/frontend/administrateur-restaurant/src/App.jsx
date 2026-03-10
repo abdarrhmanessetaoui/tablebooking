@@ -8,10 +8,14 @@ import Reports      from './pages/Reports'
 import Settings     from './pages/Settings'
 import ProtectedRoute from './components/ProtectedRoute'
 import Layout         from './components/Layout'
+import ToastContainer from './components/UI/Toast'
+import ConfirmDialog  from './components/UI/ConfirmDialog'
 
 function App() {
   return (
     <BrowserRouter>
+      <ToastContainer />
+      <ConfirmDialog />
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/dashboard"     element={<ProtectedRoute><Layout><Dashboard    /></Layout></ProtectedRoute>} />
