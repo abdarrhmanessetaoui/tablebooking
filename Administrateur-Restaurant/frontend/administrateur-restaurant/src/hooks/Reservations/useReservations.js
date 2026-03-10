@@ -24,11 +24,11 @@ export default function useReservations(initialFilters = {}) {
   const [editing, setEditing]     = useState(null)
   const [form, setForm]           = useState(EMPTY_FORM)
 
-  const [search,         setSearch]         = useState('')
-  const [filterStatus,   setFilterStatus]   = useState(initialFilters?.filterStatus || 'all')
-  const [filterService,  setFilterService]  = useState('all')
-  const [filterDate,     setFilterDate]     = useState(initialFilters?.filterDate   || '')
-  const [filterMonth,    setFilterMonth]    = useState(
+  const [search,        setSearch]        = useState('')
+  const [filterStatus,  setFilterStatus]  = useState(initialFilters?.filterStatus || 'all')
+  const [filterService, setFilterService] = useState('all')
+  const [filterDate,    setFilterDate]    = useState(initialFilters?.filterDate   || '')
+  const [filterMonth,   setFilterMonth]   = useState(
     initialFilters?.filterDate ? '' : CURRENT_MONTH
   )
 
@@ -135,5 +135,7 @@ export default function useReservations(initialFilters = {}) {
     openView, openEdit, openCreate,
     handleSubmit, handleCreate, handleDelete,
     fetchReservations,
+    reservations,
+    setReservations,
   }
 }
