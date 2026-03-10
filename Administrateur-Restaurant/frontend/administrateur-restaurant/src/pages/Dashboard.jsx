@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { RefreshCw, FileDown, CheckCircle, Clock, XCircle, CalendarDays, ArrowRight, Users, MapPin } from 'lucide-react'
+import { FileDown, CheckCircle, Clock, XCircle, CalendarDays, ArrowRight, Users, MapPin } from 'lucide-react'
 
 import useDashboardStats from '../hooks/Dashboard/useDashboardStats'
 import useRestaurantInfo from '../hooks/useRestaurantInfo'
@@ -305,13 +305,12 @@ export default function Dashboard() {
   const navigate = useNavigate()
 
   const [tab,        setTab]        = useState('today')
-  const [refreshing, setRefreshing] = useState(false)
   const [exporting,  setExporting]  = useState(false)
   const [todayRes,   setTodayRes]   = useState([])
   const [tomRes,     setTomRes]     = useState([])
   const [monthRes,   setMonthRes]   = useState([])
 
-  useEffect(() => {
+  const loadAll = useCallback(() => {
     const h    = { Authorization: `Bearer ${getToken()}` }
     const now  = new Date()
     const year = now.getFullYear()
@@ -319,7 +318,15 @@ export default function Dashboard() {
     fetch(`http://localhost:8000/api/restaurant/reservations?date=${TODAY_DATE}`,    { headers: h }).then(r => r.json()).then(d => setTodayRes(Array.isArray(d) ? d : [])).catch(() => {})
     fetch(`http://localhost:8000/api/restaurant/reservations?date=${TOMORROW_DATE}`, { headers: h }).then(r => r.json()).then(d => setTomRes(Array.isArray(d) ? d : [])).catch(() => {})
     fetch(`http://localhost:8000/api/restaurant/reservations?month=${year}-${mon}`,  { headers: h }).then(r => r.json()).then(d => setMonthRes(Array.isArray(d) ? d : [])).catch(() => {})
-  }, [])
+    refetch()
+  }, [refetch])
+
+  // initial load + auto-refresh every 60s
+  useEffect(() => {
+    loadAll()
+    const id = setInterval(loadAll, 60_000)
+    return () => clearInterval(id)
+  }, [loadAll])
 
   const TABS = [
     { key: 'today',    label: "Aujourd'hui", res: todayRes, date: TODAY_DATE    },
@@ -328,7 +335,6 @@ export default function Dashboard() {
   ]
   const active = TABS.find(t => t.key === tab)
 
-  async function handleRefresh() { setRefreshing(true); try { await refetch() } finally { setRefreshing(false) } }
   async function handleExport() {
     setExporting(true)
     try {
@@ -443,9 +449,6 @@ export default function Dashboard() {
               </p>
             </div>
             <div style={{ display: 'flex', gap: 3, flexShrink: 0 }}>
-              <Btn icon={RefreshCw} onClick={handleRefresh} disabled={refreshing}>
-                {refreshing ? 'Actualisation…' : 'Actualiser'}
-              </Btn>
               <Btn icon={FileDown} primary onClick={handleExport} disabled={exporting}>
                 {exporting ? 'Export…' : 'Exporter PDF'}
               </Btn>
