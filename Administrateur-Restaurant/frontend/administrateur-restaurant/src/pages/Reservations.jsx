@@ -1,7 +1,7 @@
 import { useLocation } from 'react-router-dom'
 import { useState } from 'react'
 import {
-  Plus, RefreshCw, FileDown, Trash2, CheckCircle,
+  Plus, FileDown, Trash2, CheckCircle,
   Clock, XCircle, X
 } from 'lucide-react'
 import useReservations from '../hooks/Reservations/useReservations'
@@ -11,6 +11,8 @@ import ReservationModal    from '../components/Reservations/ReservationModal'
 import FadeUp   from '../components/Dashboard/FadeUp'
 import Spinner  from '../components/Dashboard/Spinner'
 import { getToken } from '../utils/auth'
+import { toast }    from '../components/UI/Toast'
+import { confirm }  from '../components/UI/ConfirmDialog'
 
 const DARK      = '#2b2118'
 const GOLD      = '#c8a97e'
@@ -215,7 +217,6 @@ function exportReservationsPDF(reservations) {
 
 export default function Reservations() {
   const location = useLocation()
-  const [refreshing,  setRefreshing]  = useState(false)
   const [exporting,   setExporting]   = useState(false)
   const [selectedIds, setSelectedIds] = useState([])
 
@@ -231,15 +232,8 @@ export default function Reservations() {
     clearFilters,
     openView, openEdit, openCreate,
     handleSubmit, handleCreate, handleDelete,
-    fetchReservations,
     setReservations,
   } = useReservations(location.state)
-
-  async function handleRefresh() {
-    setRefreshing(true)
-    setSelectedIds([])
-    try { await fetchReservations() } finally { setRefreshing(false) }
-  }
 
   async function handleExportPDF() {
     setExporting(true)
@@ -253,30 +247,53 @@ export default function Reservations() {
         })
       }
       exportReservationsPDF(filtered)
-    } catch(e) { console.error('PDF error:', e) }
-    finally { setExporting(false) }
+      toast('PDF exporté avec succès', 'success')
+    } catch(e) {
+      console.error('PDF error:', e)
+      toast('Impossible d\'exporter le PDF', 'error')
+    } finally {
+      setExporting(false)
+    }
   }
 
   async function handleBulkDelete() {
-    if (!window.confirm(`Supprimer ${selectedIds.length} réservation(s) ?`)) return
+    const ok = await confirm({
+      title:        'Supprimer la sélection',
+      message:      `Voulez-vous supprimer ${selectedIds.length} réservation${selectedIds.length > 1 ? 's' : ''} ?`,
+      sub:          'Cette action est irréversible.',
+      confirmLabel: 'Tout supprimer',
+      type:         'danger',
+    })
+    if (!ok) return
     const h = { 'Content-Type': 'application/json', 'Accept': 'application/json', 'Authorization': `Bearer ${getToken()}` }
-    await Promise.all(selectedIds.map(id =>
-      fetch(`http://localhost:8000/api/restaurant/reservations/${id}`, { method: 'DELETE', headers: h })
-    ))
-    setReservations(prev => prev.filter(r => !selectedIds.includes(r.id)))
-    setSelectedIds([])
+    try {
+      await Promise.all(selectedIds.map(id =>
+        fetch(`http://localhost:8000/api/restaurant/reservations/${id}`, { method: 'DELETE', headers: h })
+      ))
+      setReservations(prev => prev.filter(r => !selectedIds.includes(r.id)))
+      toast(`${selectedIds.length} réservation${selectedIds.length > 1 ? 's supprimées' : ' supprimée'}`, 'warning')
+      setSelectedIds([])
+    } catch {
+      toast('Erreur lors de la suppression', 'error')
+    }
   }
 
   async function handleBulkStatus(status) {
+    const labels = { Confirmed: 'confirmées', Pending: 'mises en attente', Cancelled: 'annulées' }
     const h = { 'Content-Type': 'application/json', 'Accept': 'application/json', 'Authorization': `Bearer ${getToken()}` }
-    await Promise.all(selectedIds.map(id =>
-      fetch(`http://localhost:8000/api/restaurant/reservations/${id}/status`, {
-        method: 'PATCH', headers: h,
-        body: JSON.stringify({ status }),
-      })
-    ))
-    setReservations(prev => prev.map(r => selectedIds.includes(r.id) ? { ...r, status } : r))
-    setSelectedIds([])
+    try {
+      await Promise.all(selectedIds.map(id =>
+        fetch(`http://localhost:8000/api/restaurant/reservations/${id}/status`, {
+          method: 'PATCH', headers: h,
+          body: JSON.stringify({ status }),
+        })
+      ))
+      setReservations(prev => prev.map(r => selectedIds.includes(r.id) ? { ...r, status } : r))
+      toast(`${selectedIds.length} réservation${selectedIds.length > 1 ? 's' : ''} ${labels[status]}`, 'success')
+      setSelectedIds([])
+    } catch {
+      toast('Erreur lors de la mise à jour', 'error')
+    }
   }
 
   if (loading) return <Spinner />
@@ -317,9 +334,6 @@ export default function Reservations() {
               </p>
             </div>
             <div style={{ display: 'flex', gap: 3, flexShrink: 0 }}>
-              <Btn icon={RefreshCw} onClick={handleRefresh} disabled={refreshing}>
-                {refreshing ? 'Actualisation…' : 'Actualiser'}
-              </Btn>
               <Btn icon={FileDown} primary onClick={handleExportPDF} disabled={exporting}>
                 {exporting ? 'Export…' : 'Exporter PDF'}
               </Btn>
