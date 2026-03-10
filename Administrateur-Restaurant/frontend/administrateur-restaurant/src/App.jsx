@@ -10,7 +10,6 @@ import ProtectedRoute from './components/ProtectedRoute'
 import Layout         from './components/Layout'
 import ToastContainer from './components/ui/Toast'
 import ConfirmDialog  from './components/ui/ConfirmDialog'
-
 function App() {
   return (
     <BrowserRouter>
