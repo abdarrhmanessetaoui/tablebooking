@@ -1,18 +1,22 @@
 import { useLocation } from 'react-router-dom'
 import { useState } from 'react'
-import { Plus, RefreshCw, FileDown, Trash2, CheckCircle, Clock, XCircle, X } from 'lucide-react'
+import {
+  Plus, RefreshCw, FileDown, Trash2, CheckCircle,
+  Clock, XCircle, X, CalendarDays, Phone, Clock3, Users, Utensils
+} from 'lucide-react'
 import useReservations from '../hooks/Reservations/useReservations'
 import ReservationsFilters from '../components/Reservations/ReservationsFilters'
 import ReservationsTable   from '../components/Reservations/ReservationsTable'
 import ReservationModal    from '../components/Reservations/ReservationModal'
-import FadeUp from '../components/Dashboard/FadeUp'
-import Spinner from '../components/Dashboard/Spinner'
+import FadeUp   from '../components/Dashboard/FadeUp'
+import Spinner  from '../components/Dashboard/Spinner'
 import { getToken } from '../utils/auth'
 
 const DARK      = '#2b2118'
 const GOLD      = '#c8a97e'
 const GOLD_DARK = '#a8834e'
 
+/* ── Responsive button: text on desktop, icon only on mobile ── */
 function Btn({ children, onClick, primary, disabled, icon: Icon }) {
   const [hov, setHov] = useState(false)
   const bg    = primary ? (hov ? DARK : GOLD) : (hov ? GOLD : DARK)
@@ -21,17 +25,18 @@ function Btn({ children, onClick, primary, disabled, icon: Icon }) {
     <button onClick={onClick} disabled={disabled}
       onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
       style={{
-        display: 'flex', alignItems: 'center', gap: 9,
-        padding: '13px 24px', background: bg, border: 'none', color,
-        fontSize: 14, fontWeight: 800,
+        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+        padding: '11px 20px',
+        background: bg, border: 'none', color,
+        fontSize: 13, fontWeight: 800,
         cursor: disabled ? 'not-allowed' : 'pointer',
         opacity: disabled ? 0.5 : 1,
         transition: 'background 0.15s, color 0.15s',
-        fontFamily: 'inherit', letterSpacing: '-0.2px', whiteSpace: 'nowrap',
+        fontFamily: 'inherit', whiteSpace: 'nowrap', borderRadius: 10,
       }}
     >
       {Icon && <Icon size={15} strokeWidth={2.2} />}
-      {children}
+      <span className="btn-label">{children}</span>
     </button>
   )
 }
@@ -41,91 +46,96 @@ function BulkBar({ count, onDelete, onStatus, onClear }) {
   const [hovDel, setHovDel] = useState(false)
   return (
     <div style={{
-      position: 'sticky', top: 12, zIndex: 30,
-      display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap',
-      padding: '12px 18px',
+      position: 'sticky', top: 8, zIndex: 30,
+      display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap',
+      padding: '10px 16px',
       background: DARK,
-      boxShadow: '0 4px 20px rgba(43,33,24,0.25)',
+      borderRadius: 12,
+      boxShadow: '0 4px 24px rgba(43,33,24,0.28)',
       marginBottom: 12,
-      animation: 'slideDown 0.2s ease',
+      animation: 'slideDown 0.18s ease',
     }}>
-      <style>{`@keyframes slideDown { from{opacity:0;transform:translateY(-8px)} to{opacity:1;transform:translateY(0)} }`}</style>
+      <style>{`
+        @keyframes slideDown { from{opacity:0;transform:translateY(-8px)} to{opacity:1;transform:translateY(0)} }
+        @media (max-width: 600px) {
+          .btn-label { display: none !important; }
+          .bulk-label { display: none !important; }
+        }
+      `}</style>
 
       {/* Count badge */}
       <span style={{
         display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-        minWidth: 28, height: 28, borderRadius: 8,
+        minWidth: 26, height: 26, borderRadius: 7,
         background: GOLD, color: DARK,
-        fontSize: 13, fontWeight: 900, padding: '0 8px',
+        fontSize: 12, fontWeight: 900, padding: '0 7px', flexShrink: 0,
       }}>{count}</span>
-      <span style={{ fontSize: 13, fontWeight: 700, color: 'rgba(255,255,255,0.7)', marginRight: 4 }}>
+      <span className="bulk-label" style={{ fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.6)', marginRight: 2 }}>
         sélectionné{count > 1 ? 's' : ''}
       </span>
 
-      {/* Divider */}
-      <div style={{ width: 1, height: 24, background: 'rgba(255,255,255,0.15)', margin: '0 4px' }} />
+      <div style={{ width: 1, height: 20, background: 'rgba(255,255,255,0.12)', margin: '0 2px', flexShrink: 0 }} />
 
       {/* Status actions */}
       {[
-        { status: 'Confirmed', label: 'Confirmer',  icon: CheckCircle, color: '#4ade80' },
-        { status: 'Pending',   label: 'En attente', icon: Clock,       color: GOLD      },
-        { status: 'Cancelled', label: 'Annuler',    icon: XCircle,     color: '#f87171' },
-      ].map(({ status, label, icon: Icon, color }) => (
+        { status: 'Confirmed', label: 'Confirmer',  Icon: CheckCircle, color: '#4ade80' },
+        { status: 'Pending',   label: 'En attente', Icon: Clock,       color: GOLD      },
+        { status: 'Cancelled', label: 'Annuler',    Icon: XCircle,     color: '#f87171' },
+      ].map(({ status, label, Icon, color }) => (
         <button key={status} onClick={() => onStatus(status)}
           style={{
-            display: 'flex', alignItems: 'center', gap: 6,
-            padding: '7px 14px', borderRadius: 8,
-            background: 'rgba(255,255,255,0.08)',
-            border: '1px solid rgba(255,255,255,0.12)',
+            display: 'flex', alignItems: 'center', gap: 5,
+            padding: '6px 12px', borderRadius: 8,
+            background: 'rgba(255,255,255,0.07)',
+            border: '1px solid rgba(255,255,255,0.1)',
             color, fontSize: 12, fontWeight: 700,
             cursor: 'pointer', fontFamily: 'inherit',
-            transition: 'background 0.15s',
+            transition: 'background 0.15s', flexShrink: 0,
           }}
-          onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.16)'}
-          onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,255,255,0.08)'}
+          onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.15)'}
+          onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,255,255,0.07)'}
         >
           <Icon size={13} strokeWidth={2.5} />
-          {label}
+          <span className="btn-label">{label}</span>
         </button>
       ))}
 
-      {/* Divider */}
-      <div style={{ width: 1, height: 24, background: 'rgba(255,255,255,0.15)', margin: '0 4px' }} />
+      <div style={{ width: 1, height: 20, background: 'rgba(255,255,255,0.12)', margin: '0 2px', flexShrink: 0 }} />
 
       {/* Delete */}
       <button onClick={onDelete}
         onMouseEnter={() => setHovDel(true)} onMouseLeave={() => setHovDel(false)}
         style={{
-          display: 'flex', alignItems: 'center', gap: 6,
-          padding: '7px 14px', borderRadius: 8,
-          background: hovDel ? '#ef4444' : 'rgba(239,68,68,0.15)',
-          border: '1px solid rgba(239,68,68,0.3)',
+          display: 'flex', alignItems: 'center', gap: 5,
+          padding: '6px 12px', borderRadius: 8,
+          background: hovDel ? '#ef4444' : 'rgba(239,68,68,0.12)',
+          border: '1px solid rgba(239,68,68,0.25)',
           color: hovDel ? '#fff' : '#f87171',
           fontSize: 12, fontWeight: 700,
           cursor: 'pointer', fontFamily: 'inherit',
-          transition: 'all 0.15s',
+          transition: 'all 0.15s', flexShrink: 0,
         }}
       >
         <Trash2 size={13} strokeWidth={2.5} />
-        Supprimer
+        <span className="btn-label">Supprimer</span>
       </button>
 
-      {/* Clear selection — pushed right */}
+      {/* Clear — pushed right */}
       <button onClick={onClear}
         style={{
           marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 5,
-          padding: '7px 12px', borderRadius: 8,
-          background: 'none', border: '1px solid rgba(255,255,255,0.15)',
-          color: 'rgba(255,255,255,0.5)',
+          padding: '6px 10px', borderRadius: 8,
+          background: 'none', border: '1px solid rgba(255,255,255,0.12)',
+          color: 'rgba(255,255,255,0.45)',
           fontSize: 12, fontWeight: 700,
           cursor: 'pointer', fontFamily: 'inherit',
-          transition: 'all 0.15s',
+          transition: 'all 0.15s', flexShrink: 0,
         }}
         onMouseEnter={e => e.currentTarget.style.color = '#fff'}
-        onMouseLeave={e => e.currentTarget.style.color = 'rgba(255,255,255,0.5)'}
+        onMouseLeave={e => e.currentTarget.style.color = 'rgba(255,255,255,0.45)'}
       >
         <X size={13} strokeWidth={2.5} />
-        Désélectionner
+        <span className="btn-label">Désélectionner</span>
       </button>
     </div>
   )
@@ -212,9 +222,9 @@ function exportReservationsPDF(reservations) {
 
 export default function Reservations() {
   const location = useLocation()
-  const [refreshing,   setRefreshing]   = useState(false)
-  const [exporting,    setExporting]    = useState(false)
-  const [selectedIds,  setSelectedIds]  = useState([])
+  const [refreshing,  setRefreshing]  = useState(false)
+  const [exporting,   setExporting]   = useState(false)
+  const [selectedIds, setSelectedIds] = useState([])
 
   const {
     filtered, loading, error,
@@ -230,7 +240,6 @@ export default function Reservations() {
     handleSubmit, handleCreate, handleDelete,
     fetchReservations,
     setReservations,
-    reservations,
   } = useReservations(location.state)
 
   async function handleRefresh() {
@@ -255,23 +264,21 @@ export default function Reservations() {
     finally { setExporting(false) }
   }
 
-  /* ── Bulk delete ── */
   async function handleBulkDelete() {
     if (!window.confirm(`Supprimer ${selectedIds.length} réservation(s) ?`)) return
-    const headers = { 'Content-Type': 'application/json', 'Accept': 'application/json', 'Authorization': `Bearer ${getToken()}` }
+    const h = { 'Content-Type': 'application/json', 'Accept': 'application/json', 'Authorization': `Bearer ${getToken()}` }
     await Promise.all(selectedIds.map(id =>
-      fetch(`http://localhost:8000/api/restaurant/reservations/${id}`, { method: 'DELETE', headers })
+      fetch(`http://localhost:8000/api/restaurant/reservations/${id}`, { method: 'DELETE', headers: h })
     ))
     setReservations(prev => prev.filter(r => !selectedIds.includes(r.id)))
     setSelectedIds([])
   }
 
-  /* ── Bulk status ── */
   async function handleBulkStatus(status) {
-    const headers = { 'Content-Type': 'application/json', 'Accept': 'application/json', 'Authorization': `Bearer ${getToken()}` }
+    const h = { 'Content-Type': 'application/json', 'Accept': 'application/json', 'Authorization': `Bearer ${getToken()}` }
     await Promise.all(selectedIds.map(id =>
       fetch(`http://localhost:8000/api/restaurant/reservations/${id}/status`, {
-        method: 'PATCH', headers,
+        method: 'PATCH', headers: h,
         body: JSON.stringify({ status }),
       })
     ))
@@ -282,99 +289,133 @@ export default function Reservations() {
   if (loading) return <Spinner />
 
   return (
-    <div style={{
-      minHeight: '100vh', background: '#faf8f5',
-      fontFamily: "'Plus Jakarta Sans','DM Sans',system-ui,sans-serif",
-      padding: 'clamp(24px,4vw,48px) clamp(16px,3vw,40px)',
-    }}>
-      <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800;900&display=swap" rel="stylesheet" />
+    <>
+      <style>{`
+        @media (max-width: 600px) {
+          .btn-label { display: none !important; }
+          .page-subtitle { display: none !important; }
+        }
+      `}</style>
 
-      {/* Header */}
-      <FadeUp delay={0}>
-        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 16, marginBottom: 40, flexWrap: 'wrap' }}>
-          <div>
-            <h1 style={{ margin: 0, fontSize: 'clamp(28px,4vw,42px)', fontWeight: 900, color: DARK, letterSpacing: '-1.5px', lineHeight: 1 }}>
-              Réservations
-            </h1>
-            <p style={{ margin: '8px 0 0', fontSize: 13, fontWeight: 700, color: GOLD }}>
-              Gérez et modifiez les réservations
-            </p>
-          </div>
-          <div style={{ display: 'flex', gap: 3, flexWrap: 'wrap' }}>
-            <Btn icon={RefreshCw} onClick={handleRefresh} disabled={refreshing}>
-              {refreshing ? 'Actualisation…' : 'Actualiser'}
-            </Btn>
-            <Btn icon={FileDown} primary onClick={handleExportPDF} disabled={exporting}>
-              {exporting ? 'Génération…' : 'Exporter PDF'}
-            </Btn>
-            <Btn icon={Plus} onClick={openCreate}>
-              Nouvelle réservation
-            </Btn>
-          </div>
-        </div>
-      </FadeUp>
+      <div style={{
+        minHeight: '100vh', background: '#faf8f5',
+        fontFamily: "'Plus Jakarta Sans','DM Sans',system-ui,sans-serif",
+        padding: 'clamp(16px,3vw,40px) clamp(12px,3vw,36px)',
+      }}>
+        <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800;900&display=swap" rel="stylesheet" />
 
-      <FadeUp delay={20}>
-        <div style={{ height: 2, background: DARK, marginBottom: 36 }} />
-      </FadeUp>
+        {/* ── HEADER ── */}
+        <FadeUp delay={0}>
+          <div style={{
+            display: 'flex', alignItems: 'center',
+            justifyContent: 'space-between', gap: 12,
+            marginBottom: 28, flexWrap: 'wrap',
+          }}>
+            <div>
+              <h1 style={{
+                margin: 0, fontSize: 'clamp(22px,4vw,36px)',
+                fontWeight: 900, color: DARK,
+                letterSpacing: '-1.5px', lineHeight: 1,
+              }}>
+                Réservations
+              </h1>
+              <p className="page-subtitle" style={{ margin: '6px 0 0', fontSize: 12, fontWeight: 700, color: GOLD }}>
+                {filtered.length} réservation{filtered.length !== 1 ? 's' : ''}
+              </p>
+            </div>
 
-      {error && (
-        <FadeUp delay={30}>
-          <div style={{ marginBottom: 20, padding: '12px 18px', background: '#fdf0f0', borderLeft: '3px solid #b94040', fontSize: 13, fontWeight: 700, color: '#b94040' }}>
-            ⚠️ {error}
+            <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
+              <Btn icon={RefreshCw} onClick={handleRefresh} disabled={refreshing}>
+                {refreshing ? 'Actualisation…' : 'Actualiser'}
+              </Btn>
+              <Btn icon={FileDown} primary onClick={handleExportPDF} disabled={exporting}>
+                {exporting ? 'Export…' : 'Exporter PDF'}
+              </Btn>
+              <Btn icon={Plus} onClick={openCreate}>
+                Nouvelle réservation
+              </Btn>
+            </div>
           </div>
         </FadeUp>
-      )}
 
-      <FadeUp delay={40}>
-        <ReservationsFilters
-          search={search}               setSearch={setSearch}
-          filterStatus={filterStatus}   setFilterStatus={setFilterStatus}
-          filterService={filterService} setFilterService={setFilterService}
-          filterDate={filterDate}       setFilterDate={setFilterDate}
-          clearFilters={clearFilters}
-        />
-      </FadeUp>
+        {/* ── DIVIDER ── */}
+        <FadeUp delay={10}>
+          <div style={{ height: 2, background: DARK, marginBottom: 24 }} />
+        </FadeUp>
 
-      <FadeUp delay={70}>
-        <p style={{ margin: '0 0 12px', fontSize: 12, fontWeight: 800, color: '#aaa', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
-          {filtered.length} réservation{filtered.length !== 1 ? 's' : ''}
-        </p>
-      </FadeUp>
+        {/* ── ERROR ── */}
+        {error && (
+          <FadeUp delay={20}>
+            <div style={{
+              marginBottom: 16, padding: '11px 16px', borderRadius: 10,
+              background: '#fdf0f0', border: '1px solid #f5c0c0',
+              fontSize: 12, fontWeight: 700, color: '#b94040',
+              display: 'flex', alignItems: 'center', gap: 8,
+            }}>
+              <XCircle size={14} strokeWidth={2.5} />
+              {error}
+            </div>
+          </FadeUp>
+        )}
 
-      {/* Bulk action bar — shows when items selected */}
-      {selectedIds.length > 0 && (
-        <BulkBar
-          count={selectedIds.length}
-          onDelete={handleBulkDelete}
-          onStatus={handleBulkStatus}
-          onClear={() => setSelectedIds([])}
-        />
-      )}
+        {/* ── FILTERS ── */}
+        <FadeUp delay={30}>
+          <ReservationsFilters
+            search={search}               setSearch={setSearch}
+            filterStatus={filterStatus}   setFilterStatus={setFilterStatus}
+            filterService={filterService} setFilterService={setFilterService}
+            filterDate={filterDate}       setFilterDate={setFilterDate}
+            clearFilters={clearFilters}
+          />
+        </FadeUp>
 
-      <FadeUp delay={100}>
-        <ReservationsTable
-          reservations={filtered}
-          openView={openView}
-          openEdit={openEdit}
-          handleDelete={handleDelete}
-          selectedIds={selectedIds}
-          setSelectedIds={setSelectedIds}
-        />
-      </FadeUp>
+        {/* ── COUNT (mobile only — desktop shows in subtitle) ── */}
+        <FadeUp delay={50}>
+          <p style={{
+            margin: '0 0 10px',
+            fontSize: 11, fontWeight: 800, color: '#bbb',
+            letterSpacing: '0.1em', textTransform: 'uppercase',
+          }}>
+            {filtered.length} résultat{filtered.length !== 1 ? 's' : ''}
+          </p>
+        </FadeUp>
 
-      {modalMode && (
-        <ReservationModal
-          modalMode={modalMode}
-          editing={editing}
-          form={form}
-          setForm={setForm}
-          handleSubmit={handleSubmit}
-          handleCreate={handleCreate}
-          handleDelete={handleDelete}
-          setModalMode={setModalMode}
-        />
-      )}
-    </div>
+        {/* ── BULK BAR ── */}
+        {selectedIds.length > 0 && (
+          <BulkBar
+            count={selectedIds.length}
+            onDelete={handleBulkDelete}
+            onStatus={handleBulkStatus}
+            onClear={() => setSelectedIds([])}
+          />
+        )}
+
+        {/* ── TABLE ── */}
+        <FadeUp delay={70}>
+          <ReservationsTable
+            reservations={filtered}
+            openView={openView}
+            openEdit={openEdit}
+            handleDelete={handleDelete}
+            selectedIds={selectedIds}
+            setSelectedIds={setSelectedIds}
+          />
+        </FadeUp>
+
+        {/* ── MODAL ── */}
+        {modalMode && (
+          <ReservationModal
+            modalMode={modalMode}
+            editing={editing}
+            form={form}
+            setForm={setForm}
+            handleSubmit={handleSubmit}
+            handleCreate={handleCreate}
+            handleDelete={handleDelete}
+            setModalMode={setModalMode}
+          />
+        )}
+      </div>
+    </>
   )
 }
