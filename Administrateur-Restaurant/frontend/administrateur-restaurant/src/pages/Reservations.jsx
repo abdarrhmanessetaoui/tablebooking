@@ -2,7 +2,7 @@ import { useLocation } from 'react-router-dom'
 import { useState } from 'react'
 import {
   Plus, RefreshCw, FileDown, Trash2, CheckCircle,
-  Clock, XCircle, X, CalendarDays, Phone, Clock3, Users, Utensils
+  Clock, XCircle, X
 } from 'lucide-react'
 import useReservations from '../hooks/Reservations/useReservations'
 import ReservationsFilters from '../components/Reservations/ReservationsFilters'
@@ -16,7 +16,6 @@ const DARK      = '#2b2118'
 const GOLD      = '#c8a97e'
 const GOLD_DARK = '#a8834e'
 
-/* ── Responsive button: text on desktop, icon only on mobile ── */
 function Btn({ children, onClick, primary, disabled, icon: Icon }) {
   const [hov, setHov] = useState(false)
   const bg    = primary ? (hov ? DARK : GOLD) : (hov ? GOLD : DARK)
@@ -32,7 +31,7 @@ function Btn({ children, onClick, primary, disabled, icon: Icon }) {
         cursor: disabled ? 'not-allowed' : 'pointer',
         opacity: disabled ? 0.5 : 1,
         transition: 'background 0.15s, color 0.15s',
-        fontFamily: 'inherit', whiteSpace: 'nowrap', borderRadius: 10,
+        fontFamily: 'inherit', whiteSpace: 'nowrap',
       }}
     >
       {Icon && <Icon size={15} strokeWidth={2.2} />}
@@ -41,7 +40,6 @@ function Btn({ children, onClick, primary, disabled, icon: Icon }) {
   )
 }
 
-/* ── Bulk action bar ── */
 function BulkBar({ count, onDelete, onStatus, onClear }) {
   const [hovDel, setHovDel] = useState(false)
   return (
@@ -50,7 +48,6 @@ function BulkBar({ count, onDelete, onStatus, onClear }) {
       display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap',
       padding: '10px 16px',
       background: DARK,
-      borderRadius: 12,
       boxShadow: '0 4px 24px rgba(43,33,24,0.28)',
       marginBottom: 12,
       animation: 'slideDown 0.18s ease',
@@ -58,15 +55,14 @@ function BulkBar({ count, onDelete, onStatus, onClear }) {
       <style>{`
         @keyframes slideDown { from{opacity:0;transform:translateY(-8px)} to{opacity:1;transform:translateY(0)} }
         @media (max-width: 600px) {
-          .btn-label { display: none !important; }
+          .btn-label  { display: none !important; }
           .bulk-label { display: none !important; }
         }
       `}</style>
 
-      {/* Count badge */}
       <span style={{
         display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-        minWidth: 26, height: 26, borderRadius: 7,
+        minWidth: 26, height: 26,
         background: GOLD, color: DARK,
         fontSize: 12, fontWeight: 900, padding: '0 7px', flexShrink: 0,
       }}>{count}</span>
@@ -76,7 +72,6 @@ function BulkBar({ count, onDelete, onStatus, onClear }) {
 
       <div style={{ width: 1, height: 20, background: 'rgba(255,255,255,0.12)', margin: '0 2px', flexShrink: 0 }} />
 
-      {/* Status actions */}
       {[
         { status: 'Confirmed', label: 'Confirmer',  Icon: CheckCircle, color: '#4ade80' },
         { status: 'Pending',   label: 'En attente', Icon: Clock,       color: GOLD      },
@@ -85,7 +80,7 @@ function BulkBar({ count, onDelete, onStatus, onClear }) {
         <button key={status} onClick={() => onStatus(status)}
           style={{
             display: 'flex', alignItems: 'center', gap: 5,
-            padding: '6px 12px', borderRadius: 8,
+            padding: '6px 12px',
             background: 'rgba(255,255,255,0.07)',
             border: '1px solid rgba(255,255,255,0.1)',
             color, fontSize: 12, fontWeight: 700,
@@ -102,12 +97,11 @@ function BulkBar({ count, onDelete, onStatus, onClear }) {
 
       <div style={{ width: 1, height: 20, background: 'rgba(255,255,255,0.12)', margin: '0 2px', flexShrink: 0 }} />
 
-      {/* Delete */}
       <button onClick={onDelete}
         onMouseEnter={() => setHovDel(true)} onMouseLeave={() => setHovDel(false)}
         style={{
           display: 'flex', alignItems: 'center', gap: 5,
-          padding: '6px 12px', borderRadius: 8,
+          padding: '6px 12px',
           background: hovDel ? '#ef4444' : 'rgba(239,68,68,0.12)',
           border: '1px solid rgba(239,68,68,0.25)',
           color: hovDel ? '#fff' : '#f87171',
@@ -120,11 +114,10 @@ function BulkBar({ count, onDelete, onStatus, onClear }) {
         <span className="btn-label">Supprimer</span>
       </button>
 
-      {/* Clear — pushed right */}
       <button onClick={onClear}
         style={{
           marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 5,
-          padding: '6px 10px', borderRadius: 8,
+          padding: '6px 10px',
           background: 'none', border: '1px solid rgba(255,255,255,0.12)',
           color: 'rgba(255,255,255,0.45)',
           fontSize: 12, fontWeight: 700,
@@ -292,7 +285,7 @@ export default function Reservations() {
     <>
       <style>{`
         @media (max-width: 600px) {
-          .btn-label { display: none !important; }
+          .btn-label     { display: none !important; }
           .page-subtitle { display: none !important; }
         }
       `}</style>
@@ -304,7 +297,7 @@ export default function Reservations() {
       }}>
         <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800;900&display=swap" rel="stylesheet" />
 
-        {/* ── HEADER ── */}
+        {/* HEADER */}
         <FadeUp delay={0}>
           <div style={{
             display: 'flex', alignItems: 'center',
@@ -323,8 +316,7 @@ export default function Reservations() {
                 {filtered.length} réservation{filtered.length !== 1 ? 's' : ''}
               </p>
             </div>
-
-            <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
+            <div style={{ display: 'flex', gap: 3, flexShrink: 0 }}>
               <Btn icon={RefreshCw} onClick={handleRefresh} disabled={refreshing}>
                 {refreshing ? 'Actualisation…' : 'Actualiser'}
               </Btn>
@@ -338,17 +330,17 @@ export default function Reservations() {
           </div>
         </FadeUp>
 
-        {/* ── DIVIDER ── */}
+        {/* DIVIDER */}
         <FadeUp delay={10}>
           <div style={{ height: 2, background: DARK, marginBottom: 24 }} />
         </FadeUp>
 
-        {/* ── ERROR ── */}
+        {/* ERROR */}
         {error && (
           <FadeUp delay={20}>
             <div style={{
-              marginBottom: 16, padding: '11px 16px', borderRadius: 10,
-              background: '#fdf0f0', border: '1px solid #f5c0c0',
+              marginBottom: 16, padding: '11px 16px',
+              background: '#fdf0f0', borderLeft: '3px solid #b94040',
               fontSize: 12, fontWeight: 700, color: '#b94040',
               display: 'flex', alignItems: 'center', gap: 8,
             }}>
@@ -358,7 +350,7 @@ export default function Reservations() {
           </FadeUp>
         )}
 
-        {/* ── FILTERS ── */}
+        {/* FILTERS */}
         <FadeUp delay={30}>
           <ReservationsFilters
             search={search}               setSearch={setSearch}
@@ -369,7 +361,7 @@ export default function Reservations() {
           />
         </FadeUp>
 
-        {/* ── COUNT (mobile only — desktop shows in subtitle) ── */}
+        {/* COUNT */}
         <FadeUp delay={50}>
           <p style={{
             margin: '0 0 10px',
@@ -380,7 +372,7 @@ export default function Reservations() {
           </p>
         </FadeUp>
 
-        {/* ── BULK BAR ── */}
+        {/* BULK BAR */}
         {selectedIds.length > 0 && (
           <BulkBar
             count={selectedIds.length}
@@ -390,7 +382,7 @@ export default function Reservations() {
           />
         )}
 
-        {/* ── TABLE ── */}
+        {/* TABLE */}
         <FadeUp delay={70}>
           <ReservationsTable
             reservations={filtered}
@@ -402,7 +394,7 @@ export default function Reservations() {
           />
         </FadeUp>
 
-        {/* ── MODAL ── */}
+        {/* MODAL */}
         {modalMode && (
           <ReservationModal
             modalMode={modalMode}
