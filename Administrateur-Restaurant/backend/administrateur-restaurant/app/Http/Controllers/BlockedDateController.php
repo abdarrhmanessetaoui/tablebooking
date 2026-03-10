@@ -156,6 +156,17 @@ class BlockedDateController extends Controller
         return response()->json(['date' => $date], 201);
     }
 
+    public function storeBulk(Request $request)
+{
+    $request->validate(['dates' => 'required|array', 'dates.*' => 'date']);
+    $created = [];
+    foreach ($request->dates as $date) {
+        $blocked = BlockedDate::firstOrCreate(['date' => $date]);
+        $created[] = $blocked;
+    }
+    return response()->json($created);
+}
+
     // DELETE /api/blocked-dates/{date}  (date = Y-m-d)
     public function destroy($date)
     {
