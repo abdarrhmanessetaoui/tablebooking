@@ -1,110 +1,75 @@
 import { useState, useEffect, useCallback } from 'react'
-import { AlertCircle, Trash2, X } from 'lucide-react'
+import { CheckCircle, XCircle, AlertCircle, X } from 'lucide-react'
 
-const DARK = '#2b2118'
-const GOLD = '#c8a97e'
-
-let _show = null
-export function confirm(options) {
-  return new Promise(resolve => {
-    if (_show) _show({ ...options, resolve })
-  })
+const TYPES = {
+  success: { bg: '#f0fdf4', border: '#bbf7d0', color: '#166534', icon: CheckCircle, dot: '#16a34a' },
+  error:   { bg: '#fef2f2', border: '#fecaca', color: '#991b1b', icon: XCircle,     dot: '#dc2626' },
+  warning: { bg: '#fffbeb', border: '#fde68a', color: '#92400e', icon: AlertCircle, dot: '#c8a97e' },
+  info:    { bg: '#fdf6ec', border: '#e8d8b0', color: '#a8834e', icon: AlertCircle, dot: '#c8a97e' },
 }
 
-export default function ConfirmDialog() {
-  const [dialog, setDialog] = useState(null)
+let _addToast = null
 
-  const show = useCallback((d) => setDialog(d), [])
-  useEffect(() => { _show = show; return () => { _show = null } }, [show])
+export function toast(message, type = 'success', duration = 3000) {
+  if (_addToast) _addToast({ message, type, duration, id: Date.now() + Math.random() })
+}
 
-  if (!dialog) return null
+export default function ToastContainer() {
+  const [toasts, setToasts] = useState([])
 
-  const isDanger = dialog.type === 'danger'
+  const add = useCallback((t) => {
+    setToasts(prev => [...prev, t])
+    setTimeout(() => setToasts(prev => prev.filter(x => x.id !== t.id)), t.duration)
+  }, [])
 
-  function handle(result) {
-    dialog.resolve(result)
-    setDialog(null)
-  }
+  useEffect(() => {
+    _addToast = add
+    return () => { _addToast = null }
+  }, [add])
 
   return (
     <div style={{
-      position: 'fixed', inset: 0, zIndex: 9998,
-      background: 'rgba(43,33,24,0.55)',
-      display: 'flex', alignItems: 'center', justifyContent: 'center',
-      padding: 16,
-      animation: 'fadeIn 0.15s ease',
-      fontFamily: "'Plus Jakarta Sans','DM Sans',system-ui,sans-serif",
+      position: 'fixed', bottom: 24, right: 24, zIndex: 9999,
+      display: 'flex', flexDirection: 'column', gap: 8,
+      pointerEvents: 'none',
     }}>
-      <style>{`@keyframes fadeIn { from{opacity:0} to{opacity:1} } @keyframes popIn { from{opacity:0;transform:scale(0.95)} to{opacity:1;transform:scale(1)} }`}</style>
-
-      <div style={{
-        background: '#fff', width: '100%', maxWidth: 400,
-        boxShadow: '0 20px 60px rgba(43,33,24,0.2)',
-        animation: 'popIn 0.18s ease',
-        overflow: 'hidden',
-      }}>
-        {/* Header */}
-        <div style={{ background: DARK, padding: '18px 22px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            {isDanger
-              ? <Trash2 size={16} color="#f87171" strokeWidth={2.5} />
-              : <AlertCircle size={16} color={GOLD} strokeWidth={2.5} />
-            }
-            <span style={{ fontSize: 14, fontWeight: 900, color: '#fff', letterSpacing: '-0.3px' }}>
-              {dialog.title || 'Confirmation'}
-            </span>
-          </div>
-          <button onClick={() => handle(false)} style={{
-            background: 'rgba(255,255,255,0.08)', border: 'none',
-            width: 28, height: 28,
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            cursor: 'pointer', color: '#fff',
+      <style>{`
+        @keyframes toastIn { from { opacity:0; transform:translateX(24px) } to { opacity:1; transform:translateX(0) } }
+        @media (max-width: 600px) { .toast-item { width: calc(100vw - 48px) !important; } }
+      `}</style>
+      {toasts.map(t => {
+        const cfg  = TYPES[t.type] || TYPES.info
+        const Icon = cfg.icon
+        return (
+          <div key={t.id} className="toast-item" style={{
+            pointerEvents: 'all',
+            display: 'flex', alignItems: 'center', gap: 10,
+            padding: '12px 16px',
+            background: cfg.bg,
+            border: `1.5px solid ${cfg.border}`,
+            borderLeft: `4px solid ${cfg.dot}`,
+            boxShadow: '0 4px 20px rgba(43,33,24,0.12)',
+            minWidth: 280, maxWidth: 380,
+            animation: 'toastIn 0.22s ease',
+            fontFamily: "'Plus Jakarta Sans','DM Sans',system-ui,sans-serif",
           }}>
-            <X size={14} strokeWidth={2.5} />
-          </button>
-        </div>
-
-        {/* Body */}
-        <div style={{ padding: '22px 22px 18px' }}>
-          <p style={{ margin: 0, fontSize: 14, fontWeight: 600, color: DARK, lineHeight: 1.6 }}>
-            {dialog.message}
-          </p>
-          {dialog.sub && (
-            <p style={{ margin: '8px 0 0', fontSize: 12, fontWeight: 600, color: '#aaa' }}>
-              {dialog.sub}
-            </p>
-          )}
-        </div>
-
-        {/* Actions */}
-        <div style={{ padding: '0 22px 20px', display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
-          <button onClick={() => handle(false)} style={{
-            padding: '10px 20px', background: '#f5f0eb', border: 'none',
-            fontSize: 13, fontWeight: 800, color: DARK,
-            cursor: 'pointer', fontFamily: 'inherit',
-            transition: 'background 0.15s',
-          }}
-            onMouseEnter={e => e.currentTarget.style.background = '#ede5d8'}
-            onMouseLeave={e => e.currentTarget.style.background = '#f5f0eb'}
-          >
-            Annuler
-          </button>
-          <button onClick={() => handle(true)} style={{
-            padding: '10px 20px',
-            background: isDanger ? '#b94040' : DARK,
-            border: 'none',
-            fontSize: 13, fontWeight: 800,
-            color: isDanger ? '#fff' : GOLD,
-            cursor: 'pointer', fontFamily: 'inherit',
-            transition: 'background 0.15s',
-          }}
-            onMouseEnter={e => e.currentTarget.style.background = isDanger ? '#991b1b' : '#3d2d1e'}
-            onMouseLeave={e => e.currentTarget.style.background = isDanger ? '#b94040' : DARK}
-          >
-            {dialog.confirmLabel || 'Confirmer'}
-          </button>
-        </div>
-      </div>
+            <Icon size={15} color={cfg.dot} strokeWidth={2.5} style={{ flexShrink: 0 }} />
+            <span style={{ flex: 1, fontSize: 13, fontWeight: 700, color: cfg.color, lineHeight: 1.4 }}>
+              {t.message}
+            </span>
+            <button
+              onClick={() => setToasts(prev => prev.filter(x => x.id !== t.id))}
+              style={{
+                background: 'none', border: 'none', cursor: 'pointer',
+                padding: 2, display: 'flex', flexShrink: 0,
+                color: cfg.color, opacity: 0.5,
+              }}
+            >
+              <X size={13} strokeWidth={2.5} />
+            </button>
+          </div>
+        )
+      })}
     </div>
   )
 }
