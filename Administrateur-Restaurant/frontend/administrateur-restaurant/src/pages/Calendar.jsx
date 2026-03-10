@@ -1,13 +1,16 @@
 import { useState } from 'react'
-import { RefreshCw, FileDown } from 'lucide-react'
+import { FileDown } from 'lucide-react'
 import useCalendar  from '../hooks/Calendar/useCalendar'
 import CalendarNav  from '../components/Calendar/CalendarNav'
 import CalendarWeek from '../components/Calendar/CalendarWeek'
 import FadeUp  from '../components/Dashboard/FadeUp'
 import Spinner from '../components/Dashboard/Spinner'
 
-const DARK = '#2b2118'
-const GOLD = '#c8a97e'
+const DARK    = '#2b2118'
+const GOLD    = '#c8a97e'
+const GOLD_DK = '#a8834e'
+const RED_BG  = '#fdf0f0'
+const RED     = '#b94040'
 
 function Btn({ children, onClick, primary, disabled, icon: Icon }) {
   const [hov, setHov] = useState(false)
@@ -16,23 +19,30 @@ function Btn({ children, onClick, primary, disabled, icon: Icon }) {
   return (
     <button onClick={onClick} disabled={disabled}
       onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
-      style={{ display:'flex', alignItems:'center', gap:8, padding:'12px 20px', background:bg, border:'none', color, fontSize:13, fontWeight:800, cursor:disabled?'not-allowed':'pointer', opacity:disabled?0.5:1, transition:'background 0.15s,color 0.15s', fontFamily:'inherit', whiteSpace:'nowrap' }}>
-      {Icon && <Icon size={14} strokeWidth={2.5} />}
-      {children}
+      style={{
+        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+        padding: '11px 20px', background: bg, border: 'none', color,
+        fontSize: 13, fontWeight: 800,
+        cursor: disabled ? 'not-allowed' : 'pointer',
+        opacity: disabled ? 0.5 : 1,
+        transition: 'background 0.15s, color 0.15s',
+        fontFamily: 'inherit', whiteSpace: 'nowrap',
+      }}>
+      {Icon && <Icon size={15} strokeWidth={2.2} />}
+      <span className="btn-label">{children}</span>
     </button>
   )
 }
 
 export default function Calendar() {
-  const { view, setView, currentDate, setCurrentDate, weekDays, monthDays, loading, error, navigate, goToday, getByDate, getByMonth, navLabel, reservations, refetch } = useCalendar()
+  const {
+    view, setView, currentDate, setCurrentDate,
+    weekDays, monthDays, loading, error,
+    navigate, goToday, getByDate, getByMonth,
+    navLabel, reservations, refetch,
+  } = useCalendar()
 
-  const [refreshing, setRefreshing] = useState(false)
-  const [exporting,  setExporting]  = useState(false)
-
-  async function handleRefresh() {
-    setRefreshing(true)
-    try { await refetch() } finally { setRefreshing(false) }
-  }
+  const [exporting, setExporting] = useState(false)
 
   async function handleExport() {
     setExporting(true)
@@ -44,7 +54,7 @@ export default function Calendar() {
       })
       const { jsPDF } = window.jspdf
       const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' })
-      const dateStr = new Date().toLocaleDateString('fr-FR', { day:'numeric', month:'long', year:'numeric' })
+      const dateStr = new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
 
       doc.setFillColor(43,33,24); doc.rect(0,0,210,32,'F')
       doc.setFont('helvetica','bold'); doc.setFontSize(18); doc.setTextColor(200,169,126); doc.text('TableBooking.ma',20,14)
@@ -85,43 +95,77 @@ export default function Calendar() {
   }
 
   return (
-    <div style={{ minHeight:'100vh', background:'#fff', fontFamily:"'Plus Jakarta Sans','DM Sans',system-ui,sans-serif" }}>
+    <>
       <style>{`
-        * { box-sizing: border-box; }
-        .cal-wrap { max-width: 1200px; margin: 0 auto; padding: clamp(24px,4vw,52px) clamp(16px,3vw,44px); }
-        .cal-topbar { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 14px; margin-bottom: 20px; }
-        .cal-btns   { display: flex; gap: 3px; }
-        @media(max-width:480px){
-          .cal-btns { flex-direction: column; width: 100%; }
-          .cal-btns button { justify-content: center; width: 100%; }
+        @media (max-width: 600px) {
+          .btn-label     { display: none !important; }
+          .page-subtitle { display: none !important; }
         }
       `}</style>
 
-      <div className="cal-wrap">
+      <div style={{
+        minHeight: '100vh', background: '#faf8f5',
+        fontFamily: "'Plus Jakarta Sans','DM Sans',system-ui,sans-serif",
+        padding: 'clamp(16px,3vw,40px) clamp(12px,3vw,36px)',
+      }}>
+        <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800;900&display=swap" rel="stylesheet" />
+        <style>{`* { box-sizing: border-box; }`}</style>
+
+        {/* HEADER */}
         <FadeUp delay={0}>
-          <div className="cal-topbar">
+          <div style={{
+            display: 'flex', alignItems: 'flex-start',
+            justifyContent: 'space-between', gap: 12,
+            marginBottom: 8, flexWrap: 'wrap',
+          }}>
             <div>
-              <h1 style={{ margin:'0 0 7px', fontSize:'clamp(24px,4vw,40px)', fontWeight:900, color:DARK, letterSpacing:'-2px', lineHeight:1 }}>Planning</h1>
-              <p style={{ margin:0, fontSize:13, fontWeight:700, color:GOLD }}>Gérez vos réservations par jour, semaine, mois ou année</p>
+              <h1 style={{
+                margin: 0, fontSize: 'clamp(22px,4vw,36px)',
+                fontWeight: 900, color: DARK,
+                letterSpacing: '-1.5px', lineHeight: 1,
+              }}>
+                Planning
+              </h1>
+              <p className="page-subtitle" style={{ margin: '6px 0 0', fontSize: 12, fontWeight: 700, color: GOLD_DK }}>
+                Gérez vos réservations par jour, semaine, mois ou année
+              </p>
             </div>
-            <div className="cal-btns">
-              <Btn icon={RefreshCw} onClick={handleRefresh} disabled={refreshing}>{refreshing?'Actualisation…':'Actualiser'}</Btn>
-              <Btn icon={FileDown} primary onClick={handleExport} disabled={exporting}>{exporting?'Génération…':'Exporter PDF'}</Btn>
+            <div style={{ display: 'flex', gap: 3, flexShrink: 0 }}>
+              <Btn icon={FileDown} primary onClick={handleExport} disabled={exporting}>
+                {exporting ? 'Génération…' : 'Exporter PDF'}
+              </Btn>
             </div>
           </div>
-          <div style={{ height:2, background:DARK, margin:'20px 0 36px' }} />
         </FadeUp>
 
+        {/* DIVIDER */}
+        <FadeUp delay={10}>
+          <div style={{ height: 2, background: DARK, margin: '16px 0 24px' }} />
+        </FadeUp>
+
+        {/* ERROR */}
         {error && (
-          <FadeUp delay={10}>
-            <div style={{ marginBottom:28, padding:'13px 18px', borderLeft:'3px solid #b94040', background:'#fdf0f0', fontSize:13, fontWeight:700, color:'#b94040' }}>{error}</div>
+          <FadeUp delay={15}>
+            <div style={{
+              marginBottom: 16, padding: '11px 16px',
+              background: RED_BG, borderLeft: `3px solid ${RED}`,
+              fontSize: 12, fontWeight: 700, color: RED,
+            }}>
+              {error}
+            </div>
           </FadeUp>
         )}
 
+        {/* NAV */}
         <FadeUp delay={20}>
-          <CalendarNav view={view} setView={setView} navLabel={navLabel} navigate={navigate} goToday={goToday} currentDate={currentDate} />
+          <CalendarNav
+            view={view} setView={setView}
+            navLabel={navLabel} navigate={navigate}
+            goToday={goToday} currentDate={currentDate}
+          />
         </FadeUp>
 
+        {/* CALENDAR */}
         <FadeUp delay={40}>
           {loading ? <Spinner /> : (
             <CalendarWeek
@@ -132,7 +176,8 @@ export default function Calendar() {
             />
           )}
         </FadeUp>
+
       </div>
-    </div>
+    </>
   )
 }
