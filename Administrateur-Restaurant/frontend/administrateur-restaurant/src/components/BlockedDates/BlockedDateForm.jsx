@@ -22,10 +22,9 @@ const inp = {
   fontFamily: 'inherit', outline: 'none', background: '#fff',
   transition: 'border-color 0.15s',
   width: '100%', boxSizing: 'border-box',
+  minWidth: 0,           // allow shrinking below natural content width
   WebkitAppearance: 'none',
   borderRadius: 0,
-  // Ensure legible text size on iOS (prevents auto-zoom on focus)
-  fontSize: 16,
 }
 
 function Label({ children }) {
@@ -40,7 +39,7 @@ function Label({ children }) {
 
 function Field({ label, children, style }) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', ...style }}>
+    <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0, ...style }}>
       <Label>{label}</Label>
       {children}
     </div>
@@ -93,19 +92,26 @@ export default function BlockedDateForm({ form, setForm, handleBlock, submitting
         @media (max-width: 420px) {
           .mode-label { display: none !important; }
         }
-        /* Prevent iOS zoom on input focus by ensuring font-size >= 16px */
+        /* Prevent iOS zoom on input focus — 16px only on mobile */
+        @media (max-width: 767px) {
+          input[type="date"], input[type="text"], select {
+            font-size: 16px !important;
+          }
+        }
         input[type="date"], input[type="text"], select {
-          font-size: 16px !important;
           -webkit-tap-highlight-color: transparent;
         }
-        /* Interval grid: stack on mobile, 2 cols on wider screens */
+        /* Interval grid: always stacked on mobile, 2 cols on desktop */
         .interval-grid {
           display: grid;
           grid-template-columns: 1fr;
           gap: 10px;
         }
         @media (min-width: 480px) {
-          .interval-grid { grid-template-columns: 1fr 1fr; }
+          .interval-grid {
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+          }
         }
         /* Recurring grid: flexible columns */
         .recurring-grid {
@@ -115,7 +121,7 @@ export default function BlockedDateForm({ form, setForm, handleBlock, submitting
         }
       `}</style>
 
-      <div style={{ background: '#fff', border: `1.5px solid ${BORDER}`, overflow: 'hidden' }}>
+      <div style={{ background: '#fff', border: `1.5px solid ${BORDER}`, overflow: 'hidden', width: '100%', boxSizing: 'border-box' }}>
 
         {/* Mode tabs — width: 100% + overflow: hidden ensures tabs never escape the card */}
         <div style={{ display: 'flex', borderBottom: `2px solid ${DARK}`, width: '100%', overflow: 'hidden' }}>
