@@ -16,12 +16,14 @@ const WEEKDAYS = [
 ]
 
 const inp = {
-  padding: '11px 14px',
+  padding: '12px 14px',
   border: `2px solid ${BORDER}`,
-  fontSize: 13, fontWeight: 700, color: DARK,
+  fontSize: 14, fontWeight: 700, color: DARK,
   fontFamily: 'inherit', outline: 'none', background: '#fff',
   transition: 'border-color 0.15s',
   width: '100%', boxSizing: 'border-box',
+  WebkitAppearance: 'none', // fixes iOS date input styling
+  borderRadius: 0,
 }
 
 function Label({ children }) {
@@ -47,16 +49,19 @@ function ModeTab({ active, onClick, icon: Icon, label }) {
   return (
     <button onClick={onClick} title={label} style={{
       flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-      padding: '12px 8px',
+      padding: '13px 8px',
       background: active ? DARK : '#f5f0eb',
       border: 'none',
       color: active ? GOLD : '#bbb',
       fontSize: 11, fontWeight: 800,
       cursor: 'pointer', fontFamily: 'inherit',
       transition: 'all 0.15s',
+      minWidth: 0,
     }}>
-      <Icon size={14} strokeWidth={2.5} />
-      <span className="mode-label">{label}</span>
+      <Icon size={15} strokeWidth={2.5} style={{ flexShrink: 0 }} />
+      <span className="mode-label" style={{
+        overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+      }}>{label}</span>
     </button>
   )
 }
@@ -77,9 +82,13 @@ export default function BlockedDateForm({ form, setForm, handleBlock, submitting
   return (
     <>
       <style>{`
-        @media (max-width: 480px) { .mode-label { display: none !important; } }
-        .rec-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        @media (min-width: 480px) { .rec-grid { grid-template-columns: 1fr 1fr 1fr; } }
+        @media (max-width: 400px) {
+          .mode-label { display: none !important; }
+        }
+        /* Fix iOS input tap target */
+        input[type="date"], input[type="text"], select {
+          -webkit-tap-highlight-color: transparent;
+        }
       `}</style>
 
       <div style={{ background: '#fff', border: `1.5px solid ${BORDER}`, overflow: 'hidden' }}>
@@ -91,7 +100,7 @@ export default function BlockedDateForm({ form, setForm, handleBlock, submitting
           <ModeTab active={form.mode === 'recurring'} onClick={() => set('mode','recurring')} icon={RefreshCw}   label="Récurrent" />
         </div>
 
-        <div style={{ padding: 'clamp(16px,3vw,24px)', display: 'flex', flexDirection: 'column', gap: 14 }}>
+        <div style={{ padding: 'clamp(14px,4vw,24px)', display: 'flex', flexDirection: 'column', gap: 12 }}>
 
           {/* SINGLE */}
           {form.mode === 'single' && (
@@ -101,7 +110,7 @@ export default function BlockedDateForm({ form, setForm, handleBlock, submitting
             </Field>
           )}
 
-          {/* INTERVAL */}
+          {/* INTERVAL — always 2 cols, works fine on mobile */}
           {form.mode === 'interval' && (
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
               <Field label="Du">
@@ -116,9 +125,13 @@ export default function BlockedDateForm({ form, setForm, handleBlock, submitting
             </div>
           )}
 
-          {/* RECURRING */}
+          {/* RECURRING — stacks to 1 col on mobile, 3 cols on wider */}
           {form.mode === 'recurring' && (
-            <div className="rec-grid">
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))',
+              gap: 10,
+            }}>
               <Field label="Jour">
                 <select value={form.weekday} onChange={e => set('weekday', e.target.value)}
                   style={{ ...inp, cursor: 'pointer' }}>
@@ -129,7 +142,7 @@ export default function BlockedDateForm({ form, setForm, handleBlock, submitting
                 <input type="date" value={form.date_from} onChange={e => set('date_from', e.target.value)}
                   style={inp} onFocus={fo} onBlur={bl} />
               </Field>
-              <Field label="Jusqu'au" style={{ gridColumn: 'span 1' }}>
+              <Field label="Jusqu'au (optionnel)">
                 <input type="date" value={form.until} min={form.date_from}
                   onChange={e => set('until', e.target.value)}
                   style={inp} onFocus={fo} onBlur={bl} />
@@ -151,7 +164,7 @@ export default function BlockedDateForm({ form, setForm, handleBlock, submitting
             <div style={{
               padding: '10px 13px',
               background: '#fdf6ec', borderLeft: `3px solid ${GOLD}`,
-              fontSize: 12, fontWeight: 700, color: '#a8834e', lineHeight: 1.5,
+              fontSize: 12, fontWeight: 700, color: '#a8834e', lineHeight: 1.6,
             }}>
               {preview.length === 1
                 ? `1 date : ${new Date(preview[0]).toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'long', year:'numeric' })}`
@@ -164,19 +177,25 @@ export default function BlockedDateForm({ form, setForm, handleBlock, submitting
           <button onClick={handleBlock} disabled={submitting || !valid()}
             style={{
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-              padding: '13px',
+              padding: '14px',
               background: valid() && !submitting ? DARK : '#ccc',
               border: 'none', color: valid() && !submitting ? GOLD : '#fff',
               fontSize: 13, fontWeight: 800,
               cursor: submitting || !valid() ? 'not-allowed' : 'pointer',
               transition: 'background 0.15s',
               fontFamily: 'inherit', width: '100%',
+              WebkitTapHighlightColor: 'transparent',
             }}
             onMouseEnter={e => { if (!submitting && valid()) e.currentTarget.style.background = '#3d2d1e' }}
             onMouseLeave={e => { e.currentTarget.style.background = valid() && !submitting ? DARK : '#ccc' }}
           >
             <CalendarOff size={14} strokeWidth={2.5} />
-            {submitting ? 'Enregistrement…' : preview.length > 1 ? `Bloquer ${preview.length} dates` : 'Bloquer la date'}
+            {submitting
+              ? 'Enregistrement…'
+              : preview.length > 1
+                ? `Bloquer ${preview.length} dates`
+                : 'Bloquer la date'
+            }
           </button>
 
         </div>
