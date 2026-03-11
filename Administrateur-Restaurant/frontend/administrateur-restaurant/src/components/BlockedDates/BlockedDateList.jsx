@@ -16,6 +16,14 @@ function fmt(d) {
   return s.charAt(0).toUpperCase() + s.slice(1)
 }
 
+function fmtShort(d) {
+  if (!d) return '—'
+  const dt = new Date(d)
+  if (isNaN(dt)) return d
+  const s = dt.toLocaleDateString('fr-FR', { day:'numeric', month:'short', year:'numeric' })
+  return s.charAt(0).toUpperCase() + s.slice(1)
+}
+
 function isPast(d) {
   return new Date(d) < new Date(new Date().toDateString())
 }
@@ -68,6 +76,13 @@ export default function BlockedDateList({
   setSelectedDates,
 }) {
   const [page, setPage] = useState(1)
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 600)
+
+  useEffect(() => {
+    const handler = () => setIsMobile(window.innerWidth < 600)
+    window.addEventListener('resize', handler)
+    return () => window.removeEventListener('resize', handler)
+  }, [])
 
   useEffect(() => { setPage(1) }, [blockedDates?.length])
 
@@ -83,15 +98,14 @@ export default function BlockedDateList({
     )
   }
 
-  // Sort: upcoming first (closest → farthest), past dates at bottom (most recent → oldest)
   const sorted = [...blockedDates].sort((a, b) => {
     const now   = new Date().toDateString()
     const aPast = new Date(a.date) < new Date(now)
     const bPast = new Date(b.date) < new Date(now)
     if (!aPast && bPast)  return -1
     if (aPast  && !bPast) return  1
-    if (!aPast && !bPast) return a.date.localeCompare(b.date)  // both future: ascending
-    return b.date.localeCompare(a.date)                         // both past: descending (most recent first)
+    if (!aPast && !bPast) return a.date.localeCompare(b.date)
+    return b.date.localeCompare(a.date)
   })
 
   const total     = Math.ceil(sorted.length / PAGE_SIZE)
@@ -114,6 +128,14 @@ export default function BlockedDateList({
   }
 
   function getPages() {
+    // On mobile show fewer page buttons
+    if (isMobile) {
+      const p = []
+      if (safe > 1) p.push(safe - 1 > 1 ? '…' : null)
+      p.push(safe)
+      if (safe < total) p.push(safe + 1 < total ? '…' : null)
+      return [1, ...p.filter(Boolean), total].filter((v, i, a) => a.indexOf(v) === i)
+    }
     if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1)
     const p = [1]
     if (safe > 3) p.push('…')
@@ -141,7 +163,7 @@ export default function BlockedDateList({
             fontSize: 12, fontWeight: 800, color: DARK,
             textDecoration: 'underline', fontFamily: 'inherit', padding: 0,
           }}>
-            Sélectionner les {blockedDates.length} dates
+            Tout sélectionner ({blockedDates.length})
           </button>
         </div>
       )}
@@ -154,7 +176,7 @@ export default function BlockedDateList({
           display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, flexWrap: 'wrap',
         }}>
           <span style={{ fontSize: 12, fontWeight: 700, color: '#2d6a2d' }}>
-            Toutes les {blockedDates.length} dates sélectionnées
+            {blockedDates.length} dates sélectionnées
           </span>
           <button onClick={() => setSelectedDates([])} style={{
             background: 'none', border: 'none', cursor: 'pointer',
@@ -168,8 +190,10 @@ export default function BlockedDateList({
 
       {/* Header */}
       <div style={{
-        display: 'grid', gridTemplateColumns: '44px 1fr auto',
-        padding: '11px 16px', background: DARK, alignItems: 'center', gap: 12,
+        display: 'grid',
+        gridTemplateColumns: '40px 1fr auto',
+        padding: '10px 12px',
+        background: DARK, alignItems: 'center', gap: 8,
       }}>
         <Checkbox checked={pageAllSel} indeterminate={pageSomeSel} onChange={togglePage} />
         <span style={{ fontSize: 9, fontWeight: 900, color: GOLD, letterSpacing: '0.2em', textTransform: 'uppercase' }}>
@@ -189,12 +213,13 @@ export default function BlockedDateList({
           <div key={d.date ?? i}
             onClick={() => toggleOne(d.date)}
             style={{
-              display: 'grid', gridTemplateColumns: '44px 1fr auto',
-              padding: '14px 16px',
+              display: 'grid',
+              gridTemplateColumns: '40px 1fr auto',
+              padding: isMobile ? '12px 12px' : '14px 16px',
               background: selected ? '#fdf6ec' : idx % 2 === 0 ? '#fff' : CREAM,
               borderBottom: `1px solid ${BORDER}`,
               borderLeft: `3px solid ${selected ? GOLD : 'transparent'}`,
-              alignItems: 'center', gap: 12,
+              alignItems: 'center', gap: 8,
               cursor: 'pointer',
               transition: 'background 0.12s',
               opacity: past ? 0.6 : 1,
@@ -208,18 +233,25 @@ export default function BlockedDateList({
             </div>
 
             {/* Date info */}
-            <div>
-              <p style={{ margin: 0, fontSize: 'clamp(12px,2vw,14px)', fontWeight: 700, color: DARK, lineHeight: 1.3 }}>
-                {fmt(d.date)}
+            <div style={{ minWidth: 0 }}>
+              <p style={{
+                margin: 0, fontWeight: 700, color: DARK, lineHeight: 1.3,
+                fontSize: isMobile ? 12 : 14,
+                whiteSpace: isMobile ? 'normal' : 'nowrap',
+                overflow: 'hidden', textOverflow: 'ellipsis',
+              }}>
+                {isMobile ? fmtShort(d.date) : fmt(d.date)}
               </p>
               {d.reason && (
-                <p style={{ margin: '3px 0 0', fontSize: 11, fontWeight: 600, color: GOLD, fontStyle: 'italic' }}>
+                <p style={{ margin: '3px 0 0', fontSize: 11, fontWeight: 600, color: GOLD, fontStyle: 'italic',
+                  overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                }}>
                   {d.reason}
                 </p>
               )}
               {past && (
                 <span style={{
-                  display: 'inline-block', marginTop: 4,
+                  display: 'inline-block', marginTop: 3,
                   fontSize: 9, fontWeight: 900, color: '#bbb',
                   letterSpacing: '0.12em', textTransform: 'uppercase',
                 }}>
@@ -228,12 +260,12 @@ export default function BlockedDateList({
               )}
             </div>
 
-            {/* Action — full button desktop, icon only mobile */}
+            {/* Action button */}
             <button
               onClick={e => { e.stopPropagation(); handleUnblock(d.date) }}
               style={{
-                display: 'flex', alignItems: 'center', gap: 8,
-                padding: '10px 20px',
+                display: 'flex', alignItems: 'center', gap: isMobile ? 0 : 8,
+                padding: isMobile ? '9px 10px' : '10px 20px',
                 background: DARK, border: 'none', color: '#fff',
                 fontSize: 13, fontWeight: 800,
                 cursor: 'pointer', transition: 'background 0.15s',
@@ -244,7 +276,7 @@ export default function BlockedDateList({
               title="Débloquer"
             >
               <Trash2 size={14} strokeWidth={2.2} />
-              <span className="btn-label">Débloquer</span>
+              {!isMobile && <span>Débloquer</span>}
             </button>
           </div>
         )
@@ -253,15 +285,18 @@ export default function BlockedDateList({
       {/* Pagination */}
       {total > 1 && (
         <div style={{
-          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          display: 'flex', alignItems: 'center',
+          justifyContent: isMobile ? 'center' : 'space-between',
           flexWrap: 'wrap', gap: 8,
           padding: '12px 16px',
           borderTop: `1.5px solid ${BORDER}`,
           background: CREAM,
         }}>
-          <span style={{ fontSize: 11, fontWeight: 700, color: '#bbb' }}>
-            {(safe - 1) * PAGE_SIZE + 1}–{Math.min(safe * PAGE_SIZE, sorted.length)} / {sorted.length}
-          </span>
+          {!isMobile && (
+            <span style={{ fontSize: 11, fontWeight: 700, color: '#bbb' }}>
+              {(safe - 1) * PAGE_SIZE + 1}–{Math.min(safe * PAGE_SIZE, sorted.length)} / {sorted.length}
+            </span>
+          )}
           <div style={{ display: 'flex', gap: 3 }}>
             <PageBtn onClick={() => setPage(1)} disabled={safe === 1}>
               <ChevronsLeft size={12} strokeWidth={2.5} />
@@ -271,7 +306,7 @@ export default function BlockedDateList({
             </PageBtn>
             {getPages().map((p, i) =>
               p === '…'
-                ? <span key={`d${i}`} style={{ padding: '0 4px', fontSize: 12, color: '#bbb', lineHeight: '32px' }}>…</span>
+                ? <span key={`d${i}`} style={{ padding: '0 2px', fontSize: 12, color: '#bbb', lineHeight: '32px' }}>…</span>
                 : <PageBtn key={p} active={p === safe} onClick={() => setPage(p)}>{p}</PageBtn>
             )}
             <PageBtn onClick={() => setPage(p => Math.min(total, p + 1))} disabled={safe === total}>
@@ -281,6 +316,11 @@ export default function BlockedDateList({
               <ChevronsRight size={12} strokeWidth={2.5} />
             </PageBtn>
           </div>
+          {isMobile && (
+            <span style={{ fontSize: 11, fontWeight: 700, color: '#bbb', width: '100%', textAlign: 'center' }}>
+              {(safe - 1) * PAGE_SIZE + 1}–{Math.min(safe * PAGE_SIZE, sorted.length)} / {sorted.length}
+            </span>
+          )}
         </div>
       )}
     </div>
