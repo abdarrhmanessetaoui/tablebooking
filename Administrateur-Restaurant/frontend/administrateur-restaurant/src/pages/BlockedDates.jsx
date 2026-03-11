@@ -226,6 +226,8 @@ export default function BlockedDates() {
         fontFamily: "'Plus Jakarta Sans','DM Sans',system-ui,sans-serif",
         padding: 'clamp(14px,3vw,40px) clamp(12px,4vw,36px)',
         boxSizing: 'border-box',
+        width: '100%',
+        overflowX: 'hidden',
       }}>
         <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800;900&display=swap" rel="stylesheet" />
 
