@@ -172,7 +172,7 @@ class RestaurantReservationController extends Controller
         $clean
             ->filter(fn($r) => !empty($r['date']))
             ->each(function ($r) use (&$byDay, $dayMap) {
-                $dow        = date('w', strtotime($r['date']));
+                $dow = date('w', strtotime($r['date']));
                 $byDay[$dayMap[$dow]]++;
             });
 
@@ -183,9 +183,9 @@ class RestaurantReservationController extends Controller
             ->sortKeys();
 
         $monthNames = [
-            '01' => 'Jan', '02' => 'Fév', '03' => 'Mar', '04' => 'Avr',
-            '05' => 'Mai', '06' => 'Juin', '07' => 'Juil', '08' => 'Août',
-            '09' => 'Sep', '10' => 'Oct', '11' => 'Nov', '12' => 'Déc',
+            '01' => 'Janv', '02' => 'Févr', '03' => 'Mars', '04' => 'Avr',
+            '05' => 'Mai',  '06' => 'Juin', '07' => 'Juil', '08' => 'Août',
+            '09' => 'Sept', '10' => 'Oct',  '11' => 'Nov',  '12' => 'Déc',
         ];
 
         $byMonth = $clean
@@ -211,6 +211,14 @@ class RestaurantReservationController extends Controller
             ->sortKeys()
             ->mapWithKeys(fn($count, $n) => [$n . ' pers.' => $count]);
 
+        // ── by_service ──────────────────────────────────────────────────
+        $byService = $clean
+            ->filter(fn($r) => !empty($r['service']))
+            ->groupBy(fn($r) => $r['service'])
+            ->map(fn($g) => $g->count())
+            ->sortDesc();
+        // ────────────────────────────────────────────────────────────────
+
         $total     = $clean->count();
         $confirmed = $clean->filter(fn($r) => $r['status'] === 'Confirmed')->count();
         $pending   = $clean->filter(fn($r) => $r['status'] === 'Pending')->count();
@@ -226,13 +234,14 @@ class RestaurantReservationController extends Controller
             : 0;
 
         return response()->json([
-            'by_hour'   => $byHour,
-            'by_day'    => $byDay,
-            'by_week'   => $byWeek,
-            'by_month'  => $byMonth,
-            'by_year'   => $byYear,
-            'by_guests' => $byGuests,
-            'summary'   => [
+            'by_hour'    => $byHour,
+            'by_day'     => $byDay,
+            'by_week'    => $byWeek,
+            'by_month'   => $byMonth,
+            'by_year'    => $byYear,
+            'by_guests'  => $byGuests,
+            'by_service' => $byService,   // ← added
+            'summary'    => [
                 'total'      => $total,
                 'confirmed'  => $confirmed,
                 'pending'    => $pending,
