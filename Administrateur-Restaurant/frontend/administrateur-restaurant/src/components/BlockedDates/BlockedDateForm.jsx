@@ -98,14 +98,14 @@ export default function BlockedDateForm({ form, setForm, handleBlock, submitting
           font-size: 16px !important;
           -webkit-tap-highlight-color: transparent;
         }
-        /* Interval grid: 2 cols on sm+, 1 col on xs */
+        /* Interval grid: stack on mobile, 2 cols on wider screens */
         .interval-grid {
           display: grid;
-          grid-template-columns: 1fr 1fr;
+          grid-template-columns: 1fr;
           gap: 10px;
         }
-        @media (max-width: 340px) {
-          .interval-grid { grid-template-columns: 1fr; }
+        @media (min-width: 480px) {
+          .interval-grid { grid-template-columns: 1fr 1fr; }
         }
         /* Recurring grid: flexible columns */
         .recurring-grid {
