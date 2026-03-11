@@ -381,8 +381,9 @@ export default function Reports() {
       by_week:    ap(data.by_week   ||{}),
       by_month:   ap(data.by_month  ||{}),
       by_year:    ap(data.by_year   ||{}),
-      by_guests:  ap(data.by_guests ||{}),
-      by_service: ap(data.by_service||{}),
+      // categorical — never filtered by period, always show full dataset
+      by_guests:  data.by_guests  || {},
+      by_service: data.by_service || {},
     }
   }, [data, period, status])
 
