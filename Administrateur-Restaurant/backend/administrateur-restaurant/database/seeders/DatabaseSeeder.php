@@ -22,6 +22,8 @@ class DatabaseSeeder extends Seeder
             'name' => 'Test User',
             'email' => 'test@example.com',
         ]);
-        Reservation::factory(30)->create();
+        $this->call([
+            ReservationSeeder::class,
+        ]);
     }
 }
