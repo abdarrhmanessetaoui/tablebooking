@@ -289,7 +289,7 @@ export default function BlockedDates() {
           <div className="bd-layout">
 
             {/* FORM */}
-            <div className="bd-form-sticky">
+            <div className="bd-form-sticky" style={{ minWidth: 0 }}>
               <h2 style={{ margin: '0 0 5px', fontSize: 'clamp(15px,2.5vw,22px)', fontWeight: 900, color: DARK, letterSpacing: '-0.8px' }}>
                 Bloquer une date
               </h2>
