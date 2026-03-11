@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { CalendarOff, Calendar, RefreshCw } from 'lucide-react'
 
-const DARK = '#2b2118'
-const GOLD = '#c8a97e'
+const DARK   = '#2b2118'
+const GOLD   = '#c8a97e'
 const BORDER = '#e8e0d6'
 
 const WEEKDAYS = [
@@ -25,7 +25,11 @@ const inputStyle = {
 
 function Label({ children }) {
   return (
-    <label style={{ fontSize: 10, fontWeight: 900, color: DARK, letterSpacing: '0.18em', textTransform: 'uppercase', display: 'block', marginBottom: 7 }}>
+    <label style={{
+      fontSize: 10, fontWeight: 900, color: DARK,
+      letterSpacing: '0.18em', textTransform: 'uppercase',
+      display: 'block', marginBottom: 7,
+    }}>
       {children}
     </label>
   )
@@ -60,11 +64,9 @@ function ModeTab({ active, onClick, icon: Icon, children }) {
 
 export default function BlockedDateForm({ form, setForm, handleBlock, submitting, getDatesToBlock }) {
   const previewDates = getDatesToBlock ? getDatesToBlock() : []
-
   const set = (key, val) => setForm(prev => ({ ...prev, [key]: val }))
-
-  const focusStyle  = e => e.target.style.borderColor = GOLD
-  const blurStyle   = e => e.target.style.borderColor = BORDER
+  const focusStyle = e => e.target.style.borderColor = GOLD
+  const blurStyle  = e => e.target.style.borderColor = BORDER
 
   const isValid = () => {
     if (form.mode === 'single')    return !!form.date
@@ -83,7 +85,7 @@ export default function BlockedDateForm({ form, setForm, handleBlock, submitting
         <ModeTab active={form.mode === 'recurring'} onClick={() => set('mode', 'recurring')} icon={RefreshCw}>Récurrent</ModeTab>
       </div>
 
-      <div style={{ padding: '24px 24px 20px' }}>
+      <div style={{ padding: '24px 24px 20px', display: 'flex', flexDirection: 'column', gap: 16 }}>
 
         {/* SINGLE */}
         {form.mode === 'single' && (
@@ -102,8 +104,7 @@ export default function BlockedDateForm({ form, setForm, handleBlock, submitting
             </Field>
             <Field label="Au">
               <input type="date" value={form.date_to} onChange={e => set('date_to', e.target.value)}
-                min={form.date_from}
-                style={inputStyle} onFocus={focusStyle} onBlur={blurStyle} />
+                min={form.date_from} style={inputStyle} onFocus={focusStyle} onBlur={blurStyle} />
             </Field>
           </div>
         )}
@@ -123,28 +124,39 @@ export default function BlockedDateForm({ form, setForm, handleBlock, submitting
             </Field>
             <Field label="Jusqu'au (optionnel)">
               <input type="date" value={form.until} onChange={e => set('until', e.target.value)}
-                min={form.date_from}
-                style={inputStyle} onFocus={focusStyle} onBlur={blurStyle} />
+                min={form.date_from} style={inputStyle} onFocus={focusStyle} onBlur={blurStyle} />
             </Field>
           </div>
         )}
 
+        {/* REASON — always visible */}
+        <Field label="Raison (optionnel)">
+          <input
+            type="text"
+            placeholder="Ex: Fermeture exceptionnelle, Événement privé…"
+            value={form.reason || ''}
+            onChange={e => set('reason', e.target.value)}
+            style={{ ...inputStyle }}
+            onFocus={focusStyle} onBlur={blurStyle}
+          />
+        </Field>
+
         {/* Preview */}
         {previewDates.length > 0 && (
           <div style={{
-            marginTop: 16, padding: '11px 14px',
+            padding: '11px 14px',
             background: '#fdf6ec', borderLeft: `3px solid ${GOLD}`,
             fontSize: 12, fontWeight: 700, color: '#a8834e',
           }}>
             {previewDates.length === 1
-              ? `1 date sera bloquée : ${new Date(previewDates[0]).toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'long', year:'numeric' })}`
-              : `${previewDates.length} dates seront bloquées — du ${new Date(previewDates[0]).toLocaleDateString('fr-FR', { day:'numeric', month:'long', year:'numeric' })} au ${new Date(previewDates[previewDates.length-1]).toLocaleDateString('fr-FR', { day:'numeric', month:'long', year:'numeric' })}`
+              ? `1 date sera bloquée : ${new Date(previewDates[0]).toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}`
+              : `${previewDates.length} dates seront bloquées — du ${new Date(previewDates[0]).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })} au ${new Date(previewDates[previewDates.length - 1]).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}`
             }
           </div>
         )}
 
         {/* Submit */}
-        <div style={{ marginTop: 20 }}>
+        <div>
           <button onClick={handleBlock} disabled={submitting || !isValid()}
             style={{
               display: 'flex', alignItems: 'center', gap: 9,
@@ -160,7 +172,12 @@ export default function BlockedDateForm({ form, setForm, handleBlock, submitting
             onMouseLeave={e => e.currentTarget.style.background = DARK}
           >
             <CalendarOff size={14} strokeWidth={2.5} />
-            {submitting ? 'Enregistrement…' : previewDates.length > 1 ? `Bloquer ${previewDates.length} dates` : 'Bloquer la date'}
+            {submitting
+              ? 'Enregistrement…'
+              : previewDates.length > 1
+                ? `Bloquer ${previewDates.length} dates`
+                : 'Bloquer la date'
+            }
           </button>
         </div>
       </div>
