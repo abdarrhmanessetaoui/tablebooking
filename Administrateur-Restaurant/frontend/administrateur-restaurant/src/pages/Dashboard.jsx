@@ -220,7 +220,7 @@ function ReservationsTable({ reservations, onViewAll }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
       {/* Table header */}
-      <div style={{ display: 'grid', gridTemplateColumns: tpl, gap: 10, padding: '10px 16px', background: DARK }}>
+      <div style={{ display: 'grid', gridTemplateColumns: tpl, gap: 10, padding: '11px 16px', background: DARK }}>
         {COLS.map(c => (
           <span key={c.key} style={{ fontSize: 9, fontWeight: 900, color: GOLD, textTransform: 'uppercase', letterSpacing: '0.18em', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
             {c.label}
@@ -233,18 +233,22 @@ function ReservationsTable({ reservations, onViewAll }) {
         {reservations.slice(0, 8).map((r, i) => (
           <div key={r.id ?? i} style={{
             display: 'grid', gridTemplateColumns: tpl, gap: 10,
-            padding: '11px 16px',
+            padding: '14px 16px',
             background: i % 2 === 0 ? WHITE : CREAM,
             borderBottom: `1px solid ${BORDER}`,
             alignItems: 'center',
-          }}>
+            transition: 'background 0.12s',
+          }}
+            onMouseEnter={e => e.currentTarget.style.background = '#f5ede0'}
+            onMouseLeave={e => e.currentTarget.style.background = i % 2 === 0 ? WHITE : CREAM}
+          >
             <div style={{ minWidth: 0 }}>
               <p style={{ margin: 0, fontSize: 13, fontWeight: 900, color: DARK, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.name}</p>
-              {r.phone && <p style={{ margin: '1px 0 0', fontSize: 10, fontWeight: 700, color: MUTED, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.phone}</p>}
+              {r.phone && <p style={{ margin: '3px 0 0', fontSize: 10, fontWeight: 700, color: MUTED, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.phone}</p>}
             </div>
-            <span style={{ fontSize: 12, fontWeight: 900, color: DARK, fontVariantNumeric: 'tabular-nums' }}>{r.start_time}</span>
-            <span style={{ fontSize: 12, fontWeight: 900, color: DARK }}>{r.guests}</span>
-            <span style={{ fontSize: 11, fontWeight: 700, color: MUTED, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.service || '—'}</span>
+            <span style={{ fontSize: 13, fontWeight: 900, color: DARK, fontVariantNumeric: 'tabular-nums' }}>{r.start_time}</span>
+            <span style={{ fontSize: 13, fontWeight: 900, color: DARK }}>{r.guests}</span>
+            <span style={{ fontSize: 12, fontWeight: 700, color: MUTED, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.service || '—'}</span>
             <Badge status={r.status} />
           </div>
         ))}
