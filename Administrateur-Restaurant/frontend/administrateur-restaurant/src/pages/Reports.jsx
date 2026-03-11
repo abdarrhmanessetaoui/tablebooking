@@ -171,20 +171,20 @@ function SectionTitle({ title, sub, count }) {
   )
 }
 
-/* Filter chip */
+/* Filter chip — compact */
 function Chip({ label, active, onClick }) {
   const [h,setH]=useState(false)
   return (
     <button onClick={onClick} onMouseEnter={()=>setH(true)} onMouseLeave={()=>setH(false)}
       style={{
-        padding:'6px 14px',
-        border:`2px solid ${active?DARK:(h?DARK:BORDER)}`,
+        padding:'4px 10px',
+        border:`1px solid ${active?DARK:(h?DARK:BORDER)}`,
         background:active?DARK:(h?'#f5ede0':WHITE),
         color:active?GOLD:(h?DARK:MUTED),
-        fontSize:10,fontWeight:900,textTransform:'uppercase',
+        fontSize:9,fontWeight:900,textTransform:'uppercase',
         letterSpacing:'0.1em',cursor:'pointer',
         fontFamily:'inherit',transition:'all 0.12s',whiteSpace:'nowrap',
-        minHeight:34,
+        minHeight:28,
       }}>
       {label}
     </button>
@@ -488,61 +488,55 @@ export default function Reports() {
           </FadeUp>
         )}
 
-        {/* ── FILTER SECTION ── */}
+        {/* ── FILTER BAR — compact single line ── */}
         <FadeUp delay={15}>
-          {/* Same pattern: h2 + subtitle like "Bloquer une date" */}
-          <div style={{marginBottom:16,display:'flex',alignItems:'center',justifyContent:'space-between',gap:8,flexWrap:'wrap'}}>
-            <div>
-              <h2 style={{margin:'0 0 4px',fontSize:'clamp(15px,2.5vw,22px)',fontWeight:900,color:DARK,letterSpacing:'-0.8px'}}>
-                Filtres
-              </h2>
-              <p className="page-subtitle" style={{margin:0,fontSize:12,fontWeight:700,color:GOLD_DK}}>
-                Affiner par période et statut
-              </p>
+          <div style={{
+            display:'flex',alignItems:'center',gap:0,
+            border:`2px solid ${DARK}`,background:WHITE,
+            marginBottom:28,overflow:'hidden',flexWrap:'wrap',
+          }}>
+            {/* Icon label */}
+            <div style={{display:'flex',alignItems:'center',gap:6,padding:'8px 14px',background:DARK,flexShrink:0}}>
+              <Filter size={11} strokeWidth={2.5} color={GOLD}/>
+              <span style={{fontSize:8,fontWeight:900,color:GOLD,textTransform:'uppercase',letterSpacing:'0.2em'}}>Filtres</span>
             </div>
+
+            {/* Période label */}
+            <span style={{fontSize:8,fontWeight:900,color:MUTED,textTransform:'uppercase',letterSpacing:'0.14em',padding:'0 10px 0 14px',flexShrink:0,borderLeft:`1px solid ${BORDER}`}}>
+              Période
+            </span>
+            {/* Period chips */}
+            <div style={{display:'flex',gap:4,padding:'6px 10px 6px 0',flexShrink:0,flexWrap:'nowrap',overflowX:'auto'}}>
+              {PERIOD_OPTS.map(o=><Chip key={o.key} label={o.label} active={period===o.key} onClick={()=>pick('period',o.key)}/>)}
+            </div>
+
+            {/* Separator */}
+            <div style={{width:1,alignSelf:'stretch',background:BORDER,flexShrink:0,margin:'6px 0'}}/>
+
+            {/* Statut label */}
+            <span style={{fontSize:8,fontWeight:900,color:MUTED,textTransform:'uppercase',letterSpacing:'0.14em',padding:'0 10px 0 14px',flexShrink:0}}>
+              Statut
+            </span>
+            {/* Status chips */}
+            <div style={{display:'flex',gap:4,padding:'6px 10px 6px 0',flex:1,flexWrap:'nowrap',overflowX:'auto'}}>
+              {STATUS_OPTS.map(o=><Chip key={o.key} label={o.label} active={status===o.key} onClick={()=>pick('status',o.key)}/>)}
+            </div>
+
+            {/* Reset — only when active */}
             {hasFilter&&(
               <button onClick={reset} style={{
-                padding:'6px 14px',border:`2px solid ${DARK}`,background:WHITE,
-                color:DARK,fontSize:10,fontWeight:900,textTransform:'uppercase',
+                padding:'6px 14px',borderLeft:`2px solid ${DARK}`,background:'none',
+                color:MUTED,fontSize:9,fontWeight:900,textTransform:'uppercase',
                 letterSpacing:'0.1em',cursor:'pointer',fontFamily:'inherit',
-                transition:'background 0.12s',
+                flexShrink:0,alignSelf:'stretch',transition:'all 0.12s',whiteSpace:'nowrap',
+                border:'none',borderLeft:`2px solid ${DARK}`,
               }}
-                onMouseEnter={e=>e.currentTarget.style.background='#f5ede0'}
-                onMouseLeave={e=>e.currentTarget.style.background=WHITE}
+                onMouseEnter={e=>{e.currentTarget.style.background=DARK;e.currentTarget.style.color=GOLD}}
+                onMouseLeave={e=>{e.currentTarget.style.background='none';e.currentTarget.style.color=MUTED}}
               >
-                Réinitialiser ×
+                ×
               </button>
             )}
-          </div>
-
-          {/* Filter box — same border style as BlockedDateForm card */}
-          <div style={{border:`2px solid ${DARK}`,background:WHITE,marginBottom:32}}>
-            {/* Dark header bar */}
-            <div style={{display:'flex',alignItems:'center',gap:8,padding:'10px 18px',background:DARK}}>
-              <Filter size={11} strokeWidth={2.5} color={GOLD}/>
-              <span style={{fontSize:9,fontWeight:900,color:GOLD,textTransform:'uppercase',letterSpacing:'0.2em'}}>
-                {hasFilter ? `${pLabel} · ${sLabel}` : 'Sélectionner un filtre'}
-              </span>
-            </div>
-            {/* Body */}
-            <div style={{padding:'16px 18px',display:'flex',flexDirection:'column',gap:14}}>
-              {/* Period row */}
-              <div style={{display:'flex',alignItems:'center',gap:12,flexWrap:'wrap'}}>
-                <span style={{fontSize:9,fontWeight:900,color:MUTED,textTransform:'uppercase',letterSpacing:'0.14em',width:52,flexShrink:0}}>Période</span>
-                <div className="rp-chips">
-                  {PERIOD_OPTS.map(o=><Chip key={o.key} label={o.label} active={period===o.key} onClick={()=>pick('period',o.key)}/>)}
-                </div>
-              </div>
-              {/* Divider */}
-              <div style={{height:1,background:BORDER}}/>
-              {/* Status row */}
-              <div style={{display:'flex',alignItems:'center',gap:12,flexWrap:'wrap'}}>
-                <span style={{fontSize:9,fontWeight:900,color:MUTED,textTransform:'uppercase',letterSpacing:'0.14em',width:52,flexShrink:0}}>Statut</span>
-                <div className="rp-chips">
-                  {STATUS_OPTS.map(o=><Chip key={o.key} label={o.label} active={status===o.key} onClick={()=>pick('status',o.key)}/>)}
-                </div>
-              </div>
-            </div>
           </div>
         </FadeUp>
 
