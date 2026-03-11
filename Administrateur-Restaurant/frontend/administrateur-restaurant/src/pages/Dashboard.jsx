@@ -98,7 +98,7 @@ function Ring({ c, p, a, size = 88 }) {
   )
 }
 
-/* ─── Single stat block ─── */
+/* ─── Single stat block — compact horizontal ─── */
 function StatBlock({ icon: Icon, value, label, accent, bg, delay = 0, total = 0 }) {
   const n   = useCountUp(value, 700, delay)
   const pct = total > 0 ? Math.round((value / total) * 100) : null
@@ -106,43 +106,51 @@ function StatBlock({ icon: Icon, value, label, accent, bg, delay = 0, total = 0 
   useEffect(() => { const id = setTimeout(() => setW(pct ?? 0), 440); return () => clearTimeout(id) }, [pct])
 
   return (
-    <div style={{ background: bg, padding: '14px 20px', display: 'flex', alignItems: 'center', gap: 14 }}>
-      <div style={{ width: 3, alignSelf: 'stretch', background: accent, flexShrink: 0, borderRadius: 2 }} />
+    <div style={{ background: bg, padding: '10px 16px', display: 'flex', alignItems: 'center', gap: 12 }}>
+      {/* Accent bar */}
+      <div style={{ width: 3, height: 36, background: accent, flexShrink: 0, borderRadius: 2 }} />
+      {/* Label + number */}
       <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginBottom: 4 }}>
-          <Icon size={11} strokeWidth={2.5} color={accent} />
-          <span style={{ fontSize: 9, fontWeight: 900, color: accent, textTransform: 'uppercase', letterSpacing: '0.18em' }}>{label}</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 3 }}>
+          <Icon size={10} strokeWidth={2.5} color={accent} />
+          <span style={{ fontSize: 8, fontWeight: 900, color: accent, textTransform: 'uppercase', letterSpacing: '0.18em' }}>{label}</span>
         </div>
-        <span style={{ fontSize: 28, fontWeight: 900, color: DARK, letterSpacing: '-1.5px', lineHeight: 1, fontVariantNumeric: 'tabular-nums', display: 'block' }}>{n}</span>
-        {pct !== null && (
-          <div style={{ marginTop: 8 }}>
-            <div style={{ height: 3, background: BORDER, overflow: 'hidden' }}>
-              <div style={{ height: '100%', width: `${w}%`, background: accent, transition: 'width 0.9s ease' }} />
-            </div>
-            <span style={{ fontSize: 9, fontWeight: 900, color: accent, opacity: 0.75, marginTop: 3, display: 'block' }}>{pct}%</span>
-          </div>
-        )}
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: 10 }}>
+          <span style={{ fontSize: 22, fontWeight: 900, color: DARK, letterSpacing: '-1px', lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>{n}</span>
+          {pct !== null && (
+            <span style={{ fontSize: 9, fontWeight: 900, color: accent, opacity: 0.7 }}>{pct}%</span>
+          )}
+        </div>
       </div>
+      {/* Mini progress bar on the right */}
+      {pct !== null && (
+        <div style={{ width: 36, height: 3, background: BORDER, overflow: 'hidden', flexShrink: 0, alignSelf: 'center' }}>
+          <div style={{ height: '100%', width: `${w}%`, background: accent, transition: 'width 0.9s ease' }} />
+        </div>
+      )}
     </div>
   )
 }
 
-/* ─── Tiny status badge — dot + short label ─── */
+/* ─── Minimal status badge — just a dot + tiny text, no bg box ─── */
 function Badge({ status }) {
   const M = {
-    Confirmed: { label: 'Conf.',   color: GREEN, bg: GREEN_BG },
-    Pending:   { label: 'Attente', color: AMBER, bg: AMBER_BG },
-    Cancelled: { label: 'Annul.',  color: RED,   bg: RED_BG   },
+    Confirmed: { label: 'Conf.',    color: GREEN },
+    Pending:   { label: 'Attente',  color: AMBER },
+    Cancelled: { label: 'Annul.',   color: RED   },
   }
   const s = M[status] || M.Pending
   return (
     <span style={{
-      display: 'inline-flex', alignItems: 'center', gap: 4,
-      padding: '2px 7px', background: s.bg,
+      display: 'inline-flex', alignItems: 'center', gap: 5,
       fontSize: 9, fontWeight: 900, color: s.color,
-      textTransform: 'uppercase', letterSpacing: '0.08em', whiteSpace: 'nowrap',
+      textTransform: 'uppercase', letterSpacing: '0.1em', whiteSpace: 'nowrap',
     }}>
-      <span style={{ width: 5, height: 5, borderRadius: '50%', background: s.color, flexShrink: 0 }} />
+      <span style={{
+        width: 6, height: 6, borderRadius: '50%',
+        background: s.color, flexShrink: 0,
+        boxShadow: `0 0 0 2px ${s.color}22`,
+      }} />
       {s.label}
     </span>
   )
@@ -308,9 +316,9 @@ function TabPanel({ tab, stats, reservations, onViewAll }) {
           {/* Hero: big number + ring side by side */}
           <div style={{
             background: WHITE,
-            padding: '24px 20px 20px',
+            padding: '18px 20px 16px',
             display: 'flex', alignItems: 'center', gap: 20,
-            borderBottom: `2px solid ${BORDER}`,
+            borderBottom: `1px solid ${BORDER}`,
           }}>
             <div>
               <p style={{
