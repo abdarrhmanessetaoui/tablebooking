@@ -1,11 +1,10 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect, useRef } from 'react'
 import { FileDown, BarChart2, Users, CheckCircle, Clock, XCircle, Filter } from 'lucide-react'
 import useReports from '../hooks/Reports/useReports'
 import FadeUp     from '../components/Dashboard/FadeUp'
 import Spinner    from '../components/Dashboard/Spinner'
 import useCountUp from '../hooks/Dashboard/useCountUp'
 
-/* ─── Tokens — identical to BlockedDates ─── */
 const DARK     = '#2b2118'
 const GOLD     = '#c8a97e'
 const GOLD_DK  = '#a8834e'
@@ -20,9 +19,7 @@ const AMBER_BG = '#fff8ec'
 const BORDER   = '#e8e0d6'
 const MUTED    = 'rgba(43,33,24,0.38)'
 
-/* ════════════════════════════════
-   FILTER HELPERS
-════════════════════════════════ */
+/* ════ PERIOD HELPERS ════ */
 function getWeekNum(d) {
   const t = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()))
   t.setUTCDate(t.getUTCDate() + 4 - (t.getUTCDay() || 7))
@@ -39,7 +36,6 @@ function applyPeriod(obj = {}, period) {
   const wKey = `${yr}-W${String(w).padStart(2,'0')}`
   const mFr  = `${FR_M[mo]} ${yr}`
   const mNum = `${yr}-${String(mo+1).padStart(2,'0')}`
-
   return Object.fromEntries(Object.entries(obj).filter(([k]) => {
     const isDay  = DAYS.some(d => k.startsWith(d))
     const isHour = /^\d{1,2}:\d{2}/.test(k)
@@ -64,7 +60,8 @@ function applyPeriod(obj = {}, period) {
 
 function scaleSummary(base, period, raw) {
   if (period === 'all') return base
-  const bm = raw?.by_month || {}, bw = raw?.by_week || {}
+  const bm = raw?.by_month || {}
+  const bw = raw?.by_week  || {}
   const now = new Date(), yr = now.getFullYear(), mo = now.getMonth()
   const mFr  = `${FR_M[mo]} ${yr}`, mNum = `${yr}-${String(mo+1).padStart(2,'0')}`
   const wKey = `${yr}-W${String(getWeekNum(now)).padStart(2,'0')}`
@@ -76,9 +73,7 @@ function scaleSummary(base, period, raw) {
   return { ...base, total:sc(base.total), confirmed:sc(base.confirmed), pending:sc(base.pending), cancelled:sc(base.cancelled) }
 }
 
-/* ════════════════════════════════
-   PDF
-════════════════════════════════ */
+/* ════ PDF ════ */
 async function doPDF(summary, pLabel, sLabel) {
   if (!window.jspdf) await new Promise((res,rej)=>{
     const s=document.createElement('script')
@@ -111,11 +106,7 @@ async function doPDF(summary, pLabel, sLabel) {
   doc.save(`rapport_${new Date().toISOString().slice(0,10)}.pdf`)
 }
 
-/* ════════════════════════════════
-   SHARED UI — same as BlockedDates
-════════════════════════════════ */
-
-/* Button — copy of BlockedDates Btn */
+/* ════ BUTTON ════ */
 function Btn({ children, onClick, primary, disabled, icon: Icon }) {
   const [hov,setHov]=useState(false)
   const bg    = primary ? (hov?DARK:GOLD) : (hov?GOLD:DARK)
@@ -125,10 +116,10 @@ function Btn({ children, onClick, primary, disabled, icon: Icon }) {
       onMouseEnter={()=>setHov(true)} onMouseLeave={()=>setHov(false)}
       style={{
         display:'flex',alignItems:'center',justifyContent:'center',gap:8,
-        padding:'10px 16px',background:bg,border:'none',color,
+        padding:'11px 20px',background:bg,border:'none',color,
         fontSize:13,fontWeight:800,cursor:disabled?'not-allowed':'pointer',
         opacity:disabled?0.5:1,transition:'background 0.15s,color 0.15s',
-        fontFamily:'inherit',whiteSpace:'nowrap',minHeight:40,
+        fontFamily:'inherit',whiteSpace:'nowrap',
       }}>
       {Icon&&<Icon size={15} strokeWidth={2.2}/>}
       <span className="btn-label">{children}</span>
@@ -136,9 +127,9 @@ function Btn({ children, onClick, primary, disabled, icon: Icon }) {
   )
 }
 
-/* Summary card */
+/* ════ SUMMARY CARD ════ */
 function SumCard({ icon:Icon, value, label, accent, bg, delay=0 }) {
-  const n=useCountUp(typeof value==='number'?value:0, 700, delay)
+  const n = useCountUp(typeof value==='number' ? value : 0, 700, delay)
   return (
     <div style={{background:bg, borderTop:`3px solid ${accent}`, padding:'18px 20px'}}>
       <div style={{display:'flex',alignItems:'center',gap:6,marginBottom:10}}>
@@ -146,43 +137,39 @@ function SumCard({ icon:Icon, value, label, accent, bg, delay=0 }) {
         <span style={{fontSize:9,fontWeight:900,color:accent,textTransform:'uppercase',letterSpacing:'0.16em'}}>{label}</span>
       </div>
       <p style={{margin:0,fontSize:'clamp(26px,4vw,42px)',fontWeight:900,color:DARK,letterSpacing:'-2px',fontVariantNumeric:'tabular-nums',lineHeight:1}}>
-        {typeof value==='string'?value:n}
+        {typeof value==='string' ? value : n}
       </p>
     </div>
   )
 }
 
-/* Section subheading — like BlockedDates "Bloquer une date" h2 */
+/* ════ SECTION TITLE ════ */
 function SectionTitle({ title, sub, count }) {
   return (
     <div style={{marginBottom:16,display:'flex',alignItems:'center',justifyContent:'space-between',gap:8}}>
       <div>
-        <h2 style={{margin:'0 0 4px',fontSize:'clamp(15px,2.5vw,22px)',fontWeight:900,color:DARK,letterSpacing:'-0.8px'}}>
-          {title}
-        </h2>
+        <h2 style={{margin:'0 0 4px',fontSize:'clamp(15px,2.5vw,22px)',fontWeight:900,color:DARK,letterSpacing:'-0.8px'}}>{title}</h2>
         {sub&&<p style={{margin:0,fontSize:12,fontWeight:700,color:GOLD_DK}}>{sub}</p>}
       </div>
       {count!==undefined&&(
-        <span style={{padding:'4px 10px',background:DARK,fontSize:11,fontWeight:900,color:GOLD,letterSpacing:'0.05em',flexShrink:0}}>
-          {count}
-        </span>
+        <span style={{padding:'4px 10px',background:DARK,fontSize:11,fontWeight:900,color:GOLD,flexShrink:0}}>{count}</span>
       )}
     </div>
   )
 }
 
-/* Filter chip */
+/* ════ FILTER CHIP ════ */
 function Chip({ label, active, onClick }) {
   const [h,setH]=useState(false)
   return (
     <button onClick={onClick} onMouseEnter={()=>setH(true)} onMouseLeave={()=>setH(false)}
       style={{
-        height:26,padding:'0 10px',
-        border:`1.5px solid ${active?DARK:(h?DARK:BORDER)}`,
-        background:active?DARK:(h?'#f5ede0':WHITE),
+        height:28,padding:'0 12px',
+        border:`2px solid ${active?DARK:(h?DARK:BORDER)}`,
+        background:active?DARK:(h?CREAM:WHITE),
         color:active?GOLD:(h?DARK:MUTED),
-        fontSize:9,fontWeight:900,textTransform:'uppercase',letterSpacing:'0.08em',
-        cursor:'pointer',fontFamily:'inherit',transition:'all 0.1s',whiteSpace:'nowrap',
+        fontSize:10,fontWeight:900,textTransform:'uppercase',letterSpacing:'0.08em',
+        cursor:'pointer',fontFamily:'inherit',transition:'all 0.12s',whiteSpace:'nowrap',
         display:'inline-flex',alignItems:'center',flexShrink:0,
       }}>
       {label}
@@ -190,38 +177,29 @@ function Chip({ label, active, onClick }) {
   )
 }
 
-/* ════════════════════════════════
-   CHART COMPONENTS
-════════════════════════════════ */
+/* ════ BAR CHART — FIXED ════ */
+function BarChart({ data={}, title, subtitle, highlight=false, barColor=GOLD }) {
+  const [mounted, setMounted] = useState(false)
 
-/* Animated bar chart */
-function BarChart({ data={}, title, subtitle, highlight=false, barColor=GOLD, animKey=0 }) {
-  const [ready,setReady]=useState(false)
-  /* re-animate every time animKey changes */
-  useState(()=>{ setReady(false) })
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  if (typeof window!=='undefined') {
-    // Use a simple pattern: reset on animKey via key prop at call site
-  }
-  // Simple mount animation
-  const [mounted,setMounted]=useState(false)
-  // Reset when animKey changes using a ref trick
-  const prevKey = useState(animKey)
-  if (prevKey[0] !== animKey) { prevKey[1](animKey); setMounted(false) }
-  if (!mounted) setTimeout(()=>setMounted(true), 60)
+  // Reset + re-animate whenever data changes
+  useEffect(() => {
+    setMounted(false)
+    const id = setTimeout(() => setMounted(true), 80)
+    return () => clearTimeout(id)
+  }, [data])
 
-  const entries=Object.entries(data||{})
-  const max=Math.max(...entries.map(([,v])=>v),1)
-  const total=entries.reduce((s,[,v])=>s+v,0)
-  const topKey=entries.find(([,v])=>v===max)?.[0]??'—'
-  const gap=entries.length>20?2:entries.length>12?3:5
-  const lblSize=entries.length>20?6:entries.length>12?7:9
+  const entries = Object.entries(data || {})
+  const max     = Math.max(...entries.map(([,v]) => v), 1)
+  const total   = entries.reduce((s,[,v]) => s+v, 0)
+  const topKey  = entries.find(([,v]) => v===max)?.[0] ?? '—'
+  const gap     = entries.length > 20 ? 2 : entries.length > 12 ? 3 : 5
+  const lblSize = entries.length > 20 ? 6 : entries.length > 12 ? 7 : 9
 
-  const headerBg = highlight ? DARK : WHITE
-  const headerColor = highlight ? 'rgba(255,255,255,0.8)' : DARK
+  const headerBg    = highlight ? DARK : WHITE
+  const headerColor = highlight ? 'rgba(255,255,255,0.85)' : DARK
 
   if (!entries.length) return (
-    <div style={{border:`2px solid ${DARK}`,background:WHITE}}>
+    <div style={{border:`2px solid ${DARK}`,background:WHITE,display:'flex',flexDirection:'column'}}>
       <div style={{padding:'14px 18px 12px',borderBottom:`2px solid ${DARK}`,background:headerBg}}>
         <div style={{fontSize:9,fontWeight:900,color:GOLD,letterSpacing:'0.18em',textTransform:'uppercase',marginBottom:4}}>{title}</div>
         {subtitle&&<div style={{fontSize:13,fontWeight:800,color:headerColor}}>{subtitle}</div>}
@@ -234,7 +212,7 @@ function BarChart({ data={}, title, subtitle, highlight=false, barColor=GOLD, an
 
   return (
     <div style={{border:`2px solid ${DARK}`,background:WHITE,display:'flex',flexDirection:'column',minWidth:0}}>
-      {/* Header — dark bar top like BlockedDateList */}
+      {/* Header */}
       <div style={{padding:'14px 18px 12px',borderBottom:`2px solid ${DARK}`,background:headerBg,display:'flex',alignItems:'flex-start',justifyContent:'space-between',gap:10}}>
         <div style={{minWidth:0}}>
           <div style={{fontSize:9,fontWeight:900,letterSpacing:'0.18em',textTransform:'uppercase',color:GOLD,marginBottom:4}}>{title}</div>
@@ -246,36 +224,37 @@ function BarChart({ data={}, title, subtitle, highlight=false, barColor=GOLD, an
         </div>
       </div>
       {/* Bars */}
-      <div style={{padding:'18px 16px 0',flex:1,overflow:'hidden'}}>
+      <div style={{padding:'18px 16px 0',flex:1}}>
         <div style={{display:'flex',alignItems:'flex-end',gap,height:150}}>
-          {entries.map(([label,value])=>{
-            const pct=value/max*100; const isTop=value===max
+          {entries.map(([label,value]) => {
+            const pct   = (value/max)*100
+            const isTop = value===max
             return (
               <div key={label} title={`${label}: ${value}`}
                 style={{flex:1,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'flex-end',height:'100%',minWidth:0}}>
-                <span style={{fontSize:8,fontWeight:900,color:isTop?DARK:'transparent',height:13,lineHeight:'13px',marginBottom:2,fontVariantNumeric:'tabular-nums'}}>
+                <span style={{fontSize:8,fontWeight:900,color:isTop?DARK:'transparent',height:13,lineHeight:'13px',marginBottom:2}}>
                   {isTop?value:''}
                 </span>
                 <div style={{
                   width:'100%',
-                  height:mounted?`${Math.max(pct,3)}%`:'3%',
-                  background:isTop?DARK:barColor,
-                  opacity:isTop?1:0.5+(value/max)*0.5,
-                  transition:'height 0.65s cubic-bezier(0.22,1,0.36,1)',
+                  height: mounted ? `${Math.max(pct,3)}%` : '3%',
+                  background: isTop ? DARK : barColor,
+                  opacity: isTop ? 1 : 0.5+(value/max)*0.5,
+                  transition: 'height 0.65s cubic-bezier(0.22,1,0.36,1)',
                 }}/>
               </div>
             )
           })}
         </div>
         <div style={{display:'flex',gap,marginTop:5,paddingBottom:14}}>
-          {entries.map(([label])=>(
+          {entries.map(([label]) => (
             <div key={label} style={{flex:1,textAlign:'center',fontSize:lblSize,fontWeight:800,color:MUTED,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis',minWidth:0}}>
               {label}
             </div>
           ))}
         </div>
       </div>
-      {/* Footer — same CREAM footer as summary cards */}
+      {/* Footer */}
       <div style={{borderTop:`1px solid ${BORDER}`,padding:'10px 18px',display:'flex',justifyContent:'space-between',alignItems:'center',background:CREAM}}>
         <span style={{fontSize:9,fontWeight:900,color:MUTED,textTransform:'uppercase',letterSpacing:'0.1em'}}>Total</span>
         <span style={{fontSize:20,fontWeight:900,color:DARK,letterSpacing:'-1px'}}>{total}</span>
@@ -284,20 +263,22 @@ function BarChart({ data={}, title, subtitle, highlight=false, barColor=GOLD, an
   )
 }
 
-/* Service distribution chart */
-function ServiceChart({ data={}, animKey=0 }) {
-  const entries=Object.entries(data).sort(([,a],[,b])=>b-a)
-  const total=entries.reduce((s,[,v])=>s+v,0)||1
-  const COLORS=[DARK,GOLD,GREEN,AMBER,RED,'#6b4f3a','#3d6b5a']
+/* ════ SERVICE CHART — FIXED ════ */
+function ServiceChart({ data={} }) {
+  const entries = Object.entries(data).sort(([,a],[,b]) => b-a)
+  const total   = entries.reduce((s,[,v]) => s+v, 0) || 1
+  const COLORS  = [DARK,GOLD,GREEN,AMBER,RED,'#6b4f3a','#3d6b5a']
 
-  const [mounted,setMounted]=useState(false)
-  const prevKey=useState(animKey)
-  if (prevKey[0]!==animKey) { prevKey[1](animKey); setMounted(false) }
-  if (!mounted) setTimeout(()=>setMounted(true), 60)
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => {
+    setMounted(false)
+    const id = setTimeout(() => setMounted(true), 80)
+    return () => clearTimeout(id)
+  }, [data])
 
   if (!entries.length) return (
-    <div style={{border:`2px solid ${DARK}`,background:WHITE,minHeight:200,display:'flex',flexDirection:'column'}}>
-      <div style={{padding:'14px 18px 12px',borderBottom:`2px solid ${DARK}`,background:WHITE}}>
+    <div style={{border:`2px solid ${DARK}`,background:WHITE,display:'flex',flexDirection:'column',minHeight:200}}>
+      <div style={{padding:'14px 18px 12px',borderBottom:`2px solid ${DARK}`}}>
         <div style={{fontSize:9,fontWeight:900,color:GOLD,letterSpacing:'0.18em',textTransform:'uppercase',marginBottom:4}}>Par service</div>
         <div style={{fontSize:13,fontWeight:800,color:DARK}}>Répartition des formules</div>
       </div>
@@ -309,7 +290,7 @@ function ServiceChart({ data={}, animKey=0 }) {
 
   return (
     <div style={{border:`2px solid ${DARK}`,background:WHITE,display:'flex',flexDirection:'column'}}>
-      <div style={{padding:'14px 18px 12px',borderBottom:`2px solid ${DARK}`,background:WHITE,display:'flex',alignItems:'flex-start',justifyContent:'space-between'}}>
+      <div style={{padding:'14px 18px 12px',borderBottom:`2px solid ${DARK}`,display:'flex',alignItems:'flex-start',justifyContent:'space-between'}}>
         <div>
           <div style={{fontSize:9,fontWeight:900,letterSpacing:'0.18em',textTransform:'uppercase',color:GOLD,marginBottom:4}}>Par service</div>
           <div style={{fontSize:13,fontWeight:800,color:DARK}}>Répartition des formules</div>
@@ -321,27 +302,37 @@ function ServiceChart({ data={}, animKey=0 }) {
       </div>
       {/* Stacked bar */}
       <div style={{padding:'16px 18px 10px'}}>
-        <div style={{height:12,display:'flex',gap:2,overflow:'hidden'}}>
-          {entries.map(([name,val],i)=>(
+        <div style={{height:10,display:'flex',gap:2,overflow:'hidden'}}>
+          {entries.map(([name,val],i) => (
             <div key={name} title={`${name}: ${val}`}
-              style={{flex:mounted?val:0,background:COLORS[i%COLORS.length],minWidth:mounted?2:0,transition:'flex 0.75s ease'}}/>
+              style={{
+                flex: mounted ? val : 0,
+                background: COLORS[i%COLORS.length],
+                minWidth: mounted ? 2 : 0,
+                transition: 'flex 0.75s cubic-bezier(0.22,1,0.36,1)',
+              }}/>
           ))}
         </div>
       </div>
-      {/* Legend */}
+      {/* Legend rows */}
       <div style={{padding:'0 18px 16px',display:'flex',flexDirection:'column',gap:10}}>
-        {entries.map(([name,val],i)=>{
-          const pct=Math.round((val/total)*100)
+        {entries.map(([name,val],i) => {
+          const pct = Math.round((val/total)*100)
           return (
             <div key={name}>
-              <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:4}}>
+              <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:5}}>
                 <div style={{width:10,height:10,background:COLORS[i%COLORS.length],flexShrink:0}}/>
                 <span style={{flex:1,fontSize:12,fontWeight:800,color:DARK,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{name}</span>
-                <span style={{fontSize:11,fontWeight:900,color:MUTED,minWidth:32,textAlign:'right'}}>{pct}%</span>
-                <span style={{fontSize:13,fontWeight:900,color:DARK,minWidth:24,textAlign:'right'}}>{val}</span>
+                <span style={{fontSize:11,fontWeight:900,color:MUTED,minWidth:28,textAlign:'right'}}>{pct}%</span>
+                <span style={{fontSize:13,fontWeight:900,color:DARK,minWidth:22,textAlign:'right'}}>{val}</span>
               </div>
               <div style={{height:3,background:BORDER,overflow:'hidden'}}>
-                <div style={{height:'100%',width:mounted?`${pct}%`:'0%',background:COLORS[i%COLORS.length],transition:'width 0.75s ease'}}/>
+                <div style={{
+                  height:'100%',
+                  width: mounted ? `${pct}%` : '0%',
+                  background: COLORS[i%COLORS.length],
+                  transition: `width 0.75s cubic-bezier(0.22,1,0.36,1) ${i*60}ms`,
+                }}/>
               </div>
             </div>
           )
@@ -355,9 +346,7 @@ function ServiceChart({ data={}, animKey=0 }) {
   )
 }
 
-/* ════════════════════════════════
-   FILTER OPTIONS
-════════════════════════════════ */
+/* ════ FILTER OPTIONS ════ */
 const PERIOD_OPTS=[
   {key:'all',  label:'Tout'},
   {key:'month',label:'Ce mois'},
@@ -365,33 +354,23 @@ const PERIOD_OPTS=[
   {key:'today',label:"Aujourd'hui"},
 ]
 const STATUS_OPTS=[
-  {key:'all',      label:'Tous statuts'},
+  {key:'all',      label:'Tous'},
   {key:'confirmed',label:'Confirmées'},
   {key:'pending',  label:'En attente'},
   {key:'cancelled',label:'Annulées'},
 ]
 
-/* ════════════════════════════════
-   PAGE
-════════════════════════════════ */
+/* ════ PAGE ════ */
 export default function Reports() {
-  const {data,loading,error}=useReports()
-  const [exporting,setExporting]=useState(false)
-  const [period,setPeriod]=useState('all')
-  const [status,setStatus]=useState('all')
-  const [animKey,setAnimKey]=useState(0)
+  const { data, loading, error } = useReports()
+  const [exporting, setExporting] = useState(false)
+  const [period,    setPeriod]    = useState('all')
+  const [status,    setStatus]    = useState('all')
 
-  function pick(type, key) {
-    if (type==='period') setPeriod(key)
-    else                 setStatus(key)
-    setAnimKey(k=>k+1)
-  }
-  function reset() { setPeriod('all'); setStatus('all'); setAnimKey(k=>k+1) }
-
-  const filtered=useMemo(()=>{
+  const filtered = useMemo(() => {
     if (!data) return null
-    const ap=obj=>applyPeriod(obj,period)
-    let base={...(data.summary||{})}
+    const ap = obj => applyPeriod(obj, period)
+    let base = { ...(data.summary||{}) }
     if (status==='confirmed') base={...base,total:base.confirmed??0,pending:0,cancelled:0}
     if (status==='pending')   base={...base,total:base.pending??0,confirmed:0,cancelled:0}
     if (status==='cancelled') base={...base,total:base.cancelled??0,confirmed:0,pending:0}
@@ -405,101 +384,70 @@ export default function Reports() {
       by_guests:  ap(data.by_guests ||{}),
       by_service: ap(data.by_service||{}),
     }
-  },[data,period,status])
+  }, [data, period, status])
 
-  async function handleExport(){
+  async function handleExport() {
     setExporting(true)
     try {
-      const pL=PERIOD_OPTS.find(p=>p.key===period)?.label??'Tout'
-      const sL=STATUS_OPTS.find(s=>s.key===status)?.label??'Tous'
-      await doPDF(filtered?.summary||{},pL,sL)
-    } catch(e){console.error(e)} finally{setExporting(false)}
+      const pL = PERIOD_OPTS.find(p=>p.key===period)?.label ?? 'Tout'
+      const sL = STATUS_OPTS.find(s=>s.key===status)?.label ?? 'Tous'
+      await doPDF(filtered?.summary||{}, pL, sL)
+    } catch(e) { console.error(e) } finally { setExporting(false) }
   }
 
   if (loading) return <Spinner/>
 
-  const s=filtered?.summary||{}
-  const pLabel=PERIOD_OPTS.find(p=>p.key===period)?.label??'Tout'
-  const sLabel=STATUS_OPTS.find(p=>p.key===status)?.label??'Tous'
-  const hasFilter=period!=='all'||status!=='all'
+  const s      = filtered?.summary || {}
+  const pLabel = PERIOD_OPTS.find(p=>p.key===period)?.label ?? 'Tout'
+  const sLabel = STATUS_OPTS.find(p=>p.key===status)?.label ?? 'Tous'
+  const hasFilter = period!=='all' || status!=='all'
 
   return (
     <>
       <style>{`
-        @media(max-width:480px){
-          .btn-label    { display:none!important; }
-          .page-subtitle{ display:none!important; }
+        @media(max-width:600px){
+          .btn-label     { display:none!important; }
+          .page-subtitle { display:none!important; }
         }
-        /* Summary 5→3→2 */
-        .rp-sum{display:grid;grid-template-columns:repeat(5,1fr);gap:2px;background:${DARK};border:2px solid ${DARK};}
-        @media(max-width:900px){.rp-sum{grid-template-columns:repeat(3,1fr);}}
-        @media(max-width:520px){.rp-sum{grid-template-columns:repeat(2,1fr);}}
-        /* 2-col charts */
-        .rp-2{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
-        @media(max-width:720px){.rp-2{grid-template-columns:1fr;}}
-        /* 3-col charts */
-        .rp-3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
-        @media(max-width:900px){.rp-3{grid-template-columns:1fr 1fr;}}
-        @media(max-width:560px){.rp-3{grid-template-columns:1fr;}}
-
-        /* ── Filter bar ── */
-        .rp-filterbar{
-          display:flex;align-items:stretch;
-          border:2px solid ${DARK};background:${WHITE};
-          margin-bottom:28px;overflow:hidden;
-        }
-        .rp-fb-badge{
-          display:flex;align-items:center;gap:6px;
-          padding:0 14px;background:${DARK};flex-shrink:0;
-        }
-        .rp-fb-group{
-          display:flex;align-items:center;gap:8px;
-          padding:7px 12px;flex-shrink:0;
-          border-left:1px solid ${BORDER};
-        }
-        .rp-fb-lbl{
-          font-size:8px;font-weight:900;color:${MUTED};
-          text-transform:uppercase;letter-spacing:0.14em;
-          flex-shrink:0;white-space:nowrap;
-        }
-        .rp-fb-chips{display:flex;gap:4px;flex-shrink:0;}
-        .rp-fb-div{width:1px;background:${BORDER};margin:7px 0;flex-shrink:0;}
-        .rp-fb-reset{
-          display:flex;align-items:center;justify-content:center;
-          padding:0 13px;border:none;border-left:2px solid ${DARK};
-          background:transparent;color:${MUTED};
-          font-size:16px;font-weight:900;cursor:pointer;
-          font-family:inherit;transition:all 0.1s;flex-shrink:0;
-        }
-
-        /* On narrow screens: stack into 2 rows */
+        /* Summary grid */
+        .rp-sum{ display:grid; grid-template-columns:repeat(5,1fr); gap:2px; background:${DARK}; border:2px solid ${DARK}; }
+        @media(max-width:860px){ .rp-sum{ grid-template-columns:repeat(3,1fr); } }
+        @media(max-width:520px){ .rp-sum{ grid-template-columns:repeat(2,1fr); } }
+        /* Chart grids */
+        .rp-2{ display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+        @media(max-width:720px){ .rp-2{ grid-template-columns:1fr; } }
+        .rp-3{ display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
+        @media(max-width:860px){ .rp-3{ grid-template-columns:1fr 1fr; } }
+        @media(max-width:520px){ .rp-3{ grid-template-columns:1fr; } }
+        /* Filter bar */
+        .rp-fbar{ display:flex; align-items:stretch; border:2px solid ${DARK}; background:${WHITE}; margin-bottom:28px; overflow:hidden; flex-wrap:wrap; }
+        .rp-fbadge{ display:flex; align-items:center; gap:6px; padding:0 16px; background:${DARK}; flex-shrink:0; min-height:42px; }
+        .rp-fgrp{ display:flex; align-items:center; gap:8px; padding:8px 14px; flex-shrink:0; border-left:1px solid ${BORDER}; flex-wrap:wrap; }
+        .rp-flbl{ font-size:8px; font-weight:900; color:${MUTED}; text-transform:uppercase; letter-spacing:0.14em; flex-shrink:0; white-space:nowrap; }
+        .rp-fchips{ display:flex; gap:4px; flex-wrap:wrap; }
+        .rp-freset{ display:flex; align-items:center; justify-content:center; padding:0 14px; border:none; border-left:2px solid ${DARK}; background:transparent; color:${MUTED}; font-size:18px; font-weight:900; cursor:pointer; font-family:inherit; transition:all 0.1s; flex-shrink:0; }
+        .rp-freset:hover{ background:${DARK}; color:${GOLD}; }
         @media(max-width:680px){
-          .rp-filterbar{ flex-wrap:wrap; }
-          .rp-fb-badge{ width:100%;padding:8px 12px;border-bottom:1px solid rgba(255,255,255,0.12); }
-          .rp-fb-group{ border-left:none;border-top:none;padding:7px 12px;width:100%;flex-wrap:wrap; }
-          .rp-fb-div{ display:none; }
-          .rp-fb-reset{ width:100%;border-left:none;border-top:1px solid ${BORDER};padding:7px 12px; }
-          .rp-fb-chips{ flex-wrap:wrap; }
-        }
-        @media(max-width:400px){
-          .rp-fb-chips{ overflow-x:auto;flex-wrap:nowrap;scrollbar-width:none; }
-          .rp-fb-chips::-webkit-scrollbar{ display:none; }
+          .rp-fbadge{ width:100%; border-bottom:1px solid rgba(255,255,255,0.1); }
+          .rp-fgrp{ border-left:none; border-top:1px solid ${BORDER}; width:100%; }
+          .rp-freset{ width:100%; border-left:none; border-top:2px solid ${DARK}; padding:8px; }
         }
       `}</style>
 
       <div style={{
-        minHeight:'100vh',background:CREAM,
+        minHeight:'100vh', background:CREAM,
         fontFamily:"'Plus Jakarta Sans','DM Sans',system-ui,sans-serif",
-        padding:'clamp(14px,3vw,40px) clamp(12px,4vw,36px)',
-        boxSizing:'border-box',width:'100%',overflowX:'hidden',
+        padding:'clamp(16px,3vw,40px) clamp(12px,3vw,36px)',
+        boxSizing:'border-box',
       }}>
         <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800;900&display=swap" rel="stylesheet"/>
+        <style>{`*{box-sizing:border-box;}`}</style>
 
-        {/* ── HEADER — exact copy of BlockedDates header ── */}
+        {/* HEADER */}
         <FadeUp delay={0}>
-          <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',gap:12,marginBottom:8,flexWrap:'wrap'}}>
-            <div style={{minWidth:0,flex:1}}>
-              <h1 style={{margin:0,fontSize:'clamp(20px,5vw,36px)',fontWeight:900,color:DARK,letterSpacing:'-1.5px',lineHeight:1}}>
+          <div style={{display:'flex',alignItems:'flex-start',justifyContent:'space-between',gap:12,marginBottom:8,flexWrap:'wrap'}}>
+            <div>
+              <h1 style={{margin:0,fontSize:'clamp(22px,4vw,36px)',fontWeight:900,color:DARK,letterSpacing:'-1.5px',lineHeight:1}}>
                 Rapports
               </h1>
               <p className="page-subtitle" style={{margin:'6px 0 0',fontSize:12,fontWeight:700,color:GOLD_DK}}>
@@ -508,18 +456,19 @@ export default function Reports() {
             </div>
             <div style={{display:'flex',gap:3,flexShrink:0}}>
               <Btn icon={FileDown} primary onClick={handleExport} disabled={exporting}>
-                {exporting?'Génération…':'Exporter PDF'}
+                {exporting ? 'Génération…' : 'Exporter PDF'}
               </Btn>
             </div>
           </div>
         </FadeUp>
 
-        {/* ── DIVIDER — exact copy of BlockedDates ── */}
+        {/* DIVIDER */}
         <FadeUp delay={10}>
           <div style={{height:2,background:DARK,margin:'16px 0 28px'}}/>
         </FadeUp>
 
-        {error&&(
+        {/* ERROR */}
+        {error && (
           <FadeUp delay={5}>
             <div style={{marginBottom:20,padding:'11px 16px',background:RED_BG,borderLeft:`3px solid ${RED}`,fontSize:12,fontWeight:700,color:RED}}>
               {error}
@@ -527,80 +476,81 @@ export default function Reports() {
           </FadeUp>
         )}
 
-        {/* ── FILTER BAR ── */}
+        {/* FILTER BAR */}
         <FadeUp delay={15}>
-          <div className="rp-filterbar">
-            <div className="rp-fb-badge">
-              <Filter size={10} strokeWidth={2.5} color={GOLD}/>
+          <div className="rp-fbar">
+            <div className="rp-fbadge">
+              <Filter size={11} strokeWidth={2.5} color={GOLD}/>
               <span style={{fontSize:8,fontWeight:900,color:GOLD,textTransform:'uppercase',letterSpacing:'0.2em'}}>Filtres</span>
+              {hasFilter && (
+                <span style={{marginLeft:6,padding:'2px 7px',background:GOLD,color:DARK,fontSize:9,fontWeight:900}}>
+                  actifs
+                </span>
+              )}
             </div>
-            <div className="rp-fb-group">
-              <span className="rp-fb-lbl">Période</span>
-              <div className="rp-fb-chips">
-                {PERIOD_OPTS.map(o=><Chip key={o.key} label={o.label} active={period===o.key} onClick={()=>pick('period',o.key)}/>)}
+            <div className="rp-fgrp">
+              <span className="rp-flbl">Période</span>
+              <div className="rp-fchips">
+                {PERIOD_OPTS.map(o => <Chip key={o.key} label={o.label} active={period===o.key} onClick={()=>setPeriod(o.key)}/>)}
               </div>
             </div>
-            <div className="rp-fb-div"/>
-            <div className="rp-fb-group" style={{flex:1}}>
-              <span className="rp-fb-lbl">Statut</span>
-              <div className="rp-fb-chips">
-                {STATUS_OPTS.map(o=><Chip key={o.key} label={o.label} active={status===o.key} onClick={()=>pick('status',o.key)}/>)}
+            <div className="rp-fgrp" style={{flex:1}}>
+              <span className="rp-flbl">Statut</span>
+              <div className="rp-fchips">
+                {STATUS_OPTS.map(o => <Chip key={o.key} label={o.label} active={status===o.key} onClick={()=>setStatus(o.key)}/>)}
               </div>
             </div>
-            {hasFilter&&(
-              <button className="rp-fb-reset" onClick={reset}
-                onMouseEnter={e=>{e.currentTarget.style.background=DARK;e.currentTarget.style.color=GOLD}}
-                onMouseLeave={e=>{e.currentTarget.style.background='transparent';e.currentTarget.style.color=MUTED}}>
+            {hasFilter && (
+              <button className="rp-freset" onClick={()=>{setPeriod('all');setStatus('all')}} title="Réinitialiser les filtres">
                 ×
               </button>
             )}
           </div>
         </FadeUp>
 
-        {/* ── RÉSUMÉ GÉNÉRAL ── */}
+        {/* SUMMARY */}
         <FadeUp delay={20}>
-          <SectionTitle title="Résumé général" sub={`Vue d'ensemble · ${pLabel} · ${sLabel}`} count={s.total??0}/>
+          <SectionTitle title="Résumé général" sub={`${pLabel} · ${sLabel}`} count={s.total??0}/>
           <div className="rp-sum" style={{marginBottom:32}}>
             <SumCard icon={BarChart2}   value={s.total??0}     label="Total"       accent={DARK}    bg={WHITE}    delay={40} />
             <SumCard icon={CheckCircle} value={s.confirmed??0} label="Confirmées"  accent={GREEN}   bg={GREEN_BG} delay={70} />
             <SumCard icon={Clock}       value={s.pending??0}   label="En attente"  accent={AMBER}   bg={AMBER_BG} delay={100}/>
             <SumCard icon={XCircle}     value={s.cancelled??0} label="Annulées"    accent={RED}     bg={RED_BG}   delay={130}/>
-            <SumCard icon={Users}       value={s.avg_guests?`${Number(s.avg_guests).toFixed(1)}`:'0'} label="Moy. pers." accent={GOLD_DK} bg={CREAM} delay={160}/>
+            <SumCard icon={Users}       value={s.avg_guests ? `${Number(s.avg_guests).toFixed(1)}` : '0'} label="Moy. pers." accent={GOLD_DK} bg={CREAM} delay={160}/>
           </div>
         </FadeUp>
 
-        {/* ── DIVIDER ── */}
         <div style={{height:2,background:DARK,margin:'0 0 32px'}}/>
 
-        {/* ── DISTRIBUTION TEMPORELLE ── */}
+        {/* HEURE + JOUR */}
         <FadeUp delay={0}>
           <SectionTitle title="Distribution temporelle" sub="Par heure · Par jour de la semaine"/>
-          <div className="rp-2" style={{marginBottom:0}}>
-            <BarChart key={`h-${animKey}`} animKey={animKey} data={filtered?.by_hour} title="Par heure"  subtitle="Créneaux les plus demandés" barColor={GOLD}/>
-            <BarChart key={`d-${animKey}`} animKey={animKey} data={filtered?.by_day}  title="Par jour"   subtitle="Jours les plus chargés"     barColor={GOLD}/>
+          <div className="rp-2" style={{marginBottom:32}}>
+            <BarChart data={filtered?.by_hour} title="Par heure"  subtitle="Créneaux les plus demandés" barColor={GOLD}/>
+            <BarChart data={filtered?.by_day}  title="Par jour"   subtitle="Jours les plus chargés"     barColor={GOLD}/>
           </div>
         </FadeUp>
 
-        <div style={{height:2,background:DARK,margin:'32px 0'}}/>
+        <div style={{height:2,background:DARK,margin:'0 0 32px'}}/>
 
-        {/* ── SERVICES & COUVERTS ── */}
+        {/* SERVICES + COUVERTS */}
         <FadeUp delay={0}>
           <SectionTitle title="Services & Couverts" sub="Répartition des formules · Taille des groupes"/>
-          <div className="rp-2" style={{marginBottom:0}}>
-            <ServiceChart key={`svc-${animKey}`} animKey={animKey} data={filtered?.by_service??{}}/>
-            <BarChart     key={`g-${animKey}`}   animKey={animKey} data={filtered?.by_guests}  title="Par couverts" subtitle="Taille des groupes" barColor={AMBER}/>
+          <div className="rp-2" style={{marginBottom:32}}>
+            <ServiceChart data={filtered?.by_service??{}}/>
+            <BarChart data={filtered?.by_guests} title="Par couverts" subtitle="Taille des groupes" barColor={AMBER}/>
           </div>
         </FadeUp>
 
-        <div style={{height:2,background:DARK,margin:'32px 0'}}/>
+        <div style={{height:2,background:DARK,margin:'0 0 32px'}}/>
 
-        {/* ── TENDANCES PÉRIODIQUES ── */}
+        {/* SEMAINE + MOIS + ANNÉE */}
         <FadeUp delay={0}>
           <SectionTitle title="Tendances périodiques" sub="Activité semaine · mois · année"/>
           <div className="rp-3" style={{marginBottom:0}}>
-            <BarChart key={`w-${animKey}`} animKey={animKey} data={filtered?.by_week}  title="Par semaine" subtitle="Activité hebdomadaire" barColor={GOLD}/>
-            <BarChart key={`m-${animKey}`} animKey={animKey} data={filtered?.by_month} title="Par mois"    subtitle="Activité mensuelle"    barColor={GOLD}/>
-            <BarChart key={`y-${animKey}`} animKey={animKey} data={filtered?.by_year}  title="Par année"   subtitle="Historique annuel"     barColor={DARK} highlight/>
+            <BarChart data={filtered?.by_week}  title="Par semaine" subtitle="Activité hebdomadaire" barColor={GOLD}/>
+            <BarChart data={filtered?.by_month} title="Par mois"    subtitle="Activité mensuelle"    barColor={GOLD}/>
+            <BarChart data={filtered?.by_year}  title="Par année"   subtitle="Historique annuel"     barColor={DARK} highlight/>
           </div>
         </FadeUp>
 
