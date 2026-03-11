@@ -22,8 +22,10 @@ const inp = {
   fontFamily: 'inherit', outline: 'none', background: '#fff',
   transition: 'border-color 0.15s',
   width: '100%', boxSizing: 'border-box',
-  WebkitAppearance: 'none', // fixes iOS date input styling
+  WebkitAppearance: 'none',
   borderRadius: 0,
+  // Ensure legible text size on iOS (prevents auto-zoom on focus)
+  fontSize: 16,
 }
 
 function Label({ children }) {
@@ -49,7 +51,7 @@ function ModeTab({ active, onClick, icon: Icon, label }) {
   return (
     <button onClick={onClick} title={label} style={{
       flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-      padding: '13px 8px',
+      padding: '14px 8px',
       background: active ? DARK : '#f5f0eb',
       border: 'none',
       color: active ? GOLD : '#bbb',
@@ -57,8 +59,11 @@ function ModeTab({ active, onClick, icon: Icon, label }) {
       cursor: 'pointer', fontFamily: 'inherit',
       transition: 'all 0.15s',
       minWidth: 0,
+      // Ensure adequate tap target
+      minHeight: 48,
+      WebkitTapHighlightColor: 'transparent',
     }}>
-      <Icon size={15} strokeWidth={2.5} style={{ flexShrink: 0 }} />
+      <Icon size={16} strokeWidth={2.5} style={{ flexShrink: 0 }} />
       <span className="mode-label" style={{
         overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
       }}>{label}</span>
@@ -82,12 +87,29 @@ export default function BlockedDateForm({ form, setForm, handleBlock, submitting
   return (
     <>
       <style>{`
-        @media (max-width: 400px) {
+        /* Hide mode tab labels on very small screens — icon only */
+        @media (max-width: 360px) {
           .mode-label { display: none !important; }
         }
-        /* Fix iOS input tap target */
+        /* Prevent iOS zoom on input focus by ensuring font-size >= 16px */
         input[type="date"], input[type="text"], select {
+          font-size: 16px !important;
           -webkit-tap-highlight-color: transparent;
+        }
+        /* Interval grid: 2 cols on sm+, 1 col on xs */
+        .interval-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 10px;
+        }
+        @media (max-width: 340px) {
+          .interval-grid { grid-template-columns: 1fr; }
+        }
+        /* Recurring grid: flexible columns */
+        .recurring-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+          gap: 10px;
         }
       `}</style>
 
@@ -95,12 +117,12 @@ export default function BlockedDateForm({ form, setForm, handleBlock, submitting
 
         {/* Mode tabs */}
         <div style={{ display: 'flex', borderBottom: `2px solid ${DARK}` }}>
-          <ModeTab active={form.mode === 'single'}    onClick={() => set('mode','single')}    icon={CalendarOff} label="Date unique" />
+          <ModeTab active={form.mode === 'single'}    onClick={() => set('mode','single')}    icon={CalendarOff} label="Unique" />
           <ModeTab active={form.mode === 'interval'}  onClick={() => set('mode','interval')}  icon={Calendar}    label="Intervalle" />
           <ModeTab active={form.mode === 'recurring'} onClick={() => set('mode','recurring')} icon={RefreshCw}   label="Récurrent" />
         </div>
 
-        <div style={{ padding: 'clamp(14px,4vw,24px)', display: 'flex', flexDirection: 'column', gap: 12 }}>
+        <div style={{ padding: 'clamp(14px,4vw,24px)', display: 'flex', flexDirection: 'column', gap: 14 }}>
 
           {/* SINGLE */}
           {form.mode === 'single' && (
@@ -110,9 +132,9 @@ export default function BlockedDateForm({ form, setForm, handleBlock, submitting
             </Field>
           )}
 
-          {/* INTERVAL — always 2 cols, works fine on mobile */}
+          {/* INTERVAL */}
           {form.mode === 'interval' && (
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+            <div className="interval-grid">
               <Field label="Du">
                 <input type="date" value={form.date_from} onChange={e => set('date_from', e.target.value)}
                   style={inp} onFocus={fo} onBlur={bl} />
@@ -125,16 +147,12 @@ export default function BlockedDateForm({ form, setForm, handleBlock, submitting
             </div>
           )}
 
-          {/* RECURRING — stacks to 1 col on mobile, 3 cols on wider */}
+          {/* RECURRING */}
           {form.mode === 'recurring' && (
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))',
-              gap: 10,
-            }}>
+            <div className="recurring-grid">
               <Field label="Jour">
                 <select value={form.weekday} onChange={e => set('weekday', e.target.value)}
-                  style={{ ...inp, cursor: 'pointer' }}>
+                  style={{ ...inp, cursor: 'pointer', paddingRight: 8 }}>
                   {WEEKDAYS.map(d => <option key={d.value} value={d.value}>{d.label}</option>)}
                 </select>
               </Field>
@@ -164,7 +182,7 @@ export default function BlockedDateForm({ form, setForm, handleBlock, submitting
             <div style={{
               padding: '10px 13px',
               background: '#fdf6ec', borderLeft: `3px solid ${GOLD}`,
-              fontSize: 12, fontWeight: 700, color: '#a8834e', lineHeight: 1.6,
+              fontSize: 13, fontWeight: 700, color: '#a8834e', lineHeight: 1.6,
             }}>
               {preview.length === 1
                 ? `1 date : ${new Date(preview[0]).toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'long', year:'numeric' })}`
@@ -177,19 +195,20 @@ export default function BlockedDateForm({ form, setForm, handleBlock, submitting
           <button onClick={handleBlock} disabled={submitting || !valid()}
             style={{
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-              padding: '14px',
+              padding: '15px',
               background: valid() && !submitting ? DARK : '#ccc',
               border: 'none', color: valid() && !submitting ? GOLD : '#fff',
-              fontSize: 13, fontWeight: 800,
+              fontSize: 14, fontWeight: 800,
               cursor: submitting || !valid() ? 'not-allowed' : 'pointer',
               transition: 'background 0.15s',
               fontFamily: 'inherit', width: '100%',
               WebkitTapHighlightColor: 'transparent',
+              minHeight: 50,
             }}
             onMouseEnter={e => { if (!submitting && valid()) e.currentTarget.style.background = '#3d2d1e' }}
             onMouseLeave={e => { e.currentTarget.style.background = valid() && !submitting ? DARK : '#ccc' }}
           >
-            <CalendarOff size={14} strokeWidth={2.5} />
+            <CalendarOff size={15} strokeWidth={2.5} />
             {submitting
               ? 'Enregistrement…'
               : preview.length > 1
