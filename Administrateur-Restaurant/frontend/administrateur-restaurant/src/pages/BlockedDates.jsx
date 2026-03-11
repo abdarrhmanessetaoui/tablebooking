@@ -1,312 +1,271 @@
-import { useState } from 'react'
-import { FileDown, Trash2 } from 'lucide-react'
-import useBlockedDates from '../hooks/BlockedDates/useBlockedDates'
-import BlockedDateForm from '../components/BlockedDates/BlockedDateForm'
-import BlockedDateList from '../components/BlockedDates/BlockedDateList'
-import FadeUp  from '../components/Dashboard/FadeUp'
-import Spinner from '../components/Dashboard/Spinner'
-import { confirm } from '../components/ui/ConfirmDialog'
-import { toast }   from '../components/ui/Toast'
-import { getToken } from '../utils/auth'
+import { useState, useEffect } from 'react'
+import { Trash2, CalendarOff, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react'
 
-const DARK    = '#2b2118'
-const GOLD    = '#c8a97e'
-const GOLD_DK = '#a8834e'
-const RED     = '#b94040'
-const RED_BG  = '#fdf0f0'
+const DARK   = '#2b2118'
+const GOLD   = '#c8a97e'
+const BORDER = '#ece6de'
+const CREAM  = '#faf8f5'
 
-function Btn({ children, onClick, primary, disabled, icon: Icon }) {
-  const [hov, setHov] = useState(false)
-  const bg    = primary ? (hov ? DARK : GOLD) : (hov ? GOLD : DARK)
-  const color = primary ? (hov ? GOLD : DARK) : '#fff'
-  return (
-    <button onClick={onClick} disabled={disabled}
-      onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
-      style={{
-        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-        padding: '11px 20px', background: bg, border: 'none', color,
-        fontSize: 13, fontWeight: 800,
-        cursor: disabled ? 'not-allowed' : 'pointer',
-        opacity: disabled ? 0.5 : 1,
-        transition: 'background 0.15s, color 0.15s',
-        fontFamily: 'inherit', whiteSpace: 'nowrap',
-      }}>
-      {Icon && <Icon size={15} strokeWidth={2.2} />}
-      <span className="btn-label">{children}</span>
-    </button>
-  )
+const PAGE_SIZE = 10
+
+function fmt(d) {
+  if (!d) return '—'
+  const dt = new Date(d)
+  if (isNaN(dt)) return d
+  const s = dt.toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'long', year:'numeric' })
+  return s.charAt(0).toUpperCase() + s.slice(1)
 }
 
-function BulkBar({ count, onUnblock, onClear }) {
-  const [hovDel, setHovDel] = useState(false)
+function isPast(d) {
+  return new Date(d) < new Date(new Date().toDateString())
+}
+
+function Checkbox({ checked, indeterminate, onChange }) {
   return (
-    <div style={{
-      position: 'sticky', top: 8, zIndex: 30,
-      display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap',
-      padding: '10px 16px',
-      background: DARK,
-      boxShadow: '0 4px 24px rgba(43,33,24,0.28)',
-      marginBottom: 12,
-      animation: 'slideDown 0.18s ease',
+    <div onClick={e => { e.stopPropagation(); onChange() }} style={{
+      width: 17, height: 17, flexShrink: 0,
+      background: checked || indeterminate ? DARK : '#fff',
+      border: `2px solid ${checked || indeterminate ? DARK : '#d0c8be'}`,
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      cursor: 'pointer', transition: 'all 0.15s',
     }}>
-      <style>{`
-        @keyframes slideDown { from{opacity:0;transform:translateY(-8px)} to{opacity:1;transform:translateY(0)} }
-        @media (max-width: 600px) {
-          .bulk-label { display: none !important; }
-        }
-      `}</style>
-
-      <span style={{
-        display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-        minWidth: 26, height: 26,
-        background: GOLD, color: DARK,
-        fontSize: 12, fontWeight: 900, padding: '0 7px', flexShrink: 0,
-      }}>{count}</span>
-      <span className="bulk-label" style={{ fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.6)', marginRight: 2 }}>
-        sélectionné{count > 1 ? 's' : ''}
-      </span>
-
-      <div style={{ width: 1, height: 20, background: 'rgba(255,255,255,0.12)', margin: '0 4px', flexShrink: 0 }} />
-
-      <button onClick={onUnblock}
-        onMouseEnter={() => setHovDel(true)} onMouseLeave={() => setHovDel(false)}
-        style={{
-          display: 'flex', alignItems: 'center', gap: 5,
-          padding: '6px 12px',
-          background: hovDel ? '#ef4444' : 'rgba(239,68,68,0.12)',
-          border: '1px solid rgba(239,68,68,0.25)',
-          color: hovDel ? '#fff' : '#f87171',
-          fontSize: 12, fontWeight: 700,
-          cursor: 'pointer', fontFamily: 'inherit',
-          transition: 'all 0.15s', flexShrink: 0,
-        }}
-      >
-        <Trash2 size={13} strokeWidth={2.5} />
-        <span className="bulk-label">Débloquer</span>
-      </button>
-
-      <button onClick={onClear}
-        style={{
-          marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 5,
-          padding: '6px 10px',
-          background: 'none', border: '1px solid rgba(255,255,255,0.12)',
-          color: 'rgba(255,255,255,0.45)',
-          fontSize: 12, fontWeight: 700,
-          cursor: 'pointer', fontFamily: 'inherit',
-          transition: 'all 0.15s', flexShrink: 0,
-        }}
-        onMouseEnter={e => e.currentTarget.style.color = '#fff'}
-        onMouseLeave={e => e.currentTarget.style.color = 'rgba(255,255,255,0.45)'}
-      >
-        <span style={{ fontSize: 16, lineHeight: 1 }}>✕</span>
-        <span className="bulk-label">Désélectionner</span>
-      </button>
+      {checked && (
+        <svg width="9" height="7" viewBox="0 0 10 8" fill="none">
+          <path d="M1 4L3.5 6.5L9 1" stroke={GOLD} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+      )}
+      {indeterminate && !checked && (
+        <div style={{ width: 7, height: 2, background: GOLD }} />
+      )}
     </div>
   )
 }
 
-export default function BlockedDates() {
-  const {
-    blockedDates, loading, error,
-    form, setForm,
-    submitting,
-    handleBlock, handleUnblock,
-    getDatesToBlock,
-    setBlockedDates,
-  } = useBlockedDates()
+function PageBtn({ onClick, disabled, active, children }) {
+  const [hov, setHov] = useState(false)
+  return (
+    <button onClick={onClick} disabled={disabled}
+      onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
+      style={{
+        minWidth: 32, height: 32, padding: '0 6px',
+        display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+        background: active ? DARK : hov && !disabled ? '#f0ebe4' : '#fff',
+        border: `1.5px solid ${active ? DARK : BORDER}`,
+        color: active ? GOLD : disabled ? '#ccc' : DARK,
+        fontSize: 12, fontWeight: active ? 900 : 700,
+        cursor: disabled ? 'not-allowed' : 'pointer',
+        transition: 'all 0.15s', flexShrink: 0,
+      }}>
+      {children}
+    </button>
+  )
+}
 
-  const [exporting,    setExporting]    = useState(false)
-  const [selectedDates, setSelectedDates] = useState([])
+export default function BlockedDateList({ blockedDates, handleUnblock, selectedDates, setSelectedDates }) {
+  const [page, setPage] = useState(1)
 
-  async function handleBulkUnblock() {
-    const ok = await confirm({
-      title:        'Débloquer la sélection',
-      message:      `Voulez-vous débloquer ${selectedDates.length} date${selectedDates.length > 1 ? 's' : ''} ?`,
-      confirmLabel: 'Débloquer',
-      type:         'danger',
-    })
-    if (!ok) return
-    const h = { 'Content-Type': 'application/json', 'Accept': 'application/json', 'Authorization': `Bearer ${getToken()}` }
-    try {
-      await Promise.all(selectedDates.map(date =>
-        fetch(`http://localhost:8000/api/blocked-dates/${date}`, { method: 'DELETE', headers: h })
-      ))
-      setBlockedDates(prev => prev.filter(d => !selectedDates.includes(d.date)))
-      toast(`${selectedDates.length} date${selectedDates.length > 1 ? 's débloquées' : ' débloquée'}`, 'warning')
-      setSelectedDates([])
-    } catch {
-      toast('Erreur lors du déblocage', 'error')
-    }
+  useEffect(() => { setPage(1) }, [blockedDates.length])
+
+  if (!blockedDates || blockedDates.length === 0) {
+    return (
+      <div style={{ padding: '56px 0', textAlign: 'center', background: '#fff', border: `1.5px solid ${BORDER}` }}>
+        <CalendarOff size={40} color='#d8d0c8' strokeWidth={1.5} style={{ display: 'block', margin: '0 auto 14px' }} />
+        <p style={{ margin: 0, fontSize: 15, fontWeight: 900, color: '#c8bfb4' }}>Aucune date bloquée</p>
+        <p style={{ margin: '6px 0 0', fontSize: 12, fontWeight: 600, color: '#d8d0c8' }}>
+          Utilisez le formulaire pour bloquer des dates.
+        </p>
+      </div>
+    )
   }
 
-  async function handleExport() {
-    setExporting(true)
-    try {
-      if (!window.jspdf) await new Promise((res, rej) => {
-        const s = document.createElement('script')
-        s.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js'
-        s.onload = res; s.onerror = rej; document.head.appendChild(s)
-      })
-      const { jsPDF } = window.jspdf
-      const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' })
-      const dateStr = new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
+  const total      = Math.ceil(blockedDates.length / PAGE_SIZE)
+  const safe       = Math.min(page, total)
+  const items      = blockedDates.slice((safe - 1) * PAGE_SIZE, safe * PAGE_SIZE)
 
-      doc.setFillColor(43,33,24); doc.rect(0,0,210,32,'F')
-      doc.setFont('helvetica','bold'); doc.setFontSize(18); doc.setTextColor(200,169,126)
-      doc.text('TableBooking.ma',20,14)
-      doc.setFontSize(9); doc.setTextColor(255,255,255); doc.text('Dates bloquées',20,22)
-      doc.setTextColor(200,169,126); doc.setFontSize(8); doc.text(dateStr,190,22,{align:'right'})
-      doc.setTextColor(43,33,24); doc.setFontSize(20); doc.setFont('helvetica','bold')
-      doc.text('Dates bloquées',20,48)
-      doc.setFontSize(10); doc.setTextColor(200,169,126)
-      doc.text(`${blockedDates.length} date${blockedDates.length!==1?'s':''} bloquée${blockedDates.length!==1?'s':''}`,20,56)
-      doc.setDrawColor(43,33,24); doc.setLineWidth(0.5); doc.line(20,61,190,61)
-      let y = 70
-      doc.setFillColor(43,33,24); doc.rect(20,y,170,9,'F')
-      doc.setTextColor(200,169,126); doc.setFontSize(8); doc.setFont('helvetica','bold')
-      doc.text('DATE BLOQUÉE',24,y+6); y += 9
-      blockedDates.forEach((d,i) => {
-        if (y>270) { doc.addPage(); y=20 }
-        doc.setFillColor(i%2===0?255:250,i%2===0?255:248,i%2===0?255:245); doc.rect(20,y,170,9,'F')
-        doc.setDrawColor(236,230,222); doc.line(20,y+9,190,y+9)
-        const label = d.date ? new Date(d.date).toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'}) : '—'
-        doc.setTextColor(43,33,24); doc.setFontSize(9); doc.setFont('helvetica','normal')
-        doc.text(label.charAt(0).toUpperCase()+label.slice(1),24,y+6); y+=9
-      })
-      const pH = doc.internal.pageSize.height
-      doc.setFillColor(200,169,126); doc.rect(0,pH-10,210,10,'F')
-      doc.setTextColor(43,33,24); doc.setFontSize(7); doc.setFont('helvetica','bold')
-      doc.text('TableBooking.ma — Rapport généré automatiquement',20,pH-4)
-      doc.text(dateStr,190,pH-4,{align:'right'})
-      doc.save(`dates_bloquees_${new Date().toISOString().slice(0,10)}.pdf`)
-    } catch(e) { console.error(e) } finally { setExporting(false) }
+  const allSelected  = blockedDates.length > 0 && blockedDates.every(d => selectedDates.includes(d.date))
+  const pageAllSel   = items.length > 0 && items.every(d => selectedDates.includes(d.date))
+  const pageSomeSel  = items.some(d => selectedDates.includes(d.date)) && !pageAllSel
+
+  function togglePage() {
+    const ids = items.map(d => d.date)
+    if (pageAllSel) setSelectedDates(selectedDates.filter(id => !ids.includes(id)))
+    else setSelectedDates([...new Set([...selectedDates, ...ids])])
+  }
+  function toggleOne(date) {
+    if (selectedDates.includes(date)) setSelectedDates(selectedDates.filter(d => d !== date))
+    else setSelectedDates([...selectedDates, date])
   }
 
-  if (loading) return <Spinner />
+  function getPages() {
+    if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1)
+    const p = [1]
+    if (safe > 3) p.push('…')
+    for (let i = Math.max(2, safe - 1); i <= Math.min(total - 1, safe + 1); i++) p.push(i)
+    if (safe < total - 2) p.push('…')
+    p.push(total)
+    return p
+  }
 
   return (
-    <>
-      <style>{`
-        @media (max-width: 600px) {
-          .btn-label { display: none !important; }
-          .page-subtitle { display: none !important; }
-        }
-        .bd-layout {
-          display: grid;
-          grid-template-columns: 1fr;
-          gap: 0;
-        }
-        @media (min-width: 920px) {
-          .bd-layout { grid-template-columns: 400px 1fr; gap: 48px; align-items: start; }
-          .bd-form-sticky { position: sticky; top: 24px; }
-          .bd-mobile-divider { display: none !important; }
-        }
-      `}</style>
+    <div style={{ background: '#fff', border: `1px solid ${BORDER}` }}>
 
-      <div style={{
-        minHeight: '100vh', background: '#faf8f5',
-        fontFamily: "'Plus Jakarta Sans','DM Sans',system-ui,sans-serif",
-        padding: 'clamp(16px,3vw,40px) clamp(12px,3vw,36px)',
-      }}>
-        <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800;900&display=swap" rel="stylesheet" />
-
-        {/* HEADER */}
-        <FadeUp delay={0}>
-          <div style={{
-            display: 'flex', alignItems: 'flex-start',
-            justifyContent: 'space-between', gap: 12,
-            marginBottom: 8, flexWrap: 'wrap',
+      {/* Partial selection banner — select all dataset */}
+      {selectedDates.length > 0 && !allSelected && (
+        <div style={{
+          padding: '9px 16px', background: '#fdf6ec',
+          borderBottom: `1px solid #e8d8b0`,
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, flexWrap: 'wrap',
+        }}>
+          <span style={{ fontSize: 12, fontWeight: 700, color: GOLD }}>
+            {selectedDates.length} sélectionné{selectedDates.length > 1 ? 's' : ''}
+          </span>
+          <button onClick={() => setSelectedDates(blockedDates.map(d => d.date))} style={{
+            background: 'none', border: 'none', cursor: 'pointer',
+            fontSize: 12, fontWeight: 800, color: DARK,
+            textDecoration: 'underline', fontFamily: 'inherit', padding: 0,
           }}>
-            <div>
-              <h1 style={{
-                margin: 0, fontSize: 'clamp(22px,4vw,36px)',
-                fontWeight: 900, color: DARK, letterSpacing: '-1.5px', lineHeight: 1,
-              }}>
-                Dates bloquées
-              </h1>
-              <p className="page-subtitle" style={{ margin: '6px 0 0', fontSize: 12, fontWeight: 700, color: GOLD_DK }}>
-                Les dates bloquées ne peuvent pas être réservées par les clients.
-              </p>
-            </div>
-            <div style={{ display: 'flex', gap: 3, flexShrink: 0 }}>
-              <Btn icon={FileDown} primary onClick={handleExport} disabled={exporting}>
-                {exporting ? 'Génération…' : 'Exporter PDF'}
-              </Btn>
-            </div>
-          </div>
-        </FadeUp>
+            Sélectionner les {blockedDates.length} dates
+          </button>
+        </div>
+      )}
 
-        {/* DIVIDER */}
-        <FadeUp delay={10}>
-          <div style={{ height: 2, background: DARK, margin: '16px 0 28px' }} />
-        </FadeUp>
+      {/* All selected banner */}
+      {allSelected && blockedDates.length > PAGE_SIZE && (
+        <div style={{
+          padding: '9px 16px', background: '#f0f7f0',
+          borderBottom: `1px solid #b8ddb8`,
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, flexWrap: 'wrap',
+        }}>
+          <span style={{ fontSize: 12, fontWeight: 700, color: '#2d6a2d' }}>
+            Toutes les {blockedDates.length} dates sélectionnées
+          </span>
+          <button onClick={() => setSelectedDates([])} style={{
+            background: 'none', border: 'none', cursor: 'pointer',
+            fontSize: 12, fontWeight: 800, color: '#2d6a2d',
+            textDecoration: 'underline', fontFamily: 'inherit', padding: 0,
+          }}>
+            Désélectionner tout
+          </button>
+        </div>
+      )}
 
-        {/* ERROR */}
-        {error && (
-          <FadeUp delay={15}>
-            <div style={{
-              marginBottom: 20, padding: '11px 16px',
-              background: RED_BG, borderLeft: `3px solid ${RED}`,
-              fontSize: 12, fontWeight: 700, color: RED,
-            }}>
-              {error}
-            </div>
-          </FadeUp>
-        )}
-
-        {/* BULK BAR */}
-        {selectedDates.length > 0 && (
-          <BulkBar
-            count={selectedDates.length}
-            onUnblock={handleBulkUnblock}
-            onClear={() => setSelectedDates([])}
-          />
-        )}
-
-        {/* TWO-COL LAYOUT */}
-        <FadeUp delay={20}>
-          <div className="bd-layout">
-
-            {/* FORM */}
-            <div className="bd-form-sticky">
-              <h2 style={{ margin: '0 0 5px', fontSize: 'clamp(15px,2.5vw,22px)', fontWeight: 900, color: DARK, letterSpacing: '-0.8px' }}>
-                Bloquer une date
-              </h2>
-              <p className="page-subtitle" style={{ margin: '0 0 16px', fontSize: 12, fontWeight: 700, color: GOLD_DK }}>
-                Date unique · Intervalle · Récurrent
-              </p>
-              <BlockedDateForm
-                form={form} setForm={setForm}
-                handleBlock={handleBlock} submitting={submitting}
-                getDatesToBlock={getDatesToBlock}
-              />
-            </div>
-
-            {/* LIST */}
-            <div>
-              <div className="bd-mobile-divider" style={{ height: 2, background: DARK, margin: '32px 0 28px' }} />
-              <div style={{ marginBottom: 16, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
-                <h2 style={{ margin: 0, fontSize: 'clamp(15px,2.5vw,22px)', fontWeight: 900, color: DARK, letterSpacing: '-0.8px' }}>
-                  Dates bloquées
-                </h2>
-                <span style={{
-                  padding: '4px 10px', background: DARK,
-                  fontSize: 11, fontWeight: 900, color: GOLD, letterSpacing: '0.05em',
-                }}>
-                  {blockedDates.length}
-                </span>
-              </div>
-              <BlockedDateList
-                blockedDates={blockedDates}
-                handleUnblock={handleUnblock}
-                selectedDates={selectedDates}
-                setSelectedDates={setSelectedDates}
-              />
-            </div>
-
-          </div>
-        </FadeUp>
+      {/* Header */}
+      <div style={{
+        display: 'grid', gridTemplateColumns: '44px 1fr auto',
+        padding: '11px 16px', background: DARK, alignItems: 'center', gap: 12,
+      }}>
+        <Checkbox checked={pageAllSel} indeterminate={pageSomeSel} onChange={togglePage} />
+        <span style={{ fontSize: 9, fontWeight: 900, color: GOLD, letterSpacing: '0.2em', textTransform: 'uppercase' }}>
+          Date bloquée
+        </span>
+        <span style={{ fontSize: 9, fontWeight: 900, color: GOLD, letterSpacing: '0.2em', textTransform: 'uppercase' }}>
+          Action
+        </span>
       </div>
-    </>
+
+      {/* Rows */}
+      {items.map((d, i) => {
+        const past     = isPast(d.date)
+        const selected = selectedDates.includes(d.date)
+        const idx      = (safe - 1) * PAGE_SIZE + i
+        return (
+          <div key={d.date ?? i}
+            onClick={() => toggleOne(d.date)}
+            style={{
+              display: 'grid', gridTemplateColumns: '44px 1fr auto',
+              padding: '14px 16px',
+              background: selected ? '#fdf6ec' : idx % 2 === 0 ? '#fff' : CREAM,
+              borderBottom: `1px solid ${BORDER}`,
+              borderLeft: `3px solid ${selected ? GOLD : 'transparent'}`,
+              alignItems: 'center', gap: 12,
+              cursor: 'pointer',
+              transition: 'background 0.12s',
+              opacity: past ? 0.6 : 1,
+            }}
+            onMouseEnter={e => { if (!selected) e.currentTarget.style.background = '#faf5ee' }}
+            onMouseLeave={e => { e.currentTarget.style.background = selected ? '#fdf6ec' : idx % 2 === 0 ? '#fff' : CREAM }}
+          >
+            {/* Checkbox */}
+            <div onClick={e => e.stopPropagation()}>
+              <Checkbox checked={selected} onChange={() => toggleOne(d.date)} />
+            </div>
+
+            {/* Date info */}
+            <div>
+              <p style={{ margin: 0, fontSize: 'clamp(12px,2vw,14px)', fontWeight: 700, color: DARK, lineHeight: 1.3 }}>
+                {fmt(d.date)}
+              </p>
+              {d.reason && (
+                <p style={{ margin: '3px 0 0', fontSize: 11, fontWeight: 600, color: GOLD, fontStyle: 'italic' }}>
+                  {d.reason}
+                </p>
+              )}
+              {past && (
+                <span style={{
+                  display: 'inline-block', marginTop: 4,
+                  fontSize: 9, fontWeight: 900, color: '#bbb',
+                  letterSpacing: '0.12em', textTransform: 'uppercase',
+                }}>
+                  Passée
+                </span>
+              )}
+            </div>
+
+            {/* Action button — full on desktop, icon-only on mobile */}
+            <button
+              onClick={e => { e.stopPropagation(); handleUnblock(d.date) }}
+              style={{
+                display: 'flex', alignItems: 'center', gap: 8,
+                padding: '10px 20px',
+                background: DARK, border: 'none', color: '#fff',
+                fontSize: 13, fontWeight: 800,
+                cursor: 'pointer', transition: 'background 0.15s',
+                fontFamily: 'inherit', whiteSpace: 'nowrap', flexShrink: 0,
+              }}
+              onMouseEnter={e => e.currentTarget.style.background = '#b94040'}
+              onMouseLeave={e => e.currentTarget.style.background = DARK}
+              title="Débloquer"
+            >
+              <Trash2 size={14} strokeWidth={2.2} />
+              <span className="btn-label">Débloquer</span>
+            </button>
+          </div>
+        )
+      })}
+
+      {/* Pagination */}
+      {total > 1 && (
+        <div style={{
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          flexWrap: 'wrap', gap: 8,
+          padding: '12px 16px',
+          borderTop: `1.5px solid ${BORDER}`,
+          background: CREAM,
+        }}>
+          <span style={{ fontSize: 11, fontWeight: 700, color: '#bbb' }}>
+            {(safe - 1) * PAGE_SIZE + 1}–{Math.min(safe * PAGE_SIZE, blockedDates.length)} / {blockedDates.length}
+          </span>
+          <div style={{ display: 'flex', gap: 3 }}>
+            <PageBtn onClick={() => setPage(1)} disabled={safe === 1}>
+              <ChevronsLeft size={12} strokeWidth={2.5} />
+            </PageBtn>
+            <PageBtn onClick={() => setPage(p => Math.max(1, p - 1))} disabled={safe === 1}>
+              <ChevronLeft size={12} strokeWidth={2.5} />
+            </PageBtn>
+            {getPages().map((p, i) =>
+              p === '…'
+                ? <span key={`d${i}`} style={{ padding: '0 4px', fontSize: 12, color: '#bbb', lineHeight: '32px' }}>…</span>
+                : <PageBtn key={p} active={p === safe} onClick={() => setPage(p)}>{p}</PageBtn>
+            )}
+            <PageBtn onClick={() => setPage(p => Math.min(total, p + 1))} disabled={safe === total}>
+              <ChevronRight size={12} strokeWidth={2.5} />
+            </PageBtn>
+            <PageBtn onClick={() => setPage(total)} disabled={safe === total}>
+              <ChevronsRight size={12} strokeWidth={2.5} />
+            </PageBtn>
+          </div>
+        </div>
+      )}
+    </div>
   )
 }
