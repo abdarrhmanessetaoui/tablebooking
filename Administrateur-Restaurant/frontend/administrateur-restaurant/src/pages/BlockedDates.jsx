@@ -24,12 +24,13 @@ function Btn({ children, onClick, primary, disabled, icon: Icon }) {
       onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
       style={{
         display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-        padding: '11px 20px', background: bg, border: 'none', color,
+        padding: '10px 16px', background: bg, border: 'none', color,
         fontSize: 13, fontWeight: 800,
         cursor: disabled ? 'not-allowed' : 'pointer',
         opacity: disabled ? 0.5 : 1,
         transition: 'background 0.15s, color 0.15s',
         fontFamily: 'inherit', whiteSpace: 'nowrap',
+        minHeight: 40,
       }}>
       {Icon && <Icon size={15} strokeWidth={2.2} />}
       <span className="btn-label">{children}</span>
@@ -43,7 +44,7 @@ function BulkBar({ count, onUnblock, onClear }) {
     <div style={{
       position: 'sticky', top: 8, zIndex: 30,
       display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap',
-      padding: '10px 16px',
+      padding: '10px 12px',
       background: DARK,
       boxShadow: '0 4px 24px rgba(43,33,24,0.28)',
       marginBottom: 12,
@@ -51,7 +52,7 @@ function BulkBar({ count, onUnblock, onClear }) {
     }}>
       <style>{`
         @keyframes slideDown { from{opacity:0;transform:translateY(-8px)} to{opacity:1;transform:translateY(0)} }
-        @media (max-width: 600px) {
+        @media (max-width: 480px) {
           .bulk-label { display: none !important; }
         }
       `}</style>
@@ -72,13 +73,14 @@ function BulkBar({ count, onUnblock, onClear }) {
         onMouseEnter={() => setHovDel(true)} onMouseLeave={() => setHovDel(false)}
         style={{
           display: 'flex', alignItems: 'center', gap: 5,
-          padding: '6px 12px',
+          padding: '7px 12px',
           background: hovDel ? '#ef4444' : 'rgba(239,68,68,0.12)',
           border: '1px solid rgba(239,68,68,0.25)',
           color: hovDel ? '#fff' : '#f87171',
           fontSize: 12, fontWeight: 700,
           cursor: 'pointer', fontFamily: 'inherit',
           transition: 'all 0.15s', flexShrink: 0,
+          minHeight: 34,
         }}
       >
         <Trash2 size={13} strokeWidth={2.5} />
@@ -88,12 +90,13 @@ function BulkBar({ count, onUnblock, onClear }) {
       <button onClick={onClear}
         style={{
           marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 5,
-          padding: '6px 10px',
+          padding: '7px 10px',
           background: 'none', border: '1px solid rgba(255,255,255,0.12)',
           color: 'rgba(255,255,255,0.45)',
           fontSize: 12, fontWeight: 700,
           cursor: 'pointer', fontFamily: 'inherit',
           transition: 'all 0.15s', flexShrink: 0,
+          minHeight: 34,
         }}
         onMouseEnter={e => e.currentTarget.style.color = '#fff'}
         onMouseLeave={e => e.currentTarget.style.color = 'rgba(255,255,255,0.45)'}
@@ -187,39 +190,55 @@ export default function BlockedDates() {
   return (
     <>
       <style>{`
-        @media (max-width: 600px) {
+        /* Hide btn text on very small screens, keep icon */
+        @media (max-width: 480px) {
           .btn-label { display: none !important; }
           .page-subtitle { display: none !important; }
         }
+
+        /* Two-col layout: stacked on mobile, side-by-side on wider */
         .bd-layout {
           display: grid;
           grid-template-columns: 1fr;
           gap: 0;
         }
-        @media (min-width: 920px) {
-          .bd-layout { grid-template-columns: 400px 1fr; gap: 48px; align-items: start; }
-          .bd-form-sticky { position: sticky; top: 24px; }
+        @media (min-width: 960px) {
+          .bd-layout {
+            grid-template-columns: 380px 1fr;
+            gap: 48px;
+            align-items: start;
+          }
+          .bd-form-sticky {
+            position: sticky;
+            top: 24px;
+          }
           .bd-mobile-divider { display: none !important; }
+        }
+
+        /* Ensure tap targets are large enough on mobile */
+        @media (max-width: 600px) {
+          button { min-height: 40px; }
         }
       `}</style>
 
       <div style={{
         minHeight: '100vh', background: '#faf8f5',
         fontFamily: "'Plus Jakarta Sans','DM Sans',system-ui,sans-serif",
-        padding: 'clamp(16px,3vw,40px) clamp(12px,3vw,36px)',
+        padding: 'clamp(14px,3vw,40px) clamp(12px,4vw,36px)',
+        boxSizing: 'border-box',
       }}>
         <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800;900&display=swap" rel="stylesheet" />
 
         {/* HEADER */}
         <FadeUp delay={0}>
           <div style={{
-            display: 'flex', alignItems: 'flex-start',
+            display: 'flex', alignItems: 'center',
             justifyContent: 'space-between', gap: 12,
             marginBottom: 8, flexWrap: 'wrap',
           }}>
-            <div>
+            <div style={{ minWidth: 0, flex: 1 }}>
               <h1 style={{
-                margin: 0, fontSize: 'clamp(22px,4vw,36px)',
+                margin: 0, fontSize: 'clamp(20px,5vw,36px)',
                 fontWeight: 900, color: DARK, letterSpacing: '-1.5px', lineHeight: 1,
               }}>
                 Dates bloquées
@@ -284,6 +303,7 @@ export default function BlockedDates() {
 
             {/* LIST */}
             <div>
+              {/* Divider only shown on mobile between form and list */}
               <div className="bd-mobile-divider" style={{ height: 2, background: DARK, margin: '32px 0 28px' }} />
               <div style={{ marginBottom: 16, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
                 <h2 style={{ margin: 0, fontSize: 'clamp(15px,2.5vw,22px)', fontWeight: 900, color: DARK, letterSpacing: '-0.8px' }}>
@@ -292,6 +312,7 @@ export default function BlockedDates() {
                 <span style={{
                   padding: '4px 10px', background: DARK,
                   fontSize: 11, fontWeight: 900, color: GOLD, letterSpacing: '0.05em',
+                  flexShrink: 0,
                 }}>
                   {blockedDates.length}
                 </span>
