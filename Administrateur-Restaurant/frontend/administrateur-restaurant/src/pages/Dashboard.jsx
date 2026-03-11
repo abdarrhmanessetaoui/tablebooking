@@ -282,131 +282,141 @@ function TabPanel({ tab, stats, reservations, onViewAll }) {
   return (
     <>
       <style>{`
-        /* 2-col layout — stats left (fixed), table right (flex) */
-        .db-layout {
+        /* Outer card */
+        .db-card {
+          background: ${WHITE};
+          border: 2px solid ${DARK};
+          overflow: hidden;
+        }
+        /* Single unified header bar spanning full width */
+        .db-header-bar {
           display: grid;
-          grid-template-columns: 1fr;
-          gap: 0;
+          grid-template-columns: 280px 1fr;
+          background: ${DARK};
+          height: 38px;
         }
-        @media (min-width: 860px) {
-          .db-layout {
-            grid-template-columns: 280px 1fr;
-            align-items: stretch;
-            gap: 0;
-          }
-          .db-stats-sticky { position: sticky; top: 24px; }
-          .db-mobile-divider { display: none !important; }
-          /* Make both column headers the exact same height */
-          .db-col-header {
-            height: 38px;
-          }
-        }
-        .db-col-header {
-          display: flex;
-          align-items: center;
+        .db-header-left {
+          display: flex; align-items: center;
           padding: 0 20px;
-          background: #2b2118;
+          border-right: 2px solid rgba(255,255,255,0.15);
         }
-        /* Mobile cards for reservations */
+        .db-header-right {
+          display: flex; align-items: center; justify-content: space-between;
+          padding: 0 20px;
+        }
+        /* Column headers row (table sub-header) */
+        .db-col-headers {
+          display: grid;
+          grid-template-columns: 280px 1fr;
+          background: ${DARK};
+          border-top: 1px solid rgba(255,255,255,0.07);
+        }
+        /* 2-col body layout */
+        .db-body {
+          display: grid;
+          grid-template-columns: 280px 1fr;
+        }
+        /* Left column — stats */
+        .db-left {
+          border-right: 2px solid ${DARK};
+        }
+        .db-stats-sticky { position: sticky; top: 24px; }
+
+        /* Mobile: stack everything */
+        @media (max-width: 860px) {
+          .db-header-bar,
+          .db-col-headers,
+          .db-body { grid-template-columns: 1fr; }
+          .db-header-right { border-top: 1px solid rgba(255,255,255,0.1); }
+          .db-left { border-right: none; border-bottom: 2px solid ${DARK}; }
+          .db-stats-sticky { position: static; }
+        }
+
+        /* Reservation table/cards */
         .res-desktop { display: block; }
-        .res-mobile  { display: none; }
+        .res-mobile  { display: none;  }
         @media (max-width: 640px) {
-          .res-desktop { display: none; }
+          .res-desktop { display: none;  }
           .res-mobile  { display: block; }
         }
       `}</style>
 
-      <div className="db-layout">
+      <div className="db-card">
 
-        {/* ── LEFT: stats ── */}
-        <div className="db-stats-sticky">
-
-          {/* Section header — dark bar, same height as right header */}
-          <div className="db-col-header">
+        {/* ── UNIFIED HEADER BAR ── */}
+        <div className="db-header-bar">
+          <div className="db-header-left">
             <span style={{ fontSize: 9, fontWeight: 900, color: GOLD, textTransform: 'uppercase', letterSpacing: '0.2em' }}>
               Vue d'ensemble
             </span>
           </div>
-
-          {/* Hero: big number + ring side by side */}
-          <div style={{
-            background: WHITE,
-            padding: '18px 20px 16px',
-            display: 'flex', alignItems: 'center', gap: 20,
-            borderBottom: `1px solid ${BORDER}`,
-          }}>
-            <div>
-              <p style={{
-                margin: 0,
-                fontSize: 'clamp(52px,8vw,80px)', fontWeight: 900, color: DARK,
-                lineHeight: 0.9, letterSpacing: '-4px', fontVariantNumeric: 'tabular-nums',
-              }}>{hero}</p>
-              <p style={{ margin: '10px 0 0', fontSize: 11, fontWeight: 700, color: MUTED }}>
-                réservation{hero !== 1 ? 's' : ''}
-              </p>
-            </div>
-            <Ring c={c} p={p} a={a} size={88} />
-          </div>
-
-          {/* 3 stacked stat blocks */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 1, background: BORDER }}>
-            <StatBlock icon={CheckCircle} value={c} label="Confirmées" accent={GREEN} bg={GREEN_BG} delay={50}  total={total} />
-            <StatBlock icon={Clock}       value={p} label="En attente" accent={AMBER} bg={AMBER_BG} delay={80}  total={total} />
-            <StatBlock icon={XCircle}     value={a} label="Annulées"   accent={RED}   bg={RED_BG}   delay={110} total={total} />
-          </div>
-        </div>
-
-        {/* ── RIGHT: table ── */}
-        <div>
-          {/* Divider shown only on mobile between left and right */}
-          <div className="db-mobile-divider" style={{ height: 2, background: DARK, margin: '28px 0' }} />
-
-          {/* Section header */}
-          <div className="db-col-header" style={{ justifyContent: 'space-between' }}>
+          <div className="db-header-right">
             <span style={{ fontSize: 9, fontWeight: 900, color: GOLD, textTransform: 'uppercase', letterSpacing: '0.2em' }}>
               Prochaines réservations
             </span>
             <button onClick={onViewAll} style={{
-              background: 'none', border: 'none', color: GOLD, opacity: 0.8,
+              background: 'none', border: 'none', color: GOLD, opacity: 0.75,
               fontSize: 10, fontWeight: 900, cursor: 'pointer', fontFamily: 'inherit',
               display: 'flex', alignItems: 'center', gap: 5, padding: 0,
               letterSpacing: '0.1em', textTransform: 'uppercase', transition: 'opacity 0.15s',
             }}
               onMouseEnter={e => e.currentTarget.style.opacity = 1}
-              onMouseLeave={e => e.currentTarget.style.opacity = 0.8}
+              onMouseLeave={e => e.currentTarget.style.opacity = 0.75}
             >
               Voir tout <ArrowRight size={11} strokeWidth={2.5} />
             </button>
           </div>
-
-          {/* Desktop table */}
-          <div className="res-desktop">
-            <ReservationsTable reservations={reservations} onViewAll={onViewAll} />
-          </div>
-
-          {/* Mobile cards */}
-          <div className="res-mobile">
-            {reservations?.length
-              ? reservations.slice(0, 6).map((r, i) => <ResCardMobile key={r.id ?? i} r={r} i={i} />)
-              : (
-                <div style={{ padding: '40px 16px', textAlign: 'center' }}>
-                  <CalendarDays size={32} color="rgba(43,33,24,0.1)" style={{ display: 'block', margin: '0 auto 12px' }} />
-                  <p style={{ margin: 0, fontSize: 13, fontWeight: 900, color: 'rgba(43,33,24,0.18)' }}>Aucune réservation</p>
-                </div>
-              )
-            }
-            <button onClick={onViewAll} style={{
-              width: '100%', padding: '13px 16px', background: DARK, border: 'none', color: WHITE,
-              fontSize: 11, fontWeight: 900, letterSpacing: '0.1em', textTransform: 'uppercase',
-              cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-              fontFamily: 'inherit',
-            }}>
-              <span>Voir toutes les réservations</span>
-              <ArrowRight size={13} strokeWidth={2.5} />
-            </button>
-          </div>
         </div>
 
+        {/* ── TWO-COL BODY ── */}
+        <div className="db-body">
+
+          {/* LEFT: stats */}
+          <div className="db-left db-stats-sticky">
+            {/* Hero */}
+            <div style={{ padding: '18px 20px 16px', display: 'flex', alignItems: 'center', gap: 20, borderBottom: `1px solid ${BORDER}`, background: WHITE }}>
+              <div>
+                <p style={{ margin: 0, fontSize: 'clamp(52px,8vw,80px)', fontWeight: 900, color: DARK, lineHeight: 0.9, letterSpacing: '-4px', fontVariantNumeric: 'tabular-nums' }}>{hero}</p>
+                <p style={{ margin: '10px 0 0', fontSize: 11, fontWeight: 700, color: MUTED }}>réservation{hero !== 1 ? 's' : ''}</p>
+              </div>
+              <Ring c={c} p={p} a={a} size={88} />
+            </div>
+            {/* 3 stat blocks */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 1, background: BORDER }}>
+              <StatBlock icon={CheckCircle} value={c} label="Confirmées" accent={GREEN} bg={GREEN_BG} delay={50}  total={total} />
+              <StatBlock icon={Clock}       value={p} label="En attente" accent={AMBER} bg={AMBER_BG} delay={80}  total={total} />
+              <StatBlock icon={XCircle}     value={a} label="Annulées"   accent={RED}   bg={RED_BG}   delay={110} total={total} />
+            </div>
+          </div>
+
+          {/* RIGHT: table */}
+          <div>
+            <div className="res-desktop">
+              <ReservationsTable reservations={reservations} onViewAll={onViewAll} />
+            </div>
+            <div className="res-mobile">
+              {reservations?.length
+                ? reservations.slice(0, 6).map((r, i) => <ResCardMobile key={r.id ?? i} r={r} i={i} />)
+                : (
+                  <div style={{ padding: '40px 16px', textAlign: 'center' }}>
+                    <CalendarDays size={32} color="rgba(43,33,24,0.1)" style={{ display: 'block', margin: '0 auto 12px' }} />
+                    <p style={{ margin: 0, fontSize: 13, fontWeight: 900, color: 'rgba(43,33,24,0.18)' }}>Aucune réservation</p>
+                  </div>
+                )
+              }
+              <button onClick={onViewAll} style={{
+                width: '100%', padding: '13px 16px', background: DARK, border: 'none', color: WHITE,
+                fontSize: 11, fontWeight: 900, letterSpacing: '0.1em', textTransform: 'uppercase',
+                cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                fontFamily: 'inherit',
+              }}>
+                <span>Voir toutes les réservations</span>
+                <ArrowRight size={13} strokeWidth={2.5} />
+              </button>
+            </div>
+          </div>
+
+        </div>
       </div>
     </>
   )
