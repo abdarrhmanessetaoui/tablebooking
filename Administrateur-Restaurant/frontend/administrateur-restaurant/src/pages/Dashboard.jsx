@@ -185,7 +185,7 @@ function ResCardMobile({ r, i }) {
 }
 
 /* ─── Reservations table (right column) ─── */
-function ReservationsTable({ reservations, onViewAll }) {
+function ReservationsTable({ reservations, onViewAll, tabLabel }) {
   if (!reservations?.length) return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '48px 16px', textAlign: 'center' }}>
@@ -254,7 +254,7 @@ function ReservationsTable({ reservations, onViewAll }) {
         ))}
       </div>
 
-      {/* Footer CTA */}
+      {/* Footer CTA — context-aware label */}
       <button onClick={onViewAll} style={{
         width: '100%', padding: '13px 16px', background: DARK, border: 'none', color: WHITE,
         fontSize: 11, fontWeight: 900, letterSpacing: '0.1em', textTransform: 'uppercase',
@@ -264,7 +264,7 @@ function ReservationsTable({ reservations, onViewAll }) {
         onMouseEnter={e => e.currentTarget.style.background = '#3d2d1e'}
         onMouseLeave={e => e.currentTarget.style.background = DARK}
       >
-        <span>Voir toutes les réservations</span>
+        <span>Toutes les réservations — {tabLabel}</span>
         <ArrowRight size={13} strokeWidth={2.5} />
       </button>
     </div>
@@ -272,12 +272,19 @@ function ReservationsTable({ reservations, onViewAll }) {
 }
 
 /* ─── Tab panel — 2-col like BlockedDates ─── */
-function TabPanel({ tab, stats, reservations, onViewAll }) {
+function TabPanel({ tab, stats, reservations, onViewAll, tabLabel, tabDate }) {
   const c     = tab === 'today' ? stats.today_confirmed    : tab === 'tomorrow' ? (stats.tomorrow_confirmed ?? 0) : stats.confirmed
   const p     = tab === 'today' ? stats.today_pending      : tab === 'tomorrow' ? (stats.tomorrow_pending   ?? 0) : stats.pending
   const a     = tab === 'today' ? stats.today_cancelled    : tab === 'tomorrow' ? (stats.tomorrow_cancelled ?? 0) : stats.cancelled
   const hero  = tab === 'today' ? stats.today              : tab === 'tomorrow' ? (stats.tomorrow           ?? 0) : stats.total
   const total = c + p + a || 1
+
+  // Human-readable period label for buttons
+  const periodLabel = tab === 'today' ? "Aujourd'hui" : tab === 'tomorrow' ? 'Demain' : 'Ce mois'
+  // Formatted date string for sub-label (e.g. "mer. 11 mars")
+  const dateStr = tabDate
+    ? new Date(tabDate).toLocaleDateString('fr-FR', { weekday: 'short', day: 'numeric', month: 'long' })
+    : null
 
   return (
     <>
@@ -351,9 +358,16 @@ function TabPanel({ tab, stats, reservations, onViewAll }) {
             </span>
           </div>
           <div className="db-header-right">
-            <span style={{ fontSize: 9, fontWeight: 900, color: GOLD, textTransform: 'uppercase', letterSpacing: '0.2em' }}>
-              Prochaines réservations
-            </span>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+              <span style={{ fontSize: 9, fontWeight: 900, color: GOLD, textTransform: 'uppercase', letterSpacing: '0.2em' }}>
+                Réservations — {periodLabel}
+              </span>
+              {dateStr && (
+                <span style={{ fontSize: 9, fontWeight: 700, color: 'rgba(200,169,126,0.55)', textTransform: 'capitalize' }}>
+                  {dateStr}
+                </span>
+              )}
+            </div>
             <button onClick={onViewAll} style={{
               background: 'none', border: 'none', color: GOLD, opacity: 0.75,
               fontSize: 10, fontWeight: 900, cursor: 'pointer', fontFamily: 'inherit',
@@ -392,7 +406,7 @@ function TabPanel({ tab, stats, reservations, onViewAll }) {
           {/* RIGHT: table */}
           <div>
             <div className="res-desktop">
-              <ReservationsTable reservations={reservations} onViewAll={onViewAll} />
+              <ReservationsTable reservations={reservations} onViewAll={onViewAll} tabLabel={periodLabel} />
             </div>
             <div className="res-mobile">
               {reservations?.length
@@ -401,6 +415,7 @@ function TabPanel({ tab, stats, reservations, onViewAll }) {
                   <div style={{ padding: '40px 16px', textAlign: 'center' }}>
                     <CalendarDays size={32} color="rgba(43,33,24,0.1)" style={{ display: 'block', margin: '0 auto 12px' }} />
                     <p style={{ margin: 0, fontSize: 13, fontWeight: 900, color: 'rgba(43,33,24,0.18)' }}>Aucune réservation</p>
+                    <p style={{ margin: '5px 0 0', fontSize: 11, fontWeight: 700, color: 'rgba(43,33,24,0.12)' }}>{periodLabel}</p>
                   </div>
                 )
               }
@@ -410,7 +425,7 @@ function TabPanel({ tab, stats, reservations, onViewAll }) {
                 cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                 fontFamily: 'inherit',
               }}>
-                <span>Voir toutes les réservations</span>
+                <span>Toutes les réservations — {periodLabel}</span>
                 <ArrowRight size={13} strokeWidth={2.5} />
               </button>
             </div>
@@ -556,6 +571,9 @@ export default function Dashboard() {
                 {t.key === 'today' && stats.today_pending > 0 && (
                   <span className="tab-pill">{stats.today_pending}</span>
                 )}
+                {t.key === 'tomorrow' && (stats.tomorrow_pending ?? 0) > 0 && (
+                  <span className="tab-pill">{stats.tomorrow_pending}</span>
+                )}
               </button>
             ))}
           </div>
@@ -567,6 +585,8 @@ export default function Dashboard() {
             tab={tab}
             stats={stats}
             reservations={active?.res ?? []}
+            tabLabel={active?.label ?? ''}
+            tabDate={active?.date ?? null}
             onViewAll={() => navigate('/reservations', { state: active?.date ? { filterDate: active.date } : {} })}
           />
         </FadeUp>
