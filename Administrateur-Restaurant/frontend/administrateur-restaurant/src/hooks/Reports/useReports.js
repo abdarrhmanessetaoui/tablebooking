@@ -75,7 +75,7 @@ function aggregate(rows) {
 
       // week
       const wn  = getWeekNum(d)
-      inc(by_week, `${yr}-W${String(wn).padStart(2,'0')}`)
+      inc(by_week, `S${String(wn).padStart(2,'0')} '${String(yr).slice(2)}`)
 
       // month
       inc(by_month, `${FR_MONTHS[mo]} ${yr}`)
