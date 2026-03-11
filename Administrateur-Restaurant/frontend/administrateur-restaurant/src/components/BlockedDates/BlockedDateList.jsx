@@ -61,10 +61,15 @@ function PageBtn({ onClick, disabled, active, children }) {
   )
 }
 
-export default function BlockedDateList({ blockedDates, handleUnblock, selectedDates, setSelectedDates }) {
+export default function BlockedDateList({
+  blockedDates,
+  handleUnblock,
+  selectedDates = [],
+  setSelectedDates,
+}) {
   const [page, setPage] = useState(1)
 
-  useEffect(() => { setPage(1) }, [blockedDates.length])
+  useEffect(() => { setPage(1) }, [blockedDates?.length])
 
   if (!blockedDates || blockedDates.length === 0) {
     return (
@@ -78,24 +83,20 @@ export default function BlockedDateList({ blockedDates, handleUnblock, selectedD
     )
   }
 
-  const total    = Math.ceil(blockedDates.length / PAGE_SIZE)
-  const safe     = Math.min(page, total)
-  const items    = blockedDates.slice((safe - 1) * PAGE_SIZE, safe * PAGE_SIZE)
+  const total     = Math.ceil(blockedDates.length / PAGE_SIZE)
+  const safe      = Math.min(page, total)
+  const items     = blockedDates.slice((safe - 1) * PAGE_SIZE, safe * PAGE_SIZE)
 
-  const allSelected  = blockedDates.length > 0 && blockedDates.every(d => selectedDates.includes(d.date))
-  const someSelected = selectedDates.length > 0 && !allSelected
-  const pageAllSel   = items.length > 0 && items.every(d => selectedDates.includes(d.date))
-  const pageSomeSel  = items.some(d => selectedDates.includes(d.date)) && !pageAllSel
+  const allSelected = blockedDates.length > 0 && blockedDates.every(d => selectedDates.includes(d.date))
+  const pageAllSel  = items.length > 0 && items.every(d => selectedDates.includes(d.date))
+  const pageSomeSel = items.some(d => selectedDates.includes(d.date)) && !pageAllSel
 
-  function toggleAll()  {
-    if (allSelected) setSelectedDates([])
-    else setSelectedDates(blockedDates.map(d => d.date))
-  }
   function togglePage() {
     const ids = items.map(d => d.date)
     if (pageAllSel) setSelectedDates(selectedDates.filter(id => !ids.includes(id)))
     else setSelectedDates([...new Set([...selectedDates, ...ids])])
   }
+
   function toggleOne(date) {
     if (selectedDates.includes(date)) setSelectedDates(selectedDates.filter(d => d !== date))
     else setSelectedDates([...selectedDates, date])
@@ -114,17 +115,17 @@ export default function BlockedDateList({ blockedDates, handleUnblock, selectedD
   return (
     <div style={{ background: '#fff', border: `1px solid ${BORDER}` }}>
 
-      {/* Select-all banner */}
-      {someSelected && (
+      {/* Partial selection banner */}
+      {selectedDates.length > 0 && !allSelected && (
         <div style={{
           padding: '9px 16px', background: '#fdf6ec',
           borderBottom: `1px solid #e8d8b0`,
           display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, flexWrap: 'wrap',
         }}>
           <span style={{ fontSize: 12, fontWeight: 700, color: GOLD }}>
-            {selectedDates.length} sélectionné{selectedDates.length > 1 ? 's' : ''} sur cette page
+            {selectedDates.length} sélectionné{selectedDates.length > 1 ? 's' : ''}
           </span>
-          <button onClick={toggleAll} style={{
+          <button onClick={() => setSelectedDates(blockedDates.map(d => d.date))} style={{
             background: 'none', border: 'none', cursor: 'pointer',
             fontSize: 12, fontWeight: 800, color: DARK,
             textDecoration: 'underline', fontFamily: 'inherit', padding: 0,
@@ -134,6 +135,7 @@ export default function BlockedDateList({ blockedDates, handleUnblock, selectedD
         </div>
       )}
 
+      {/* All selected banner */}
       {allSelected && blockedDates.length > PAGE_SIZE && (
         <div style={{
           padding: '9px 16px', background: '#f0f7f0',
@@ -183,16 +185,18 @@ export default function BlockedDateList({ blockedDates, handleUnblock, selectedD
               borderLeft: `3px solid ${selected ? GOLD : 'transparent'}`,
               alignItems: 'center', gap: 12,
               cursor: 'pointer',
-              transition: 'all 0.12s',
+              transition: 'background 0.12s',
               opacity: past ? 0.6 : 1,
             }}
             onMouseEnter={e => { if (!selected) e.currentTarget.style.background = '#faf5ee' }}
             onMouseLeave={e => { e.currentTarget.style.background = selected ? '#fdf6ec' : idx % 2 === 0 ? '#fff' : CREAM }}
           >
+            {/* Checkbox */}
             <div onClick={e => e.stopPropagation()}>
               <Checkbox checked={selected} onChange={() => toggleOne(d.date)} />
             </div>
 
+            {/* Date info */}
             <div>
               <p style={{ margin: 0, fontSize: 'clamp(12px,2vw,14px)', fontWeight: 700, color: DARK, lineHeight: 1.3 }}>
                 {fmt(d.date)}
@@ -213,19 +217,23 @@ export default function BlockedDateList({ blockedDates, handleUnblock, selectedD
               )}
             </div>
 
+            {/* Action — full button desktop, icon only mobile */}
             <button
               onClick={e => { e.stopPropagation(); handleUnblock(d.date) }}
               style={{
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                width: 32, height: 32, flexShrink: 0,
-                background: '#fdf0f0', border: 'none',
+                display: 'flex', alignItems: 'center', gap: 8,
+                padding: '10px 20px',
+                background: DARK, border: 'none', color: '#fff',
+                fontSize: 13, fontWeight: 800,
                 cursor: 'pointer', transition: 'background 0.15s',
+                fontFamily: 'inherit', whiteSpace: 'nowrap', flexShrink: 0,
               }}
-              onMouseEnter={e => { e.currentTarget.style.background = '#b94040'; e.currentTarget.querySelector('svg').style.color = '#fff' }}
-              onMouseLeave={e => { e.currentTarget.style.background = '#fdf0f0'; e.currentTarget.querySelector('svg').style.color = '#b94040' }}
+              onMouseEnter={e => e.currentTarget.style.background = '#b94040'}
+              onMouseLeave={e => e.currentTarget.style.background = DARK}
               title="Débloquer"
             >
-              <Trash2 size={13} strokeWidth={2.5} color="#b94040" style={{ transition: 'color 0.15s' }} />
+              <Trash2 size={14} strokeWidth={2.2} />
+              <span className="btn-label">Débloquer</span>
             </button>
           </div>
         )
@@ -244,15 +252,23 @@ export default function BlockedDateList({ blockedDates, handleUnblock, selectedD
             {(safe - 1) * PAGE_SIZE + 1}–{Math.min(safe * PAGE_SIZE, blockedDates.length)} / {blockedDates.length}
           </span>
           <div style={{ display: 'flex', gap: 3 }}>
-            <PageBtn onClick={() => setPage(1)} disabled={safe === 1}><ChevronsLeft size={12} strokeWidth={2.5} /></PageBtn>
-            <PageBtn onClick={() => setPage(p => Math.max(1, p - 1))} disabled={safe === 1}><ChevronLeft size={12} strokeWidth={2.5} /></PageBtn>
+            <PageBtn onClick={() => setPage(1)} disabled={safe === 1}>
+              <ChevronsLeft size={12} strokeWidth={2.5} />
+            </PageBtn>
+            <PageBtn onClick={() => setPage(p => Math.max(1, p - 1))} disabled={safe === 1}>
+              <ChevronLeft size={12} strokeWidth={2.5} />
+            </PageBtn>
             {getPages().map((p, i) =>
               p === '…'
                 ? <span key={`d${i}`} style={{ padding: '0 4px', fontSize: 12, color: '#bbb', lineHeight: '32px' }}>…</span>
                 : <PageBtn key={p} active={p === safe} onClick={() => setPage(p)}>{p}</PageBtn>
             )}
-            <PageBtn onClick={() => setPage(p => Math.min(total, p + 1))} disabled={safe === total}><ChevronRight size={12} strokeWidth={2.5} /></PageBtn>
-            <PageBtn onClick={() => setPage(total)} disabled={safe === total}><ChevronsRight size={12} strokeWidth={2.5} /></PageBtn>
+            <PageBtn onClick={() => setPage(p => Math.min(total, p + 1))} disabled={safe === total}>
+              <ChevronRight size={12} strokeWidth={2.5} />
+            </PageBtn>
+            <PageBtn onClick={() => setPage(total)} disabled={safe === total}>
+              <ChevronsRight size={12} strokeWidth={2.5} />
+            </PageBtn>
           </div>
         </div>
       )}
