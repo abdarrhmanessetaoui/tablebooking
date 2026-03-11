@@ -12,24 +12,24 @@ const GOLD_DK = '#a8834e'
 const RED     = '#b94040'
 const RED_BG  = '#fdf0f0'
 
-function Btn({ children, onClick, primary, disabled, icon: Icon }) {
+function IconBtn({ onClick, disabled, icon: Icon, title, primary }) {
   const [hov, setHov] = useState(false)
   const bg    = primary ? (hov ? DARK : GOLD) : (hov ? GOLD : DARK)
   const color = primary ? (hov ? GOLD : DARK) : '#fff'
   return (
-    <button onClick={onClick} disabled={disabled}
+    <button onClick={onClick} disabled={disabled} title={title}
       onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
       style={{
-        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-        padding: '11px 20px', background: bg, border: 'none', color,
-        fontSize: 13, fontWeight: 800,
+        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7,
+        padding: '10px 16px', background: bg, border: 'none', color,
+        fontSize: 12, fontWeight: 800,
         cursor: disabled ? 'not-allowed' : 'pointer',
         opacity: disabled ? 0.5 : 1,
         transition: 'background 0.15s, color 0.15s',
         fontFamily: 'inherit', whiteSpace: 'nowrap',
       }}>
-      {Icon && <Icon size={15} strokeWidth={2.2} />}
-      <span className="btn-label">{children}</span>
+      <Icon size={15} strokeWidth={2.2} />
+      <span className="hdr-label">{title}</span>
     </button>
   )
 }
@@ -41,7 +41,6 @@ export default function BlockedDates() {
     submitting,
     handleBlock, handleUnblock,
     getDatesToBlock,
-    refetch,
   } = useBlockedDates()
 
   const [exporting, setExporting] = useState(false)
@@ -59,10 +58,12 @@ export default function BlockedDates() {
       const dateStr = new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
 
       doc.setFillColor(43,33,24); doc.rect(0,0,210,32,'F')
-      doc.setFont('helvetica','bold'); doc.setFontSize(18); doc.setTextColor(200,169,126); doc.text('TableBooking.ma',20,14)
+      doc.setFont('helvetica','bold'); doc.setFontSize(18); doc.setTextColor(200,169,126)
+      doc.text('TableBooking.ma',20,14)
       doc.setFontSize(9); doc.setTextColor(255,255,255); doc.text('Dates bloquées',20,22)
       doc.setTextColor(200,169,126); doc.setFontSize(8); doc.text(dateStr,190,22,{align:'right'})
-      doc.setTextColor(43,33,24); doc.setFontSize(20); doc.setFont('helvetica','bold'); doc.text('Dates bloquées',20,48)
+      doc.setTextColor(43,33,24); doc.setFontSize(20); doc.setFont('helvetica','bold')
+      doc.text('Dates bloquées',20,48)
       doc.setFontSize(10); doc.setTextColor(200,169,126)
       doc.text(`${blockedDates.length} date${blockedDates.length!==1?'s':''} bloquée${blockedDates.length!==1?'s':''}`,20,56)
       doc.setDrawColor(43,33,24); doc.setLineWidth(0.5); doc.line(20,61,190,61)
@@ -74,7 +75,8 @@ export default function BlockedDates() {
 
       blockedDates.forEach((d,i) => {
         if (y>270) { doc.addPage(); y=20 }
-        doc.setFillColor(i%2===0?255:250,i%2===0?255:248,i%2===0?255:245); doc.rect(20,y,170,9,'F')
+        doc.setFillColor(i%2===0?255:250,i%2===0?255:248,i%2===0?255:245)
+        doc.rect(20,y,170,9,'F')
         doc.setDrawColor(236,230,222); doc.line(20,y+9,190,y+9)
         const label = d.date ? new Date(d.date).toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'}) : '—'
         doc.setTextColor(43,33,24); doc.setFontSize(9); doc.setFont('helvetica','normal')
@@ -95,31 +97,16 @@ export default function BlockedDates() {
   return (
     <>
       <style>{`
-        @media (max-width: 600px) {
-          .btn-label     { display: none !important; }
-          .page-subtitle { display: none !important; }
-        }
-        .blocked-layout {
+        @media (max-width: 600px) { .hdr-label { display: none !important; } }
+        .bd-layout {
           display: grid;
           grid-template-columns: 1fr;
-          gap: 0;
+          gap: 32px;
         }
-        @media (min-width: 900px) {
-          .blocked-layout {
-            grid-template-columns: 420px 1fr;
-            gap: 40px;
-            align-items: start;
-          }
-          .blocked-divider-mobile { display: none !important; }
-        }
-        .blocked-sticky {
-          position: static;
-        }
-        @media (min-width: 900px) {
-          .blocked-sticky {
-            position: sticky;
-            top: 24px;
-          }
+        @media (min-width: 920px) {
+          .bd-layout { grid-template-columns: 400px 1fr; gap: 48px; align-items: start; }
+          .bd-form-sticky { position: sticky; top: 24px; }
+          .bd-mobile-divider { display: none !important; }
         }
       `}</style>
 
@@ -127,10 +114,8 @@ export default function BlockedDates() {
         minHeight: '100vh', background: '#faf8f5',
         fontFamily: "'Plus Jakarta Sans','DM Sans',system-ui,sans-serif",
         padding: 'clamp(16px,3vw,40px) clamp(12px,3vw,36px)',
-        boxSizing: 'border-box',
       }}>
         <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800;900&display=swap" rel="stylesheet" />
-        <style>{`* { box-sizing: border-box; }`}</style>
 
         {/* HEADER */}
         <FadeUp delay={0}>
@@ -142,26 +127,22 @@ export default function BlockedDates() {
             <div>
               <h1 style={{
                 margin: 0, fontSize: 'clamp(22px,4vw,36px)',
-                fontWeight: 900, color: DARK,
-                letterSpacing: '-1.5px', lineHeight: 1,
+                fontWeight: 900, color: DARK, letterSpacing: '-1.5px', lineHeight: 1,
               }}>
                 Dates bloquées
               </h1>
-              <p className="page-subtitle" style={{ margin: '6px 0 0', fontSize: 12, fontWeight: 700, color: GOLD_DK }}>
-                Les dates bloquées ne peuvent pas être réservées par les clients.
+              <p style={{ margin: '6px 0 0', fontSize: 12, fontWeight: 700, color: GOLD_DK }}>
+                Les dates bloquées ne peuvent pas être réservées.
               </p>
             </div>
-            <div style={{ display: 'flex', gap: 3, flexShrink: 0 }}>
-              <Btn icon={FileDown} primary onClick={handleExport} disabled={exporting}>
-                {exporting ? 'Génération…' : 'Exporter PDF'}
-              </Btn>
-            </div>
+            <IconBtn icon={FileDown} primary onClick={handleExport}
+              disabled={exporting} title={exporting ? 'Génération…' : 'Exporter PDF'} />
           </div>
         </FadeUp>
 
         {/* DIVIDER */}
         <FadeUp delay={10}>
-          <div style={{ height: 2, background: DARK, margin: '16px 0 32px' }} />
+          <div style={{ height: 2, background: DARK, margin: '16px 0 28px' }} />
         </FadeUp>
 
         {/* ERROR */}
@@ -177,41 +158,40 @@ export default function BlockedDates() {
           </FadeUp>
         )}
 
-        {/* TWO-COLUMN LAYOUT */}
+        {/* TWO-COL LAYOUT */}
         <FadeUp delay={20}>
-          <div className="blocked-layout">
+          <div className="bd-layout">
 
-            {/* LEFT — Form (sticky on desktop) */}
-            <div className="blocked-sticky">
-              <h2 style={{ margin: '0 0 5px', fontSize: 'clamp(15px,2.5vw,20px)', fontWeight: 900, color: DARK, letterSpacing: '-0.8px' }}>
-                Bloquer une date
-              </h2>
-              <p style={{ margin: '0 0 16px', fontSize: 12, fontWeight: 700, color: GOLD_DK }}>
-                Sélectionnez une date, un intervalle ou un jour récurrent
-              </p>
+            {/* FORM — sticky on desktop */}
+            <div className="bd-form-sticky">
+              <div style={{ marginBottom: 16 }}>
+                <h2 style={{ margin: '0 0 4px', fontSize: 'clamp(15px,2vw,19px)', fontWeight: 900, color: DARK, letterSpacing: '-0.6px' }}>
+                  Bloquer
+                </h2>
+                <p style={{ margin: 0, fontSize: 11, fontWeight: 700, color: GOLD_DK }}>
+                  Date unique · Intervalle · Récurrent
+                </p>
+              </div>
               <BlockedDateForm
-                form={form}
-                setForm={setForm}
-                handleBlock={handleBlock}
-                submitting={submitting}
+                form={form} setForm={setForm}
+                handleBlock={handleBlock} submitting={submitting}
                 getDatesToBlock={getDatesToBlock}
               />
             </div>
 
-            {/* Mobile divider only */}
-            <div className="blocked-divider-mobile" style={{ height: 2, background: DARK, margin: '32px 0' }} />
-
-            {/* RIGHT — List */}
+            {/* LIST */}
             <div>
-              <div style={{ marginBottom: 16, display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
-                <h2 style={{ margin: 0, fontSize: 'clamp(15px,2.5vw,20px)', fontWeight: 900, color: DARK, letterSpacing: '-0.8px' }}>
+              <div className="bd-mobile-divider" style={{ height: 2, background: DARK, marginBottom: 28 }} />
+              <div style={{ marginBottom: 16, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
+                <h2 style={{ margin: 0, fontSize: 'clamp(15px,2vw,19px)', fontWeight: 900, color: DARK, letterSpacing: '-0.6px' }}>
                   Dates bloquées
                 </h2>
                 <span style={{
-                  fontSize: 11, fontWeight: 800, color: '#bbb',
-                  letterSpacing: '0.1em', textTransform: 'uppercase',
+                  padding: '4px 10px', background: DARK,
+                  fontSize: 11, fontWeight: 900, color: GOLD,
+                  letterSpacing: '0.05em',
                 }}>
-                  {blockedDates.length} date{blockedDates.length !== 1 ? 's' : ''}
+                  {blockedDates.length}
                 </span>
               </div>
               <BlockedDateList blockedDates={blockedDates} handleUnblock={handleUnblock} />
@@ -219,7 +199,6 @@ export default function BlockedDates() {
 
           </div>
         </FadeUp>
-
       </div>
     </>
   )
