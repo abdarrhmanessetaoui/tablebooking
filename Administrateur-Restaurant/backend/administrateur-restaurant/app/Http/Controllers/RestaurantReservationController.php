@@ -156,92 +156,108 @@ class RestaurantReservationController extends Controller
     }
 
     public function reports()
-    {
-        $messages = WpMessage::where('formid', $this->formId())->get();
-        $clean    = $messages->map(fn($m) => $m->toCleanArray());
+{
+    $rows = DB::table('wpjn_cpappbk_messages')
+        ->where('formid', 13)
+        ->whereNull('deleted_at') // remove if no soft deletes
+        ->get();
 
-        $byHour = $clean
-            ->filter(fn($r) => !empty($r['start_time']))
-            ->groupBy(fn($r) => substr($r['start_time'], 0, 5))
-            ->map(fn($g) => $g->count())
-            ->sortKeys();
+    $by_hour    = [];
+    $by_day     = [];
+    $by_week    = [];
+    $by_month   = [];
+    $by_year    = [];
+    $by_guests  = [];
+    $by_service = [];   // ← NEW
 
-        $dayMap = [0 => 'Dim', 1 => 'Lun', 2 => 'Mar', 3 => 'Mer', 4 => 'Jeu', 5 => 'Ven', 6 => 'Sam'];
-        $byDay  = ['Lun' => 0, 'Mar' => 0, 'Mer' => 0, 'Jeu' => 0, 'Ven' => 0, 'Sam' => 0, 'Dim' => 0];
+    $total = $confirmed = $pending = $cancelled = $guests_sum = 0;
 
-        $clean
-            ->filter(fn($r) => !empty($r['date']))
-            ->each(function ($r) use (&$byDay, $dayMap) {
-                $dow        = date('w', strtotime($r['date']));
-                $byDay[$dayMap[$dow]]++;
-            });
+    $daysFr = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'];
+    $monthsFr = ['Janv', 'Févr', 'Mars', 'Avr', 'Mai', 'Juin',
+                 'Juil', 'Août', 'Sept', 'Oct', 'Nov', 'Déc'];
 
-        $byWeek = $clean
-            ->filter(fn($r) => !empty($r['date']))
-            ->groupBy(fn($r) => date('Y-\WW', strtotime($r['date'])))
-            ->map(fn($g) => $g->count())
-            ->sortKeys();
+    foreach ($rows as $row) {
+        // Parse posted_data (PHP serialized)
+        $d = @unserialize($row->posted_data);
+        if (!$d) continue;
 
-        $monthNames = [
-            '01' => 'Jan', '02' => 'Fév', '03' => 'Mar', '04' => 'Avr',
-            '05' => 'Mai', '06' => 'Juin', '07' => 'Juil', '08' => 'Août',
-            '09' => 'Sep', '10' => 'Oct', '11' => 'Nov', '12' => 'Déc',
-        ];
+        $apps    = $d['apps'] ?? [];
+        $app     = $apps[0] ?? null;
+        if (!$app) continue;
 
-        $byMonth = $clean
-            ->filter(fn($r) => !empty($r['date']))
-            ->groupBy(fn($r) => substr($r['date'], 0, 7))
-            ->map(fn($g) => $g->count())
-            ->sortKeys()
-            ->mapWithKeys(function ($count, $ym) use ($monthNames) {
-                [$y, $m] = explode('-', $ym);
-                return [($monthNames[$m] ?? $m) . ' ' . $y => $count];
-            });
+        $status  = $app['cancelled'] ?? 'Pending';
+        $date    = isset($app['date']) ? Carbon::parse($app['date']) : null;
+        $guests  = (int)($d['app_quantity_1'] ?? 1);
+        $service = $d['app_service_1'] ?? null;
 
-        $byYear = $clean
-            ->filter(fn($r) => !empty($r['date']))
-            ->groupBy(fn($r) => substr($r['date'], 0, 4))
-            ->map(fn($g) => $g->count())
-            ->sortKeys();
+        $total++;
+        if ($status === 'Confirmed') $confirmed++;
+        elseif ($status === 'Cancelled') $cancelled++;
+        else $pending++;
+        $guests_sum += $guests;
 
-        $byGuests = $clean
-            ->filter(fn($r) => !empty($r['guests']))
-            ->groupBy(fn($r) => (string) intval($r['guests']))
-            ->map(fn($g) => $g->count())
-            ->sortKeys()
-            ->mapWithKeys(fn($count, $n) => [$n . ' pers.' => $count]);
+        // by_guests
+        $gKey = (string)$guests;
+        $by_guests[$gKey] = ($by_guests[$gKey] ?? 0) + 1;
 
-        $total     = $clean->count();
-        $confirmed = $clean->filter(fn($r) => $r['status'] === 'Confirmed')->count();
-        $pending   = $clean->filter(fn($r) => $r['status'] === 'Pending')->count();
-        $cancelled = $clean->filter(fn($r) => $r['status'] === 'Cancelled')->count();
+        // by_service  ← NEW
+        if ($service) {
+            $by_service[$service] = ($by_service[$service] ?? 0) + 1;
+        }
 
-        $guestValues = $clean
-            ->filter(fn($r) => !empty($r['guests']))
-            ->pluck('guests')
-            ->map(fn($g) => intval($g));
+        if (!$date) continue;
 
-        $avgGuests = $guestValues->count() > 0
-            ? round($guestValues->sum() / $guestValues->count(), 1)
-            : 0;
+        // by_hour
+        $slot = $app['slot'] ?? null;
+        if ($slot) {
+            $hKey = explode('/', $slot)[0];
+            $by_hour[$hKey] = ($by_hour[$hKey] ?? 0) + 1;
+        }
 
-        return response()->json([
-            'by_hour'   => $byHour,
-            'by_day'    => $byDay,
-            'by_week'   => $byWeek,
-            'by_month'  => $byMonth,
-            'by_year'   => $byYear,
-            'by_guests' => $byGuests,
-            'summary'   => [
-                'total'      => $total,
-                'confirmed'  => $confirmed,
-                'pending'    => $pending,
-                'cancelled'  => $cancelled,
-                'avg_guests' => $avgGuests,
-            ],
-        ]);
+        // by_day (Lun–Dim)
+        $dKey = $daysFr[$date->dayOfWeek];
+        $by_day[$dKey] = ($by_day[$dKey] ?? 0) + 1;
+
+        // by_week
+        $wKey = $date->format('Y') . '-W' . str_pad($date->weekOfYear, 2, '0', STR_PAD_LEFT);
+        $by_week[$wKey] = ($by_week[$wKey] ?? 0) + 1;
+
+        // by_month
+        $mKey = $monthsFr[$date->month - 1] . ' ' . $date->format('Y');
+        $by_month[$mKey] = ($by_month[$mKey] ?? 0) + 1;
+
+        // by_year
+        $yKey = $date->format('Y');
+        $by_year[$yKey] = ($by_year[$yKey] ?? 0) + 1;
     }
 
+    // Sort by_day in week order
+    $dayOrder = array_flip(['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim']);
+    uksort($by_day, fn($a, $b) => ($dayOrder[$a] ?? 9) <=> ($dayOrder[$b] ?? 9));
+
+    // Sort by_guests numerically
+    ksort($by_guests, SORT_NUMERIC);
+
+    // Sort by_service by count descending
+    arsort($by_service);
+
+    return response()->json([
+        'by_hour'    => $by_hour,
+        'by_day'     => $by_day,
+        'by_week'    => $by_week,
+        'by_month'   => $by_month,
+        'by_year'    => $by_year,
+        'by_guests'  => $by_guests,
+        'by_service' => $by_service,   // ← NEW
+        'summary'    => [
+            'total'      => $total,
+            'confirmed'  => $confirmed,
+            'pending'    => $pending,
+            'cancelled'  => $cancelled,
+            'avg_guests' => $total > 0 ? round($guests_sum / $total, 1) : 0,
+        ],
+    ]);
+}
     public function info()
     {
         $form = DB::table('wpjn_cpappbk_forms')
