@@ -13,12 +13,13 @@ const headers = () => ({
 })
 
 const EMPTY_FORM = {
-  mode:      'single',   // 'single' | 'interval' | 'recurring'
+  mode:      'single',
   date:      '',
   date_from: '',
   date_to:   '',
-  weekday:   '1',        // 0=Sun … 6=Sat
-  until:     '',         // optional end date for recurring
+  weekday:   '1',
+  until:     '',
+  reason:    '',
 }
 
 export default function useBlockedDates() {
@@ -44,7 +45,6 @@ export default function useBlockedDates() {
     }
   }
 
-  // Build list of dates to block depending on mode
   function getDatesToBlock() {
     const dates = []
 
@@ -67,7 +67,6 @@ export default function useBlockedDates() {
       const end     = form.until ? new Date(form.until) : new Date(new Date().getFullYear() + 2, 11, 31)
       const weekday = parseInt(form.weekday)
       const cur     = new Date(start)
-      // advance to first matching weekday
       while (cur.getDay() !== weekday) cur.setDate(cur.getDate() + 1)
       while (cur <= end) {
         dates.push(cur.toISOString().slice(0, 10))
@@ -79,10 +78,10 @@ export default function useBlockedDates() {
   }
 
   const handleBlock = async () => {
-    const dates = getDatesToBlock()
+    const dates  = getDatesToBlock()
+    const reason = form.reason || null
     if (dates.length === 0) return
 
-    // Warn if blocking many dates
     if (dates.length > 10) {
       const ok = await confirm({
         title:        'Bloquer plusieurs dates',
@@ -97,13 +96,12 @@ export default function useBlockedDates() {
     setSubmitting(true)
     setError('')
     try {
-      // Send all dates in one request if backend supports bulk,
-      // otherwise send one by one
       const res = await fetch(API_WRITE + '/bulk', {
         method:  'POST',
         headers: headers(),
-        body:    JSON.stringify({ dates }),
+        body:    JSON.stringify({ dates, reason }),
       })
+
       if (!res.ok) {
         // fallback: one by one
         const added = []
@@ -111,12 +109,9 @@ export default function useBlockedDates() {
           const r = await fetch(API_WRITE, {
             method:  'POST',
             headers: headers(),
-            body:    JSON.stringify({ date }),
+            body:    JSON.stringify({ date, reason }),
           })
-          if (r.ok) {
-            const d = await r.json()
-            added.push(d)
-          }
+          if (r.ok) added.push(await r.json())
         }
         setBlockedDates(prev =>
           [...prev, ...added]
@@ -124,7 +119,7 @@ export default function useBlockedDates() {
             .sort((a, b) => a.date.localeCompare(b.date))
         )
       } else {
-        const data = await res.json()
+        const data     = await res.json()
         const newDates = Array.isArray(data) ? data : data.dates || []
         setBlockedDates(prev =>
           [...prev, ...newDates]
@@ -132,6 +127,7 @@ export default function useBlockedDates() {
             .sort((a, b) => a.date.localeCompare(b.date))
         )
       }
+
       toast(
         dates.length === 1
           ? 'Date bloquée avec succès'
@@ -147,9 +143,12 @@ export default function useBlockedDates() {
   }
 
   const handleUnblock = async (date) => {
+    const label = new Date(date).toLocaleDateString('fr-FR', {
+      weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
+    })
     const ok = await confirm({
       title:        'Débloquer la date',
-      message:      `Voulez-vous débloquer le ${new Date(date).toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'long', year:'numeric' })} ?`,
+      message:      `Voulez-vous débloquer le ${label} ?`,
       confirmLabel: 'Débloquer',
       type:         'danger',
     })
