@@ -291,10 +291,21 @@ function TabPanel({ tab, stats, reservations, onViewAll }) {
         @media (min-width: 860px) {
           .db-layout {
             grid-template-columns: 280px 1fr;
-            align-items: start;
+            align-items: stretch;
+            gap: 0;
           }
           .db-stats-sticky { position: sticky; top: 24px; }
           .db-mobile-divider { display: none !important; }
+          /* Make both column headers the exact same height */
+          .db-col-header {
+            height: 38px;
+          }
+        }
+        .db-col-header {
+          display: flex;
+          align-items: center;
+          padding: 0 20px;
+          background: #2b2118;
         }
         /* Mobile cards for reservations */
         .res-desktop { display: block; }
@@ -310,8 +321,8 @@ function TabPanel({ tab, stats, reservations, onViewAll }) {
         {/* ── LEFT: stats ── */}
         <div className="db-stats-sticky">
 
-          {/* Section header — dark bar */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 20px', background: DARK }}>
+          {/* Section header — dark bar, same height as right header */}
+          <div className="db-col-header">
             <span style={{ fontSize: 9, fontWeight: 900, color: GOLD, textTransform: 'uppercase', letterSpacing: '0.2em' }}>
               Vue d'ensemble
             </span>
@@ -351,7 +362,7 @@ function TabPanel({ tab, stats, reservations, onViewAll }) {
           <div className="db-mobile-divider" style={{ height: 2, background: DARK, margin: '28px 0' }} />
 
           {/* Section header */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 20px', background: DARK }}>
+          <div className="db-col-header" style={{ justifyContent: 'space-between' }}>
             <span style={{ fontSize: 9, fontWeight: 900, color: GOLD, textTransform: 'uppercase', letterSpacing: '0.2em' }}>
               Prochaines réservations
             </span>
