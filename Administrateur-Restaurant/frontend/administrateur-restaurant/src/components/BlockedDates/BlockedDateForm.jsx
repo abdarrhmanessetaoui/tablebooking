@@ -50,22 +50,24 @@ function Field({ label, children, style }) {
 function ModeTab({ active, onClick, icon: Icon, label }) {
   return (
     <button onClick={onClick} title={label} style={{
-      flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-      padding: '14px 8px',
+      // flex: 1 with min-width: 0 ensures all 3 tabs share space equally and never overflow
+      flex: '1 1 0', minWidth: 0,
+      display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5,
+      padding: '13px 4px',
       background: active ? DARK : '#f5f0eb',
       border: 'none',
       color: active ? GOLD : '#bbb',
       fontSize: 11, fontWeight: 800,
       cursor: 'pointer', fontFamily: 'inherit',
       transition: 'all 0.15s',
-      minWidth: 0,
-      // Ensure adequate tap target
       minHeight: 48,
+      overflow: 'hidden',
       WebkitTapHighlightColor: 'transparent',
     }}>
-      <Icon size={16} strokeWidth={2.5} style={{ flexShrink: 0 }} />
+      <Icon size={15} strokeWidth={2.5} style={{ flexShrink: 0 }} />
       <span className="mode-label" style={{
         overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+        minWidth: 0,
       }}>{label}</span>
     </button>
   )
@@ -87,8 +89,8 @@ export default function BlockedDateForm({ form, setForm, handleBlock, submitting
   return (
     <>
       <style>{`
-        /* Hide mode tab labels on very small screens — icon only */
-        @media (max-width: 360px) {
+        /* Hide mode tab labels on small screens — icon only */
+        @media (max-width: 420px) {
           .mode-label { display: none !important; }
         }
         /* Prevent iOS zoom on input focus by ensuring font-size >= 16px */
@@ -115,8 +117,8 @@ export default function BlockedDateForm({ form, setForm, handleBlock, submitting
 
       <div style={{ background: '#fff', border: `1.5px solid ${BORDER}`, overflow: 'hidden' }}>
 
-        {/* Mode tabs */}
-        <div style={{ display: 'flex', borderBottom: `2px solid ${DARK}` }}>
+        {/* Mode tabs — width: 100% + overflow: hidden ensures tabs never escape the card */}
+        <div style={{ display: 'flex', borderBottom: `2px solid ${DARK}`, width: '100%', overflow: 'hidden' }}>
           <ModeTab active={form.mode === 'single'}    onClick={() => set('mode','single')}    icon={CalendarOff} label="Unique" />
           <ModeTab active={form.mode === 'interval'}  onClick={() => set('mode','interval')}  icon={Calendar}    label="Intervalle" />
           <ModeTab active={form.mode === 'recurring'} onClick={() => set('mode','recurring')} icon={RefreshCw}   label="Récurrent" />
