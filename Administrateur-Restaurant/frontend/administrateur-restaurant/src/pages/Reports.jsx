@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { FileDown, BarChart2, Users, CheckCircle, Clock, XCircle, Filter } from 'lucide-react'
 import useReports from '../hooks/Reports/useReports'
 import FadeUp     from '../components/Dashboard/FadeUp'
@@ -362,30 +362,11 @@ const STATUS_OPTS=[
 
 /* ════ PAGE ════ */
 export default function Reports() {
-  const { data, loading, error } = useReports()
+  // period, status, setPeriod, setStatus all live in the hook now
+  // data is already filtered+aggregated for the selected period & status
+  const { data, loading, error, period, setPeriod, status, setStatus } = useReports()
   const [exporting, setExporting] = useState(false)
-  const [period,    setPeriod]    = useState('all')
-  const [status,    setStatus]    = useState('all')
-
-  const filtered = useMemo(() => {
-    if (!data) return null
-    const ap = obj => applyPeriod(obj, period)
-    let base = { ...(data.summary||{}) }
-    if (status==='confirmed') base={...base,total:base.confirmed??0,pending:0,cancelled:0}
-    if (status==='pending')   base={...base,total:base.pending??0,confirmed:0,cancelled:0}
-    if (status==='cancelled') base={...base,total:base.cancelled??0,confirmed:0,pending:0}
-    return {
-      summary:    scaleSummary(base,period,data),
-      by_hour:    ap(data.by_hour   ||{}),
-      by_day:     ap(data.by_day    ||{}),
-      by_week:    ap(data.by_week   ||{}),
-      by_month:   ap(data.by_month  ||{}),
-      by_year:    ap(data.by_year   ||{}),
-      // categorical — never filtered by period, always show full dataset
-      by_guests:  data.by_guests  || {},
-      by_service: data.by_service || {},
-    }
-  }, [data, period, status])
+  const filtered = data
 
   async function handleExport() {
     setExporting(true)
