@@ -4,18 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Models\WpMessage;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class RestaurantReservationController extends Controller
 {
     private function formId(): int
     {
         return auth()->user()->restaurant_form_id;
-    }
-
-    private function parseStatus(string $postedData): string
-    {
-        $data = @unserialize($postedData);
-        return is_array($data) ? ($data['app_status_1'] ?? 'Pending') : 'Pending';
     }
 
     private function cancelExpiredPending(): void
@@ -135,19 +130,42 @@ class RestaurantReservationController extends Controller
         return response()->json(['deleted' => true]);
     }
 
+    public function updateStatus(Request $request, int $id)
+    {
+        $request->validate([
+            'status' => 'required|in:Pending,Confirmed,Cancelled',
+        ]);
+
+        $message = WpMessage::where('formid', $this->formId())->findOrFail($id);
+
+        $data = @unserialize($message->posted_data);
+        if (is_array($data)) {
+            $data['app_status_1']         = $request->status;
+            $data['apps'][0]['cancelled'] = $request->status;
+            $message->posted_data         = serialize($data);
+            $message->save();
+        }
+
+        return response()->json($message->toCleanArray());
+    }
+
+    public function show(int $id)
+    {
+        $message = WpMessage::where('formid', $this->formId())->findOrFail($id);
+        return response()->json($message->toCleanArray());
+    }
+
     public function reports()
     {
         $messages = WpMessage::where('formid', $this->formId())->get();
         $clean    = $messages->map(fn($m) => $m->toCleanArray());
 
-        // ── Par heure ──────────────────────────────────────────────
         $byHour = $clean
             ->filter(fn($r) => !empty($r['start_time']))
             ->groupBy(fn($r) => substr($r['start_time'], 0, 5))
             ->map(fn($g) => $g->count())
             ->sortKeys();
 
-        // ── Par jour de la semaine (FR, Lun→Dim) ───────────────────
         $dayMap = [0 => 'Dim', 1 => 'Lun', 2 => 'Mar', 3 => 'Mer', 4 => 'Jeu', 5 => 'Ven', 6 => 'Sam'];
         $byDay  = ['Lun' => 0, 'Mar' => 0, 'Mer' => 0, 'Jeu' => 0, 'Ven' => 0, 'Sam' => 0, 'Dim' => 0];
 
@@ -155,18 +173,15 @@ class RestaurantReservationController extends Controller
             ->filter(fn($r) => !empty($r['date']))
             ->each(function ($r) use (&$byDay, $dayMap) {
                 $dow        = date('w', strtotime($r['date']));
-                $key        = $dayMap[$dow];
-                $byDay[$key]++;
+                $byDay[$dayMap[$dow]]++;
             });
 
-        // ── Par semaine (ISO 8601) ──────────────────────────────────
         $byWeek = $clean
             ->filter(fn($r) => !empty($r['date']))
             ->groupBy(fn($r) => date('Y-\WW', strtotime($r['date'])))
             ->map(fn($g) => $g->count())
             ->sortKeys();
 
-        // ── Par mois ───────────────────────────────────────────────
         $monthNames = [
             '01' => 'Jan', '02' => 'Fév', '03' => 'Mar', '04' => 'Avr',
             '05' => 'Mai', '06' => 'Juin', '07' => 'Juil', '08' => 'Août',
@@ -180,18 +195,15 @@ class RestaurantReservationController extends Controller
             ->sortKeys()
             ->mapWithKeys(function ($count, $ym) use ($monthNames) {
                 [$y, $m] = explode('-', $ym);
-                $label   = ($monthNames[$m] ?? $m) . ' ' . $y;
-                return [$label => $count];
+                return [($monthNames[$m] ?? $m) . ' ' . $y => $count];
             });
 
-        // ── Par année ──────────────────────────────────────────────
         $byYear = $clean
             ->filter(fn($r) => !empty($r['date']))
             ->groupBy(fn($r) => substr($r['date'], 0, 4))
             ->map(fn($g) => $g->count())
             ->sortKeys();
 
-        // ── Par nombre de personnes ────────────────────────────────
         $byGuests = $clean
             ->filter(fn($r) => !empty($r['guests']))
             ->groupBy(fn($r) => (string) intval($r['guests']))
@@ -199,7 +211,6 @@ class RestaurantReservationController extends Controller
             ->sortKeys()
             ->mapWithKeys(fn($count, $n) => [$n . ' pers.' => $count]);
 
-        // ── Résumé global ──────────────────────────────────────────
         $total     = $clean->count();
         $confirmed = $clean->filter(fn($r) => $r['status'] === 'Confirmed')->count();
         $pending   = $clean->filter(fn($r) => $r['status'] === 'Pending')->count();
@@ -231,34 +242,9 @@ class RestaurantReservationController extends Controller
         ]);
     }
 
-    public function updateStatus(Request $request, int $id)
-    {
-        $request->validate([
-            'status' => 'required|in:Pending,Confirmed,Cancelled',
-        ]);
-
-        $message = WpMessage::where('formid', $this->formId())->findOrFail($id);
-
-        $data = @unserialize($message->posted_data);
-        if (is_array($data)) {
-            $data['app_status_1']         = $request->status;
-            $data['apps'][0]['cancelled'] = $request->status;
-            $message->posted_data         = serialize($data);
-            $message->save();
-        }
-
-        return response()->json($message->toCleanArray());
-    }
-
-    public function show(int $id)
-    {
-        $message = WpMessage::where('formid', $this->formId())->findOrFail($id);
-        return response()->json($message->toCleanArray());
-    }
-
     public function info()
     {
-        $form = \Illuminate\Support\Facades\DB::table('wpjn_cpappbk_forms')
+        $form = DB::table('wpjn_cpappbk_forms')
             ->where('id', $this->formId())
             ->first();
 
@@ -282,7 +268,7 @@ class RestaurantReservationController extends Controller
 
     public function services()
     {
-        $form = \Illuminate\Support\Facades\DB::table('wpjn_cpappbk_forms')
+        $form = DB::table('wpjn_cpappbk_forms')
             ->where('id', $this->formId())
             ->first();
 
