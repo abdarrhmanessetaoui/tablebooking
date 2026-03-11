@@ -83,9 +83,20 @@ export default function BlockedDateList({
     )
   }
 
-  const total     = Math.ceil(blockedDates.length / PAGE_SIZE)
+  // Sort: upcoming first (closest → farthest), past dates at bottom (most recent → oldest)
+  const sorted = [...blockedDates].sort((a, b) => {
+    const now   = new Date().toDateString()
+    const aPast = new Date(a.date) < new Date(now)
+    const bPast = new Date(b.date) < new Date(now)
+    if (!aPast && bPast)  return -1
+    if (aPast  && !bPast) return  1
+    if (!aPast && !bPast) return a.date.localeCompare(b.date)  // both future: ascending
+    return b.date.localeCompare(a.date)                         // both past: descending (most recent first)
+  })
+
+  const total     = Math.ceil(sorted.length / PAGE_SIZE)
   const safe      = Math.min(page, total)
-  const items     = blockedDates.slice((safe - 1) * PAGE_SIZE, safe * PAGE_SIZE)
+  const items     = sorted.slice((safe - 1) * PAGE_SIZE, safe * PAGE_SIZE)
 
   const allSelected = blockedDates.length > 0 && blockedDates.every(d => selectedDates.includes(d.date))
   const pageAllSel  = items.length > 0 && items.every(d => selectedDates.includes(d.date))
@@ -249,7 +260,7 @@ export default function BlockedDateList({
           background: CREAM,
         }}>
           <span style={{ fontSize: 11, fontWeight: 700, color: '#bbb' }}>
-            {(safe - 1) * PAGE_SIZE + 1}–{Math.min(safe * PAGE_SIZE, blockedDates.length)} / {blockedDates.length}
+            {(safe - 1) * PAGE_SIZE + 1}–{Math.min(safe * PAGE_SIZE, sorted.length)} / {sorted.length}
           </span>
           <div style={{ display: 'flex', gap: 3 }}>
             <PageBtn onClick={() => setPage(1)} disabled={safe === 1}>
