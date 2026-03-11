@@ -61,15 +61,10 @@ function PageBtn({ onClick, disabled, active, children }) {
   )
 }
 
-export default function BlockedDateList({
-  blockedDates,
-  handleUnblock,
-  selectedDates = [],
-  setSelectedDates,
-}) {
+export default function BlockedDateList({ blockedDates, handleUnblock, selectedDates, setSelectedDates }) {
   const [page, setPage] = useState(1)
 
-  useEffect(() => { setPage(1) }, [blockedDates?.length])
+  useEffect(() => { setPage(1) }, [blockedDates.length])
 
   if (!blockedDates || blockedDates.length === 0) {
     return (
@@ -83,20 +78,19 @@ export default function BlockedDateList({
     )
   }
 
-  const total     = Math.ceil(blockedDates.length / PAGE_SIZE)
-  const safe      = Math.min(page, total)
-  const items     = blockedDates.slice((safe - 1) * PAGE_SIZE, safe * PAGE_SIZE)
+  const total      = Math.ceil(blockedDates.length / PAGE_SIZE)
+  const safe       = Math.min(page, total)
+  const items      = blockedDates.slice((safe - 1) * PAGE_SIZE, safe * PAGE_SIZE)
 
-  const allSelected = blockedDates.length > 0 && blockedDates.every(d => selectedDates.includes(d.date))
-  const pageAllSel  = items.length > 0 && items.every(d => selectedDates.includes(d.date))
-  const pageSomeSel = items.some(d => selectedDates.includes(d.date)) && !pageAllSel
+  const allSelected  = blockedDates.length > 0 && blockedDates.every(d => selectedDates.includes(d.date))
+  const pageAllSel   = items.length > 0 && items.every(d => selectedDates.includes(d.date))
+  const pageSomeSel  = items.some(d => selectedDates.includes(d.date)) && !pageAllSel
 
   function togglePage() {
     const ids = items.map(d => d.date)
     if (pageAllSel) setSelectedDates(selectedDates.filter(id => !ids.includes(id)))
     else setSelectedDates([...new Set([...selectedDates, ...ids])])
   }
-
   function toggleOne(date) {
     if (selectedDates.includes(date)) setSelectedDates(selectedDates.filter(d => d !== date))
     else setSelectedDates([...selectedDates, date])
@@ -115,7 +109,7 @@ export default function BlockedDateList({
   return (
     <div style={{ background: '#fff', border: `1px solid ${BORDER}` }}>
 
-      {/* Partial selection banner */}
+      {/* Partial selection banner — select all dataset */}
       {selectedDates.length > 0 && !allSelected && (
         <div style={{
           padding: '9px 16px', background: '#fdf6ec',
@@ -217,7 +211,7 @@ export default function BlockedDateList({
               )}
             </div>
 
-            {/* Action — full button desktop, icon only mobile */}
+            {/* Action button — full on desktop, icon-only on mobile */}
             <button
               onClick={e => { e.stopPropagation(); handleUnblock(d.date) }}
               style={{
