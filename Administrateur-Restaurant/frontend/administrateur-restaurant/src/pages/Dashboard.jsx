@@ -132,19 +132,19 @@ function StatBlock({ icon: Icon, value, label, accent, bg, delay = 0, total = 0 
   )
 }
 
-/* ─── Minimal status badge — just a dot + tiny text, no bg box ─── */
+/* ─── Minimal status badge — just a dot + full text, no bg box ─── */
 function Badge({ status }) {
   const M = {
-    Confirmed: { label: 'Conf.',    color: GREEN },
-    Pending:   { label: 'Attente',  color: AMBER },
-    Cancelled: { label: 'Annul.',   color: RED   },
+    Confirmed: { label: 'Confirmée',  color: GREEN },
+    Pending:   { label: 'En attente', color: AMBER },
+    Cancelled: { label: 'Annulée',    color: RED   },
   }
   const s = M[status] || M.Pending
   return (
     <span style={{
       display: 'inline-flex', alignItems: 'center', gap: 5,
-      fontSize: 9, fontWeight: 900, color: s.color,
-      textTransform: 'uppercase', letterSpacing: '0.1em', whiteSpace: 'nowrap',
+      fontSize: 10, fontWeight: 900, color: s.color,
+      letterSpacing: '0.04em', whiteSpace: 'nowrap',
     }}>
       <span style={{
         width: 6, height: 6, borderRadius: '50%',
@@ -213,7 +213,7 @@ function ReservationsTable({ reservations, onViewAll, tabLabel }) {
     { key: 'start_time', label: 'Heure',    flex: 0.7 },
     { key: 'guests',     label: 'Couverts', flex: 0.7 },
     { key: 'service',    label: 'Service',  flex: 1.0 },
-    { key: 'status',     label: 'Statut',   flex: 0.9 },
+    { key: 'status',     label: 'Statut',   flex: 1.2 },
   ]
   const tpl = COLS.map(c => `${c.flex}fr`).join(' ')
 
