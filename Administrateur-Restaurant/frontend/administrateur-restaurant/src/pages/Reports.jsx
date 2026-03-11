@@ -171,20 +171,19 @@ function SectionTitle({ title, sub, count }) {
   )
 }
 
-/* Filter chip — compact */
+/* Filter chip */
 function Chip({ label, active, onClick }) {
   const [h,setH]=useState(false)
   return (
     <button onClick={onClick} onMouseEnter={()=>setH(true)} onMouseLeave={()=>setH(false)}
       style={{
-        padding:'4px 10px',
-        border:`1px solid ${active?DARK:(h?DARK:BORDER)}`,
+        height:26,padding:'0 10px',
+        border:`1.5px solid ${active?DARK:(h?DARK:BORDER)}`,
         background:active?DARK:(h?'#f5ede0':WHITE),
         color:active?GOLD:(h?DARK:MUTED),
-        fontSize:9,fontWeight:900,textTransform:'uppercase',
-        letterSpacing:'0.1em',cursor:'pointer',
-        fontFamily:'inherit',transition:'all 0.12s',whiteSpace:'nowrap',
-        minHeight:28,
+        fontSize:9,fontWeight:900,textTransform:'uppercase',letterSpacing:'0.08em',
+        cursor:'pointer',fontFamily:'inherit',transition:'all 0.1s',whiteSpace:'nowrap',
+        display:'inline-flex',alignItems:'center',flexShrink:0,
       }}>
       {label}
     </button>
@@ -442,10 +441,50 @@ export default function Reports() {
         .rp-3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
         @media(max-width:900px){.rp-3{grid-template-columns:1fr 1fr;}}
         @media(max-width:560px){.rp-3{grid-template-columns:1fr;}}
-        /* chips */
-        .rp-chips{display:flex;gap:5px;flex-wrap:wrap;}
-        @media(max-width:520px){.rp-chips{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;}}
-        .rp-chips::-webkit-scrollbar{display:none;}
+
+        /* ── Filter bar ── */
+        .rp-filterbar{
+          display:flex;align-items:stretch;
+          border:2px solid ${DARK};background:${WHITE};
+          margin-bottom:28px;overflow:hidden;
+        }
+        .rp-fb-badge{
+          display:flex;align-items:center;gap:6px;
+          padding:0 14px;background:${DARK};flex-shrink:0;
+        }
+        .rp-fb-group{
+          display:flex;align-items:center;gap:8px;
+          padding:7px 12px;flex-shrink:0;
+          border-left:1px solid ${BORDER};
+        }
+        .rp-fb-lbl{
+          font-size:8px;font-weight:900;color:${MUTED};
+          text-transform:uppercase;letter-spacing:0.14em;
+          flex-shrink:0;white-space:nowrap;
+        }
+        .rp-fb-chips{display:flex;gap:4px;flex-shrink:0;}
+        .rp-fb-div{width:1px;background:${BORDER};margin:7px 0;flex-shrink:0;}
+        .rp-fb-reset{
+          display:flex;align-items:center;justify-content:center;
+          padding:0 13px;border:none;border-left:2px solid ${DARK};
+          background:transparent;color:${MUTED};
+          font-size:16px;font-weight:900;cursor:pointer;
+          font-family:inherit;transition:all 0.1s;flex-shrink:0;
+        }
+
+        /* On narrow screens: stack into 2 rows */
+        @media(max-width:680px){
+          .rp-filterbar{ flex-wrap:wrap; }
+          .rp-fb-badge{ width:100%;padding:8px 12px;border-bottom:1px solid rgba(255,255,255,0.12); }
+          .rp-fb-group{ border-left:none;border-top:none;padding:7px 12px;width:100%;flex-wrap:wrap; }
+          .rp-fb-div{ display:none; }
+          .rp-fb-reset{ width:100%;border-left:none;border-top:1px solid ${BORDER};padding:7px 12px; }
+          .rp-fb-chips{ flex-wrap:wrap; }
+        }
+        @media(max-width:400px){
+          .rp-fb-chips{ overflow-x:auto;flex-wrap:nowrap;scrollbar-width:none; }
+          .rp-fb-chips::-webkit-scrollbar{ display:none; }
+        }
       `}</style>
 
       <div style={{
@@ -488,52 +527,30 @@ export default function Reports() {
           </FadeUp>
         )}
 
-        {/* ── FILTER BAR — compact single line ── */}
+        {/* ── FILTER BAR ── */}
         <FadeUp delay={15}>
-          <div style={{
-            display:'flex',alignItems:'center',gap:0,
-            border:`2px solid ${DARK}`,background:WHITE,
-            marginBottom:28,overflow:'hidden',flexWrap:'wrap',
-          }}>
-            {/* Icon label */}
-            <div style={{display:'flex',alignItems:'center',gap:6,padding:'8px 14px',background:DARK,flexShrink:0}}>
-              <Filter size={11} strokeWidth={2.5} color={GOLD}/>
+          <div className="rp-filterbar">
+            <div className="rp-fb-badge">
+              <Filter size={10} strokeWidth={2.5} color={GOLD}/>
               <span style={{fontSize:8,fontWeight:900,color:GOLD,textTransform:'uppercase',letterSpacing:'0.2em'}}>Filtres</span>
             </div>
-
-            {/* Période label */}
-            <span style={{fontSize:8,fontWeight:900,color:MUTED,textTransform:'uppercase',letterSpacing:'0.14em',padding:'0 10px 0 14px',flexShrink:0,borderLeft:`1px solid ${BORDER}`}}>
-              Période
-            </span>
-            {/* Period chips */}
-            <div style={{display:'flex',gap:4,padding:'6px 10px 6px 0',flexShrink:0,flexWrap:'nowrap',overflowX:'auto'}}>
-              {PERIOD_OPTS.map(o=><Chip key={o.key} label={o.label} active={period===o.key} onClick={()=>pick('period',o.key)}/>)}
+            <div className="rp-fb-group">
+              <span className="rp-fb-lbl">Période</span>
+              <div className="rp-fb-chips">
+                {PERIOD_OPTS.map(o=><Chip key={o.key} label={o.label} active={period===o.key} onClick={()=>pick('period',o.key)}/>)}
+              </div>
             </div>
-
-            {/* Separator */}
-            <div style={{width:1,alignSelf:'stretch',background:BORDER,flexShrink:0,margin:'6px 0'}}/>
-
-            {/* Statut label */}
-            <span style={{fontSize:8,fontWeight:900,color:MUTED,textTransform:'uppercase',letterSpacing:'0.14em',padding:'0 10px 0 14px',flexShrink:0}}>
-              Statut
-            </span>
-            {/* Status chips */}
-            <div style={{display:'flex',gap:4,padding:'6px 10px 6px 0',flex:1,flexWrap:'nowrap',overflowX:'auto'}}>
-              {STATUS_OPTS.map(o=><Chip key={o.key} label={o.label} active={status===o.key} onClick={()=>pick('status',o.key)}/>)}
+            <div className="rp-fb-div"/>
+            <div className="rp-fb-group" style={{flex:1}}>
+              <span className="rp-fb-lbl">Statut</span>
+              <div className="rp-fb-chips">
+                {STATUS_OPTS.map(o=><Chip key={o.key} label={o.label} active={status===o.key} onClick={()=>pick('status',o.key)}/>)}
+              </div>
             </div>
-
-            {/* Reset — only when active */}
             {hasFilter&&(
-              <button onClick={reset} style={{
-                padding:'6px 14px',borderLeft:`2px solid ${DARK}`,background:'none',
-                color:MUTED,fontSize:9,fontWeight:900,textTransform:'uppercase',
-                letterSpacing:'0.1em',cursor:'pointer',fontFamily:'inherit',
-                flexShrink:0,alignSelf:'stretch',transition:'all 0.12s',whiteSpace:'nowrap',
-                border:'none',borderLeft:`2px solid ${DARK}`,
-              }}
+              <button className="rp-fb-reset" onClick={reset}
                 onMouseEnter={e=>{e.currentTarget.style.background=DARK;e.currentTarget.style.color=GOLD}}
-                onMouseLeave={e=>{e.currentTarget.style.background='none';e.currentTarget.style.color=MUTED}}
-              >
+                onMouseLeave={e=>{e.currentTarget.style.background='transparent';e.currentTarget.style.color=MUTED}}>
                 ×
               </button>
             )}
