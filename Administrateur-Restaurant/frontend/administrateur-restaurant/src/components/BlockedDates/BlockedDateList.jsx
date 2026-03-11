@@ -15,8 +15,7 @@ function UnblockBtn({ onClick }) {
         background: hov ? '#b94040' : DARK,
         border: 'none', color: '#fff',
         fontSize: 13, fontWeight: 800,
-        cursor: 'pointer',
-        transition: 'background 0.15s',
+        cursor: 'pointer', transition: 'background 0.15s',
         fontFamily: 'inherit', whiteSpace: 'nowrap',
       }}>
       <Trash2 size={14} strokeWidth={2.2} />
@@ -29,16 +28,17 @@ function formatDate(d) {
   if (!d) return '—'
   const date = new Date(d)
   if (isNaN(date.getTime())) return d
-  return date.toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'long', year:'numeric' })
+  const s = date.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
+  return s.charAt(0).toUpperCase() + s.slice(1)
 }
 
 export default function BlockedDateList({ blockedDates, handleUnblock }) {
   if (!blockedDates || blockedDates.length === 0) {
     return (
-      <div style={{ padding:'64px 0', textAlign:'center' }}>
-        <CalendarOff size={44} color='#d8d0c8' strokeWidth={1.5} style={{ display:'block', margin:'0 auto 18px' }} />
-        <p style={{ margin:0, fontSize:17, fontWeight:900, color:'#c8bfb4' }}>Aucune date bloquée</p>
-        <p style={{ margin:'6px 0 0', fontSize:13, fontWeight:600, color:'#d8d0c8' }}>
+      <div style={{ padding: '64px 0', textAlign: 'center' }}>
+        <CalendarOff size={44} color='#d8d0c8' strokeWidth={1.5} style={{ display: 'block', margin: '0 auto 18px' }} />
+        <p style={{ margin: 0, fontSize: 17, fontWeight: 900, color: '#c8bfb4' }}>Aucune date bloquée</p>
+        <p style={{ margin: '6px 0 0', fontSize: 13, fontWeight: 600, color: '#d8d0c8' }}>
           Bloquez des dates pour les rendre indisponibles aux clients.
         </p>
       </div>
@@ -49,13 +49,16 @@ export default function BlockedDateList({ blockedDates, handleUnblock }) {
     <div>
       {/* Header */}
       <div style={{
-        display:'grid', gridTemplateColumns:'1fr auto',
-        padding:'13px 24px', background:DARK,
+        display: 'grid', gridTemplateColumns: '1fr auto auto',
+        padding: '13px 24px', background: DARK, gap: 16,
       }}>
-        <span style={{ fontSize:10, fontWeight:900, color:GOLD, letterSpacing:'0.2em', textTransform:'uppercase' }}>
+        <span style={{ fontSize: 10, fontWeight: 900, color: GOLD, letterSpacing: '0.2em', textTransform: 'uppercase' }}>
           Date bloquée
         </span>
-        <span style={{ fontSize:10, fontWeight:900, color:GOLD, letterSpacing:'0.2em', textTransform:'uppercase' }}>
+        <span style={{ fontSize: 10, fontWeight: 900, color: GOLD, letterSpacing: '0.2em', textTransform: 'uppercase' }}>
+          Raison
+        </span>
+        <span style={{ fontSize: 10, fontWeight: 900, color: GOLD, letterSpacing: '0.2em', textTransform: 'uppercase' }}>
           Action
         </span>
       </div>
@@ -63,14 +66,22 @@ export default function BlockedDateList({ blockedDates, handleUnblock }) {
       {/* Rows */}
       {blockedDates.map((d, i) => (
         <div key={d.date ?? i} style={{
-          display:'grid', gridTemplateColumns:'1fr auto',
-          padding:'20px 24px',
+          display: 'grid', gridTemplateColumns: '1fr auto auto',
+          padding: '18px 24px',
           background: i % 2 === 0 ? '#fff' : '#faf8f5',
-          borderBottom:'1px solid #ece6de',
-          alignItems:'center',
+          borderBottom: '1px solid #ece6de',
+          alignItems: 'center', gap: 16,
         }}>
-          <span style={{ fontSize:15, fontWeight:700, color:DARK, letterSpacing:'-0.2px' }}>
+          <span style={{ fontSize: 14, fontWeight: 700, color: DARK }}>
             {formatDate(d.date)}
+          </span>
+          <span style={{
+            fontSize: 12, fontWeight: 600,
+            color: d.reason ? '#a8834e' : '#ccc',
+            fontStyle: d.reason ? 'normal' : 'italic',
+            maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+          }}>
+            {d.reason || 'Aucune raison'}
           </span>
           <UnblockBtn onClick={() => handleUnblock(d.date)} />
         </div>
