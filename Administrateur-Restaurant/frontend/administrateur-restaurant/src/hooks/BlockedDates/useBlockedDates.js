@@ -167,6 +167,7 @@ export default function useBlockedDates() {
     form, setForm, submitting,
     handleBlock, handleUnblock,
     getDatesToBlock,
+    setBlockedDates,
     refetch: fetchBlockedDates,
   }
 }
