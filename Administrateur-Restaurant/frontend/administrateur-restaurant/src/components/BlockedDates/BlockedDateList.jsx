@@ -225,7 +225,7 @@ export default function BlockedDateList({
         {/* Header */}
         <div style={{
           display: 'grid',
-          gridTemplateColumns: '44px 1fr auto',
+          gridTemplateColumns: `44px 1fr ${isMobile ? '44px' : '120px'}`,
           padding: '10px 12px',
           background: DARK, alignItems: 'center', gap: 8,
         }}>
@@ -233,9 +233,11 @@ export default function BlockedDateList({
           <span style={{ fontSize: 9, fontWeight: 900, color: GOLD, letterSpacing: '0.2em', textTransform: 'uppercase' }}>
             Date bloquée
           </span>
-          <span style={{ fontSize: 9, fontWeight: 900, color: GOLD, letterSpacing: '0.2em', textTransform: 'uppercase' }}>
-            Action
-          </span>
+          {!isMobile && (
+            <span style={{ fontSize: 9, fontWeight: 900, color: GOLD, letterSpacing: '0.2em', textTransform: 'uppercase' }}>
+              Action
+            </span>
+          )}
         </div>
 
         {/* Rows */}
@@ -250,7 +252,7 @@ export default function BlockedDateList({
               onClick={() => toggleOne(d.date)}
               style={{
                 display: 'grid',
-                gridTemplateColumns: '44px 1fr auto',
+                gridTemplateColumns: `44px 1fr ${isMobile ? '44px' : '120px'}`,
                 padding: isMobile ? '13px 12px' : '14px 16px',
                 background: bg,
                 borderBottom: `1px solid ${BORDER}`,
@@ -305,13 +307,13 @@ export default function BlockedDateList({
               <button
                 onClick={e => { e.stopPropagation(); handleUnblock(d.date) }}
                 style={{
-                  display: 'flex', alignItems: 'center', gap: 6,
-                  // Square on mobile, wider on desktop
-                  padding: isMobile ? '10px 11px' : '10px 18px',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+                  width: '100%',
+                  padding: isMobile ? '10px 0' : '10px 18px',
                   background: DARK, border: 'none', color: '#fff',
                   fontSize: 13, fontWeight: 800,
                   cursor: 'pointer', transition: 'background 0.15s',
-                  fontFamily: 'inherit', whiteSpace: 'nowrap', flexShrink: 0,
+                  fontFamily: 'inherit', whiteSpace: 'nowrap',
                   minHeight: 40,
                   WebkitTapHighlightColor: 'transparent',
                 }}
