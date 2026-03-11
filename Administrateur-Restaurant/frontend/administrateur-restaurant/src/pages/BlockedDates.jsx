@@ -99,12 +99,35 @@ export default function BlockedDates() {
           .btn-label     { display: none !important; }
           .page-subtitle { display: none !important; }
         }
+        .blocked-layout {
+          display: grid;
+          grid-template-columns: 1fr;
+          gap: 0;
+        }
+        @media (min-width: 900px) {
+          .blocked-layout {
+            grid-template-columns: 420px 1fr;
+            gap: 40px;
+            align-items: start;
+          }
+          .blocked-divider-mobile { display: none !important; }
+        }
+        .blocked-sticky {
+          position: static;
+        }
+        @media (min-width: 900px) {
+          .blocked-sticky {
+            position: sticky;
+            top: 24px;
+          }
+        }
       `}</style>
 
       <div style={{
         minHeight: '100vh', background: '#faf8f5',
         fontFamily: "'Plus Jakarta Sans','DM Sans',system-ui,sans-serif",
         padding: 'clamp(16px,3vw,40px) clamp(12px,3vw,36px)',
+        boxSizing: 'border-box',
       }}>
         <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800;900&display=swap" rel="stylesheet" />
         <style>{`* { box-sizing: border-box; }`}</style>
@@ -145,7 +168,7 @@ export default function BlockedDates() {
         {error && (
           <FadeUp delay={15}>
             <div style={{
-              marginBottom: 16, padding: '11px 16px',
+              marginBottom: 20, padding: '11px 16px',
               background: RED_BG, borderLeft: `3px solid ${RED}`,
               fontSize: 12, fontWeight: 700, color: RED,
             }}>
@@ -154,39 +177,47 @@ export default function BlockedDates() {
           </FadeUp>
         )}
 
-        {/* FORM SECTION */}
+        {/* TWO-COLUMN LAYOUT */}
         <FadeUp delay={20}>
-          <h2 style={{ margin: '0 0 5px', fontSize: 'clamp(16px,2.5vw,22px)', fontWeight: 900, color: DARK, letterSpacing: '-0.8px' }}>
-            Bloquer une date
-          </h2>
-          <p className="page-subtitle" style={{ margin: '0 0 20px', fontSize: 12, fontWeight: 700, color: GOLD_DK }}>
-            Sélectionnez une date à bloquer pour les clients
-          </p>
-          <BlockedDateForm
-            form={form}
-            setForm={setForm}
-            handleBlock={handleBlock}
-            submitting={submitting}
-            getDatesToBlock={getDatesToBlock}
-          />
-        </FadeUp>
+          <div className="blocked-layout">
 
-        {/* SECTION DIVIDER */}
-        <FadeUp delay={40}>
-          <div style={{ height: 2, background: DARK, margin: '36px 0' }} />
-        </FadeUp>
+            {/* LEFT — Form (sticky on desktop) */}
+            <div className="blocked-sticky">
+              <h2 style={{ margin: '0 0 5px', fontSize: 'clamp(15px,2.5vw,20px)', fontWeight: 900, color: DARK, letterSpacing: '-0.8px' }}>
+                Bloquer une date
+              </h2>
+              <p style={{ margin: '0 0 16px', fontSize: 12, fontWeight: 700, color: GOLD_DK }}>
+                Sélectionnez une date, un intervalle ou un jour récurrent
+              </p>
+              <BlockedDateForm
+                form={form}
+                setForm={setForm}
+                handleBlock={handleBlock}
+                submitting={submitting}
+                getDatesToBlock={getDatesToBlock}
+              />
+            </div>
 
-        {/* LIST SECTION */}
-        <FadeUp delay={60}>
-          <div style={{ marginBottom: 20 }}>
-            <h2 style={{ margin: '0 0 5px', fontSize: 'clamp(16px,2.5vw,22px)', fontWeight: 900, color: DARK, letterSpacing: '-0.8px' }}>
-              Dates bloquées
-            </h2>
-            <p style={{ margin: 0, fontSize: 12, fontWeight: 700, color: GOLD_DK }}>
-              {blockedDates.length} date{blockedDates.length !== 1 ? 's' : ''} bloquée{blockedDates.length !== 1 ? 's' : ''}
-            </p>
+            {/* Mobile divider only */}
+            <div className="blocked-divider-mobile" style={{ height: 2, background: DARK, margin: '32px 0' }} />
+
+            {/* RIGHT — List */}
+            <div>
+              <div style={{ marginBottom: 16, display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
+                <h2 style={{ margin: 0, fontSize: 'clamp(15px,2.5vw,20px)', fontWeight: 900, color: DARK, letterSpacing: '-0.8px' }}>
+                  Dates bloquées
+                </h2>
+                <span style={{
+                  fontSize: 11, fontWeight: 800, color: '#bbb',
+                  letterSpacing: '0.1em', textTransform: 'uppercase',
+                }}>
+                  {blockedDates.length} date{blockedDates.length !== 1 ? 's' : ''}
+                </span>
+              </div>
+              <BlockedDateList blockedDates={blockedDates} handleUnblock={handleUnblock} />
+            </div>
+
           </div>
-          <BlockedDateList blockedDates={blockedDates} handleUnblock={handleUnblock} />
         </FadeUp>
 
       </div>
