@@ -178,6 +178,111 @@ function MobileCard({ r, selected, highlighted, onToggle, openView, openEdit, ha
   )
 }
 
+
+function TableRow({ r, i, selected, highlighted, highlightRef, toggleOne, openView, openEdit, handleDelete }) {
+  const [hov, setHov] = useState(false)
+  const s = STATUS[r.status] || { bg: '#f5f5f5', color: '#888', label: r.status || '—', dot: '#aaa' }
+
+  let rowBg = i % 2 === 0 ? '#fff' : CREAM
+  if (selected)    rowBg = '#fdf6ec'
+  if (highlighted) rowBg = '#fff8ec'
+  const bg = (!selected && !highlighted && hov) ? '#f5ede0' : rowBg
+
+  return (
+    <tr
+      ref={highlighted ? highlightRef : null}
+      className={highlighted ? 'row-highlighted' : ''}
+      onClick={() => toggleOne(r.id)}
+      onMouseEnter={() => setHov(true)}
+      onMouseLeave={() => setHov(false)}
+      style={{
+        background: bg,
+        borderBottom: `1px solid ${BORDER}`,
+        borderLeft: highlighted
+          ? `4px solid ${GOLD}`
+          : selected
+          ? `4px solid ${GOLD}88`
+          : hov ? `4px solid ${GOLD}44` : '4px solid transparent',
+        transition: 'background 0.12s, border-color 0.12s',
+        cursor: 'pointer',
+      }}
+    >
+      <td style={{ padding: '11px 16px' }} onClick={e => e.stopPropagation()}>
+        <Checkbox checked={selected} onChange={() => toggleOne(r.id)} />
+      </td>
+      <td style={{ padding: '11px 14px' }}>
+        <span style={{
+          fontSize: 13, fontWeight: highlighted ? 900 : 800,
+          color: highlighted ? GOLD_DARK : DARK,
+          display: 'block', maxWidth: 160,
+          overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+        }}>
+          {r.name || '—'}
+        </span>
+        {highlighted && (
+          <span style={{
+            fontSize: 9, fontWeight: 900, color: GOLD,
+            textTransform: 'uppercase', letterSpacing: '0.1em',
+          }}>
+            ← depuis tableau de bord
+          </span>
+        )}
+      </td>
+      <td style={{ padding: '11px 14px', fontSize: 12, fontWeight: 600, color: '#999', whiteSpace: 'nowrap' }}>
+        {r.phone || '—'}
+      </td>
+      <td style={{ padding: '11px 14px', fontSize: 12, fontWeight: 700, color: DARK, whiteSpace: 'nowrap' }}>
+        {r.date || '—'}
+      </td>
+      <td style={{ padding: '11px 14px' }}>
+        <span style={{
+          display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+          padding: '3px 8px', background: highlighted ? `${GOLD}22` : '#f5f0eb',
+          fontSize: 12, fontWeight: 900, color: GOLD_DARK, fontVariantNumeric: 'tabular-nums',
+        }}>
+          {r.start_time || '—'}
+        </span>
+      </td>
+      <td style={{ padding: '11px 14px', textAlign: 'center' }}>
+        <span style={{
+          display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+          width: 26, height: 26,
+          background: highlighted ? `${GOLD}22` : '#f5f0eb',
+          fontSize: 12, fontWeight: 900, color: DARK,
+        }}>
+          {r.guests || '—'}
+        </span>
+      </td>
+      <td style={{ padding: '11px 14px' }}>
+        <span style={{
+          fontSize: 11, fontWeight: 700, color: '#888',
+          background: '#f5f0eb', padding: '3px 8px',
+          whiteSpace: 'nowrap', display: 'inline-block',
+        }}>
+          {r.service || '—'}
+        </span>
+      </td>
+      <td style={{ padding: '11px 14px' }}>
+        <span style={{
+          display: 'inline-flex', alignItems: 'center', gap: 4,
+          padding: '4px 10px',
+          background: s.bg, fontSize: 10, fontWeight: 800, color: s.color, whiteSpace: 'nowrap',
+        }}>
+          <span style={{ width: 5, height: 5, borderRadius: '50%', background: s.dot, flexShrink: 0 }} />
+          {s.label}
+        </span>
+      </td>
+      <td style={{ padding: '11px 14px' }}>
+        <div style={{ display: 'flex', gap: 4 }}>
+          <ActionBtn icon={Eye}    title="Voir"      onClick={() => openView(r)} />
+          <ActionBtn icon={Pencil} title="Modifier"  onClick={() => openEdit(r)} />
+          <ActionBtn icon={Trash2} title="Supprimer" onClick={() => handleDelete(r.id)} danger />
+        </div>
+      </td>
+    </tr>
+  )
+}
+
 export default function ReservationsTable({
   reservations, openView, openEdit, handleDelete,
   selectedIds, setSelectedIds,
@@ -335,110 +440,16 @@ export default function ReservationsTable({
               </tr>
             </thead>
             <tbody>
-              {pageItems.map((r, i) => {
-                const s          = STATUS[r.status] || { bg: '#f5f5f5', color: '#888', label: r.status || '—', dot: '#aaa' }
-                const selected   = selectedIds.includes(r.id)
-                const highlighted = r.id === highlightId
-
-                let rowBg = i % 2 === 0 ? '#fff' : CREAM
-                if (selected)   rowBg = '#fdf6ec'
-                if (highlighted) rowBg = '#fff8ec'
-
-                return (
-                  <tr
-                    key={r.id}
-                    ref={highlighted ? highlightRef : null}
-                    className={highlighted ? 'row-highlighted' : ''}
-                    onClick={() => toggleOne(r.id)}
-                    style={{
-                      background: rowBg,
-                      borderBottom: `1px solid ${BORDER}`,
-                      borderLeft: highlighted
-                        ? `4px solid ${GOLD}`
-                        : selected
-                        ? `4px solid ${GOLD}88`
-                        : '4px solid transparent',
-                      transition: 'background 0.12s',
-                      cursor: 'pointer',
-                    }}
-                    onMouseEnter={e => { if (!selected && !highlighted) e.currentTarget.style.background = '#faf5ee' }}
-                    onMouseLeave={e => { e.currentTarget.style.background = rowBg }}
-                  >
-                    <td style={{ padding: '11px 16px' }} onClick={e => e.stopPropagation()}>
-                      <Checkbox checked={selected} onChange={() => toggleOne(r.id)} />
-                    </td>
-                    <td style={{ padding: '11px 14px' }}>
-                      <span style={{
-                        fontSize: 13, fontWeight: highlighted ? 900 : 800,
-                        color: highlighted ? GOLD_DARK : DARK,
-                        display: 'block', maxWidth: 160,
-                        overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-                      }}>
-                        {r.name || '—'}
-                      </span>
-                      {highlighted && (
-                        <span style={{
-                          fontSize: 9, fontWeight: 900, color: GOLD,
-                          textTransform: 'uppercase', letterSpacing: '0.1em',
-                        }}>
-                          ← depuis tableau de bord
-                        </span>
-                      )}
-                    </td>
-                    <td style={{ padding: '11px 14px', fontSize: 12, fontWeight: 600, color: '#999', whiteSpace: 'nowrap' }}>
-                      {r.phone || '—'}
-                    </td>
-                    <td style={{ padding: '11px 14px', fontSize: 12, fontWeight: 700, color: DARK, whiteSpace: 'nowrap' }}>
-                      {r.date || '—'}
-                    </td>
-                    <td style={{ padding: '11px 14px' }}>
-                      <span style={{
-                        display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                        padding: '3px 8px', background: highlighted ? `${GOLD}22` : '#f5f0eb',
-                        fontSize: 12, fontWeight: 900, color: GOLD_DARK, fontVariantNumeric: 'tabular-nums',
-                      }}>
-                        {r.start_time || '—'}
-                      </span>
-                    </td>
-                    <td style={{ padding: '11px 14px', textAlign: 'center' }}>
-                      <span style={{
-                        display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                        width: 26, height: 26,
-                        background: highlighted ? `${GOLD}22` : '#f5f0eb',
-                        fontSize: 12, fontWeight: 900, color: DARK,
-                      }}>
-                        {r.guests || '—'}
-                      </span>
-                    </td>
-                    <td style={{ padding: '11px 14px' }}>
-                      <span style={{
-                        fontSize: 11, fontWeight: 700, color: '#888',
-                        background: '#f5f0eb', padding: '3px 8px',
-                        whiteSpace: 'nowrap', display: 'inline-block',
-                      }}>
-                        {r.service || '—'}
-                      </span>
-                    </td>
-                    <td style={{ padding: '11px 14px' }}>
-                      <span style={{
-                        display: 'inline-flex', alignItems: 'center', gap: 4,
-                        padding: '4px 10px',
-                        background: s.bg, fontSize: 10, fontWeight: 800, color: s.color, whiteSpace: 'nowrap',
-                      }}>
-                        <span style={{ width: 5, height: 5, borderRadius: '50%', background: s.dot, flexShrink: 0 }} />
-                        {s.label}
-                      </span>
-                    </td>
-                    <td style={{ padding: '11px 14px' }}>
-                      <div style={{ display: 'flex', gap: 4 }}>
-                        <ActionBtn icon={Eye}    title="Voir"      onClick={() => openView(r)} />
-                        <ActionBtn icon={Pencil} title="Modifier"  onClick={() => openEdit(r)} />
-                        <ActionBtn icon={Trash2} title="Supprimer" onClick={() => handleDelete(r.id)} danger />
-                      </div>
-                    </td>
-                  </tr>
-                )
-              })}
+              {pageItems.map((r, i) => (
+                <TableRow
+                  key={r.id} r={r} i={i}
+                  selected={selectedIds.includes(r.id)}
+                  highlighted={r.id === highlightId}
+                  highlightRef={highlightRef}
+                  toggleOne={toggleOne}
+                  openView={openView} openEdit={openEdit} handleDelete={handleDelete}
+                />
+              ))}
               {pageItems.length === 0 && (
                 <tr>
                   <td colSpan={9} style={{ padding: '52px 24px', textAlign: 'center', fontSize: 13, fontWeight: 700, color: '#ccc' }}>
