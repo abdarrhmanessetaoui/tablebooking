@@ -130,7 +130,7 @@ function MobileCard({ r, selected, highlighted, onToggle, openView, openEdit, ha
         {[
           { Icon: CalendarDays, value: r.date,       gold: false },
           { Icon: Clock3,       value: r.start_time, gold: false },
-          { Icon: Users,        value: r.guests ? `${r.guests} pers.` : null, gold: false },
+          { Icon: Users,        value: r.guests ? `${r.guests} personnes` : null, gold: false },
           { Icon: Utensils,     value: r.service,    gold: true  },
         ].filter(item => item.value).map((item, i) => (
           <span key={i} style={{
@@ -325,7 +325,7 @@ export default function ReservationsTable({
                 <th style={{ padding: '12px 16px', width: 40 }}>
                   <Checkbox checked={pageAllSel} indeterminate={pageSomeSel} onChange={togglePage} />
                 </th>
-                {['Nom', 'Téléphone', 'Date', 'Heure', 'Cvts', 'Service', 'Statut', 'Actions'].map(c => (
+                {['Nom', 'Téléphone', 'Date', 'Heure', 'Personnes', 'Service', 'Statut', 'Actions'].map(c => (
                   <th key={c} style={{
                     padding: '12px 14px', textAlign: 'left',
                     fontSize: 9, fontWeight: 900, color: GOLD,
