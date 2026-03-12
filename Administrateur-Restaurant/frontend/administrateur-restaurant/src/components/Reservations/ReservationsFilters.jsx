@@ -85,7 +85,7 @@ export default function ReservationsFilters({
 
         {/* Date */}
         <div className="filters-date">
-          <input type="date" value={filterDate} onChange={e => setFilterDate(e.target.value)} style={{ ...base, cursor: 'pointer' }} />
+          <input type="month" value={filterDate} onChange={e => setFilterDate(e.target.value)} style={{ ...base, cursor: 'pointer' }} />
         </div>
 
         {/* Clear */}
