@@ -1,240 +1,605 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
-import {
-  CalendarCheck, ClipboardList,
-  CheckCircle2, Clock, XCircle,
-  Download, RefreshCw, Clock4, Flame,
-} from 'lucide-react'
+import { FileDown, CheckCircle, Clock, XCircle, CalendarDays, ArrowRight, Users, MapPin } from 'lucide-react'
 
 import useDashboardStats from '../hooks/Dashboard/useDashboardStats'
 import useRestaurantInfo from '../hooks/useRestaurantInfo'
-import { B } from '../utils/brand'
+import FadeUp            from '../components/Dashboard/FadeUp'
+import Spinner           from '../components/Dashboard/Spinner'
+import useCountUp        from '../hooks/Dashboard/useCountUp'
+import { exportPDF }     from '../utils/exportPDF'
+import { getToken }      from '../utils/auth'
 
-import FadeUp    from '../components/Dashboard/FadeUp'
-import Spinner   from '../components/Dashboard/Spinner'
-import Card      from '../components/Dashboard/Card'
-import IBox      from '../components/Dashboard/IBox'
-import TodayHero from '../components/Dashboard/TodayHero'
-import StatCard  from '../components/Dashboard/StatCard'
-import useCountUp from '../hooks/Dashboard/useCountUp'
+/* ─── TOKENS ─── */
+const DARK    = '#2b2118'
+const GOLD    = '#c8a97e'
+const GOLD_DK = '#a8834e'
+const CREAM   = '#faf8f5'
+const WHITE   = '#ffffff'
+const GREEN   = '#1a6e42'
+const GREEN_BG= '#edfaf4'
+const RED     = '#b94040'
+const RED_BG  = '#fdf0f0'
+const AMBER   = '#a8670a'
+const AMBER_BG= '#fff8ec'
+const BORDER  = '#e8e0d6'
+const MUTED   = 'rgba(43,33,24,0.38)'
 
-/* ── Live clock ──────────────────────────────────────────────────────── */
+const TODAY_DATE    = new Date().toISOString().slice(0, 10)
+const TOMORROW_DATE = new Date(Date.now() + 86400000).toISOString().slice(0, 10)
+
+/* ─── Live clock ─── */
 function LiveClock() {
-  const [time, setTime] = useState(new Date())
+  const [t, setT] = useState(new Date())
   useEffect(() => {
-    const t = setInterval(() => setTime(new Date()), 1000)
-    return () => clearInterval(t)
+    const id = setInterval(() => setT(new Date()), 1000)
+    return () => clearInterval(id)
   }, [])
   return (
-    <span style={{ fontVariantNumeric: 'tabular-nums' }}>
-      {time.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+    <span style={{ fontVariantNumeric: 'tabular-nums', fontWeight: 700 }}>
+      {t.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })}
+      &nbsp;·&nbsp;
+      {t.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
     </span>
   )
 }
 
-/* ── Service banner ──────────────────────────────────────────────────── */
-function ServiceBanner() {
-  const h = new Date().getHours()
-  const isLunch  = h >= 11 && h < 15
-  const isDinner = h >= 18 && h < 23
-  if (!isLunch && !isDinner) return null
+/* ─── Btn — same as BlockedDates ─── */
+function Btn({ children, onClick, primary, disabled, icon: Icon }) {
+  const [hov, setHov] = useState(false)
+  const bg    = primary ? (hov ? DARK : GOLD) : (hov ? GOLD : DARK)
+  const color = primary ? (hov ? GOLD : DARK) : '#fff'
   return (
-    <div style={{
-      display: 'flex', alignItems: 'center', gap: 12,
-      padding: '14px 22px',
-      background: isDinner ? B.black : B.brownTint,
-      borderRadius: 14, marginBottom: 16,
-    }}>
-      <Flame size={15} color={isDinner ? B.brownLight : B.brown} strokeWidth={2.5} />
-      <span style={{ fontSize: 14, fontWeight: 800, color: isDinner ? '#fff' : B.brown }}>
-        {isDinner ? '🌙 Service du soir en cours' : '☀️ Service du midi en cours'}
-      </span>
-      <span style={{
-        marginLeft: 'auto', fontSize: 13, fontWeight: 700,
-        color: isDinner ? 'rgba(255,255,255,0.45)' : B.brown,
-        display: 'flex', alignItems: 'center', gap: 5,
-      }}>
-        <Clock4 size={13} strokeWidth={2} />
-        <LiveClock />
-      </span>
-    </div>
-  )
-}
-
-/* ── Section label ───────────────────────────────────────────────────── */
-function Label({ text }) {
-  return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 9, marginBottom: 12 }}>
-      <div style={{ width: 4, height: 16, background: B.brown, borderRadius: 2 }} />
-      <span style={{ fontSize: 10, fontWeight: 900, color: B.blackSoft, letterSpacing: '0.18em', textTransform: 'uppercase' }}>
-        {text}
-      </span>
-    </div>
-  )
-}
-
-/* ── Status chip (inline — no extra file) ────────────────────────────── */
-function StatusChip({ icon, iconColor, iconBg, value, label, delay = 0 }) {
-  const n = useCountUp(value, 750, delay)
-  return (
-    <div style={{ background: iconBg, borderRadius: 16, padding: '20px 22px' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
-        <IBox icon={icon} color={iconColor} bg="transparent" size={14} />
-        <span style={{ fontSize: 11, fontWeight: 900, color: iconColor, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
-          {label}
-        </span>
-      </div>
-      <p style={{
-        margin: 0, fontSize: 48, fontWeight: 900,
-        color: B.black, lineHeight: 1,
-        fontVariantNumeric: 'tabular-nums', letterSpacing: '-2px',
-        fontFamily: "'Plus Jakarta Sans', 'DM Sans', system-ui",
-      }}>
-        {n}
-      </p>
-    </div>
-  )
-}
-
-/* ── Button ──────────────────────────────────────────────────────────── */
-function Btn({ children, onClick, primary = false }) {
-  const [hov, setHov]         = useState(false)
-  const [pressed, setPressed] = useState(false)
-  return (
-    <button
-      onClick={onClick}
-      onMouseEnter={() => setHov(true)}
-      onMouseLeave={() => { setHov(false); setPressed(false) }}
-      onMouseDown={() => setPressed(true)}
-      onMouseUp={() => setPressed(false)}
+    <button onClick={onClick} disabled={disabled}
+      onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
       style={{
-        display: 'flex', alignItems: 'center', gap: 8,
-        padding: '13px 22px',
-        background: primary ? (hov ? B.brownDark : B.brown) : (hov ? '#E4E4E4' : '#EFEFEF'),
-        border: 'none', borderRadius: 13,
-        fontSize: 14, fontWeight: 800,
-        color: primary ? '#fff' : B.blackSoft,
-        cursor: 'pointer', whiteSpace: 'nowrap',
-        transition: 'background 0.15s, transform 0.1s',
-        transform: pressed ? 'scale(0.97)' : hov ? 'translateY(-2px)' : 'none',
-        userSelect: 'none',
-      }}
-    >
-      {children}
+        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+        padding: '10px 16px', background: bg, border: 'none', color,
+        fontSize: 13, fontWeight: 800,
+        cursor: disabled ? 'not-allowed' : 'pointer',
+        opacity: disabled ? 0.5 : 1,
+        transition: 'background 0.15s, color 0.15s',
+        fontFamily: 'inherit', whiteSpace: 'nowrap', minHeight: 40,
+      }}>
+      {Icon && <Icon size={15} strokeWidth={2.2} />}
+      <span className="btn-label">{children}</span>
     </button>
   )
 }
 
-/* ── MAIN ─────────────────────────────────────────────────────────────── */
+/* ─── Ring donut ─── */
+function Ring({ c, p, a, size = 88 }) {
+  const total = c + p + a || 1
+  const pct   = Math.round((c / total) * 100)
+  const r = 30, circ = 2 * Math.PI * r
+  const segs = [{ v: c, color: GREEN }, { v: p, color: GOLD }, { v: a, color: RED }]
+  let off = 0
+  return (
+    <div style={{ position: 'relative', width: size, height: size, flexShrink: 0 }}>
+      <svg width={size} height={size} viewBox="0 0 72 72" style={{ transform: 'rotate(-90deg)' }}>
+        <circle cx="36" cy="36" r={r} fill="none" stroke={BORDER} strokeWidth="8" />
+        {segs.map((s, i) => {
+          if (!s.v) { off += (s.v / total) * circ; return null }
+          const arc = (s.v / total) * circ
+          const el = (
+            <circle key={i} cx="36" cy="36" r={r} fill="none" stroke={s.color} strokeWidth="8"
+              strokeDasharray={`${arc} ${circ}`} strokeDashoffset={-off}
+              style={{ transition: `stroke-dasharray 0.9s ease ${i * 0.12}s` }}
+            />
+          )
+          off += arc; return el
+        })}
+      </svg>
+      <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+        <span style={{ fontSize: 16, fontWeight: 900, color: DARK, lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>{pct}%</span>
+        <span style={{ fontSize: 7, fontWeight: 900, color: GOLD_DK, textTransform: 'uppercase', letterSpacing: '0.1em', marginTop: 2 }}>conf.</span>
+      </div>
+    </div>
+  )
+}
+
+/* ─── Single stat block — compact horizontal ─── */
+function StatBlock({ icon: Icon, value, label, accent, bg, delay = 0, total = 0 }) {
+  const n   = useCountUp(value, 700, delay)
+  const pct = total > 0 ? Math.round((value / total) * 100) : null
+  const [w, setW] = useState(0)
+  useEffect(() => { const id = setTimeout(() => setW(pct ?? 0), 440); return () => clearTimeout(id) }, [pct])
+
+  return (
+    <div style={{ background: bg, padding: '10px 16px', display: 'flex', alignItems: 'center', gap: 12 }}>
+      {/* Accent bar */}
+      <div style={{ width: 3, height: 36, background: accent, flexShrink: 0, borderRadius: 2 }} />
+      {/* Label + number */}
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 3 }}>
+          <Icon size={10} strokeWidth={2.5} color={accent} />
+          <span style={{ fontSize: 8, fontWeight: 900, color: accent, textTransform: 'uppercase', letterSpacing: '0.18em' }}>{label}</span>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: 10 }}>
+          <span style={{ fontSize: 22, fontWeight: 900, color: DARK, letterSpacing: '-1px', lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>{n}</span>
+          {pct !== null && (
+            <span style={{ fontSize: 9, fontWeight: 900, color: accent, opacity: 0.7 }}>{pct}%</span>
+          )}
+        </div>
+      </div>
+      {/* Mini progress bar on the right */}
+      {pct !== null && (
+        <div style={{ width: 36, height: 3, background: BORDER, overflow: 'hidden', flexShrink: 0, alignSelf: 'center' }}>
+          <div style={{ height: '100%', width: `${w}%`, background: accent, transition: 'width 0.9s ease' }} />
+        </div>
+      )}
+    </div>
+  )
+}
+
+/* ─── Minimal status badge — just a dot + full text, no bg box ─── */
+function Badge({ status }) {
+  const M = {
+    Confirmed: { label: 'Confirmée',  color: GREEN },
+    Pending:   { label: 'En attente', color: AMBER },
+    Cancelled: { label: 'Annulée',    color: RED   },
+  }
+  const s = M[status] || M.Pending
+  return (
+    <span style={{
+      display: 'inline-flex', alignItems: 'center', gap: 5,
+      fontSize: 10, fontWeight: 900, color: s.color,
+      letterSpacing: '0.04em', whiteSpace: 'nowrap',
+    }}>
+      <span style={{
+        width: 6, height: 6, borderRadius: '50%',
+        background: s.color, flexShrink: 0,
+        boxShadow: `0 0 0 2px ${s.color}22`,
+      }} />
+      {s.label}
+    </span>
+  )
+}
+
+/* ─── Mobile reservation card ─── */
+function ResCardMobile({ r, i }) {
+  return (
+    <div style={{ padding: '13px 14px', borderBottom: `1px solid ${BORDER}`, background: i % 2 === 0 ? WHITE : CREAM }}>
+      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 10, marginBottom: 7 }}>
+        <div style={{ minWidth: 0 }}>
+          <p style={{ margin: 0, fontSize: 13, fontWeight: 900, color: DARK, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.name}</p>
+          {r.phone && <p style={{ margin: '2px 0 0', fontSize: 11, fontWeight: 700, color: MUTED }}>{r.phone}</p>}
+        </div>
+        <Badge status={r.status} />
+      </div>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
+        <span style={{ fontSize: 11, fontWeight: 900, color: DARK, display: 'flex', alignItems: 'center', gap: 4 }}>
+          <Clock size={11} strokeWidth={2.5} color={MUTED} />{r.start_time}
+        </span>
+        <span style={{ fontSize: 11, fontWeight: 900, color: DARK, display: 'flex', alignItems: 'center', gap: 4 }}>
+          <Users size={11} strokeWidth={2.5} color={MUTED} />{r.guests} pers.
+        </span>
+        {r.service && (
+          <span style={{ fontSize: 11, fontWeight: 700, color: MUTED, display: 'flex', alignItems: 'center', gap: 4 }}>
+            <MapPin size={11} strokeWidth={2.5} color={MUTED} />{r.service}
+          </span>
+        )}
+      </div>
+    </div>
+  )
+}
+
+/* ─── Reservations table (right column) ─── */
+function ReservationsTable({ reservations, onViewAll, tabLabel }) {
+  if (!reservations?.length) return (
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '48px 16px', textAlign: 'center' }}>
+        <CalendarDays size={36} color="rgba(43,33,24,0.1)" style={{ marginBottom: 14 }} />
+        <p style={{ margin: 0, fontSize: 14, fontWeight: 900, color: 'rgba(43,33,24,0.18)' }}>Aucune réservation</p>
+        <p style={{ margin: '5px 0 0', fontSize: 11, fontWeight: 700, color: 'rgba(43,33,24,0.12)' }}>Les réservations apparaîtront ici</p>
+      </div>
+      <button onClick={onViewAll} style={{
+        width: '100%', padding: '13px 20px', background: DARK, border: 'none', color: WHITE,
+        fontSize: 11, fontWeight: 900, letterSpacing: '0.1em', textTransform: 'uppercase',
+        cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        fontFamily: 'inherit', transition: 'background 0.15s',
+      }}
+        onMouseEnter={e => e.currentTarget.style.background = '#3d2d1e'}
+        onMouseLeave={e => e.currentTarget.style.background = DARK}
+      >
+        <span>Voir toutes les réservations</span>
+        <ArrowRight size={13} strokeWidth={2.5} />
+      </button>
+    </div>
+  )
+
+  const COLS = [
+    { key: 'name',       label: 'Nom',      flex: 1.8 },
+    { key: 'start_time', label: 'Heure',    flex: 0.7 },
+    { key: 'guests',     label: 'Couverts', flex: 0.7 },
+    { key: 'service',    label: 'Service',  flex: 1.0 },
+    { key: 'status',     label: 'Statut',   flex: 1.2 },
+  ]
+  const tpl = COLS.map(c => `${c.flex}fr`).join(' ')
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+      {/* Table header */}
+      <div style={{ display: 'grid', gridTemplateColumns: tpl, gap: 10, padding: '11px 16px', background: DARK }}>
+        {COLS.map(c => (
+          <span key={c.key} style={{ fontSize: 9, fontWeight: 900, color: GOLD, textTransform: 'uppercase', letterSpacing: '0.18em', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            {c.label}
+          </span>
+        ))}
+      </div>
+
+      {/* Rows */}
+      <div style={{ flex: 1, overflow: 'hidden' }}>
+        {reservations.slice(0, 8).map((r, i) => (
+          <div key={r.id ?? i} style={{
+            display: 'grid', gridTemplateColumns: tpl, gap: 10,
+            padding: '14px 16px',
+            background: i % 2 === 0 ? WHITE : CREAM,
+            borderBottom: `1px solid ${BORDER}`,
+            alignItems: 'center',
+            transition: 'background 0.12s',
+          }}
+            onMouseEnter={e => e.currentTarget.style.background = '#f5ede0'}
+            onMouseLeave={e => e.currentTarget.style.background = i % 2 === 0 ? WHITE : CREAM}
+          >
+            <div style={{ minWidth: 0 }}>
+              <p style={{ margin: 0, fontSize: 13, fontWeight: 900, color: DARK, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.name}</p>
+              {r.phone && <p style={{ margin: '3px 0 0', fontSize: 10, fontWeight: 700, color: MUTED, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.phone}</p>}
+            </div>
+            <span style={{ fontSize: 13, fontWeight: 900, color: DARK, fontVariantNumeric: 'tabular-nums' }}>{r.start_time}</span>
+            <span style={{ fontSize: 13, fontWeight: 900, color: DARK }}>{r.guests}</span>
+            <span style={{ fontSize: 12, fontWeight: 700, color: MUTED, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.service || '—'}</span>
+            <Badge status={r.status} />
+          </div>
+        ))}
+      </div>
+
+      {/* Footer CTA — context-aware label */}
+      <button onClick={onViewAll} style={{
+        width: '100%', padding: '13px 16px', background: DARK, border: 'none', color: WHITE,
+        fontSize: 11, fontWeight: 900, letterSpacing: '0.1em', textTransform: 'uppercase',
+        cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        fontFamily: 'inherit', transition: 'background 0.15s', marginTop: 'auto',
+      }}
+        onMouseEnter={e => e.currentTarget.style.background = '#3d2d1e'}
+        onMouseLeave={e => e.currentTarget.style.background = DARK}
+      >
+        <span>Toutes les réservations — {tabLabel}</span>
+        <ArrowRight size={13} strokeWidth={2.5} />
+      </button>
+    </div>
+  )
+}
+
+/* ─── Tab panel — 2-col like BlockedDates ─── */
+function TabPanel({ tab, stats, reservations, onViewAll, tabLabel, tabDate }) {
+  const c     = tab === 'today' ? stats.today_confirmed    : tab === 'tomorrow' ? (stats.tomorrow_confirmed ?? 0) : stats.confirmed
+  const p     = tab === 'today' ? stats.today_pending      : tab === 'tomorrow' ? (stats.tomorrow_pending   ?? 0) : stats.pending
+  const a     = tab === 'today' ? stats.today_cancelled    : tab === 'tomorrow' ? (stats.tomorrow_cancelled ?? 0) : stats.cancelled
+  const hero  = tab === 'today' ? stats.today              : tab === 'tomorrow' ? (stats.tomorrow           ?? 0) : stats.total
+  const total = c + p + a || 1
+
+  // Human-readable period label for buttons
+  const periodLabel = tab === 'today' ? "Aujourd'hui" : tab === 'tomorrow' ? 'Demain' : 'Ce mois'
+  // Formatted date string for sub-label (e.g. "mer. 11 mars")
+  const dateStr = tabDate
+    ? new Date(tabDate).toLocaleDateString('fr-FR', { weekday: 'short', day: 'numeric', month: 'long' })
+    : null
+
+  return (
+    <>
+      <style>{`
+        /* Outer card */
+        .db-card {
+          background: ${WHITE};
+          border: 2px solid ${DARK};
+          overflow: hidden;
+        }
+        /* Single unified header bar spanning full width */
+        .db-header-bar {
+          display: grid;
+          grid-template-columns: 280px 1fr;
+          background: ${DARK};
+          height: 38px;
+        }
+        .db-header-left {
+          display: flex; align-items: center;
+          padding: 0 20px;
+          border-right: 2px solid rgba(255,255,255,0.15);
+        }
+        .db-header-right {
+          display: flex; align-items: center; justify-content: space-between;
+          padding: 0 20px;
+        }
+        /* Column headers row (table sub-header) */
+        .db-col-headers {
+          display: grid;
+          grid-template-columns: 280px 1fr;
+          background: ${DARK};
+          border-top: 1px solid rgba(255,255,255,0.07);
+        }
+        /* 2-col body layout */
+        .db-body {
+          display: grid;
+          grid-template-columns: 280px 1fr;
+        }
+        /* Left column — stats */
+        .db-left {
+          border-right: 2px solid ${DARK};
+        }
+        .db-stats-sticky { position: sticky; top: 24px; }
+
+        /* Mobile: stack everything */
+        @media (max-width: 860px) {
+          .db-header-bar,
+          .db-col-headers,
+          .db-body { grid-template-columns: 1fr; }
+          .db-header-right { border-top: 1px solid rgba(255,255,255,0.1); }
+          .db-left { border-right: none; border-bottom: 2px solid ${DARK}; }
+          .db-stats-sticky { position: static; }
+        }
+
+        /* Reservation table/cards */
+        .res-desktop { display: block; }
+        .res-mobile  { display: none;  }
+        @media (max-width: 640px) {
+          .res-desktop { display: none;  }
+          .res-mobile  { display: block; }
+        }
+      `}</style>
+
+      <div className="db-card">
+
+        {/* ── UNIFIED HEADER BAR ── */}
+        <div className="db-header-bar">
+          <div className="db-header-left">
+            <span style={{ fontSize: 9, fontWeight: 900, color: GOLD, textTransform: 'uppercase', letterSpacing: '0.2em' }}>
+              Vue d'ensemble
+            </span>
+          </div>
+          <div className="db-header-right">
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+              <span style={{ fontSize: 9, fontWeight: 900, color: GOLD, textTransform: 'uppercase', letterSpacing: '0.2em' }}>
+                Réservations — {periodLabel}
+              </span>
+              {dateStr && (
+                <span style={{ fontSize: 9, fontWeight: 700, color: 'rgba(200,169,126,0.55)', textTransform: 'capitalize' }}>
+                  {dateStr}
+                </span>
+              )}
+            </div>
+            <button onClick={onViewAll} style={{
+              background: 'none', border: 'none', color: GOLD, opacity: 0.75,
+              fontSize: 10, fontWeight: 900, cursor: 'pointer', fontFamily: 'inherit',
+              display: 'flex', alignItems: 'center', gap: 5, padding: 0,
+              letterSpacing: '0.1em', textTransform: 'uppercase', transition: 'opacity 0.15s',
+            }}
+              onMouseEnter={e => e.currentTarget.style.opacity = 1}
+              onMouseLeave={e => e.currentTarget.style.opacity = 0.75}
+            >
+              Voir tout <ArrowRight size={11} strokeWidth={2.5} />
+            </button>
+          </div>
+        </div>
+
+        {/* ── TWO-COL BODY ── */}
+        <div className="db-body">
+
+          {/* LEFT: stats */}
+          <div className="db-left db-stats-sticky">
+            {/* Hero */}
+            <div style={{ padding: '18px 20px 16px', display: 'flex', alignItems: 'center', gap: 20, borderBottom: `1px solid ${BORDER}`, background: WHITE }}>
+              <div>
+                <p style={{ margin: 0, fontSize: 'clamp(52px,8vw,80px)', fontWeight: 900, color: DARK, lineHeight: 0.9, letterSpacing: '-4px', fontVariantNumeric: 'tabular-nums' }}>{hero}</p>
+                <p style={{ margin: '10px 0 0', fontSize: 11, fontWeight: 700, color: MUTED }}>réservation{hero !== 1 ? 's' : ''}</p>
+              </div>
+              <Ring c={c} p={p} a={a} size={88} />
+            </div>
+            {/* 3 stat blocks */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 1, background: BORDER }}>
+              <StatBlock icon={CheckCircle} value={c} label="Confirmées" accent={GREEN} bg={GREEN_BG} delay={50}  total={total} />
+              <StatBlock icon={Clock}       value={p} label="En attente" accent={AMBER} bg={AMBER_BG} delay={80}  total={total} />
+              <StatBlock icon={XCircle}     value={a} label="Annulées"   accent={RED}   bg={RED_BG}   delay={110} total={total} />
+            </div>
+          </div>
+
+          {/* RIGHT: table */}
+          <div>
+            <div className="res-desktop">
+              <ReservationsTable reservations={reservations} onViewAll={onViewAll} tabLabel={periodLabel} />
+            </div>
+            <div className="res-mobile">
+              {reservations?.length
+                ? reservations.slice(0, 6).map((r, i) => <ResCardMobile key={r.id ?? i} r={r} i={i} />)
+                : (
+                  <div style={{ padding: '40px 16px', textAlign: 'center' }}>
+                    <CalendarDays size={32} color="rgba(43,33,24,0.1)" style={{ display: 'block', margin: '0 auto 12px' }} />
+                    <p style={{ margin: 0, fontSize: 13, fontWeight: 900, color: 'rgba(43,33,24,0.18)' }}>Aucune réservation</p>
+                    <p style={{ margin: '5px 0 0', fontSize: 11, fontWeight: 700, color: 'rgba(43,33,24,0.12)' }}>{periodLabel}</p>
+                  </div>
+                )
+              }
+              <button onClick={onViewAll} style={{
+                width: '100%', padding: '13px 16px', background: DARK, border: 'none', color: WHITE,
+                fontSize: 11, fontWeight: 900, letterSpacing: '0.1em', textTransform: 'uppercase',
+                cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                fontFamily: 'inherit',
+              }}>
+                <span>Toutes les réservations — {periodLabel}</span>
+                <ArrowRight size={13} strokeWidth={2.5} />
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </>
+  )
+}
+
+/* ═══════════════════════
+   PAGE
+═══════════════════════ */
 export default function Dashboard() {
-  const { stats, loading, error } = useDashboardStats()
+  const { stats, loading, error, refetch } = useDashboardStats()
+  const { info }                           = useRestaurantInfo()
   const navigate = useNavigate()
 
-  const today = new Date().toLocaleDateString('fr-FR', {
-    weekday: 'long', day: 'numeric', month: 'long',
-  })
+  const [tab,       setTab]       = useState('today')
+  const [exporting, setExporting] = useState(false)
+  const [todayRes,  setTodayRes]  = useState([])
+  const [tomRes,    setTomRes]    = useState([])
+  const [monthRes,  setMonthRes]  = useState([])
+
+  const loadAll = useCallback(() => {
+    const h   = { Authorization: `Bearer ${getToken()}` }
+    const now = new Date()
+    const yr  = now.getFullYear()
+    const mo  = String(now.getMonth() + 1).padStart(2, '0')
+    fetch(`http://localhost:8000/api/restaurant/reservations?date=${TODAY_DATE}`,    { headers: h }).then(r => r.json()).then(d => setTodayRes(Array.isArray(d) ? d : [])).catch(() => {})
+    fetch(`http://localhost:8000/api/restaurant/reservations?date=${TOMORROW_DATE}`, { headers: h }).then(r => r.json()).then(d => setTomRes(Array.isArray(d) ? d : [])).catch(() => {})
+    fetch(`http://localhost:8000/api/restaurant/reservations?month=${yr}-${mo}`,     { headers: h }).then(r => r.json()).then(d => setMonthRes(Array.isArray(d) ? d : [])).catch(() => {})
+    refetch()
+  }, [refetch])
+
+  useEffect(() => {
+    loadAll()
+    const id = setInterval(loadAll, 60_000)
+    return () => clearInterval(id)
+  }, [loadAll])
+
+  const TABS = [
+    { key: 'today',    label: "Aujourd'hui", res: todayRes, date: TODAY_DATE    },
+    { key: 'tomorrow', label: 'Demain',      res: tomRes,   date: TOMORROW_DATE },
+    { key: 'month',    label: 'Ce mois',     res: monthRes, date: null          },
+  ]
+  const active = TABS.find(t => t.key === tab)
+
+  async function handleExport() {
+    setExporting(true)
+    try {
+      if (!window.jspdf) await new Promise((res, rej) => {
+        const s = document.createElement('script')
+        s.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js'
+        s.onload = res; s.onerror = rej; document.head.appendChild(s)
+      })
+      exportPDF(stats)
+    } catch (e) { console.error(e) } finally { setExporting(false) }
+  }
 
   if (loading) return <Spinner />
 
   return (
-    <div style={{
-      minHeight: '100vh', background: B.pageBg,
-      fontFamily: "'Plus Jakarta Sans', 'DM Sans', system-ui, sans-serif",
-    }}>
-      <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800;900&display=swap" rel="stylesheet" />
-
+    <>
       <style>{`
-        .wrap        { max-width:1160px; margin:0 auto; padding:clamp(16px,4vw,44px) clamp(16px,3vw,36px); }
-        .topbar      { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:12px; }
-        .topbar-btns { display:flex; gap:10px; }
-        .status-row  { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
-        .stat-row    { display:grid; grid-template-columns:repeat(2,1fr); gap:14px; }
-        @media(max-width:640px) {
-          .stat-row  { grid-template-columns:1fr; }
+        * { box-sizing: border-box; }
+        body { -webkit-font-smoothing: antialiased; }
+
+        @media (max-width: 480px) {
+          .btn-label     { display: none !important; }
+          .page-subtitle { display: none !important; }
         }
-        @media(max-width:480px) {
-          .status-row { grid-template-columns:1fr; gap:10px; }
-          .topbar-btns { width:100%; }
-          .topbar-btns button { flex:1; justify-content:center; }
+
+        /* Tabs */
+        .db-tabs {
+          display: flex;
+          border-bottom: 2px solid ${DARK};
+          margin-bottom: 8px;
+          overflow-x: auto; scrollbar-width: none;
+          background: ${WHITE};
+        }
+        .db-tabs::-webkit-scrollbar { display: none; }
+        .db-tab {
+          display: flex; align-items: center; gap: 7px;
+          padding: 12px clamp(14px, 2.2vw, 26px);
+          background: none; border: none;
+          border-bottom: 3px solid transparent; margin-bottom: -2px;
+          color: ${MUTED}; font-size: 10px; font-weight: 900;
+          cursor: pointer; font-family: inherit;
+          letter-spacing: .14em; text-transform: uppercase;
+          transition: color .14s, border-color .14s;
+          white-space: nowrap; flex-shrink: 0;
+        }
+        .db-tab.active { border-bottom-color: ${DARK}; color: ${DARK}; }
+        .db-tab:hover:not(.active) { color: ${DARK}; }
+        .tab-pill {
+          display: inline-flex; align-items: center; justify-content: center;
+          min-width: 17px; height: 17px; padding: 0 4px;
+          background: ${AMBER_BG}; color: ${AMBER};
+          font-size: 9px; font-weight: 900;
         }
       `}</style>
 
-      <div className="wrap">
+      <div style={{
+        minHeight: '100vh', background: CREAM,
+        fontFamily: "'Plus Jakarta Sans','DM Sans',system-ui,sans-serif",
+        padding: 'clamp(14px,3vw,40px) clamp(12px,4vw,36px)',
+        width: '100%', overflowX: 'hidden', boxSizing: 'border-box',
+      }}>
+        <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800;900&display=swap" rel="stylesheet" />
 
-        {/* 1 — TOP BAR */}
+        {/* HEADER */}
         <FadeUp delay={0}>
-          <Card padding="18px 26px" style={{ marginBottom: 16 }}>
-            <div className="topbar">
-              <div>
-                <h1 style={{ margin: 0, fontSize: 'clamp(20px,3.5vw,28px)', fontWeight: 900, color: B.black, letterSpacing: '-0.8px', lineHeight: 1 }}>
-                  Aujourd'hui
-                </h1>
-                <p style={{ margin: '4px 0 0', fontSize: 13, fontWeight: 600, color: B.inkMute, textTransform: 'capitalize' }}>
-                  {today}
-                </p>
-              </div>
-              <div className="topbar-btns">
-                <Btn onClick={() => {}}><RefreshCw size={14} strokeWidth={2.5} /> Actualiser</Btn>
-                <Btn icon={FileDown} primary onClick={handleExport} disabled={exporting}>
-                  {exporting ? 'Export…' : 'Exporter PDF'}
-                </Btn>
-              </div>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, marginBottom: 8, flexWrap: 'wrap' }}>
+            <div style={{ minWidth: 0, flex: 1 }}>
+              <h1 style={{ margin: 0, fontSize: 'clamp(20px,5vw,36px)', fontWeight: 900, color: DARK, letterSpacing: '-1.5px', lineHeight: 1 }}>
+                Tableau de bord
+              </h1>
+              <p className="page-subtitle" style={{ margin: '6px 0 0', fontSize: 12, fontWeight: 700, color: GOLD_DK }}>
+                <LiveClock />
+              </p>
             </div>
-          </Card>
-        </FadeUp>
-
-        {/* 2 — SERVICE BANNER (contextual) */}
-        <FadeUp delay={30}><ServiceBanner /></FadeUp>
-
-        {/* 3 — HERO: big total */}
-        <FadeUp delay={70}>
-          <div style={{ marginBottom: 14 }}>
-            <Label text="Total du jour" />
-            <TodayHero
-              value={stats.today}
-              onClick={() => navigate('/reservations')}
-            />
-          </div>
-        </FadeUp>
-
-        {/* 4 — DETAIL: confirmed / pending / cancelled */}
-        <FadeUp delay={140}>
-          <div style={{ marginBottom: 24 }}>
-            <Label text="Détail" />
-            <div className="status-row">
-              <StatusChip icon={CheckCircle2} iconColor={B.black}   iconBg="#EFEFEF"      value={stats.today_confirmed} label="Confirmées" delay={140} />
-              <StatusChip icon={Clock}        iconColor={B.brown}   iconBg={B.brownTint}  value={stats.today_pending}   label="En attente" delay={190} />
-              <StatusChip icon={XCircle}      iconColor={B.inkMute} iconBg="#F5F5F5"      value={stats.today_cancelled} label="Annulées"   delay={240} />
+            <div style={{ display: 'flex', gap: 3, flexShrink: 0 }}>
+              <Btn icon={FileDown} primary onClick={handleExport} disabled={exporting}>
+                {exporting ? 'Export…' : 'Exporter PDF'}
+              </Btn>
             </div>
           </div>
         </FadeUp>
 
-        {/* 5 — FORWARD: tomorrow + monthly */}
-        <FadeUp delay={280}>
-          <Label text="À venir" />
-          <div className="stat-row">
-            <StatCard
-              icon={CalendarCheck} iconColor={B.brown} iconBg={B.brownTint}
-              value={stats.tomorrow} label="Réservations demain"
-              trend="+8 vs hier" actionLabel="Voir le planning"
-              onClick={() => navigate('/calendar')} delay={0}
-            />
-            <StatCard
-              icon={ClipboardList} iconColor={B.blackSoft} iconBg="#EFEFEF"
-              value={stats.total} label="Total ce mois"
-              delay={60}
-            />
+        {/* DIVIDER */}
+        <FadeUp delay={10}>
+          <div style={{ height: 2, background: DARK, margin: '16px 0 20px' }} />
+        </FadeUp>
+
+        {/* TABS */}
+        <FadeUp delay={20}>
+          <div className="db-tabs">
+            {TABS.map(t => (
+              <button key={t.key} className={`db-tab${tab === t.key ? ' active' : ''}`} onClick={() => setTab(t.key)}>
+                {t.label}
+                {t.key === 'today' && stats.today_pending > 0 && (
+                  <span className="tab-pill">{stats.today_pending}</span>
+                )}
+                {t.key === 'tomorrow' && (stats.tomorrow_pending ?? 0) > 0 && (
+                  <span className="tab-pill">{stats.tomorrow_pending}</span>
+                )}
+              </button>
+            ))}
           </div>
+        </FadeUp>
+
+        {/* CONTENT */}
+        <FadeUp delay={30} key={tab}>
+          <TabPanel
+            tab={tab}
+            stats={stats}
+            reservations={active?.res ?? []}
+            tabLabel={active?.label ?? ''}
+            tabDate={active?.date ?? null}
+            onViewAll={() => navigate('/reservations', { state: active?.date ? { filterDate: active.date } : {} })}
+          />
         </FadeUp>
 
         {/* ERROR */}
         {error && (
-          <div style={{ marginTop: 16, padding: '13px 18px', background: '#F5F5F5', borderRadius: 12, fontSize: 14, fontWeight: 700, color: B.blackSoft }}>
-            ⚠️ {error}
-          </div>
+          <FadeUp delay={0}>
+            <div style={{ marginTop: 12, padding: '11px 16px', background: RED_BG, borderLeft: `3px solid ${RED}`, fontSize: 12, fontWeight: 700, color: RED }}>
+              Erreur de chargement — {error}
+            </div>
+          </FadeUp>
         )}
-
       </div>
-    </div>
+    </>
   )
 }
