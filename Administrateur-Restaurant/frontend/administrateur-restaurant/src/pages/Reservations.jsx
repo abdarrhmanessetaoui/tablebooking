@@ -417,6 +417,7 @@ export default function Reservations() {
             handleDelete={handleDelete}
             selectedIds={selectedIds}
             setSelectedIds={setSelectedIds}
+            highlightId={location.state?.openId ?? null}
           />
         </FadeUp>
 
