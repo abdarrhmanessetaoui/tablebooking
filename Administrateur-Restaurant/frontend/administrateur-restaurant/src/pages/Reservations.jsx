@@ -1,5 +1,5 @@
 import { useLocation } from 'react-router-dom'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import {
   Plus, FileDown, Trash2, CheckCircle,
   Clock, XCircle, X
@@ -224,7 +224,7 @@ export default function Reservations() {
   const { services } = useServices()   // ← dynamic services from API
 
   const {
-    filtered, loading, error,
+    filteredLocal: filteredFromHook, loading, error,
     modalMode, setModalMode,
     form, setForm,
     editing,
@@ -242,14 +242,26 @@ export default function Reservations() {
   useEffect(() => {
     if (!location.state?.filterStatus) setFilterStatus('Pending')
   }, []) // eslint-disable-line
+  // Re-filter by month locally (hook does exact match, we need startsWith for YYYY-MM)
+  const filteredLocal = useMemo(() => {
+    if (!filterDate) return filteredFromHook
+    // If filterDate is YYYY-MM (month picker), match all dates in that month
+    if (/^\d{4}-\d{2}$/.test(filterDate)) {
+      return filteredFromHook.filter(r => (r.date || '').startsWith(filterDate))
+    }
+    // If filterDate is YYYY-MM-DD (exact date), keep exact match
+    return filteredFromHook.filter(r => r.date === filterDate)
+  }, [filteredFromHook, filterDate])
+
+
 
   // If navigated from Dashboard with openId → open that reservation in modal
   useEffect(() => {
     const openId = location.state?.openId
-    if (!openId || loading || !filtered.length) return
-    const target = filtered.find(r => r.id === openId)
+    if (!openId || loading || !filteredLocal.length) return
+    const target = filteredLocal.find(r => r.id === openId)
     if (target) openView(target)
-  }, [location.state?.openId, loading, filtered.length]) // eslint-disable-line
+  }, [location.state?.openId, loading, filteredLocal.length]) // eslint-disable-line
 
   async function handleExportPDF() {
     setExporting(true)
@@ -262,7 +274,7 @@ export default function Reservations() {
           document.head.appendChild(s)
         })
       }
-      exportReservationsPDF(filtered)
+      exportReservationsPDF(filteredLocal)
       toast('PDF exporté avec succès', 'success')
     } catch(e) {
       console.error('PDF error:', e)
@@ -346,7 +358,7 @@ export default function Reservations() {
                 Réservations
               </h1>
               <p className="page-subtitle" style={{ margin: '6px 0 0', fontSize: 12, fontWeight: 700, color: GOLD }}>
-                {filtered.length} réservation{filtered.length !== 1 ? 's' : ''}
+                {filteredLocal.length} réservation{filteredLocal.length !== 1 ? 's' : ''}
               </p>
             </div>
             <div style={{ display: 'flex', gap: 3, flexShrink: 0 }}>
@@ -399,7 +411,7 @@ export default function Reservations() {
             fontSize: 11, fontWeight: 800, color: '#bbb',
             letterSpacing: '0.1em', textTransform: 'uppercase',
           }}>
-            {filtered.length} résultat{filtered.length !== 1 ? 's' : ''}
+            {filteredLocal.length} résultat{filteredLocal.length !== 1 ? 's' : ''}
           </p>
         </FadeUp>
 
@@ -416,7 +428,7 @@ export default function Reservations() {
         {/* TABLE */}
         <FadeUp delay={70}>
           <ReservationsTable
-            reservations={filtered}
+            reservations={filteredLocal}
             openView={openView}
             openEdit={openEdit}
             handleDelete={handleDelete}
