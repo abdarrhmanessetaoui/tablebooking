@@ -192,7 +192,7 @@ function ResCardMobile({ r, i, onRowClick }) {
           <Clock size={11} strokeWidth={2.5} color={MUTED} />{r.start_time}
         </span>
         <span style={{ fontSize: 11, fontWeight: 900, color: DARK, display: 'flex', alignItems: 'center', gap: 4 }}>
-          <Users size={11} strokeWidth={2.5} color={MUTED} />{r.guests} pers.
+          <Users size={11} strokeWidth={2.5} color={MUTED} />{r.guests} personnes
         </span>
         {r.service && (
           <span style={{ fontSize: 11, fontWeight: 700, color: MUTED, display: 'flex', alignItems: 'center', gap: 4 }}>
@@ -233,7 +233,7 @@ function ReservationsTable({ reservations, onViewAll, tabLabel, onRowClick, show
     ...(showDate ? [{ key: 'date', label: 'Date', flex: 1.1 }] : []),
     { key: 'name',       label: 'Nom',      flex: 1.8 },
     { key: 'start_time', label: 'Heure',    flex: 0.7 },
-    { key: 'guests',     label: 'Pers.',    flex: 0.65 },
+    { key: 'guests',     label: 'Personnes',    flex: 0.65 },
     { key: 'service',    label: 'Service',  flex: 1.0 },
     { key: 'status',     label: 'Statut',   flex: 1.1 },
     { key: '_cta',       label: '',         flex: 0.3 },
@@ -311,7 +311,7 @@ function ResRow({ r, i, tpl, showDate, onRowClick }) {
       {/* Heure */}
       <span style={{ fontSize: 13, fontWeight: 900, color: DARK, fontVariantNumeric: 'tabular-nums' }}>{r.start_time}</span>
 
-      {/* Pers. — with icon */}
+      {/* Personnes — with icon */}
       <span style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 13, fontWeight: 900, color: DARK }}>
         <Users size={11} strokeWidth={2.5} color={MUTED} />
         {r.guests}
