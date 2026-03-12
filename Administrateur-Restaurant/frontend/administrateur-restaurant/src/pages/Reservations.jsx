@@ -172,7 +172,7 @@ function exportReservationsPDF(reservations) {
   doc.text(`${reservations.length} réservation${reservations.length !== 1 ? 's' : ''}`, PAD, y)
   y += 10
 
-  const cols = [['Nom', 42], ['Téléphone', 32], ['Date', 26], ['Heure', 22], ['Couverts', 22], ['Statut', 26]]
+  const cols = [['Nom', 42], ['Téléphone', 32], ['Date', 26], ['Heure', 22], ['Personnes', 22], ['Statut', 26]]
   doc.setFillColor(43, 33, 24)
   doc.rect(PAD, y, W - PAD * 2, 8, 'F')
   doc.setFontSize(8)
@@ -236,7 +236,27 @@ export default function Reservations() {
     openView, openEdit, openCreate,
     handleSubmit, handleCreate, handleDelete,
     setReservations,
-  } = useReservations(location.state)
+  } = useReservations({
+    // Defaults: Pending + current month — overridden if navigating from dashboard
+    filterStatus:  location.state?.filterStatus  ?? 'Pending',
+    filterDate:    location.state?.filterDate    ?? new Date().toISOString().slice(0, 7), // YYYY-MM
+    filterService: location.state?.filterService ?? '',
+    filterDate_exact: location.state?.filterDate ?? null,
+    ...location.state,
+  })
+
+  // Set default filters on first mount: Pending + ce mois
+  useEffect(() => {
+    const hasExplicitStatus = location.state?.filterStatus
+    if (!hasExplicitStatus) setFilterStatus('Pending')
+
+    const hasExplicitDate = location.state?.filterDate
+    if (!hasExplicitDate) {
+      const now = new Date()
+      const ym  = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
+      setFilterDate(ym)
+    }
+  }, []) // eslint-disable-line
 
   // If navigated from Dashboard with openId → open that reservation in modal
   useEffect(() => {
