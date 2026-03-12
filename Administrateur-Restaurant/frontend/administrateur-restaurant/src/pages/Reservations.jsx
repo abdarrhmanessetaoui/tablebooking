@@ -238,13 +238,9 @@ export default function Reservations() {
     setReservations,
   } = useReservations(location.state)
 
-  // Default filters on mount: En attente + mois courant
+  // Default filter on mount: En attente seulement
   useEffect(() => {
     if (!location.state?.filterStatus) setFilterStatus('Pending')
-    if (!location.state?.filterDate) {
-      const now = new Date()
-      setFilterDate(`${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`)
-    }
   }, []) // eslint-disable-line
 
   // If navigated from Dashboard with openId → open that reservation in modal
