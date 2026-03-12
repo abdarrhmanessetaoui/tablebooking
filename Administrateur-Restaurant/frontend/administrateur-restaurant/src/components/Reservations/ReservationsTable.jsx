@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import {
   Eye, Pencil, Trash2,
   ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight,
@@ -80,20 +80,33 @@ function PageBtn({ onClick, disabled, active, children }) {
   )
 }
 
-function MobileCard({ r, selected, onToggle, openView, openEdit, handleDelete }) {
+function MobileCard({ r, selected, highlighted, onToggle, openView, openEdit, handleDelete, rowRef }) {
   const s = STATUS[r.status] || { bg: '#f5f5f5', color: '#888', label: r.status || '—', dot: '#aaa' }
   return (
-    <div style={{
-      background: selected ? '#fdf6ec' : '#fff',
-      borderLeft: `3px solid ${selected ? GOLD : 'transparent'}`,
+    <div ref={rowRef} style={{
+      background: highlighted ? '#fff8ec' : selected ? '#fdf6ec' : '#fff',
+      borderLeft: `3px solid ${highlighted ? GOLD : selected ? GOLD : 'transparent'}`,
       borderBottom: `1px solid ${BORDER}`,
       padding: '14px 16px',
       transition: 'all 0.15s',
+      position: 'relative',
     }}>
+      {/* "Sélectionnée" badge */}
+      {highlighted && (
+        <div style={{
+          position: 'absolute', top: 10, right: 14,
+          fontSize: 9, fontWeight: 900, color: GOLD_DARK,
+          letterSpacing: '0.12em', textTransform: 'uppercase',
+          background: '#fdf6ec', padding: '2px 7px',
+          border: `1px solid ${GOLD}55`,
+        }}>
+          Sélectionnée
+        </div>
+      )}
       {/* Row 1: checkbox + name + status */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
         <Checkbox checked={selected} onChange={onToggle} />
-        <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ flex: 1, minWidth: 0, paddingRight: highlighted ? 90 : 0 }}>
           <p style={{ margin: 0, fontSize: 14, fontWeight: 800, color: DARK, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
             {r.name || '—'}
           </p>
@@ -137,8 +150,8 @@ function MobileCard({ r, selected, onToggle, openView, openEdit, handleDelete })
       <div style={{ display: 'flex', gap: 4 }}>
         <button onClick={() => openView(r)} style={{
           flex: 1, padding: '8px',
-          background: '#f5f0eb', border: 'none',
-          fontSize: 11, fontWeight: 700, color: DARK,
+          background: highlighted ? GOLD : '#f5f0eb', border: 'none',
+          fontSize: 11, fontWeight: 700, color: highlighted ? DARK : DARK,
           cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5,
           fontFamily: 'inherit',
         }}>
@@ -168,11 +181,28 @@ function MobileCard({ r, selected, onToggle, openView, openEdit, handleDelete })
 export default function ReservationsTable({
   reservations, openView, openEdit, handleDelete,
   selectedIds, setSelectedIds,
+  highlightId,
 }) {
   const [page,     setPage]     = useState(1)
   const [pageSize, setPageSize] = useState(25)
+  const highlightRef = useRef(null)
 
   useEffect(() => { setPage(1) }, [reservations.length])
+
+  // When highlightId changes, jump to the right page and scroll to that row
+  useEffect(() => {
+    if (!highlightId) return
+    const idx = reservations.findIndex(r => r.id === highlightId)
+    if (idx === -1) return
+    const targetPage = Math.floor(idx / pageSize) + 1
+    setPage(targetPage)
+    // Scroll after render
+    setTimeout(() => {
+      if (highlightRef.current) {
+        highlightRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      }
+    }, 120)
+  }, [highlightId, pageSize, reservations])
 
   const totalPages = Math.ceil(reservations.length / pageSize) || 1
   const safePage   = Math.min(page, totalPages)
@@ -217,6 +247,14 @@ export default function ReservationsTable({
           .res-table-wrap { display: none;  }
           .res-cards-wrap { display: block; }
         }
+        @keyframes pulse-gold {
+          0%   { box-shadow: inset 3px 0 0 ${GOLD}, 0 0 0 3px ${GOLD}33; }
+          50%  { box-shadow: inset 3px 0 0 ${GOLD}, 0 0 0 6px ${GOLD}11; }
+          100% { box-shadow: inset 3px 0 0 ${GOLD}, 0 0 0 3px ${GOLD}33; }
+        }
+        .row-highlighted {
+          animation: pulse-gold 1.8s ease 2;
+        }
       `}</style>
 
       <div style={{ background: '#fff', border: `1px solid ${BORDER}`, fontFamily: "'Plus Jakarta Sans','DM Sans',system-ui,sans-serif" }}>
@@ -260,6 +298,25 @@ export default function ReservationsTable({
           </div>
         )}
 
+        {/* ── HIGHLIGHT BANNER ── */}
+        {highlightId && pageItems.some(r => r.id === highlightId) && (
+          <div style={{
+            padding: '9px 16px',
+            background: '#fff8ec',
+            borderBottom: `2px solid ${GOLD}66`,
+            display: 'flex', alignItems: 'center', gap: 10,
+          }}>
+            <span style={{
+              width: 8, height: 8, borderRadius: '50%',
+              background: GOLD, flexShrink: 0,
+              boxShadow: `0 0 0 3px ${GOLD}33`,
+            }} />
+            <span style={{ fontSize: 12, fontWeight: 700, color: GOLD_DARK }}>
+              Réservation sélectionnée depuis le tableau de bord
+            </span>
+          </div>
+        )}
+
         {/* ── DESKTOP TABLE ── */}
         <div className="res-table-wrap" style={{ overflowX: 'auto' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 680 }}>
@@ -279,25 +336,54 @@ export default function ReservationsTable({
             </thead>
             <tbody>
               {pageItems.map((r, i) => {
-                const s        = STATUS[r.status] || { bg: '#f5f5f5', color: '#888', label: r.status || '—', dot: '#aaa' }
-                const selected = selectedIds.includes(r.id)
+                const s          = STATUS[r.status] || { bg: '#f5f5f5', color: '#888', label: r.status || '—', dot: '#aaa' }
+                const selected   = selectedIds.includes(r.id)
+                const highlighted = r.id === highlightId
+
+                let rowBg = i % 2 === 0 ? '#fff' : CREAM
+                if (selected)   rowBg = '#fdf6ec'
+                if (highlighted) rowBg = '#fff8ec'
+
                 return (
-                  <tr key={r.id} onClick={() => toggleOne(r.id)} style={{
-                    background: selected ? '#fdf6ec' : i % 2 === 0 ? '#fff' : CREAM,
-                    borderBottom: `1px solid ${BORDER}`,
-                    borderLeft: `3px solid ${selected ? GOLD : 'transparent'}`,
-                    transition: 'all 0.12s', cursor: 'pointer',
-                  }}
-                    onMouseEnter={e => { if (!selected) e.currentTarget.style.background = '#faf5ee' }}
-                    onMouseLeave={e => { e.currentTarget.style.background = selected ? '#fdf6ec' : i % 2 === 0 ? '#fff' : CREAM }}
+                  <tr
+                    key={r.id}
+                    ref={highlighted ? highlightRef : null}
+                    className={highlighted ? 'row-highlighted' : ''}
+                    onClick={() => toggleOne(r.id)}
+                    style={{
+                      background: rowBg,
+                      borderBottom: `1px solid ${BORDER}`,
+                      borderLeft: highlighted
+                        ? `4px solid ${GOLD}`
+                        : selected
+                        ? `4px solid ${GOLD}88`
+                        : '4px solid transparent',
+                      transition: 'background 0.12s',
+                      cursor: 'pointer',
+                    }}
+                    onMouseEnter={e => { if (!selected && !highlighted) e.currentTarget.style.background = '#faf5ee' }}
+                    onMouseLeave={e => { e.currentTarget.style.background = rowBg }}
                   >
                     <td style={{ padding: '11px 16px' }} onClick={e => e.stopPropagation()}>
                       <Checkbox checked={selected} onChange={() => toggleOne(r.id)} />
                     </td>
                     <td style={{ padding: '11px 14px' }}>
-                      <span style={{ fontSize: 13, fontWeight: 800, color: DARK, display: 'block', maxWidth: 160, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      <span style={{
+                        fontSize: 13, fontWeight: highlighted ? 900 : 800,
+                        color: highlighted ? GOLD_DARK : DARK,
+                        display: 'block', maxWidth: 160,
+                        overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                      }}>
                         {r.name || '—'}
                       </span>
+                      {highlighted && (
+                        <span style={{
+                          fontSize: 9, fontWeight: 900, color: GOLD,
+                          textTransform: 'uppercase', letterSpacing: '0.1em',
+                        }}>
+                          ← depuis tableau de bord
+                        </span>
+                      )}
                     </td>
                     <td style={{ padding: '11px 14px', fontSize: 12, fontWeight: 600, color: '#999', whiteSpace: 'nowrap' }}>
                       {r.phone || '—'}
@@ -308,7 +394,7 @@ export default function ReservationsTable({
                     <td style={{ padding: '11px 14px' }}>
                       <span style={{
                         display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                        padding: '3px 8px', background: '#f5f0eb',
+                        padding: '3px 8px', background: highlighted ? `${GOLD}22` : '#f5f0eb',
                         fontSize: 12, fontWeight: 900, color: GOLD_DARK, fontVariantNumeric: 'tabular-nums',
                       }}>
                         {r.start_time || '—'}
@@ -317,7 +403,8 @@ export default function ReservationsTable({
                     <td style={{ padding: '11px 14px', textAlign: 'center' }}>
                       <span style={{
                         display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                        width: 26, height: 26, background: '#f5f0eb',
+                        width: 26, height: 26,
+                        background: highlighted ? `${GOLD}22` : '#f5f0eb',
                         fontSize: 12, fontWeight: 900, color: DARK,
                       }}>
                         {r.guests || '—'}
@@ -393,6 +480,8 @@ export default function ReservationsTable({
             <MobileCard
               key={r.id} r={r}
               selected={selectedIds.includes(r.id)}
+              highlighted={r.id === highlightId}
+              rowRef={r.id === highlightId ? highlightRef : null}
               onToggle={() => toggleOne(r.id)}
               openView={openView} openEdit={openEdit} handleDelete={handleDelete}
             />
