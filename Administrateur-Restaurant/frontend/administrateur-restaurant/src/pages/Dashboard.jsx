@@ -44,7 +44,7 @@ function LiveClock() {
   )
 }
 
-/* ─── Btn — same as BlockedDates ─── */
+/* ─── Btn ─── */
 function Btn({ children, onClick, primary, disabled, icon: Icon }) {
   const [hov, setHov] = useState(false)
   const bg    = primary ? (hov ? DARK : GOLD) : (hov ? GOLD : DARK)
@@ -98,7 +98,7 @@ function Ring({ c, p, a, size = 88 }) {
   )
 }
 
-/* ─── Single stat block — compact horizontal ─── */
+/* ─── Single stat block ─── */
 function StatBlock({ icon: Icon, value, label, accent, bg, delay = 0, total = 0 }) {
   const n   = useCountUp(value, 700, delay)
   const pct = total > 0 ? Math.round((value / total) * 100) : null
@@ -107,9 +107,7 @@ function StatBlock({ icon: Icon, value, label, accent, bg, delay = 0, total = 0 
 
   return (
     <div style={{ background: bg, padding: '10px 16px', display: 'flex', alignItems: 'center', gap: 12 }}>
-      {/* Accent bar */}
       <div style={{ width: 3, height: 36, background: accent, flexShrink: 0, borderRadius: 2 }} />
-      {/* Label + number */}
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 3 }}>
           <Icon size={10} strokeWidth={2.5} color={accent} />
@@ -122,7 +120,6 @@ function StatBlock({ icon: Icon, value, label, accent, bg, delay = 0, total = 0 
           )}
         </div>
       </div>
-      {/* Mini progress bar on the right */}
       {pct !== null && (
         <div style={{ width: 36, height: 3, background: BORDER, overflow: 'hidden', flexShrink: 0, alignSelf: 'center' }}>
           <div style={{ height: '100%', width: `${w}%`, background: accent, transition: 'width 0.9s ease' }} />
@@ -132,7 +129,7 @@ function StatBlock({ icon: Icon, value, label, accent, bg, delay = 0, total = 0 
   )
 }
 
-/* ─── Minimal status badge — just a dot + full text, no bg box ─── */
+/* ─── Status badge ─── */
 function Badge({ status }) {
   const M = {
     Confirmed: { label: 'Confirmée',  color: GREEN },
@@ -254,7 +251,7 @@ function ReservationsTable({ reservations, onViewAll, tabLabel }) {
         ))}
       </div>
 
-      {/* Footer CTA — context-aware label */}
+      {/* Footer CTA */}
       <button onClick={onViewAll} style={{
         width: '100%', padding: '13px 16px', background: DARK, border: 'none', color: WHITE,
         fontSize: 11, fontWeight: 900, letterSpacing: '0.1em', textTransform: 'uppercase',
@@ -271,75 +268,27 @@ function ReservationsTable({ reservations, onViewAll, tabLabel }) {
   )
 }
 
-/* ─── Tab panel — 2-col like BlockedDates ─── */
+/* ─── Tab panel ─── */
 function TabPanel({ tab, stats, reservations, onViewAll, tabLabel, tabDate }) {
   const c     = tab === 'today' ? stats.today_confirmed    : tab === 'tomorrow' ? (stats.tomorrow_confirmed ?? 0) : stats.confirmed
   const p     = tab === 'today' ? stats.today_pending      : tab === 'tomorrow' ? (stats.tomorrow_pending   ?? 0) : stats.pending
   const a     = tab === 'today' ? stats.today_cancelled    : tab === 'tomorrow' ? (stats.tomorrow_cancelled ?? 0) : stats.cancelled
   const hero  = tab === 'today' ? stats.today              : tab === 'tomorrow' ? (stats.tomorrow           ?? 0) : stats.total
   const total = c + p + a || 1
-
-  // Human-readable period label for buttons
   const periodLabel = tab === 'today' ? "Aujourd'hui" : tab === 'tomorrow' ? 'Demain' : 'Ce mois'
-  // Formatted date string for sub-label (e.g. "mer. 11 mars")
-  const dateStr = tabDate
-    ? new Date(tabDate).toLocaleDateString('fr-FR', { weekday: 'short', day: 'numeric', month: 'long' })
-    : null
 
   return (
     <>
       <style>{`
-        /* Outer card */
-        .db-card {
-          background: ${WHITE};
-          border: 2px solid ${DARK};
-          overflow: hidden;
-        }
-        /* Single unified header bar spanning full width */
-        .db-header-bar {
-          display: grid;
-          grid-template-columns: 280px 1fr;
-          background: ${DARK};
-          height: 38px;
-        }
-        .db-header-left {
-          display: flex; align-items: center;
-          padding: 0 20px;
-          border-right: 2px solid rgba(255,255,255,0.15);
-        }
-        .db-header-right {
-          display: flex; align-items: center; justify-content: space-between;
-          padding: 0 20px;
-        }
-        /* Column headers row (table sub-header) */
-        .db-col-headers {
-          display: grid;
-          grid-template-columns: 280px 1fr;
-          background: ${DARK};
-          border-top: 1px solid rgba(255,255,255,0.07);
-        }
-        /* 2-col body layout */
-        .db-body {
-          display: grid;
-          grid-template-columns: 280px 1fr;
-        }
-        /* Left column — stats */
-        .db-left {
-          border-right: 2px solid ${DARK};
-        }
+        .db-card { background: ${WHITE}; border: 2px solid ${DARK}; overflow: hidden; }
+        .db-body { display: grid; grid-template-columns: 280px 1fr; }
+        .db-left { border-right: 2px solid ${DARK}; }
         .db-stats-sticky { position: sticky; top: 24px; }
-
-        /* Mobile: stack everything */
         @media (max-width: 860px) {
-          .db-header-bar,
-          .db-col-headers,
           .db-body { grid-template-columns: 1fr; }
-          .db-header-right { border-top: 1px solid rgba(255,255,255,0.1); }
           .db-left { border-right: none; border-bottom: 2px solid ${DARK}; }
           .db-stats-sticky { position: static; }
         }
-
-        /* Reservation table/cards */
         .res-desktop { display: block; }
         .res-mobile  { display: none;  }
         @media (max-width: 640px) {
@@ -349,45 +298,10 @@ function TabPanel({ tab, stats, reservations, onViewAll, tabLabel, tabDate }) {
       `}</style>
 
       <div className="db-card">
-
-        {/* ── UNIFIED HEADER BAR ── */}
-        <div className="db-header-bar">
-          <div className="db-header-left">
-            <span style={{ fontSize: 9, fontWeight: 900, color: GOLD, textTransform: 'uppercase', letterSpacing: '0.2em' }}>
-              Vue d'ensemble
-            </span>
-          </div>
-          <div className="db-header-right">
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-              <span style={{ fontSize: 9, fontWeight: 900, color: GOLD, textTransform: 'uppercase', letterSpacing: '0.2em' }}>
-                Réservations — {periodLabel}
-              </span>
-              {dateStr && (
-                <span style={{ fontSize: 9, fontWeight: 700, color: 'rgba(200,169,126,0.55)', textTransform: 'capitalize' }}>
-                  {dateStr}
-                </span>
-              )}
-            </div>
-            <button onClick={onViewAll} style={{
-              background: 'none', border: 'none', color: GOLD, opacity: 0.75,
-              fontSize: 10, fontWeight: 900, cursor: 'pointer', fontFamily: 'inherit',
-              display: 'flex', alignItems: 'center', gap: 5, padding: 0,
-              letterSpacing: '0.1em', textTransform: 'uppercase', transition: 'opacity 0.15s',
-            }}
-              onMouseEnter={e => e.currentTarget.style.opacity = 1}
-              onMouseLeave={e => e.currentTarget.style.opacity = 0.75}
-            >
-              Voir tout <ArrowRight size={11} strokeWidth={2.5} />
-            </button>
-          </div>
-        </div>
-
-        {/* ── TWO-COL BODY ── */}
         <div className="db-body">
 
           {/* LEFT: stats */}
           <div className="db-left db-stats-sticky">
-            {/* Hero */}
             <div style={{ padding: '18px 20px 16px', display: 'flex', alignItems: 'center', gap: 20, borderBottom: `1px solid ${BORDER}`, background: WHITE }}>
               <div>
                 <p style={{ margin: 0, fontSize: 'clamp(52px,8vw,80px)', fontWeight: 900, color: DARK, lineHeight: 0.9, letterSpacing: '-4px', fontVariantNumeric: 'tabular-nums' }}>{hero}</p>
@@ -395,7 +309,6 @@ function TabPanel({ tab, stats, reservations, onViewAll, tabLabel, tabDate }) {
               </div>
               <Ring c={c} p={p} a={a} size={88} />
             </div>
-            {/* 3 stat blocks */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 1, background: BORDER }}>
               <StatBlock icon={CheckCircle} value={c} label="Confirmées" accent={GREEN} bg={GREEN_BG} delay={50}  total={total} />
               <StatBlock icon={Clock}       value={p} label="En attente" accent={AMBER} bg={AMBER_BG} delay={80}  total={total} />
@@ -483,7 +396,7 @@ export default function Dashboard() {
         s.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js'
         s.onload = res; s.onerror = rej; document.head.appendChild(s)
       })
-      exportPDF(stats)
+      exportPDF(stats, active?.res || [], active?.label || "Aujourd'hui")
     } catch (e) { console.error(e) } finally { setExporting(false) }
   }
 
@@ -493,19 +406,13 @@ export default function Dashboard() {
     <>
       <style>{`
         * { box-sizing: border-box; }
-        body { -webkit-font-smoothing: antialiased; }
-
         @media (max-width: 480px) {
           .btn-label     { display: none !important; }
           .page-subtitle { display: none !important; }
         }
-
-        /* Tabs */
         .db-tabs {
-          display: flex;
-          border-bottom: 2px solid ${DARK};
-          margin-bottom: 8px;
-          overflow-x: auto; scrollbar-width: none;
+          display: flex; border-bottom: 2px solid ${DARK};
+          margin-bottom: 8px; overflow-x: auto; scrollbar-width: none;
           background: ${WHITE};
         }
         .db-tabs::-webkit-scrollbar { display: none; }
