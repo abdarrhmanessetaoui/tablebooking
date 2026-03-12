@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { FileDown, CheckCircle, Clock, XCircle, CalendarDays, ArrowRight, Users, MapPin } from 'lucide-react'
+import { FileDown, CheckCircle, Clock, XCircle, CalendarDays, ArrowRight, Users, MapPin, ChevronRight } from 'lucide-react'
 
 import useDashboardStats from '../hooks/Dashboard/useDashboardStats'
 import useRestaurantInfo from '../hooks/useRestaurantInfo'
@@ -27,6 +27,12 @@ const MUTED   = 'rgba(43,33,24,0.38)'
 
 const TODAY_DATE    = new Date().toISOString().slice(0, 10)
 const TOMORROW_DATE = new Date(Date.now() + 86400000).toISOString().slice(0, 10)
+
+/* ─── helpers ─── */
+function fmtDate(iso) {
+  if (!iso) return ''
+  return new Date(iso).toLocaleDateString('fr-FR', { weekday: 'short', day: 'numeric', month: 'short' })
+}
 
 /* ─── Live clock ─── */
 function LiveClock() {
@@ -154,17 +160,34 @@ function Badge({ status }) {
 }
 
 /* ─── Mobile reservation card ─── */
-function ResCardMobile({ r, i }) {
+function ResCardMobile({ r, i, onRowClick }) {
+  const [hov, setHov] = useState(false)
   return (
-    <div style={{ padding: '13px 14px', borderBottom: `1px solid ${BORDER}`, background: i % 2 === 0 ? WHITE : CREAM }}>
+    <div
+      onClick={() => onRowClick(r)}
+      onMouseEnter={() => setHov(true)}
+      onMouseLeave={() => setHov(false)}
+      style={{
+        padding: '13px 14px', borderBottom: `1px solid ${BORDER}`,
+        background: hov ? '#f5ede0' : i % 2 === 0 ? WHITE : CREAM,
+        cursor: 'pointer', transition: 'background 0.12s',
+      }}>
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 10, marginBottom: 7 }}>
         <div style={{ minWidth: 0 }}>
           <p style={{ margin: 0, fontSize: 13, fontWeight: 900, color: DARK, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.name}</p>
           {r.phone && <p style={{ margin: '2px 0 0', fontSize: 11, fontWeight: 700, color: MUTED }}>{r.phone}</p>}
         </div>
-        <Badge status={r.status} />
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
+          <Badge status={r.status} />
+          <ChevronRight size={13} strokeWidth={2.5} color={MUTED} />
+        </div>
       </div>
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
+        {r.date && r.date !== TODAY_DATE && r.date !== TOMORROW_DATE && (
+          <span style={{ fontSize: 11, fontWeight: 900, color: GOLD_DK, display: 'flex', alignItems: 'center', gap: 4 }}>
+            <CalendarDays size={11} strokeWidth={2.5} color={GOLD_DK} />{fmtDate(r.date)}
+          </span>
+        )}
         <span style={{ fontSize: 11, fontWeight: 900, color: DARK, display: 'flex', alignItems: 'center', gap: 4 }}>
           <Clock size={11} strokeWidth={2.5} color={MUTED} />{r.start_time}
         </span>
@@ -182,7 +205,7 @@ function ResCardMobile({ r, i }) {
 }
 
 /* ─── Reservations table (right column) ─── */
-function ReservationsTable({ reservations, onViewAll, tabLabel }) {
+function ReservationsTable({ reservations, onViewAll, tabLabel, onRowClick, showDate }) {
   if (!reservations?.length) return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '48px 16px', textAlign: 'center' }}>
@@ -205,12 +228,15 @@ function ReservationsTable({ reservations, onViewAll, tabLabel }) {
     </div>
   )
 
+  // Show date column when viewing "Ce mois" tab
   const COLS = [
+    ...(showDate ? [{ key: 'date', label: 'Date', flex: 1.1 }] : []),
     { key: 'name',       label: 'Nom',      flex: 1.8 },
     { key: 'start_time', label: 'Heure',    flex: 0.7 },
-    { key: 'guests',     label: 'Couverts', flex: 0.7 },
+    { key: 'guests',     label: 'Pers.',    flex: 0.65 },
     { key: 'service',    label: 'Service',  flex: 1.0 },
-    { key: 'status',     label: 'Statut',   flex: 1.2 },
+    { key: 'status',     label: 'Statut',   flex: 1.1 },
+    { key: '_cta',       label: '',         flex: 0.3 },
   ]
   const tpl = COLS.map(c => `${c.flex}fr`).join(' ')
 
@@ -228,26 +254,7 @@ function ReservationsTable({ reservations, onViewAll, tabLabel }) {
       {/* Rows */}
       <div style={{ flex: 1, overflow: 'hidden' }}>
         {reservations.slice(0, 8).map((r, i) => (
-          <div key={r.id ?? i} style={{
-            display: 'grid', gridTemplateColumns: tpl, gap: 10,
-            padding: '14px 16px',
-            background: i % 2 === 0 ? WHITE : CREAM,
-            borderBottom: `1px solid ${BORDER}`,
-            alignItems: 'center',
-            transition: 'background 0.12s',
-          }}
-            onMouseEnter={e => e.currentTarget.style.background = '#f5ede0'}
-            onMouseLeave={e => e.currentTarget.style.background = i % 2 === 0 ? WHITE : CREAM}
-          >
-            <div style={{ minWidth: 0 }}>
-              <p style={{ margin: 0, fontSize: 13, fontWeight: 900, color: DARK, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.name}</p>
-              {r.phone && <p style={{ margin: '3px 0 0', fontSize: 10, fontWeight: 700, color: MUTED, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.phone}</p>}
-            </div>
-            <span style={{ fontSize: 13, fontWeight: 900, color: DARK, fontVariantNumeric: 'tabular-nums' }}>{r.start_time}</span>
-            <span style={{ fontSize: 13, fontWeight: 900, color: DARK }}>{r.guests}</span>
-            <span style={{ fontSize: 12, fontWeight: 700, color: MUTED, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.service || '—'}</span>
-            <Badge status={r.status} />
-          </div>
+          <ResRow key={r.id ?? i} r={r} i={i} tpl={tpl} showDate={showDate} onRowClick={onRowClick} />
         ))}
       </div>
 
@@ -268,14 +275,73 @@ function ReservationsTable({ reservations, onViewAll, tabLabel }) {
   )
 }
 
+/* ─── Single clickable table row ─── */
+function ResRow({ r, i, tpl, showDate, onRowClick }) {
+  const [hov, setHov] = useState(false)
+  return (
+    <div
+      onClick={() => onRowClick(r)}
+      onMouseEnter={() => setHov(true)}
+      onMouseLeave={() => setHov(false)}
+      style={{
+        display: 'grid', gridTemplateColumns: tpl, gap: 10,
+        padding: '13px 16px',
+        background: hov ? '#f5ede0' : i % 2 === 0 ? WHITE : CREAM,
+        borderBottom: `1px solid ${BORDER}`,
+        alignItems: 'center',
+        cursor: 'pointer',
+        transition: 'background 0.12s',
+      }}
+    >
+      {/* Date column — only for month view */}
+      {showDate && (
+        <div style={{ minWidth: 0 }}>
+          <span style={{ fontSize: 11, fontWeight: 900, color: GOLD_DK, whiteSpace: 'nowrap' }}>
+            {fmtDate(r.date)}
+          </span>
+        </div>
+      )}
+
+      {/* Name + phone */}
+      <div style={{ minWidth: 0 }}>
+        <p style={{ margin: 0, fontSize: 13, fontWeight: 900, color: DARK, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.name}</p>
+        {r.phone && <p style={{ margin: '2px 0 0', fontSize: 10, fontWeight: 700, color: MUTED, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.phone}</p>}
+      </div>
+
+      {/* Heure */}
+      <span style={{ fontSize: 13, fontWeight: 900, color: DARK, fontVariantNumeric: 'tabular-nums' }}>{r.start_time}</span>
+
+      {/* Pers. — with icon */}
+      <span style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 13, fontWeight: 900, color: DARK }}>
+        <Users size={11} strokeWidth={2.5} color={MUTED} />
+        {r.guests}
+      </span>
+
+      {/* Service */}
+      <span style={{ fontSize: 12, fontWeight: 700, color: MUTED, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.service || '—'}</span>
+
+      {/* Statut */}
+      <Badge status={r.status} />
+
+      {/* Chevron hint */}
+      <ChevronRight
+        size={14} strokeWidth={2.5}
+        color={hov ? GOLD_DK : 'transparent'}
+        style={{ transition: 'color 0.12s', justifySelf: 'end' }}
+      />
+    </div>
+  )
+}
+
 /* ─── Tab panel ─── */
-function TabPanel({ tab, stats, reservations, onViewAll, tabLabel, tabDate }) {
+function TabPanel({ tab, stats, reservations, onViewAll, tabLabel, tabDate, onRowClick }) {
   const c     = tab === 'today' ? stats.today_confirmed    : tab === 'tomorrow' ? (stats.tomorrow_confirmed ?? 0) : stats.confirmed
   const p     = tab === 'today' ? stats.today_pending      : tab === 'tomorrow' ? (stats.tomorrow_pending   ?? 0) : stats.pending
   const a     = tab === 'today' ? stats.today_cancelled    : tab === 'tomorrow' ? (stats.tomorrow_cancelled ?? 0) : stats.cancelled
   const hero  = tab === 'today' ? stats.today              : tab === 'tomorrow' ? (stats.tomorrow           ?? 0) : stats.total
   const total = c + p + a || 1
   const periodLabel = tab === 'today' ? "Aujourd'hui" : tab === 'tomorrow' ? 'Demain' : 'Ce mois'
+  const showDate    = tab === 'month'  // show date column only in month view
 
   return (
     <>
@@ -319,11 +385,19 @@ function TabPanel({ tab, stats, reservations, onViewAll, tabLabel, tabDate }) {
           {/* RIGHT: table */}
           <div>
             <div className="res-desktop">
-              <ReservationsTable reservations={reservations} onViewAll={onViewAll} tabLabel={periodLabel} />
+              <ReservationsTable
+                reservations={reservations}
+                onViewAll={onViewAll}
+                tabLabel={periodLabel}
+                onRowClick={onRowClick}
+                showDate={showDate}
+              />
             </div>
             <div className="res-mobile">
               {reservations?.length
-                ? reservations.slice(0, 6).map((r, i) => <ResCardMobile key={r.id ?? i} r={r} i={i} />)
+                ? reservations.slice(0, 6).map((r, i) => (
+                    <ResCardMobile key={r.id ?? i} r={r} i={i} onRowClick={onRowClick} />
+                  ))
                 : (
                   <div style={{ padding: '40px 16px', textAlign: 'center' }}>
                     <CalendarDays size={32} color="rgba(43,33,24,0.1)" style={{ display: 'block', margin: '0 auto 12px' }} />
@@ -387,6 +461,16 @@ export default function Dashboard() {
     { key: 'month',    label: 'Ce mois',     res: monthRes, date: null          },
   ]
   const active = TABS.find(t => t.key === tab)
+
+  // Click a row → go to Reservations page with that reservation open in modal
+  function handleRowClick(r) {
+    navigate('/reservations', {
+      state: {
+        openId:     r.id,
+        filterDate: active?.date ?? null,
+      }
+    })
+  }
 
   async function handleExport() {
     setExporting(true)
@@ -495,6 +579,7 @@ export default function Dashboard() {
             tabLabel={active?.label ?? ''}
             tabDate={active?.date ?? null}
             onViewAll={() => navigate('/reservations', { state: active?.date ? { filterDate: active.date } : {} })}
+            onRowClick={handleRowClick}
           />
         </FadeUp>
 
