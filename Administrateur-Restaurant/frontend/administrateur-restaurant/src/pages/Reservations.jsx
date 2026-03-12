@@ -221,10 +221,11 @@ export default function Reservations() {
   const [exporting,   setExporting]   = useState(false)
   const [selectedIds, setSelectedIds] = useState([])
 
-  const { services } = useServices()   // ← dynamic services from API
+  const { services } = useServices()
 
   const {
-    filteredLocal: filteredFromHook, loading, error,
+    filtered,                              // ← correct name from hook
+    loading, error,
     modalMode, setModalMode,
     form, setForm,
     editing,
@@ -242,18 +243,17 @@ export default function Reservations() {
   useEffect(() => {
     if (!location.state?.filterStatus) setFilterStatus('Pending')
   }, []) // eslint-disable-line
-  // Re-filter by month locally (hook does exact match, we need startsWith for YYYY-MM)
+
+  // Apply month filter locally (hook already handles filterDate exact match,
+  // but we also need YYYY-MM prefix match for the month picker)
   const filteredLocal = useMemo(() => {
-    if (!filterDate) return filteredFromHook
-    // If filterDate is YYYY-MM (month picker), match all dates in that month
+    const base = Array.isArray(filtered) ? filtered : []
+    if (!filterDate) return base
     if (/^\d{4}-\d{2}$/.test(filterDate)) {
-      return filteredFromHook.filter(r => (r.date || '').startsWith(filterDate))
+      return base.filter(r => (r.date || '').startsWith(filterDate))
     }
-    // If filterDate is YYYY-MM-DD (exact date), keep exact match
-    return filteredFromHook.filter(r => r.date === filterDate)
-  }, [filteredFromHook, filterDate])
-
-
+    return base.filter(r => r.date === filterDate)
+  }, [filtered, filterDate])
 
   // If navigated from Dashboard with openId → open that reservation in modal
   useEffect(() => {
@@ -400,7 +400,7 @@ export default function Reservations() {
             filterService={filterService} setFilterService={setFilterService}
             filterDate={filterDate}       setFilterDate={setFilterDate}
             clearFilters={clearFilters}
-            services={services}           // ← dynamic list from API
+            services={services}
           />
         </FadeUp>
 
@@ -449,7 +449,7 @@ export default function Reservations() {
             handleCreate={handleCreate}
             handleDelete={handleDelete}
             setModalMode={setModalMode}
-            services={services}           // ← also pass to modal for create/edit form
+            services={services}
           />
         )}
       </div>
