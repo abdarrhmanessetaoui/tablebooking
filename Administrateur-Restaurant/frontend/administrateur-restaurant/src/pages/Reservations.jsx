@@ -1,11 +1,11 @@
 import { useLocation } from 'react-router-dom'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import {
   Plus, FileDown, Trash2, CheckCircle,
   Clock, XCircle, X
 } from 'lucide-react'
 import useReservations from '../hooks/Reservations/useReservations'
-import useServices     from  '../hooks/Reservations/useservices'
+import useServices     from '../hooks/Reservations/useServices'
 import ReservationsFilters from '../components/Reservations/ReservationsFilters'
 import ReservationsTable   from '../components/Reservations/ReservationsTable'
 import ReservationModal    from '../components/Reservations/ReservationModal'
@@ -237,6 +237,14 @@ export default function Reservations() {
     handleSubmit, handleCreate, handleDelete,
     setReservations,
   } = useReservations(location.state)
+
+  // If navigated from Dashboard with openId → open that reservation in modal
+  useEffect(() => {
+    const openId = location.state?.openId
+    if (!openId || loading || !filtered.length) return
+    const target = filtered.find(r => r.id === openId)
+    if (target) openView(target)
+  }, [location.state?.openId, loading, filtered.length]) // eslint-disable-line
 
   async function handleExportPDF() {
     setExporting(true)
