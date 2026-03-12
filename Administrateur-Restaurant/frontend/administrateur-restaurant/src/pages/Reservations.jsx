@@ -236,25 +236,14 @@ export default function Reservations() {
     openView, openEdit, openCreate,
     handleSubmit, handleCreate, handleDelete,
     setReservations,
-  } = useReservations({
-    // Defaults: Pending + current month — overridden if navigating from dashboard
-    filterStatus:  location.state?.filterStatus  ?? 'Pending',
-    filterDate:    location.state?.filterDate    ?? new Date().toISOString().slice(0, 7), // YYYY-MM
-    filterService: location.state?.filterService ?? '',
-    filterDate_exact: location.state?.filterDate ?? null,
-    ...location.state,
-  })
+  } = useReservations(location.state)
 
-  // Set default filters on first mount: Pending + ce mois
+  // Default filters on mount: En attente + mois courant
   useEffect(() => {
-    const hasExplicitStatus = location.state?.filterStatus
-    if (!hasExplicitStatus) setFilterStatus('Pending')
-
-    const hasExplicitDate = location.state?.filterDate
-    if (!hasExplicitDate) {
+    if (!location.state?.filterStatus) setFilterStatus('Pending')
+    if (!location.state?.filterDate) {
       const now = new Date()
-      const ym  = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
-      setFilterDate(ym)
+      setFilterDate(`${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`)
     }
   }, []) // eslint-disable-line
 
