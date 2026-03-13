@@ -1,7 +1,9 @@
-import { Search, X } from 'lucide-react'
+import { Search, X, ChevronLeft, ChevronRight } from 'lucide-react'
 
 const DARK = '#2b2118'
 const GOLD = '#c8a97e'
+
+const MONTHS_FR = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre']
 
 export default function ReservationsFilters({
   search, setSearch,
@@ -12,6 +14,17 @@ export default function ReservationsFilters({
   services = [],
 }) {
   const hasFilters = search || filterStatus !== 'all' || filterDate || (filterService && filterService !== 'all')
+
+  // Parse current month/year from filterDate
+  const currentDate = filterDate ? new Date(filterDate) : new Date()
+  const currentYear  = currentDate.getFullYear()
+  const currentMonth = currentDate.getMonth()
+
+  function goMonth(delta) {
+    const d = new Date(currentYear, currentMonth + delta, 1)
+    // Set filterDate to first day of that month
+    setFilterDate(d.toISOString().slice(0, 10))
+  }
 
   const base = {
     background: '#fff',
@@ -40,6 +53,20 @@ export default function ReservationsFilters({
           .filters-search { grid-column: auto; }
           .filters-date   { grid-column: auto; }
           .filters-clear  { grid-column: auto; }
+        }
+        .month-nav-btn {
+          display: flex; align-items: center; justify-content: center;
+          width: 40px; flex-shrink: 0;
+          background: #f5f0eb;
+          border: 2px solid #e8e0d8;
+          color: #999;
+          cursor: pointer;
+          transition: all 0.15s;
+        }
+        .month-nav-btn:hover {
+          background: ${DARK};
+          border-color: ${DARK};
+          color: ${GOLD};
         }
       `}</style>
 
@@ -83,23 +110,34 @@ export default function ReservationsFilters({
           {services.map(s => <option key={s} value={s}>{s}</option>)}
         </select>
 
-        {/* Date — single date input, works for both day and month filtering */}
-        <div className="filters-date" style={{ position: 'relative' }}>
-          <input
-            type="date"
-            value={filterDate}
-            onChange={e => setFilterDate(e.target.value)}
-            style={{ ...base }}
-          />
-          {filterDate && (
-            <button onClick={() => setFilterDate('')} style={{
-              position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)',
-              background: 'none', border: 'none', cursor: 'pointer', padding: 4,
-              display: 'flex', alignItems: 'center',
-            }}>
-              <X size={12} color="#bbb" strokeWidth={2.5} />
-            </button>
-          )}
+        {/* Month navigator — prev arrow + label + next arrow */}
+        <div className="filters-date" style={{ display: 'flex' }}>
+          <button className="month-nav-btn" onClick={() => goMonth(-1)} title="Mois précédent">
+            <ChevronLeft size={15} strokeWidth={2.5} />
+          </button>
+
+          <div style={{
+            flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center',
+            background: filterDate ? DARK : '#fff',
+            border: '2px solid #e8e0d8',
+            borderLeft: 'none', borderRight: 'none',
+            fontSize: 13, fontWeight: 800,
+            color: filterDate ? GOLD : '#bbb',
+            letterSpacing: '0.02em',
+            whiteSpace: 'nowrap',
+            padding: '0 12px',
+            cursor: 'pointer',
+            transition: 'all 0.15s',
+          }}
+            onClick={() => setFilterDate(new Date().toISOString().slice(0, 10))}
+            title="Revenir au mois actuel"
+          >
+            {MONTHS_FR[currentMonth]} {currentYear}
+          </div>
+
+          <button className="month-nav-btn" onClick={() => goMonth(1)} title="Mois suivant">
+            <ChevronRight size={15} strokeWidth={2.5} />
+          </button>
         </div>
 
         {/* Clear */}
