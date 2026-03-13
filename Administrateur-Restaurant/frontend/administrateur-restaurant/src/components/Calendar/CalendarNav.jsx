@@ -26,7 +26,6 @@ function ArrowBtn({ onClick, children }) {
 export default function CalendarNav({ view, setView, navLabel, navigate, goToday, currentDate }) {
   const isToday   = new Date().toDateString() === currentDate.toDateString()
   const [hToday, setHToday] = useState(false)
-  const [hViews, setHViews] = useState(null)
 
   return (
     <>
@@ -48,7 +47,6 @@ export default function CalendarNav({ view, setView, navLabel, navigate, goToday
       `}</style>
 
       <div className="cnav">
-        {/* Left — nav arrows + label + today */}
         <div className="cnav-left">
           <ArrowBtn onClick={() => navigate('prev')}><ChevronLeft size={16} strokeWidth={2.5} /></ArrowBtn>
 
@@ -70,7 +68,6 @@ export default function CalendarNav({ view, setView, navLabel, navigate, goToday
           )}
         </div>
 
-        {/* Right — view switcher */}
         <div className="cnav-views">
           {VIEWS.map((v, i) => (
             <button key={v} onClick={() => setView(v)}
