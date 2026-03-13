@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
+import { createPortal } from 'react-dom'
 import { Search, X, Calendar, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react'
 
 const DARK = '#2b2118'
@@ -7,18 +8,65 @@ const GOLD = '#c8a97e'
 const MONTHS_FR = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre']
 const DAYS_FR   = ['Lu','Ma','Me','Je','Ve','Sa','Di']
 
-function CalendarPopup({ filterDate, setFilterDate, onClose, popupStyle = {} }) {
-  const today      = new Date()
-  const initDate   = filterDate
+const navBtnStyle = {
+  background: 'none', border: 'none', cursor: 'pointer',
+  color: 'rgba(200,169,126,0.7)', padding: '4px 6px',
+  fontFamily: 'inherit', display: 'flex', alignItems: 'center',
+}
+
+function CalendarPopup({ filterDate, setFilterDate, onClose, anchorRef }) {
+  const today    = new Date()
+  const initDate = filterDate
     ? (filterDate.length === 7 ? new Date(filterDate + '-01') : new Date(filterDate))
     : today
   const [viewYear,  setViewYear]  = useState(initDate.getFullYear())
   const [viewMonth, setViewMonth] = useState(initDate.getMonth())
-  const [mode,      setMode]      = useState('day') // 'day' | 'month'
+  const [mode,      setMode]      = useState('day')
+  const [pos,       setPos]       = useState({ top: -9999, left: -9999, width: 280 })
+  const popupRef = useRef(null)
 
-  // Parse current selection
-  const selFull  = filterDate && filterDate.length === 10  // YYYY-MM-DD
-  const selMonth = filterDate && filterDate.length === 7   // YYYY-MM
+  // Compute position relative to anchor button
+  useEffect(() => {
+    function calcPos() {
+      if (!anchorRef.current) return
+      const rect  = anchorRef.current.getBoundingClientRect()
+      const pw    = 280
+      const vw    = window.innerWidth
+      const vh    = window.innerHeight
+      const ph    = popupRef.current ? popupRef.current.offsetHeight : 340
+      // Horizontal: right-align to button, clamped inside viewport
+      let left = rect.right - pw
+      if (left < 8) left = 8
+      if (left + pw > vw - 8) left = vw - pw - 8
+      // Vertical: below if room, above if not
+      const top = (vh - rect.bottom > ph + 8 || vh - rect.bottom > rect.top)
+        ? rect.bottom + 4
+        : rect.top - ph - 4
+      setPos({ top, left, width: Math.min(pw, vw - 16) })
+    }
+    calcPos()
+    window.addEventListener('resize',  calcPos)
+    window.addEventListener('scroll',  calcPos, true)
+    return () => {
+      window.removeEventListener('resize',  calcPos)
+      window.removeEventListener('scroll',  calcPos, true)
+    }
+  }, [anchorRef])
+
+  // Close on outside click
+  useEffect(() => {
+    function handler(e) {
+      if (
+        popupRef.current  && !popupRef.current.contains(e.target) &&
+        anchorRef.current && !anchorRef.current.contains(e.target)
+      ) onClose()
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [onClose, anchorRef])
+
+  const selFull  = filterDate && filterDate.length === 10
+  const selMonth = filterDate && filterDate.length === 7
   const selYear  = selFull || selMonth ? parseInt(filterDate.slice(0, 4)) : null
   const selMon   = selFull || selMonth ? parseInt(filterDate.slice(5, 7)) - 1 : null
   const selDay   = selFull ? parseInt(filterDate.slice(8, 10)) : null
@@ -43,131 +91,101 @@ function CalendarPopup({ filterDate, setFilterDate, onClose, popupStyle = {} }) 
     onClose()
   }
 
-  const firstDow  = new Date(viewYear, viewMonth, 1).getDay()
-  const offset    = firstDow === 0 ? 6 : firstDow - 1
-  const daysInMon = new Date(viewYear, viewMonth + 1, 0).getDate()
+  const firstDow   = new Date(viewYear, viewMonth, 1).getDay()
+  const offset     = firstDow === 0 ? 6 : firstDow - 1
+  const daysInMon  = new Date(viewYear, viewMonth + 1, 0).getDate()
   const daysInPrev = new Date(viewYear, viewMonth, 0).getDate()
-
-  const cell = (content, onClick, extra = {}) => ({
-    content, onClick,
-    isToday: extra.isToday, isSelected: extra.isSelected, isOther: extra.isOther,
-  })
 
   const dayCells = []
   for (let i = 0; i < offset; i++)
-    dayCells.push(cell(daysInPrev - offset + 1 + i, null, { isOther: true }))
+    dayCells.push({ content: daysInPrev - offset + 1 + i, isOther: true })
   for (let d = 1; d <= daysInMon; d++) {
     const isToday    = d === today.getDate() && viewMonth === today.getMonth() && viewYear === today.getFullYear()
     const isSelected = selFull && selDay === d && selMon === viewMonth && selYear === viewYear
-    dayCells.push(cell(d, () => pickDay(d), { isToday, isSelected }))
+    dayCells.push({ content: d, onClick: () => pickDay(d), isToday, isSelected })
   }
   const remaining = 42 - dayCells.length
   for (let d = 1; d <= remaining; d++)
-    dayCells.push(cell(d, null, { isOther: true }))
+    dayCells.push({ content: d, isOther: true })
 
-  const s = {
-    popup: {
-      position: 'fixed', zIndex: 9999,
-      background: '#fff', border: `2px solid ${DARK}`,
-      width: 280, minWidth: 240, boxShadow: '0 8px 32px rgba(43,33,24,0.18)',
-    },
-    header: {
-      display: 'flex', alignItems: 'center',
-      background: DARK, padding: '8px 6px', gap: 2,
-    },
-    headerTitle: {
-      flex: 1, textAlign: 'center', fontSize: 13, fontWeight: 800,
-      color: GOLD, letterSpacing: '0.02em',
-    },
-    navBtn: {
-      background: 'none', border: 'none', cursor: 'pointer',
-      color: 'rgba(200,169,126,0.7)', fontSize: 15, padding: '4px 6px',
-      fontFamily: 'inherit', display: 'flex', alignItems: 'center',
-      transition: 'color 0.12s',
-    },
-    modeWrap: {
-      display: 'flex', borderBottom: '2px solid #e8e0d8',
-    },
-    modeBtn: (active) => ({
-      flex: 1, padding: '7px', fontSize: 11, fontWeight: 800,
-      textTransform: 'uppercase', letterSpacing: '0.08em',
-      background: 'none', border: 'none', cursor: 'pointer',
-      fontFamily: 'inherit', color: active ? DARK : '#bbb',
-      borderBottom: active ? `2px solid ${DARK}` : 'none',
-      marginBottom: active ? -2 : 0,
-      transition: 'all 0.12s',
-    }),
-    dayGrid: {
-      display: 'grid', gridTemplateColumns: 'repeat(7,1fr)',
-      padding: '6px 8px 10px',
-    },
-    dayLabel: {
-      textAlign: 'center', fontSize: 10, fontWeight: 800,
-      color: '#bbb', padding: '4px 0', letterSpacing: '0.06em',
-    },
-    dayCell: (isOther, isToday, isSelected) => ({
-      textAlign: 'center', fontSize: 12,
-      fontWeight: isSelected ? 800 : isToday ? 900 : isOther ? 400 : 700,
-      color: isSelected ? GOLD : isToday ? GOLD : isOther ? '#ccc' : DARK,
-      background: isSelected ? DARK : 'transparent',
-      padding: '5px 2px', cursor: isOther ? 'default' : 'pointer',
-      transition: 'background 0.1s',
-      borderRadius: 2,
-    }),
-    monthGrid: {
-      display: 'grid', gridTemplateColumns: 'repeat(3,1fr)',
-      gap: 4, padding: 8,
-    },
-    monthCell: (isSelected, isCurrent) => ({
-      padding: '8px 4px', textAlign: 'center', fontSize: 12,
-      fontWeight: isSelected ? 800 : isCurrent ? 900 : 700,
-      color: isSelected ? GOLD : isCurrent ? GOLD : DARK,
-      background: isSelected ? DARK : 'transparent',
-      cursor: 'pointer', transition: 'background 0.1s',
-    }),
-    selectedBadge: {
-      padding: '6px 10px', borderTop: '1px solid #e8e0d8',
-      fontSize: 11, fontWeight: 700, color: DARK,
-      background: '#faf8f5', textAlign: 'center', letterSpacing: '0.04em',
-    },
-  }
-
-  return (
-    <div style={{ ...s.popup, ...popupStyle }}>
-      {/* Header nav */}
-      <div style={s.header}>
-        <button style={s.navBtn} onClick={() => setViewYear(y => y - 1)} title="Année précédente">
+  const popup = (
+    <div
+      ref={popupRef}
+      style={{
+        position: 'fixed',
+        top:   pos.top,
+        left:  pos.left,
+        width: pos.width,
+        zIndex: 99999,
+        background: '#fff',
+        border: `2px solid ${DARK}`,
+        boxShadow: '0 8px 32px rgba(43,33,24,0.22)',
+        fontFamily: "'Plus Jakarta Sans','DM Sans',system-ui,sans-serif",
+      }}
+    >
+      {/* Header */}
+      <div style={{ display: 'flex', alignItems: 'center', background: DARK, padding: '8px 6px', gap: 2 }}>
+        <button onClick={() => setViewYear(y => y - 1)} style={navBtnStyle} title="Année précédente">
           <ChevronsLeft size={13} strokeWidth={2.5} />
         </button>
-        <button style={s.navBtn} onClick={() => navMonth(-1)} title="Mois précédent">
+        <button onClick={() => navMonth(-1)} style={navBtnStyle} title="Mois précédent">
           <ChevronLeft size={13} strokeWidth={2.5} />
         </button>
-        <span style={s.headerTitle}>{MONTHS_FR[viewMonth]} {viewYear}</span>
-        <button style={s.navBtn} onClick={() => navMonth(1)} title="Mois suivant">
+        <span style={{ flex: 1, textAlign: 'center', fontSize: 13, fontWeight: 800, color: GOLD, letterSpacing: '0.02em' }}>
+          {MONTHS_FR[viewMonth]} {viewYear}
+        </span>
+        <button onClick={() => navMonth(1)} style={navBtnStyle} title="Mois suivant">
           <ChevronRight size={13} strokeWidth={2.5} />
         </button>
-        <button style={s.navBtn} onClick={() => setViewYear(y => y + 1)} title="Année suivante">
+        <button onClick={() => setViewYear(y => y + 1)} style={navBtnStyle} title="Année suivante">
           <ChevronsRight size={13} strokeWidth={2.5} />
         </button>
       </div>
 
       {/* Mode toggle */}
-      <div style={s.modeWrap}>
-        <button style={s.modeBtn(mode === 'day')}   onClick={() => setMode('day')}>Jour</button>
-        <button style={s.modeBtn(mode === 'month')} onClick={() => setMode('month')}>Mois</button>
+      <div style={{ display: 'flex', borderBottom: '2px solid #e8e0d8' }}>
+        {['day', 'month'].map(m => (
+          <button key={m} onClick={() => setMode(m)} style={{
+            flex: 1, padding: '7px', fontSize: 11, fontWeight: 800,
+            textTransform: 'uppercase', letterSpacing: '0.08em',
+            background: 'none', border: 'none', cursor: 'pointer',
+            fontFamily: 'inherit',
+            color: mode === m ? DARK : '#bbb',
+            borderBottom: mode === m ? `2px solid ${DARK}` : 'none',
+            marginBottom: mode === m ? -2 : 0,
+            transition: 'all 0.12s',
+          }}>
+            {m === 'day' ? 'Jour' : 'Mois'}
+          </button>
+        ))}
       </div>
 
       {/* Day grid */}
       {mode === 'day' && (
-        <div style={s.dayGrid}>
-          {DAYS_FR.map(d => <div key={d} style={s.dayLabel}>{d}</div>)}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7,1fr)', padding: '6px 8px 10px' }}>
+          {DAYS_FR.map(d => (
+            <div key={d} style={{
+              textAlign: 'center', fontSize: 10, fontWeight: 800,
+              color: '#bbb', padding: '4px 0', letterSpacing: '0.06em',
+            }}>
+              {d}
+            </div>
+          ))}
           {dayCells.map((c, i) => (
             <div
               key={i}
-              style={s.dayCell(c.isOther, c.isToday, c.isSelected)}
-              onClick={c.onClick || undefined}
+              onClick={c.onClick}
               onMouseEnter={e => { if (!c.isOther && !c.isSelected) e.currentTarget.style.background = '#f5f0eb' }}
               onMouseLeave={e => { if (!c.isSelected) e.currentTarget.style.background = 'transparent' }}
+              style={{
+                textAlign: 'center', fontSize: 12, borderRadius: 2,
+                fontWeight: c.isSelected ? 800 : c.isToday ? 900 : c.isOther ? 400 : 700,
+                color: c.isSelected ? GOLD : c.isToday ? GOLD : c.isOther ? '#ccc' : DARK,
+                background: c.isSelected ? DARK : 'transparent',
+                padding: '5px 2px',
+                cursor: c.isOther ? 'default' : 'pointer',
+                transition: 'background 0.1s',
+              }}
             >
               {c.content}
             </div>
@@ -177,17 +195,23 @@ function CalendarPopup({ filterDate, setFilterDate, onClose, popupStyle = {} }) 
 
       {/* Month grid */}
       {mode === 'month' && (
-        <div style={s.monthGrid}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 4, padding: 8 }}>
           {MONTHS_FR.map((m, i) => {
             const isCurrent  = i === today.getMonth() && viewYear === today.getFullYear()
             const isSelected = selMonth && selMon === i && selYear === viewYear
             return (
               <div
                 key={m}
-                style={s.monthCell(isSelected, isCurrent)}
                 onClick={() => pickMonth(i)}
                 onMouseEnter={e => { if (!isSelected) e.currentTarget.style.background = '#f5f0eb' }}
-                onMouseLeave={e => { if (!isSelected) e.currentTarget.style.background = isSelected ? DARK : 'transparent' }}
+                onMouseLeave={e => { e.currentTarget.style.background = isSelected ? DARK : 'transparent' }}
+                style={{
+                  padding: '8px 4px', textAlign: 'center', fontSize: 12, cursor: 'pointer',
+                  fontWeight: isSelected ? 800 : isCurrent ? 900 : 700,
+                  color: isSelected ? GOLD : isCurrent ? GOLD : DARK,
+                  background: isSelected ? DARK : 'transparent',
+                  transition: 'background 0.1s',
+                }}
               >
                 {m.slice(0, 4)}
               </div>
@@ -196,14 +220,20 @@ function CalendarPopup({ filterDate, setFilterDate, onClose, popupStyle = {} }) 
         </div>
       )}
 
-      {/* Show full date when a day is selected */}
+      {/* Selected day badge */}
       {selFull && (
-        <div style={s.selectedBadge}>
+        <div style={{
+          padding: '6px 10px', borderTop: '1px solid #e8e0d8',
+          fontSize: 11, fontWeight: 700, color: DARK,
+          background: '#faf8f5', textAlign: 'center', letterSpacing: '0.04em',
+        }}>
           {String(selDay).padStart(2,'0')} {MONTHS_FR[selMon]} {selYear}
         </div>
       )}
     </div>
   )
+
+  return createPortal(popup, document.body)
 }
 
 export default function ReservationsFilters({
@@ -215,42 +245,10 @@ export default function ReservationsFilters({
   services = [],
 }) {
   const [calOpen, setCalOpen] = useState(false)
-  const [popupPos, setPopupPos] = useState({})
-  const containerRef = useRef(null)
+  const anchorRef = useRef(null)
 
   const hasFilters = search || filterStatus !== 'all' || filterDate || (filterService && filterService !== 'all')
 
-  function openCal() {
-    if (calOpen) { setCalOpen(false); return }
-    if (containerRef.current) {
-      const rect   = containerRef.current.getBoundingClientRect()
-      const popupW = 280
-      const vw     = window.innerWidth
-      // Right-align to button, but clamp so popup never goes off either edge
-      let left = rect.right - popupW
-      if (left + popupW > vw - 8) left = vw - popupW - 8
-      if (left < 8) left = 8
-      setPopupPos({ top: rect.bottom + 4, left, width: Math.min(popupW, vw - 16) })
-    }
-    setCalOpen(true)
-  }
-  useEffect(() => {
-    function handler(e) {
-      if (calOpen && containerRef.current && !containerRef.current.contains(e.target))
-        setCalOpen(false)
-    }
-    function closeOnMove() { setCalOpen(false) }
-    document.addEventListener('mousedown', handler)
-    window.addEventListener('scroll', closeOnMove, true)
-    window.addEventListener('resize', closeOnMove)
-    return () => {
-      document.removeEventListener('mousedown', handler)
-      window.removeEventListener('scroll', closeOnMove, true)
-      window.removeEventListener('resize', closeOnMove)
-    }
-  }, [calOpen])
-
-  // Format button label
   function dateLabel() {
     if (!filterDate) return 'Choisir une date'
     if (filterDate.length === 7) {
@@ -333,9 +331,9 @@ export default function ReservationsFilters({
         </select>
 
         {/* Date picker */}
-        <div className="filters-date" style={{ position: 'relative' }} ref={containerRef}>
+        <div className="filters-date" ref={anchorRef}>
           <button
-            onClick={openCal}
+            onClick={() => setCalOpen(o => !o)}
             style={{
               display: 'flex', alignItems: 'center', justifyContent: 'space-between',
               gap: 8, width: '100%', padding: '10px 14px',
@@ -344,34 +342,28 @@ export default function ReservationsFilters({
               fontSize: 13, fontWeight: 800,
               color: filterDate ? GOLD : '#bbb',
               cursor: 'pointer', fontFamily: 'inherit',
-              transition: 'all 0.15s',
+              transition: 'all 0.15s', position: 'relative',
             }}
           >
-            <span>{dateLabel()}</span>
+            <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              {dateLabel()}
+            </span>
             <Calendar size={14} strokeWidth={2.2} style={{ flexShrink: 0 }} />
           </button>
 
           {filterDate && (
             <button
-              onClick={() => { setFilterDate(''); setCalOpen(false) }}
+              onClick={e => { e.stopPropagation(); setFilterDate(''); setCalOpen(false) }}
               title="Effacer la date"
               style={{
                 position: 'absolute', right: 36, top: '50%', transform: 'translateY(-50%)',
                 background: 'none', border: 'none', cursor: 'pointer', padding: '4px 6px',
                 display: 'flex', alignItems: 'center', color: 'rgba(200,169,126,0.6)',
+                zIndex: 1,
               }}
             >
               <X size={11} strokeWidth={2.5} />
             </button>
-          )}
-
-          {calOpen && (
-            <CalendarPopup
-              filterDate={filterDate}
-              setFilterDate={setFilterDate}
-              onClose={() => setCalOpen(false)}
-              popupStyle={popupPos}
-            />
           )}
         </div>
 
@@ -391,6 +383,16 @@ export default function ReservationsFilters({
           </div>
         )}
       </div>
+
+      {/* Calendar rendered via portal directly into document.body — escapes ALL overflow/clip */}
+      {calOpen && (
+        <CalendarPopup
+          filterDate={filterDate}
+          setFilterDate={setFilterDate}
+          onClose={() => setCalOpen(false)}
+          anchorRef={anchorRef}
+        />
+      )}
     </>
   )
 }
