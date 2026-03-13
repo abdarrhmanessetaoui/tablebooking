@@ -1,15 +1,16 @@
 import {
   LayoutDashboard, CalendarDays, BookOpen,
-  BarChart2, Settings, CalendarOff, LogOut,
+  BarChart2, Settings, CalendarOff, LogOut, Utensils,
 } from 'lucide-react'
 
 export const navItems = [
-  { to: '/dashboard',     label: 'Tableau de bord',      icon: <LayoutDashboard size={22} strokeWidth={2} /> },
-  { to: '/reservations',  label: 'Réservations',   icon: <BookOpen        size={22} strokeWidth={2} /> },
-  { to: '/calendar',      label: 'Planning',       icon: <CalendarDays    size={22} strokeWidth={2} /> },
-  { to: '/blocked-dates', label: 'Dates bloquées', icon: <CalendarOff     size={22} strokeWidth={2} /> },
-  { to: '/reports',       label: 'Rapports',       icon: <BarChart2       size={22} strokeWidth={2} /> },
-/*   { to: '/settings',      label: 'Paramètres',     icon: <Settings        size={22} strokeWidth={2} /> }, */
+  { to: '/dashboard',     label: 'Tableau de bord', icon: <LayoutDashboard size={22} strokeWidth={2} /> },
+  { to: '/reservations',  label: 'Réservations',    icon: <BookOpen        size={22} strokeWidth={2} /> },
+  { to: '/calendar',      label: 'Planning',        icon: <CalendarDays    size={22} strokeWidth={2} /> },
+  { to: '/blocked-dates', label: 'Dates bloquées',  icon: <CalendarOff     size={22} strokeWidth={2} /> },
+  { to: '/services',      label: 'Services',        icon: <Utensils        size={22} strokeWidth={2} /> },
+  { to: '/reports',       label: 'Rapports',        icon: <BarChart2       size={22} strokeWidth={2} /> },
+/*   { to: '/settings',      label: 'Paramètres',      icon: <Settings        size={22} strokeWidth={2} /> }, */
 ]
 
 export function LogoutIcon() {
