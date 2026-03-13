@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import {
   Eye, Pencil, Trash2,
   ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight,
-  CalendarDays, Clock3, Users, Utensils,
+  CalendarDays, Clock3, Users, Utensils, User2,
 } from 'lucide-react'
 
 const DARK      = '#2b2118'
@@ -211,14 +211,16 @@ function TableRow({ r, i, selected, highlighted, highlightRef, toggleOne, openVi
         <Checkbox checked={selected} onChange={() => toggleOne(r.id)} />
       </td>
       <td style={{ padding: '11px 14px' }}>
-        <span style={{
-          fontSize: 13, fontWeight: highlighted ? 900 : 800,
-          color: highlighted ? GOLD_DARK : DARK,
-          display: 'block', maxWidth: 160,
-          overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-        }}>
-          {r.name || '—'}
-        </span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 5, overflow: 'hidden' }}>
+          <User2 size={11} strokeWidth={2.5} color={highlighted ? GOLD_DARK : DARK} style={{ flexShrink: 0 }} />
+          <span style={{
+            fontSize: 13, fontWeight: highlighted ? 900 : 800,
+            color: highlighted ? GOLD_DARK : DARK,
+            overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+          }}>
+            {r.name || '—'}
+          </span>
+        </div>
         {highlighted && (
           <span style={{
             fontSize: 9, fontWeight: 900, color: GOLD,
@@ -236,10 +238,11 @@ function TableRow({ r, i, selected, highlighted, highlightRef, toggleOne, openVi
       </td>
       <td style={{ padding: '11px 14px' }}>
         <span style={{
-          display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-          padding: '3px 8px', background: highlighted ? `${GOLD}22` : '#f5f0eb',
-          fontSize: 12, fontWeight: 900, color: GOLD_DARK, fontVariantNumeric: 'tabular-nums',
+          display: 'inline-flex', alignItems: 'center', gap: 5,
+          padding: '4px 9px', background: highlighted ? `${GOLD}22` : '#f5f0eb',
+          fontSize: 11, fontWeight: 700, color: GOLD_DARK, fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap',
         }}>
+          <Clock3 size={11} strokeWidth={2.5} color={GOLD_DARK} />
           {r.start_time || '—'}
         </span>
       </td>
@@ -255,10 +258,12 @@ function TableRow({ r, i, selected, highlighted, highlightRef, toggleOne, openVi
       </td>
       <td style={{ padding: '11px 14px' }}>
         <span style={{
-          fontSize: 11, fontWeight: 700, color: DARK,
-          background: '#f5f0eb', padding: '3px 8px',
-          whiteSpace: 'nowrap', display: 'inline-block',
+          display: 'inline-flex', alignItems: 'center', gap: 5,
+          padding: '4px 9px', background: '#f5f0eb',
+          fontSize: 11, fontWeight: 700, color: GOLD_DARK,
+          whiteSpace: 'nowrap',
         }}>
+          <Utensils size={11} strokeWidth={2.5} color={GOLD_DARK} />
           {r.service || '—'}
         </span>
       </td>
