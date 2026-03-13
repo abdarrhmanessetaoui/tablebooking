@@ -155,23 +155,23 @@ export default function Services() {
             
               </p>
 
-                <ServiceForm
-    key={editingSvc?.idx ?? 'new'}
-    initial={editingSvc
-      ? {
-          name:           editingSvc.name,
-          price:          editingSvc.price,
-          capacity:       editingSvc.capacity,
-          duration:       editingSvc.duration,
-          available_days: editingSvc.available_days ?? [0,1,2,3,4,5,6],  // ← ADD THIS
-        }
-      : undefined
-    }
-    onSave={handleSave}
-    saving={saving}
-    editingName={editingSvc?.name ?? null}
-    onCancel={() => setEditingSvc(null)}
-  />  
+              <ServiceForm
+  key={editingSvc?.idx ?? 'new'}
+  initial={editingSvc
+    ? {
+        name:           editingSvc.name,
+        price:          editingSvc.price,
+        capacity:       editingSvc.capacity,
+        duration:       editingSvc.duration,
+        available_days: editingSvc.available_days ?? [0,1,2,3,4,5,6],  // ← ADD THIS
+      }
+    : undefined
+  }
+  onSave={handleSave}
+  saving={saving}
+  editingName={editingSvc?.name ?? null}
+  onCancel={() => setEditingSvc(null)}
+/>
 
             {/* RIGHT — list */}
             <div>
