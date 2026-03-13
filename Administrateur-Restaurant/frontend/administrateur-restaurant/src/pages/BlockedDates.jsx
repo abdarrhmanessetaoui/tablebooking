@@ -232,7 +232,7 @@ export default function BlockedDates() {
                 Bloquer une date
               </h2>
               <p className="page-subtitle" style={{ margin: '0 0 16px', fontSize: 12, fontWeight: 700, color: GOLD_DK }}>
-                Date unique · Intervalle · Récurrent
+                
               </p>
               <BlockedDateForm form={form} setForm={setForm} handleBlock={handleBlock} submitting={submitting} getDatesToBlock={getDatesToBlock} />
             </div>
