@@ -18,8 +18,8 @@ const RED      = '#b94040'
 const RED_BG   = '#fdf0f0'
 const AMBER    = '#a8670a'
 const AMBER_BG = '#fff8ec'
-const BORDER   = '#e8e0d6'
-const MUTED    = 'rgba(43,33,24,0.38)'
+const BORDER   = '#2b2118'
+const MUTED    = '#2b2118'
 
 /* ════ PDF ════ */
 async function doPDF(summary, pLabel, sLabel) {
@@ -120,7 +120,7 @@ function BarChart({ data={}, title, subtitle, highlight=false, barColor=GOLD }) 
   const lblSize = entries.length > 20 ? 6 : entries.length > 12 ? 7 : 9
 
   const headerBg    = highlight ? DARK : WHITE
-  const headerColor = highlight ? 'rgba(255,255,255,0.85)' : DARK
+  const headerColor = highlight ? '#2b2118' : DARK
 
   if (!entries.length) return (
     <div style={{border:`2px solid ${DARK}`,background:WHITE,display:'flex',flexDirection:'column'}}>
@@ -128,7 +128,7 @@ function BarChart({ data={}, title, subtitle, highlight=false, barColor=GOLD }) 
         <div style={{fontSize:9,fontWeight:900,color:GOLD,letterSpacing:'0.18em',textTransform:'uppercase',marginBottom:4}}>{title}</div>
         {subtitle&&<div style={{fontSize:13,fontWeight:800,color:headerColor}}>{subtitle}</div>}
       </div>
-      <div style={{height:160,display:'flex',alignItems:'center',justifyContent:'center',fontSize:13,fontWeight:900,color:'rgba(43,33,24,0.13)'}}>
+      <div style={{height:160,display:'flex',alignItems:'center',justifyContent:'center',fontSize:13,fontWeight:900,color: '#2b2118'}}>
         Aucune donnée
       </div>
     </div>
@@ -176,7 +176,7 @@ function BarChart({ data={}, title, subtitle, highlight=false, barColor=GOLD }) 
           ))}
         </div>
       </div>
-      <div style={{borderTop:`1px solid ${BORDER}`,padding:'10px 18px',display:'flex',justifyContent:'space-between',alignItems:'center',background:CREAM}}>
+      <div style={{borderTop: `1px solid ${BORDER}`,padding:'10px 18px',display:'flex',justifyContent:'space-between',alignItems:'center',background:CREAM}}>
         <span style={{fontSize:9,fontWeight:900,color:MUTED,textTransform:'uppercase',letterSpacing:'0.1em'}}>Total</span>
         <span style={{fontSize:20,fontWeight:900,color:DARK,letterSpacing:'-1px'}}>{total}</span>
       </div>
@@ -199,7 +199,7 @@ function ServiceChart({ data={} }) {
         <div style={{fontSize:9,fontWeight:900,color:GOLD,letterSpacing:'0.18em',textTransform:'uppercase',marginBottom:4}}>Par service</div>
         <div style={{fontSize:13,fontWeight:800,color:DARK}}>Répartition des formules</div>
       </div>
-      <div style={{flex:1,display:'flex',alignItems:'center',justifyContent:'center',fontSize:13,fontWeight:900,color:'rgba(43,33,24,0.13)'}}>
+      <div style={{flex:1,display:'flex',alignItems:'center',justifyContent:'center',fontSize:13,fontWeight:900,color: '#2b2118'}}>
         Aucune donnée
       </div>
     </div>
@@ -241,7 +241,7 @@ function ServiceChart({ data={} }) {
                 <span style={{fontSize:11,fontWeight:900,color:MUTED,minWidth:28,textAlign:'right'}}>{pct}%</span>
                 <span style={{fontSize:13,fontWeight:900,color:DARK,minWidth:22,textAlign:'right'}}>{val}</span>
               </div>
-              <div style={{height:3,background:BORDER,overflow:'hidden'}}>
+              <div style={{height:3,background: BORDER,overflow:'hidden'}}>
                 <div style={{
                   height:'100%',
                   width: mounted ? `${pct}%` : '0%',
@@ -253,7 +253,7 @@ function ServiceChart({ data={} }) {
           )
         })}
       </div>
-      <div style={{borderTop:`1px solid ${BORDER}`,padding:'10px 18px',display:'flex',justifyContent:'space-between',alignItems:'center',background:CREAM,marginTop:'auto'}}>
+      <div style={{borderTop: `1px solid ${BORDER}`,padding:'10px 18px',display:'flex',justifyContent:'space-between',alignItems:'center',background:CREAM,marginTop:'auto'}}>
         <span style={{fontSize:9,fontWeight:900,color:MUTED,textTransform:'uppercase',letterSpacing:'0.1em'}}>Total</span>
         <span style={{fontSize:20,fontWeight:900,color:DARK,letterSpacing:'-1px'}}>{total}</span>
       </div>
