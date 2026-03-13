@@ -29,8 +29,7 @@ function Btn({ children, onClick, primary, disabled, icon: Icon }) {
         cursor: disabled ? 'not-allowed' : 'pointer',
         opacity: disabled ? 0.5 : 1,
         transition: 'background 0.15s, color 0.15s',
-        fontFamily: 'inherit', whiteSpace: 'nowrap',
-        minHeight: 40,
+        fontFamily: 'inherit', whiteSpace: 'nowrap', minHeight: 40,
       }}>
       {Icon && <Icon size={15} strokeWidth={2.2} />}
       <span className="btn-label">{children}</span>
@@ -44,45 +43,36 @@ function BulkBar({ count, onUnblock, onClear }) {
     <div style={{
       position: 'sticky', top: 8, zIndex: 30,
       display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap',
-      padding: '10px 12px',
-      background: DARK,
+      padding: '10px 12px', background: DARK,
       boxShadow: '0 4px 24px rgba(43,33,24,0.28)',
-      marginBottom: 12,
-      animation: 'slideDown 0.18s ease',
+      marginBottom: 12, animation: 'slideDown 0.18s ease',
     }}>
       <style>{`
         @keyframes slideDown { from{opacity:0;transform:translateY(-8px)} to{opacity:1;transform:translateY(0)} }
-        @media (max-width: 480px) {
-          .bulk-label { display: none !important; }
-        }
+        @media (max-width: 480px) { .bulk-label { display: none !important; } }
       `}</style>
 
       <span style={{
         display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-        minWidth: 26, height: 26,
-        background: GOLD, color: DARK,
+        minWidth: 26, height: 26, background: GOLD, color: DARK,
         fontSize: 12, fontWeight: 900, padding: '0 7px', flexShrink: 0,
       }}>{count}</span>
-      <span className="bulk-label" style={{ fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.6)', marginRight: 2 }}>
+      <span className="bulk-label" style={{ fontSize: 12, fontWeight: 700, color: '#fff', marginRight: 2 }}>
         sélectionné{count > 1 ? 's' : ''}
       </span>
 
-      <div style={{ width: 1, height: 20, background: 'rgba(255,255,255,0.12)', margin: '0 4px', flexShrink: 0 }} />
+      <div style={{ width: 1, height: 20, background: DARK, margin: '0 4px', flexShrink: 0 }} />
 
       <button onClick={onUnblock}
         onMouseEnter={() => setHovDel(true)} onMouseLeave={() => setHovDel(false)}
         style={{
-          display: 'flex', alignItems: 'center', gap: 5,
-          padding: '7px 12px',
+          display: 'flex', alignItems: 'center', gap: 5, padding: '7px 12px',
           background: hovDel ? '#ef4444' : 'rgba(239,68,68,0.12)',
           border: '1px solid rgba(239,68,68,0.25)',
           color: hovDel ? '#fff' : '#f87171',
-          fontSize: 12, fontWeight: 700,
-          cursor: 'pointer', fontFamily: 'inherit',
-          transition: 'all 0.15s', flexShrink: 0,
-          minHeight: 34,
-        }}
-      >
+          fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit',
+          transition: 'all 0.15s', flexShrink: 0, minHeight: 34,
+        }}>
         <Trash2 size={13} strokeWidth={2.5} />
         <span className="bulk-label">Débloquer</span>
       </button>
@@ -90,16 +80,12 @@ function BulkBar({ count, onUnblock, onClear }) {
       <button onClick={onClear}
         style={{
           marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 5,
-          padding: '7px 10px',
-          background: 'none', border: '1px solid rgba(255,255,255,0.12)',
-          color: 'rgba(255,255,255,0.45)',
-          fontSize: 12, fontWeight: 700,
-          cursor: 'pointer', fontFamily: 'inherit',
-          transition: 'all 0.15s', flexShrink: 0,
-          minHeight: 34,
+          padding: '7px 10px', background: 'none', border: `1px solid ${DARK}`,
+          color: '#fff', fontSize: 12, fontWeight: 700,
+          cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.15s', flexShrink: 0, minHeight: 34,
         }}
-        onMouseEnter={e => e.currentTarget.style.color = '#fff'}
-        onMouseLeave={e => e.currentTarget.style.color = 'rgba(255,255,255,0.45)'}
+        onMouseEnter={e => e.currentTarget.style.color = GOLD}
+        onMouseLeave={e => e.currentTarget.style.color = '#fff'}
       >
         <span style={{ fontSize: 16, lineHeight: 1 }}>✕</span>
         <span className="bulk-label">Désélectionner</span>
@@ -111,22 +97,19 @@ function BulkBar({ count, onUnblock, onClear }) {
 export default function BlockedDates() {
   const {
     blockedDates, loading, error,
-    form, setForm,
-    submitting,
+    form, setForm, submitting,
     handleBlock, handleUnblock,
-    getDatesToBlock,
-    setBlockedDates,
+    getDatesToBlock, setBlockedDates,
   } = useBlockedDates()
 
-  const [exporting,    setExporting]    = useState(false)
+  const [exporting,     setExporting]     = useState(false)
   const [selectedDates, setSelectedDates] = useState([])
 
   async function handleBulkUnblock() {
     const ok = await confirm({
       title:        'Débloquer la sélection',
       message:      `Voulez-vous débloquer ${selectedDates.length} date${selectedDates.length > 1 ? 's' : ''} ?`,
-      confirmLabel: 'Débloquer',
-      type:         'danger',
+      confirmLabel: 'Débloquer', type: 'danger',
     })
     if (!ok) return
     const h = { 'Content-Type': 'application/json', 'Accept': 'application/json', 'Authorization': `Bearer ${getToken()}` }
@@ -137,9 +120,7 @@ export default function BlockedDates() {
       setBlockedDates(prev => prev.filter(d => !selectedDates.includes(d.date)))
       toast(`${selectedDates.length} date${selectedDates.length > 1 ? 's débloquées' : ' débloquée'}`, 'warning')
       setSelectedDates([])
-    } catch {
-      toast('Erreur lors du déblocage', 'error')
-    }
+    } catch { toast('Erreur lors du déblocage', 'error') }
   }
 
   async function handleExport() {
@@ -153,7 +134,6 @@ export default function BlockedDates() {
       const { jsPDF } = window.jspdf
       const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' })
       const dateStr = new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
-
       doc.setFillColor(43,33,24); doc.rect(0,0,210,32,'F')
       doc.setFont('helvetica','bold'); doc.setFontSize(18); doc.setTextColor(200,169,126)
       doc.text('TableBooking.ma',20,14)
@@ -190,59 +170,31 @@ export default function BlockedDates() {
   return (
     <>
       <style>{`
-        /* Hide btn text on very small screens, keep icon */
         @media (max-width: 480px) {
           .btn-label { display: none !important; }
           .page-subtitle { display: none !important; }
         }
-
-        /* Two-col layout: stacked on mobile, side-by-side on wider */
-        .bd-layout {
-          display: grid;
-          grid-template-columns: 1fr;
-          gap: 0;
-        }
+        .bd-layout { display: grid; grid-template-columns: 1fr; gap: 0; }
         @media (min-width: 960px) {
-          .bd-layout {
-            grid-template-columns: 380px 1fr;
-            gap: 48px;
-            align-items: start;
-          }
-          .bd-form-sticky {
-            position: sticky;
-            top: 24px;
-          }
+          .bd-layout { grid-template-columns: 380px 1fr; gap: 48px; align-items: start; }
+          .bd-form-sticky { position: sticky; top: 24px; }
           .bd-mobile-divider { display: none !important; }
         }
-
-        /* Ensure tap targets are large enough on mobile */
-        @media (max-width: 600px) {
-          button { min-height: 40px; }
-        }
+        @media (max-width: 600px) { button { min-height: 40px; } }
       `}</style>
 
       <div style={{
         minHeight: '100vh', background: '#faf8f5',
         fontFamily: "'Plus Jakarta Sans','DM Sans',system-ui,sans-serif",
         padding: 'clamp(14px,3vw,40px) clamp(12px,4vw,36px)',
-        boxSizing: 'border-box',
-        width: '100%',
-        overflowX: 'hidden',
+        boxSizing: 'border-box', width: '100%', overflowX: 'hidden',
       }}>
         <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800;900&display=swap" rel="stylesheet" />
 
-        {/* HEADER */}
         <FadeUp delay={0}>
-          <div style={{
-            display: 'flex', alignItems: 'center',
-            justifyContent: 'space-between', gap: 12,
-            marginBottom: 8, flexWrap: 'wrap',
-          }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, marginBottom: 8, flexWrap: 'wrap' }}>
             <div style={{ minWidth: 0, flex: 1 }}>
-              <h1 style={{
-                margin: 0, fontSize: 'clamp(20px,5vw,36px)',
-                fontWeight: 900, color: DARK, letterSpacing: '-1.5px', lineHeight: 1,
-              }}>
+              <h1 style={{ margin: 0, fontSize: 'clamp(20px,5vw,36px)', fontWeight: 900, color: DARK, letterSpacing: '-1.5px', lineHeight: 1 }}>
                 Dates bloquées
               </h1>
               <p className="page-subtitle" style={{ margin: '6px 0 0', fontSize: 12, fontWeight: 700, color: GOLD_DK }}>
@@ -257,38 +209,24 @@ export default function BlockedDates() {
           </div>
         </FadeUp>
 
-        {/* DIVIDER */}
         <FadeUp delay={10}>
           <div style={{ height: 2, background: DARK, margin: '16px 0 28px' }} />
         </FadeUp>
 
-        {/* ERROR */}
         {error && (
           <FadeUp delay={15}>
-            <div style={{
-              marginBottom: 20, padding: '11px 16px',
-              background: RED_BG, borderLeft: `3px solid ${RED}`,
-              fontSize: 12, fontWeight: 700, color: RED,
-            }}>
+            <div style={{ marginBottom: 20, padding: '11px 16px', background: RED_BG, borderLeft: `3px solid ${RED}`, fontSize: 12, fontWeight: 700, color: RED }}>
               {error}
             </div>
           </FadeUp>
         )}
 
-        {/* BULK BAR */}
         {selectedDates.length > 0 && (
-          <BulkBar
-            count={selectedDates.length}
-            onUnblock={handleBulkUnblock}
-            onClear={() => setSelectedDates([])}
-          />
+          <BulkBar count={selectedDates.length} onUnblock={handleBulkUnblock} onClear={() => setSelectedDates([])} />
         )}
 
-        {/* TWO-COL LAYOUT */}
         <FadeUp delay={20}>
           <div className="bd-layout">
-
-            {/* FORM */}
             <div className="bd-form-sticky" style={{ minWidth: 0 }}>
               <h2 style={{ margin: '0 0 5px', fontSize: 'clamp(15px,2.5vw,22px)', fontWeight: 900, color: DARK, letterSpacing: '-0.8px' }}>
                 Bloquer une date
@@ -296,37 +234,20 @@ export default function BlockedDates() {
               <p className="page-subtitle" style={{ margin: '0 0 16px', fontSize: 12, fontWeight: 700, color: GOLD_DK }}>
                 Date unique · Intervalle · Récurrent
               </p>
-              <BlockedDateForm
-                form={form} setForm={setForm}
-                handleBlock={handleBlock} submitting={submitting}
-                getDatesToBlock={getDatesToBlock}
-              />
+              <BlockedDateForm form={form} setForm={setForm} handleBlock={handleBlock} submitting={submitting} getDatesToBlock={getDatesToBlock} />
             </div>
-
-            {/* LIST */}
             <div>
-              {/* Divider only shown on mobile between form and list */}
               <div className="bd-mobile-divider" style={{ height: 2, background: DARK, margin: '32px 0 28px' }} />
               <div style={{ marginBottom: 16, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
                 <h2 style={{ margin: 0, fontSize: 'clamp(15px,2.5vw,22px)', fontWeight: 900, color: DARK, letterSpacing: '-0.8px' }}>
                   Dates bloquées
                 </h2>
-                <span style={{
-                  padding: '4px 10px', background: DARK,
-                  fontSize: 11, fontWeight: 900, color: GOLD, letterSpacing: '0.05em',
-                  flexShrink: 0,
-                }}>
+                <span style={{ padding: '4px 10px', background: DARK, fontSize: 11, fontWeight: 900, color: GOLD, letterSpacing: '0.05em', flexShrink: 0 }}>
                   {blockedDates.length}
                 </span>
               </div>
-              <BlockedDateList
-                blockedDates={blockedDates}
-                handleUnblock={handleUnblock}
-                selectedDates={selectedDates}
-                setSelectedDates={setSelectedDates}
-              />
+              <BlockedDateList blockedDates={blockedDates} handleUnblock={handleUnblock} selectedDates={selectedDates} setSelectedDates={setSelectedDates} />
             </div>
-
           </div>
         </FadeUp>
       </div>
