@@ -10,7 +10,7 @@ const GOLD_DK = '#a8834e'
 const CREAM   = '#faf8f5'
 const BORDER  = '#2b2118'
 
-const FR_DAYS = ['Dim','Lun','Mar','Mer','Jeu','Ven','Sam']
+const FR_DAYS      = ['Dim','Lun','Mar','Mer','Jeu','Ven','Sam']
 const FR_DAYS_FULL = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi']
 
 function Label({ children }) {
@@ -149,7 +149,7 @@ export default function Settings() {
     info, setInfoField, saveInfo, savingInfo,
     hours, activeService, setActiveServiceIdx, activeDay, setActiveDay,
     toggleWorkingDay, updateDayOH, saveHours, savingHours,
-    services,
+    services, servicesOnActiveDay,
     notifications, setNotifField, saveNotif, savingNotif,
   } = useRestaurantSettings()
 
@@ -159,12 +159,12 @@ export default function Settings() {
     </div>
   )
 
-  // current service's ohindex → into allOH
-  const currentSvc    = services[activeService]
-  const ohindex       = currentSvc?.ohindex ?? activeService
-  const currentOH     = hours.allOH?.[ohindex]
-  const currentSlot   = currentOH?.openhours?.[activeDay]
-  const isDayOpen     = hours.working_dates?.[activeDay] ?? false
+  // Use only services available on the active day for tabs + time editor
+  const currentSvc  = servicesOnActiveDay[activeService]
+  const ohindex     = currentSvc?.ohindex ?? activeService
+  const currentOH   = hours.allOH?.[ohindex]
+  const currentSlot = currentOH?.openhours?.[activeDay]
+  const isDayOpen   = hours.working_dates?.[activeDay] ?? false
 
   return (
     <>
@@ -239,19 +239,20 @@ export default function Settings() {
             </Section>
           </FadeUp>
 
-          {/* ══ 2. PLANNING (jours + horaires combinés) ══ */}
+          {/* ══ 2. PLANNING ══ */}
           <FadeUp delay={30}>
             <Section icon={Clock} title="Jours & Horaires" action={<SaveBtn onClick={saveHours} saving={savingHours} />}>
 
-              {/* ── Row 1: day pills ── */}
+              {/* ── Day pills ── */}
               <Label>Jours d'ouverture</Label>
               <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 8, marginBottom: 24 }}>
                 {FR_DAYS.map((day, i) => {
-                  const open   = hours.working_dates?.[i] ?? false
+                  const open     = hours.working_dates?.[i] ?? false
                   const isActive = activeDay === i
+                  // count services available this day
+                  const svcCount = services.filter(s => (s.available_days ?? [0,1,2,3,4,5,6]).includes(i)).length
                   return (
-                    <button key={i}
-                      onClick={() => setActiveDay(i)}
+                    <button key={i} onClick={() => { setActiveDay(i); setActiveServiceIdx(0) }}
                       style={{
                         display: 'flex', flexDirection: 'column', alignItems: 'center',
                         padding: '10px 14px', minWidth: 58, gap: 3,
@@ -267,22 +268,34 @@ export default function Settings() {
                         {day}
                       </span>
                       <span style={{ fontSize: 9, fontWeight: 700, opacity: 0.75 }}>
-                        {open ? 'Ouvert' : 'Fermé'}
+                        {open ? `${svcCount} svc` : 'Fermé'}
                       </span>
                     </button>
                   )
                 })}
               </div>
 
-              {/* ── Row 2: selected day header + open toggle ── */}
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, marginBottom: 16 }}>
-                <div>
+              {/* ── Selected day header + open toggle ── */}
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, marginBottom: 20 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
                   <span style={{ fontSize: 16, fontWeight: 900, color: DARK }}>{FR_DAYS_FULL[activeDay]}</span>
-                  <span style={{ marginLeft: 10, fontSize: 11, fontWeight: 800, color: isDayOpen ? '#16a34a' : '#b94040',
+                  <span style={{
+                    fontSize: 11, fontWeight: 800,
+                    color: isDayOpen ? '#16a34a' : '#b94040',
                     background: isDayOpen ? '#f0f7f0' : '#fdf0f0',
-                    padding: '3px 10px', border: `1.5px solid ${isDayOpen ? '#16a34a' : '#b94040'}` }}>
+                    padding: '3px 10px', border: `1.5px solid ${isDayOpen ? '#16a34a' : '#b94040'}`,
+                  }}>
                     {isDayOpen ? 'Ouvert' : 'Fermé'}
                   </span>
+                  {isDayOpen && servicesOnActiveDay.length > 0 && (
+                    <span style={{
+                      fontSize: 11, fontWeight: 800, color: GOLD_DK,
+                      background: '#fdf6ec', padding: '3px 10px',
+                      border: `1.5px solid #e8c87a`,
+                    }}>
+                      {servicesOnActiveDay.length} service{servicesOnActiveDay.length > 1 ? 's' : ''}
+                    </span>
+                  )}
                 </div>
                 <button onClick={() => toggleWorkingDay(activeDay)}
                   style={{
@@ -296,59 +309,71 @@ export default function Settings() {
                 </button>
               </div>
 
-              {/* ── Row 3: service tabs ── */}
-              {services.length > 0 && (
-                <>
-                  <Label>Horaires par service</Label>
-                  <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', marginTop: 8, marginBottom: 16 }}>
-                    {services.map((svc, i) => (
-                      <TabBtn key={i} active={activeService === i} onClick={() => setActiveServiceIdx(i)}>
-                        {svc.name}
-                      </TabBtn>
-                    ))}
+              {isDayOpen ? (
+                servicesOnActiveDay.length === 0 ? (
+                  /* No services configured for this day */
+                  <div style={{
+                    padding: '20px 24px', background: '#fdf6ec',
+                    border: `2px solid #e8c87a`,
+                    fontSize: 13, fontWeight: 700, color: GOLD_DK,
+                  }}>
+                    Aucun service n'est configuré pour le {FR_DAYS_FULL[activeDay].toLowerCase()}. 
+                    Ajoutez des jours disponibles depuis la page <strong>Services</strong>.
                   </div>
-                </>
-              )}
+                ) : (
+                  <>
+                    {/* ── Service tabs — only services available this day ── */}
+                    <Label>Horaires par service</Label>
+                    <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', marginTop: 8, marginBottom: 16 }}>
+                      {servicesOnActiveDay.map((svc, i) => (
+                        <TabBtn key={svc.idx} active={activeService === i} onClick={() => setActiveServiceIdx(i)}>
+                          {svc.name}
+                        </TabBtn>
+                      ))}
+                    </div>
 
-              {/* ── Row 4: time editor ── */}
-              {isDayOpen && currentSlot ? (
-                <div style={{ background: CREAM, border: `2px solid ${DARK}`, padding: 'clamp(14px,3vw,24px)' }}>
-                  <div style={{ marginBottom: 10, fontSize: 12, fontWeight: 800, color: GOLD_DK }}>
-                    {currentSvc?.name ?? 'Service'} · {FR_DAYS_FULL[activeDay]}
-                  </div>
-                  <div style={{ display: 'flex', alignItems: 'flex-end', gap: 20, flexWrap: 'wrap' }}>
-                    <div>
-                      <Label>Ouverture</Label>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                        <TimeInput max={23} value={currentSlot.h1} onChange={v => updateDayOH(ohindex, activeDay, 'h1', v)} />
-                        <span style={{ fontSize: 18, fontWeight: 900, color: GOLD_DK }}>:</span>
-                        <TimeInput max={59} value={currentSlot.m1} onChange={v => updateDayOH(ohindex, activeDay, 'm1', v)} />
+                    {/* ── Time editor ── */}
+                    {currentSlot ? (
+                      <div style={{ background: CREAM, border: `2px solid ${DARK}`, padding: 'clamp(14px,3vw,24px)' }}>
+                        <div style={{ marginBottom: 10, fontSize: 12, fontWeight: 800, color: GOLD_DK }}>
+                          {currentSvc?.name ?? 'Service'} · {FR_DAYS_FULL[activeDay]}
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'flex-end', gap: 20, flexWrap: 'wrap' }}>
+                          <div>
+                            <Label>Ouverture</Label>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                              <TimeInput max={23} value={currentSlot.h1} onChange={v => updateDayOH(ohindex, activeDay, 'h1', v)} />
+                              <span style={{ fontSize: 18, fontWeight: 900, color: GOLD_DK }}>:</span>
+                              <TimeInput max={59} value={currentSlot.m1} onChange={v => updateDayOH(ohindex, activeDay, 'm1', v)} />
+                            </div>
+                          </div>
+                          <div style={{ paddingBottom: 12, fontSize: 20, color: DARK, fontWeight: 900 }}>→</div>
+                          <div>
+                            <Label>Fermeture</Label>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                              <TimeInput max={23} value={currentSlot.h2} onChange={v => updateDayOH(ohindex, activeDay, 'h2', v)} />
+                              <span style={{ fontSize: 18, fontWeight: 900, color: GOLD_DK }}>:</span>
+                              <TimeInput max={59} value={currentSlot.m2} onChange={v => updateDayOH(ohindex, activeDay, 'm2', v)} />
+                            </div>
+                          </div>
+                          <div>
+                            <Label>Aperçu</Label>
+                            <div style={{ padding: '10px 16px', background: DARK, fontSize: 14, fontWeight: 900, color: GOLD, letterSpacing: '0.06em', whiteSpace: 'nowrap' }}>
+                              {String(currentSlot.h1 ?? 0).padStart(2,'0')}:{String(currentSlot.m1 ?? 0).padStart(2,'0')}
+                              {' — '}
+                              {String(currentSlot.h2 ?? 0).padStart(2,'0')}:{String(currentSlot.m2 ?? 0).padStart(2,'0')}
+                            </div>
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                    <div style={{ paddingBottom: 12, fontSize: 20, color: DARK, fontWeight: 900 }}>→</div>
-                    <div>
-                      <Label>Fermeture</Label>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                        <TimeInput max={23} value={currentSlot.h2} onChange={v => updateDayOH(ohindex, activeDay, 'h2', v)} />
-                        <span style={{ fontSize: 18, fontWeight: 900, color: GOLD_DK }}>:</span>
-                        <TimeInput max={59} value={currentSlot.m2} onChange={v => updateDayOH(ohindex, activeDay, 'm2', v)} />
-                      </div>
-                    </div>
-                    <div>
-                      <Label>Aperçu</Label>
-                      <div style={{ padding: '10px 16px', background: DARK, fontSize: 14, fontWeight: 900, color: GOLD, letterSpacing: '0.06em', whiteSpace: 'nowrap' }}>
-                        {String(currentSlot.h1 ?? 0).padStart(2,'0')}:{String(currentSlot.m1 ?? 0).padStart(2,'0')}
-                        {' — '}
-                        {String(currentSlot.h2 ?? 0).padStart(2,'0')}:{String(currentSlot.m2 ?? 0).padStart(2,'0')}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ) : !isDayOpen ? (
+                    ) : null}
+                  </>
+                )
+              ) : (
                 <div style={{ padding: '20px 24px', background: '#fdf0f0', border: `2px solid #fecaca`, fontSize: 13, fontWeight: 700, color: '#b94040' }}>
                   Ce jour est marqué comme fermé — aucun horaire à configurer.
                 </div>
-              ) : null}
+              )}
 
             </Section>
           </FadeUp>
