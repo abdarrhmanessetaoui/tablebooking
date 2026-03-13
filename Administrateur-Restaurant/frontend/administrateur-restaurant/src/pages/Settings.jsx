@@ -251,7 +251,7 @@ export default function Settings() {
                   const isActive = activeDay === i
                   return (
                     <button key={i}
-                      onClick={() => { setActiveDay(i); if (!open) toggleWorkingDay(i) }}
+                      onClick={() => setActiveDay(i)}
                       style={{
                         display: 'flex', flexDirection: 'column', alignItems: 'center',
                         padding: '10px 14px', minWidth: 58, gap: 3,
