@@ -86,7 +86,6 @@ function DayView({ date, getByDate }) {
 
   return (
     <div style={{ border:`2px solid ${DARK}` }}>
-      {/* Header */}
       <div style={{ padding:'20px 24px', background:DARK, display:'flex', flexWrap:'wrap', alignItems:'flex-start', justifyContent:'space-between', gap:16 }}>
         <div>
           <h3 style={{ margin:'0 0 4px', fontSize:'clamp(15px,2.2vw,20px)', fontWeight:900, color:'#fff', letterSpacing:'-0.6px', textTransform:'capitalize' }}>
@@ -130,7 +129,6 @@ function WeekView({ weekDays, getByDate }) {
         @media(max-width:900px){ .wk-mobile { display: block; } .wk-desktop { display: none !important; } }
       `}</style>
 
-      {/* Mobile — tabbed */}
       <div className="wk-mobile">
         <div style={{ display:'flex', gap:3, marginBottom:12, overflowX:'auto', paddingBottom:4, WebkitOverflowScrolling:'touch' }}>
           {weekDays.map((day, i) => {
@@ -161,7 +159,6 @@ function WeekView({ weekDays, getByDate }) {
         </div>
       </div>
 
-      {/* Desktop — 7 columns */}
       <div className="wk-desktop">
         {weekDays.map((day, i) => {
           const isToday = day.toDateString() === today
