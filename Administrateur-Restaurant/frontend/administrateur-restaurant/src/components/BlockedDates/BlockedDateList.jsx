@@ -69,7 +69,7 @@ function PageBtn({ onClick, disabled, active, children }) {
       style={{
         minWidth: 36, height: 36, padding: '0 6px',
         display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-        background: active ? DARK : hov && !disabled ? '#f0ebe4' : '#fff',
+        background: active ? DARK : hov && !disabled ? '#FBF5EA' : '#fff',
         border: `1.5px solid ${active ? DARK : DARK}`,
         color: active ? GOLD : disabled ? DARK : DARK,
         fontSize: 12, fontWeight: active ? 900 : 700,
@@ -182,9 +182,10 @@ export default function BlockedDateList({ blockedDates, handleUnblock, selectedD
           </div>
         )}
 
-        <div style={{ display: 'grid', gridTemplateColumns: `44px 1fr ${isMobile ? '44px' : '120px'}`, padding: '10px 12px', background: DARK, alignItems: 'center', gap: 8 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: isMobile ? `44px 1fr 44px` : `44px 1fr 1fr 120px`, padding: '10px 12px', background: DARK, alignItems: 'center', gap: 8 }}>
           <Checkbox checked={pageAllSel} indeterminate={pageSomeSel} onChange={togglePage} />
           <span style={{ fontSize: 9, fontWeight: 900, color: GOLD, letterSpacing: '0.2em', textTransform: 'uppercase' }}>Date bloquée</span>
+          {!isMobile && <span style={{ fontSize: 9, fontWeight: 900, color: GOLD, letterSpacing: '0.2em', textTransform: 'uppercase' }}>Raison</span>}
           {!isMobile && <span style={{ fontSize: 9, fontWeight: 900, color: GOLD, letterSpacing: '0.2em', textTransform: 'uppercase' }}>Action</span>}
         </div>
 
@@ -196,7 +197,7 @@ export default function BlockedDateList({ blockedDates, handleUnblock, selectedD
           return (
             <div key={d.date ?? i} className="bd-row" onClick={() => toggleOne(d.date)}
               style={{
-                display: 'grid', gridTemplateColumns: `44px 1fr ${isMobile ? '44px' : '120px'}`,
+                display: 'grid', gridTemplateColumns: isMobile ? `44px 1fr 44px` : `44px 1fr 1fr 120px`,
                 padding: isMobile ? '13px 12px' : '14px 16px', background: bg,
                 borderBottom: `1px solid ${BORDER}`,
                 borderLeft: `3px solid ${selected ? GOLD : 'transparent'}`,
@@ -217,7 +218,7 @@ export default function BlockedDateList({ blockedDates, handleUnblock, selectedD
                 }}>
                   {isMobile ? fmtShort(d.date) : fmt(d.date)}
                 </p>
-                {d.reason && (
+                {isMobile && d.reason && (
                   <p style={{ margin: '3px 0 0', fontSize: 11, fontWeight: 600, color: GOLD, fontStyle: 'italic', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                     {d.reason}
                   </p>
@@ -228,6 +229,14 @@ export default function BlockedDateList({ blockedDates, handleUnblock, selectedD
                   </span>
                 )}
               </div>
+              {!isMobile && (
+                <div style={{ minWidth: 0 }}>
+                  {d.reason
+                    ? <p style={{ margin: 0, fontSize: 13, fontWeight: 600, color: GOLD, fontStyle: 'italic', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{d.reason}</p>
+                    : <p style={{ margin: 0, fontSize: 12, fontWeight: 600, color: DARK, opacity: 0.3 }}>—</p>
+                  }
+                </div>
+              )}
               <button onClick={e => { e.stopPropagation(); handleUnblock(d.date) }}
                 style={{
                   display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, width: '100%',
