@@ -1,4 +1,4 @@
-import { useLocation } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { useState, useEffect, useMemo } from 'react'
 import {
   Plus, FileDown, Trash2, CheckCircle,
@@ -218,6 +218,7 @@ function exportReservationsPDF(reservations) {
 
 export default function Reservations() {
   const location = useLocation()
+  const navigate  = useNavigate()
   const [exporting,   setExporting]   = useState(false)
   const [selectedIds, setSelectedIds] = useState([])
 
@@ -232,11 +233,17 @@ export default function Reservations() {
     filterStatus,  setFilterStatus,
     filterService, setFilterService,
     filterDate,    setFilterDate,
-    clearFilters,
+    clearFilters: _clearFilters,
     openView, openEdit, openCreate,
     handleSubmit, handleCreate, handleDelete,
     setReservations,
   } = useReservations(location.state)
+
+  // Clear filters AND wipe dashboard navigation state so openId no longer locks the view
+  function clearFilters() {
+    _clearFilters()
+    navigate('/reservations', { replace: true, state: null })
+  }
 
   // Default filters on mount
   useEffect(() => {
