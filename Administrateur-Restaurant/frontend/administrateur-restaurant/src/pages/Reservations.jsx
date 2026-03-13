@@ -15,9 +15,8 @@ import { getToken } from '../utils/auth'
 import { toast }   from '../components/ui/Toast'
 import { confirm } from '../components/ui/ConfirmDialog'
 
-const DARK      = '#2b2118'
-const GOLD      = '#c8a97e'
-const GOLD_DARK = '#a8834e'
+const DARK = '#2b2118'
+const GOLD = '#c8a97e'
 
 function Btn({ children, onClick, primary, disabled, icon: Icon }) {
   const [hov, setHov] = useState(false)
@@ -224,11 +223,9 @@ export default function Reservations() {
   const { services } = useServices()
 
   const {
-    filtered,                              // ← correct name from hook
-    loading, error,
+    filtered, loading, error,
     modalMode, setModalMode,
-    form, setForm,
-    editing,
+    form, setForm, editing,
     search,        setSearch,
     filterStatus,  setFilterStatus,
     filterService, setFilterService,
@@ -239,19 +236,25 @@ export default function Reservations() {
     setReservations,
   } = useReservations(location.state)
 
-  // Default filter on mount: En attente seulement
+  // Default filter on mount: current month
   useEffect(() => {
-    if (!location.state?.filterStatus) setFilterStatus('Pending')
+    if (!location.state?.filterDate) {
+      setFilterDate(new Date().toISOString().slice(0, 7)) // YYYY-MM
+    }
+    if (!location.state?.filterStatus) {
+      setFilterStatus('Pending')
+    }
   }, []) // eslint-disable-line
 
-  // Apply month filter locally (hook already handles filterDate exact match,
-  // but we also need YYYY-MM prefix match for the month picker)
+  // All date filtering lives here — hook only does search/status/service
   const filteredLocal = useMemo(() => {
     const base = Array.isArray(filtered) ? filtered : []
     if (!filterDate) return base
+    // YYYY-MM → month match
     if (/^\d{4}-\d{2}$/.test(filterDate)) {
       return base.filter(r => (r.date || '').startsWith(filterDate))
     }
+    // YYYY-MM-DD → exact match
     return base.filter(r => r.date === filterDate)
   }, [filtered, filterDate])
 
