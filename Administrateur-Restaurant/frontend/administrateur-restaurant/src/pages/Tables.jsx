@@ -154,33 +154,50 @@ export default function Tables() {
       setTables(prev => prev.filter(t => !selectedTables.includes(t.idx)))
       toast(`${selectedTables.length} table${selectedTables.length > 1 ? 's supprimées' : ' supprimée'}`, 'warning')
       setSelectedTables([])
-    } catch { toast('Erreur lors de la suppression', 'error') }
+    } catch {
+      toast('Erreur lors de la suppression', 'error')
+      setSelectedTables([])
+    }
   }
 
   async function handleBulkActivate() {
+    // ✅ FIX 2: was filtering tables already active (wrong) — now filters inactive ones to activate
+    const toActivate = selectedTables.filter(idx => !tables.find(t => t.idx === idx)?.active)
     try {
       await Promise.all(
-        selectedTables
-          .filter(idx => !tables.find(t => t.idx === idx)?.active)
-          .map(idx => fetch(`${API}/${idx}/toggle`, { method: 'PATCH', headers: hdrs() }))
+        toActivate.map(idx =>
+          fetch(`${API}/${idx}/toggle`, { method: 'PATCH', headers: hdrs() })
+        )
       )
-      setTables(prev => prev.map(t => selectedTables.includes(t.idx) ? { ...t, active: true } : t))
+      setTables(prev => prev.map(t =>
+        selectedTables.includes(t.idx) ? { ...t, active: true } : t
+      ))
       toast(`${selectedTables.length} table${selectedTables.length > 1 ? 's activées' : ' activée'}`, 'success')
       setSelectedTables([])
-    } catch { toast('Erreur', 'error') }
+    } catch {
+      toast('Erreur lors de l\'activation', 'error')
+      setSelectedTables([])
+    }
   }
 
   async function handleBulkDeactivate() {
+    // ✅ FIX 2: was filtering inactive tables (wrong) — now filters active ones to deactivate
+    const toDeactivate = selectedTables.filter(idx => tables.find(t => t.idx === idx)?.active)
     try {
       await Promise.all(
-        selectedTables
-          .filter(idx => tables.find(t => t.idx === idx)?.active)
-          .map(idx => fetch(`${API}/${idx}/toggle`, { method: 'PATCH', headers: hdrs() }))
+        toDeactivate.map(idx =>
+          fetch(`${API}/${idx}/toggle`, { method: 'PATCH', headers: hdrs() })
+        )
       )
-      setTables(prev => prev.map(t => selectedTables.includes(t.idx) ? { ...t, active: false } : t))
+      setTables(prev => prev.map(t =>
+        selectedTables.includes(t.idx) ? { ...t, active: false } : t
+      ))
       toast(`${selectedTables.length} table${selectedTables.length > 1 ? 's désactivées' : ' désactivée'}`, 'warning')
       setSelectedTables([])
-    } catch { toast('Erreur', 'error') }
+    } catch {
+      toast('Erreur lors de la désactivation', 'error')
+      setSelectedTables([])
+    }
   }
 
   async function handleExport() {
