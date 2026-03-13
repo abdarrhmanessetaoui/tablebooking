@@ -10,18 +10,6 @@ use App\Http\Controllers\TimeSlotController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\TableController;
 
-// ── ONE-TIME FIX — visit /api/fix-services once in browser, then delete these 10 lines
-Route::get('/fix-services', function () {
-    $row = DB::table('wpjn_cpappbk_forms')->where('id', 13)->first();
-    if (!$row) return 'Not found';
-    $structure = json_decode($row->form_structure, true);
-    foreach ($structure[0][0]['services'] as &$svc) {
-        if (!isset($svc['available_days'])) $svc['available_days'] = [0,1,2,3,4,5,6];
-    }
-    DB::table('wpjn_cpappbk_forms')->where('id', 13)->update(['form_structure' => json_encode($structure)]);
-    return 'Done — ' . count($structure[0][0]['services']) . ' services fixed';
-});
-// ── END ONE-TIME FIX ──────────────────────────────────────────────────────────
 
 // ── Auth ──────────────────────────────────────────────────────────────────────
 Route::post('/login',  [AuthenticatedSessionController::class, 'store']);
