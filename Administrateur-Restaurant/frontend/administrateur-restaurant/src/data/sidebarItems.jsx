@@ -11,7 +11,7 @@ export const navItems = [
   { to: '/services',      label: 'Services',        icon: <Utensils        size={22} strokeWidth={2} /> },
   { to: '/tables',       label: 'Tables',         icon: <LayoutGrid     size={22} strokeWidth={2} /> },
   { to: '/reports',       label: 'Rapports',        icon: <BarChart2       size={22} strokeWidth={2} /> },
-/*   { to: '/settings',      label: 'Paramètres',      icon: <Settings        size={22} strokeWidth={2} /> }, */
+  { to: '/settings',      label: 'Paramètres',      icon: <Settings        size={22} strokeWidth={2} /> },
 ]
 
 export function LogoutIcon() {
