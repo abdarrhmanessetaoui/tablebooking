@@ -152,7 +152,7 @@ export default function Services() {
                 {editingSvc ? 'Modifier le service' : 'Ajouter un service'}
               </h2>
               <p className="page-subtitle" style={{ margin: '0 0 16px', fontSize: 12, fontWeight: 700, color: GOLD_DK }}>
-                {editingSvc ? `Modification de "${editingSvc.name}"` : 'Remplissez les champs ci-dessous'}
+            
               </p>
 
               <ServiceForm
