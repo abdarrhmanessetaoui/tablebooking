@@ -220,8 +220,8 @@ export default function Reservations() {
   const [exporting,   setExporting]   = useState(false)
   const [selectedIds, setSelectedIds] = useState([])
 
-  // Detect if we arrived from Dashboard with a specific reservation to highlight
-  const comingFromDashboard = !!location.state?.openId
+  // Track if we arrived from Dashboard — cleared once modal opens so filters work normally
+  const [comingFromDashboard, setComingFromDashboard] = useState(!!location.state?.openId)
 
   const { services } = useServices()
 
@@ -297,7 +297,10 @@ export default function Reservations() {
       filteredLocal.find(r => r.id === openId) ||
       allRes.find(r => r.id === openId)
 
-    if (target) openView(target)
+    if (target) {
+      openView(target)
+      setComingFromDashboard(false) // clear so filters work normally after modal opens
+    }
   }, [location.state?.openId, loading, filtered]) // eslint-disable-line
 
   async function handleExportPDF() {
