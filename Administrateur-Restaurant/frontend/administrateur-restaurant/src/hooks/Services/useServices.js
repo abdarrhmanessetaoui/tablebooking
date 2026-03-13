@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react'
-import { getToken } from '../../utils/auth'
-import { toast }   from '../../components/ui/Toast'
-import { confirm } from '../../components/ui/ConfirmDialog'
+import { getToken }  from '../../utils/auth'
+import { toast }     from '../../components/ui/Toast'
+import { confirm }   from '../../components/ui/ConfirmDialog'
 
 const API = 'http://localhost:8000/api/services'
 
 const hdrs = () => ({
   'Content-Type': 'application/json',
-  'Accept': 'application/json',
+  'Accept':       'application/json',
   'Authorization': `Bearer ${getToken()}`,
 })
 
@@ -35,34 +35,25 @@ export default function useServices() {
 
   async function handleSave(form, resetForm) {
     setSaving(true)
+    const body = {
+      name:           form.name,
+      price:          parseFloat(form.price)    || 0,
+      capacity:       parseInt(form.capacity)   || 1,
+      duration:       parseInt(form.duration)   || 60,
+      available_days: form.available_days       ?? [0,1,2,3,4,5,6],
+    }
     try {
       if (editingSvc) {
         await fetch(`${API}/${editingSvc.idx}`, {
-          method: 'PUT', headers: hdrs(),
-          body: JSON.stringify({
-            name:     form.name,
-            price:    parseFloat(form.price)    || 0,
-            capacity: parseInt(form.capacity)   || 1,
-            duration: parseInt(form.duration)   || 60,
-          }),
+          method: 'PUT', headers: hdrs(), body: JSON.stringify(body),
         })
         setServices(prev => prev.map(s =>
-          s.idx === editingSvc.idx
-            ? { ...s, name: form.name, price: parseFloat(form.price), capacity: String(form.capacity), duration: String(form.duration) }
-            : s
+          s.idx === editingSvc.idx ? { ...s, ...body } : s
         ))
         toast(`Service "${form.name}" modifié`, 'success')
         setEditingSvc(null)
       } else {
-        const res  = await fetch(API, {
-          method: 'POST', headers: hdrs(),
-          body: JSON.stringify({
-            name:     form.name,
-            price:    parseFloat(form.price)    || 0,
-            capacity: parseInt(form.capacity)   || 1,
-            duration: parseInt(form.duration)   || 60,
-          }),
-        })
+        const res  = await fetch(API, { method: 'POST', headers: hdrs(), body: JSON.stringify(body) })
         const data = await res.json()
         setServices(prev => [...prev, data])
         toast(`Service "${form.name}" ajouté`, 'success')
@@ -77,11 +68,9 @@ export default function useServices() {
 
   async function handleDelete(svc) {
     const ok = await confirm({
-      title:        'Supprimer le service',
-      message:      `Voulez-vous supprimer "${svc.name}" ?`,
-      sub:          'Les réservations existantes ne seront pas affectées.',
-      confirmLabel: 'Supprimer',
-      type:         'danger',
+      title: 'Supprimer le service', message: `Voulez-vous supprimer "${svc.name}" ?`,
+      sub: 'Les réservations existantes ne seront pas affectées.',
+      confirmLabel: 'Supprimer', type: 'danger',
     })
     if (!ok) return
     try {
