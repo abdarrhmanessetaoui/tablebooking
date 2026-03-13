@@ -11,6 +11,7 @@ import Layout         from './components/Layout'
 import ToastContainer from './components/ui/Toast'
 import ConfirmDialog  from './components/ui/ConfirmDialog'
 import Services from './pages/Services'
+import Tables from './pages/Tables'
 
 function App() {
   return (
