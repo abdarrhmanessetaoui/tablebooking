@@ -261,38 +261,19 @@ export default function TableList({ tables, editingTbl, onEdit, onDelete, onTogg
               {/* Actions */}
               <div onClick={e => e.stopPropagation()} style={{ display: 'flex', gap: 3, alignItems: 'center' }}>
                 {/* Toggle active */}
-                <button
-  onClick={() => onToggle(tbl)}
-  title={tbl.active ? 'Désactiver' : 'Activer'}
-  style={{
-    display: 'flex', alignItems: 'center', gap: 8,
-    padding: '0 14px', height: 36,
-    background: tbl.active ? '#16a34a' : 'rgba(0,0,0,0.06)',
-    border: 'none',
-    borderRadius: 999,
-    color: tbl.active ? '#fff' : '#6b7280',
-    fontSize: 12, fontWeight: 600,
-    cursor: 'pointer',
-    fontFamily: 'inherit',
-    flexShrink: 0,
-    transition: 'background 0.18s, color 0.18s, transform 0.1s',
-    boxShadow: tbl.active ? '0 1px 6px rgba(22,163,74,0.35)' : 'none',
-  }}
-  onMouseEnter={e => {
-    e.currentTarget.style.background = tbl.active ? '#15803d' : 'rgba(0,0,0,0.11)'
-  }}
-  onMouseLeave={e => {
-    e.currentTarget.style.background = tbl.active ? '#16a34a' : 'rgba(0,0,0,0.06)'
-  }}
-  onMouseDown={e => e.currentTarget.style.transform = 'scale(0.95)'}
-  onMouseUp={e => e.currentTarget.style.transform = 'scale(1)'}
->
-  {tbl.active
-    ? <ToggleRight size={16} strokeWidth={2.5} />
-    : <ToggleLeft  size={16} strokeWidth={2.5} />
-  }
-  {tbl.active ? 'Actif' : 'Inactif'}
-</button>
+                <button onClick={() => onToggle(tbl)} title={tbl.active ? 'Désactiver' : 'Activer'}
+                  style={{
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    width: 34, height: 34, background: 'none',
+                    border: `1.5px solid ${tbl.active ? GREEN : '#ddd'}`,
+                    color: tbl.active ? GREEN : '#bbb',
+                    cursor: 'pointer', transition: 'all 0.15s', flexShrink: 0,
+                  }}
+                  onMouseEnter={e => { e.currentTarget.style.background = tbl.active ? GREEN_BG : '#f5f5f5' }}
+                  onMouseLeave={e => { e.currentTarget.style.background = 'none' }}
+                >
+                  {tbl.active ? <ToggleRight size={15} strokeWidth={2} /> : <ToggleLeft size={15} strokeWidth={2} />}
+                </button>
 
                 {/* Edit */}
                 <button onClick={() => onEdit(tbl)} title="Modifier"
