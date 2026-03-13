@@ -7,60 +7,68 @@ use Illuminate\Support\Facades\DB;
 
 class TimeSlotController extends Controller
 {
-    private function formId(): ?int
+    private function getFormStructure()
     {
-        auth()->shouldUse('sanctum');
-        $user = auth('sanctum')->user();
-        return $user
-            ? $user->restaurant_form_id
-            : (int) request()->query('form_id');
+        $row = DB::table('wpjn_cpappbk_forms')->where('id', 13)->first();
+        if (!$row) return null;
+        return json_decode($row->form_structure, true);
     }
 
-    private function getStructure(int $formId): ?array
+    private function saveFormStructure(array $structure)
     {
-        $form = DB::table('wpjn_cpappbk_forms')->where('id', $formId)->first();
-        if (!$form) return null;
-        return json_decode($form->form_structure, true);
+        DB::table('wpjn_cpappbk_forms')->where('id', 13)->update([
+            'form_structure' => json_encode($structure),
+        ]);
+    }
+
+    private function normalizeDaySlots(array $oh): array
+    {
+        if (isset($oh['openhours']) && count($oh['openhours']) === 7) {
+            return $oh;
+        }
+        $base = $oh['openhours'][0] ?? ['type' => 'all', 'h1' => '12', 'm1' => '0', 'h2' => '23', 'm2' => '0'];
+        $oh['openhours'] = array_map(fn($d) => array_merge($base, ['type' => 'day', 'd' => (string)$d]), range(0, 6));
+        return $oh;
     }
 
     public function index()
     {
-        $formId = $this->formId();
-        if (!$formId) return response()->json([]);
-
-        $structure = $this->getStructure($formId);
+        $structure = $this->getFormStructure();
         if (!$structure) return response()->json([]);
 
+        $fapp = null;
         foreach ($structure[0] ?? [] as $field) {
-            if (($field['ftype'] ?? '') !== 'fapp') continue;
-            return response()->json([
-                'allOH'         => $field['allOH']         ?? [],
-                'working_dates' => $field['working_dates']  ?? [],
-            ]);
+            if (($field['ftype'] ?? '') === 'fapp') { $fapp = $field; break; }
         }
+        if (!$fapp) return response()->json([]);
 
-        return response()->json([]);
+        $allOH         = array_map([$this, 'normalizeDaySlots'], $fapp['allOH'] ?? []);
+        $working_dates = $fapp['working_dates'] ?? [false,true,true,true,true,true,true];
+
+        return response()->json([
+            'allOH'         => $allOH,
+            'working_dates' => $working_dates,
+        ]);
     }
 
     public function update(Request $request)
     {
-        $formId = auth()->user()->restaurant_form_id;
-        if (!$formId) return response()->json(['message' => 'Unauthorized'], 401);
-
-        $structure = $this->getStructure($formId);
-        if (!$structure) return response()->json(['message' => 'Form not found'], 404);
+        $structure = $this->getFormStructure();
+        if (!$structure) return response()->json(['error' => 'Not found'], 404);
 
         foreach ($structure[0] as &$field) {
             if (($field['ftype'] ?? '') !== 'fapp') continue;
-            if ($request->has('allOH'))         $field['allOH']         = $request->allOH;
-            if ($request->has('working_dates')) $field['working_dates'] = $request->working_dates;
+
+            if ($request->has('allOH')) {
+                $field['allOH'] = $request->allOH;
+            }
+            if ($request->has('working_dates')) {
+                $field['working_dates'] = $request->working_dates;
+            }
             break;
         }
 
-        DB::table('wpjn_cpappbk_forms')
-            ->where('id', $formId)
-            ->update(['form_structure' => json_encode($structure)]);
-
-        return response()->json(['message' => 'Saved successfully']);
+        $this->saveFormStructure($structure);
+        return response()->json(['success' => true]);
     }
 }
