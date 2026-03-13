@@ -68,11 +68,11 @@ function BulkBar({ count, onDelete, onStatus, onClear }) {
         background: GOLD, color: DARK,
         fontSize: 12, fontWeight: 900, padding: '0 7px', flexShrink: 0,
       }}>{count}</span>
-      <span className="bulk-label" style={{ fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.6)', marginRight: 2 }}>
+      <span className="bulk-label" style={{ fontSize: 12, fontWeight: 700, color: '#2b2118', marginRight: 2 }}>
         sélectionné{count > 1 ? 's' : ''}
       </span>
 
-      <div style={{ width: 1, height: 20, background: 'rgba(255,255,255,0.12)', margin: '0 2px', flexShrink: 0 }} />
+      <div style={{ width: 1, height: 20, background: '#2b2118', margin: '0 2px', flexShrink: 0 }} />
 
       {[
         { status: 'Confirmed', label: 'Confirmer',  Icon: CheckCircle, color: '#4ade80' },
@@ -83,21 +83,21 @@ function BulkBar({ count, onDelete, onStatus, onClear }) {
           style={{
             display: 'flex', alignItems: 'center', gap: 5,
             padding: '6px 12px',
-            background: 'rgba(255,255,255,0.07)',
-            border: '1px solid rgba(255,255,255,0.1)',
+            background: '#2b2118',
+            border: '1px solid #2b2118',
             color, fontSize: 12, fontWeight: 700,
             cursor: 'pointer', fontFamily: 'inherit',
             transition: 'background 0.15s', flexShrink: 0,
           }}
-          onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.15)'}
-          onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,255,255,0.07)'}
+          onMouseEnter={e => e.currentTarget.style.background = '#2b2118'}
+          onMouseLeave={e => e.currentTarget.style.background = '#2b2118'}
         >
           <Icon size={13} strokeWidth={2.5} />
           <span className="btn-label">{label}</span>
         </button>
       ))}
 
-      <div style={{ width: 1, height: 20, background: 'rgba(255,255,255,0.12)', margin: '0 2px', flexShrink: 0 }} />
+      <div style={{ width: 1, height: 20, background: '#2b2118', margin: '0 2px', flexShrink: 0 }} />
 
       <button onClick={onDelete}
         onMouseEnter={() => setHovDel(true)} onMouseLeave={() => setHovDel(false)}
@@ -120,14 +120,14 @@ function BulkBar({ count, onDelete, onStatus, onClear }) {
         style={{
           marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 5,
           padding: '6px 10px',
-          background: 'none', border: '1px solid rgba(255,255,255,0.12)',
-          color: 'rgba(255,255,255,0.45)',
+          background: 'none', border: '1px solid #2b2118',
+          color: '#2b2118',
           fontSize: 12, fontWeight: 700,
           cursor: 'pointer', fontFamily: 'inherit',
           transition: 'all 0.15s', flexShrink: 0,
         }}
         onMouseEnter={e => e.currentTarget.style.color = '#fff'}
-        onMouseLeave={e => e.currentTarget.style.color = 'rgba(255,255,255,0.45)'}
+        onMouseLeave={e => e.currentTarget.style.color = '#2b2118'}
       >
         <X size={13} strokeWidth={2.5} />
         <span className="btn-label">Désélectionner</span>
@@ -436,7 +436,7 @@ export default function Reservations() {
         <FadeUp delay={50}>
           <p style={{
             margin: '0 0 10px',
-            fontSize: 11, fontWeight: 800, color: '#bbb',
+            fontSize: 11, fontWeight: 800, color: '#2b2118',
             letterSpacing: '0.1em', textTransform: 'uppercase',
           }}>
             {filteredLocal.length} résultat{filteredLocal.length !== 1 ? 's' : ''}
