@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { CalendarClock, Save, Store, Mail, MapPin, Clock, Users, Bell, ChevronDown, ChevronUp } from 'lucide-react'
-import useTimeSlots from '../hooks/useTimeSlots'
+import useTimeSlots from '../hooks/useSettings'
 import FadeUp  from '../components/Dashboard/FadeUp'
 import Spinner from '../components/Dashboard/Spinner'
 
