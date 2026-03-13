@@ -69,7 +69,7 @@ function CalendarPopup({ filterDate, setFilterDate, onClose, popupStyle = {} }) 
     popup: {
       position: 'fixed', zIndex: 9999,
       background: '#fff', border: `2px solid ${DARK}`,
-      width: 280, boxShadow: '0 8px 32px rgba(43,33,24,0.18)',
+      width: 280, minWidth: 240, boxShadow: '0 8px 32px rgba(43,33,24,0.18)',
     },
     header: {
       display: 'flex', alignItems: 'center',
@@ -223,12 +223,14 @@ export default function ReservationsFilters({
   function openCal() {
     if (calOpen) { setCalOpen(false); return }
     if (containerRef.current) {
-      const rect = containerRef.current.getBoundingClientRect()
+      const rect   = containerRef.current.getBoundingClientRect()
       const popupW = 280
-      // Prefer right-aligned to the button; fall back to left-aligned if near left edge
+      const vw     = window.innerWidth
+      // Right-align to button, but clamp so popup never goes off either edge
       let left = rect.right - popupW
-      if (left < 8) left = rect.left
-      setPopupPos({ top: rect.bottom + 4, left })
+      if (left + popupW > vw - 8) left = vw - popupW - 8
+      if (left < 8) left = 8
+      setPopupPos({ top: rect.bottom + 4, left, width: Math.min(popupW, vw - 16) })
     }
     setCalOpen(true)
   }
@@ -237,8 +239,15 @@ export default function ReservationsFilters({
       if (calOpen && containerRef.current && !containerRef.current.contains(e.target))
         setCalOpen(false)
     }
+    function closeOnMove() { setCalOpen(false) }
     document.addEventListener('mousedown', handler)
-    return () => document.removeEventListener('mousedown', handler)
+    window.addEventListener('scroll', closeOnMove, true)
+    window.addEventListener('resize', closeOnMove)
+    return () => {
+      document.removeEventListener('mousedown', handler)
+      window.removeEventListener('scroll', closeOnMove, true)
+      window.removeEventListener('resize', closeOnMove)
+    }
   }, [calOpen])
 
   // Format button label
