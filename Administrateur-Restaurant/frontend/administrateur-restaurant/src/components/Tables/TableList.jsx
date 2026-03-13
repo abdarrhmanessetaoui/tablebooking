@@ -294,12 +294,14 @@ export default function TableList({ tables, editingTbl, onEdit, onDelete, onTogg
           { label: 'Capacité', val: `${totalCap} pers.` },
         ].map((s, i) => (
           <div key={i} style={{
-            flex: 1, padding: '10px 14px',
+            flex: 1,
+            padding: '10px 18px',
             background: i === 0 ? DARK : i === 1 ? '#3d2d1e' : '#4a3525',
             borderRight: i < 2 ? `1px solid #4a3525` : 'none',
+            overflow: 'visible',
           }}>
             <p style={{ margin: 0, fontSize: 9, fontWeight: 900, color: GOLD, letterSpacing: '0.18em', textTransform: 'uppercase' }}>{s.label}</p>
-            <p style={{ margin: '2px 0 0', fontSize: 20, fontWeight: 900, color: '#fff' }}>{s.val}</p>
+            <p style={{ margin: '2px 0 0', fontSize: 20, fontWeight: 900, color: '#fff', whiteSpace: 'nowrap' }}>{s.val}</p>
           </div>
         ))}
       </div>
