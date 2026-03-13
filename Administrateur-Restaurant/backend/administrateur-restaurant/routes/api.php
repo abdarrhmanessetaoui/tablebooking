@@ -31,4 +31,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/blocked-dates/{date}',                    [BlockedDateController::class, 'destroy']);
     Route::post('/blocked-dates/bulk', [BlockedDateController::class, 'storeBulk']);
     Route::put('/time-slots',                                 [TimeSlotController::class,   'update']);
+    Route::get   ('/services',         [ServiceController::class, 'index']);
+    Route::post  ('/services',         [ServiceController::class, 'store']);
+    Route::put   ('/services/{idx}',   [ServiceController::class, 'update']);
+    Route::delete('/services/{idx}',   [ServiceController::class, 'destroy']);
 });
