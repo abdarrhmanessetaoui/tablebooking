@@ -287,24 +287,27 @@ export default function TableList({ tables, editingTbl, onEdit, onDelete, onTogg
       <style>{`@media (hover: hover) { .tbl-row:hover { background: #fdf6ec !important; } }`}</style>
 
       {/* Stats bar */}
-      <div style={{ display: 'flex', gap: 0, marginBottom: 12 }}>
-        {[
-          { label: 'Total',    val: tables.length },
-          { label: 'Actives',  val: activeCnt },
-          { label: 'Capacité', val: `${totalCap} pers.` },
-        ].map((s, i) => (
-          <div key={i} style={{
-            flex: 1,
-            padding: '10px 18px',
-            background: i === 0 ? DARK : i === 1 ? '#3d2d1e' : '#4a3525',
-            borderRight: i < 2 ? `1px solid #4a3525` : 'none',
-            overflow: 'visible',
-          }}>
-            <p style={{ margin: 0, fontSize: 9, fontWeight: 900, color: GOLD, letterSpacing: '0.18em', textTransform: 'uppercase' }}>{s.label}</p>
-            <p style={{ margin: '2px 0 0', fontSize: 20, fontWeight: 900, color: '#fff', whiteSpace: 'nowrap' }}>{s.val}</p>
-          </div>
-        ))}
-      </div>
+      <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: 12, tableLayout: 'auto' }}>
+        <tbody>
+          <tr>
+            {[
+              { label: 'Total',    val: String(tables.length),       bg: DARK },
+              { label: 'Actives',  val: String(activeCnt),           bg: '#3d2d1e' },
+              { label: 'Capacité', val: `${totalCap}\u00a0pers.`,    bg: '#4a3525' },
+            ].map((s, i) => (
+              <td key={i} style={{
+                padding: '10px 20px',
+                background: s.bg,
+                borderRight: i < 2 ? `1px solid #4a3525` : 'none',
+                width: i === 2 ? '100%' : '1%',
+              }}>
+                <p style={{ margin: 0, fontSize: 9, fontWeight: 900, color: GOLD, letterSpacing: '0.18em', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>{s.label}</p>
+                <p style={{ margin: '2px 0 0', fontSize: 20, fontWeight: 900, color: '#fff', whiteSpace: 'nowrap' }}>{s.val}</p>
+              </td>
+            ))}
+          </tr>
+        </tbody>
+      </table>
 
       <div style={{ border: `1px solid ${BORDER}`, overflow: 'hidden' }}>
 
