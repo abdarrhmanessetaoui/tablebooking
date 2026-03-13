@@ -229,15 +229,22 @@ export default function Reservations() {
     filtered, loading, error,
     modalMode, setModalMode,
     form, setForm, editing,
-    search,        setSearch,
-    filterStatus,  setFilterStatus,
-    filterService, setFilterService,
-    filterDate,    setFilterDate,
-    clearFilters,
+    search,           setSearch:        _setSearch,
+    filterStatus,     setFilterStatus:  _setFilterStatus,
+    filterService,    setFilterService: _setFilterService,
+    filterDate,       setFilterDate:    _setFilterDate,
+    clearFilters:     _clearFilters,
     openView, openEdit, openCreate,
     handleSubmit, handleCreate, handleDelete,
     setReservations,
   } = useReservations(location.state)
+
+  // Wrap every filter setter — as soon as user touches a filter, exit dashboard mode
+  function setSearch(v)        { setComingFromDashboard(false); _setSearch(v) }
+  function setFilterStatus(v)  { setComingFromDashboard(false); _setFilterStatus(v) }
+  function setFilterService(v) { setComingFromDashboard(false); _setFilterService(v) }
+  function setFilterDate(v)    { setComingFromDashboard(false); _setFilterDate(v) }
+  function clearFilters()      { setComingFromDashboard(false); _clearFilters() }
 
   // ── Default filters on mount ──────────────────────────────────────────────
   // When coming from Dashboard with openId:
@@ -299,7 +306,6 @@ export default function Reservations() {
 
     if (target) {
       openView(target)
-      setComingFromDashboard(false) // clear so filters work normally after modal opens
     }
   }, [location.state?.openId, loading, filtered]) // eslint-disable-line
 
