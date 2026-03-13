@@ -1,5 +1,4 @@
-import { useState } from 'react'
-import { Search, X, Calendar, CalendarDays } from 'lucide-react'
+import { Search, X } from 'lucide-react'
 
 const DARK = '#2b2118'
 const GOLD = '#c8a97e'
@@ -12,8 +11,6 @@ export default function ReservationsFilters({
   clearFilters,
   services = [],
 }) {
-  const [dateMode, setDateMode] = useState('month')
-
   const hasFilters = search || filterStatus !== 'all' || filterDate || (filterService && filterService !== 'all')
 
   const base = {
@@ -24,12 +21,6 @@ export default function ReservationsFilters({
     color: DARK, fontFamily: 'inherit',
     outline: 'none', boxSizing: 'border-box',
     width: '100%', borderRadius: 0,
-  }
-
-  function toggleDateMode() {
-    const next = dateMode === 'month' ? 'day' : 'month'
-    setDateMode(next)
-    setFilterDate('')
   }
 
   return (
@@ -92,39 +83,23 @@ export default function ReservationsFilters({
           {services.map(s => <option key={s} value={s}>{s}</option>)}
         </select>
 
-        {/* Date — single toggle button + input */}
-        <div className="filters-date" style={{ display: 'flex' }}>
-          {/* Single toggle button */}
-          <button
-            onClick={toggleDateMode}
-            title={dateMode === 'month' ? 'Passer au filtre par jour' : 'Passer au filtre par mois'}
-            style={{
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              gap: 5,
-              padding: '0 12px', flexShrink: 0,
-              background: filterDate ? DARK : '#f5f0eb',
-              border: '2px solid #e8e0d8',
-              borderRight: 'none',
-              color: filterDate ? GOLD : '#999',
-              cursor: 'pointer', transition: 'all 0.15s',
-              fontSize: 10, fontWeight: 900,
-              letterSpacing: '0.08em', textTransform: 'uppercase',
-              fontFamily: 'inherit',
-            }}
-          >
-            {dateMode === 'month'
-              ? <><Calendar size={13} strokeWidth={2.5} /><span>Mois</span></>
-              : <><CalendarDays size={13} strokeWidth={2.5} /><span>Jour</span></>
-            }
-          </button>
-
-          {/* Input */}
+        {/* Date — single date input, works for both day and month filtering */}
+        <div className="filters-date" style={{ position: 'relative' }}>
           <input
-            type={dateMode === 'month' ? 'month' : 'date'}
+            type="date"
             value={filterDate}
             onChange={e => setFilterDate(e.target.value)}
-            style={{ ...base, flex: 1, minWidth: 0 }}
+            style={{ ...base }}
           />
+          {filterDate && (
+            <button onClick={() => setFilterDate('')} style={{
+              position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)',
+              background: 'none', border: 'none', cursor: 'pointer', padding: 4,
+              display: 'flex', alignItems: 'center',
+            }}>
+              <X size={12} color="#bbb" strokeWidth={2.5} />
+            </button>
+          )}
         </div>
 
         {/* Clear */}
