@@ -292,7 +292,7 @@ export default function TableList({ tables, editingTbl, onEdit, onDelete, onTogg
     : <ToggleLeft  size={16} strokeWidth={2.5} />
   }
   {tbl.active ? 'Actif' : 'Inactif'}
-</button>  
+</button>
 
                 {/* Edit */}
                 <button onClick={() => onEdit(tbl)} title="Modifier"
