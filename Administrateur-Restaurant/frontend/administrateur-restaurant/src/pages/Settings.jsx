@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Store, MapPin, Mail, Users, Phone, Clock, CalendarClock, Bell, Save, ChevronDown, ChevronUp, Globe } from 'lucide-react'
+import { Store, MapPin, Mail, Users, Phone, Clock, Bell, Save, ChevronDown, ChevronUp, Globe } from 'lucide-react'
 import useRestaurantSettings from '../hooks/useRestaurantSettings'
 import FadeUp  from '../components/Dashboard/FadeUp'
 import Spinner from '../components/Dashboard/Spinner'
@@ -10,7 +10,8 @@ const GOLD_DK = '#a8834e'
 const CREAM   = '#faf8f5'
 const BORDER  = '#2b2118'
 
-const FR_DAYS = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi']
+const FR_DAYS = ['Dim','Lun','Mar','Mer','Jeu','Ven','Sam']
+const FR_DAYS_FULL = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi']
 
 function Label({ children }) {
   return (
@@ -24,10 +25,8 @@ function TextInput({ value, onChange, placeholder, type = 'text', icon: Icon, di
   const [focused, setFocused] = useState(false)
   return (
     <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
-      {Icon && (
-        <Icon size={14} strokeWidth={2} color={focused ? GOLD : DARK}
-          style={{ position: 'absolute', left: 12, flexShrink: 0, transition: 'color 0.15s', pointerEvents: 'none' }} />
-      )}
+      {Icon && <Icon size={14} strokeWidth={2} color={focused ? GOLD : DARK}
+        style={{ position: 'absolute', left: 12, flexShrink: 0, transition: 'color 0.15s', pointerEvents: 'none' }} />}
       <input type={type} value={value ?? ''} onChange={e => onChange(e.target.value)}
         placeholder={placeholder} disabled={disabled}
         onFocus={() => setFocused(true)} onBlur={() => setFocused(false)}
@@ -124,11 +123,32 @@ function Field({ label, children }) {
   )
 }
 
+function TabBtn({ active, onClick, children, disabled }) {
+  const [hov, setHov] = useState(false)
+  return (
+    <button onClick={onClick} disabled={disabled}
+      onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
+      style={{
+        padding: '9px 16px',
+        background: active ? DARK : hov ? CREAM : '#fff',
+        border: `2px solid ${active ? DARK : BORDER}`,
+        color: active ? GOLD : DARK,
+        fontSize: 12, fontWeight: 800,
+        cursor: disabled ? 'default' : 'pointer',
+        fontFamily: 'inherit', transition: 'all 0.15s',
+        opacity: disabled ? 0.4 : 1,
+      }}>
+      {children}
+    </button>
+  )
+}
+
 export default function Settings() {
   const {
     loading,
     info, setInfoField, saveInfo, savingInfo,
-    hours, activeOH, setActiveService, toggleWorkingDay, updateOH, saveHours, savingHours,
+    hours, activeService, setActiveServiceIdx, activeDay, setActiveDay,
+    toggleWorkingDay, updateDayOH, saveHours, savingHours,
     services,
     notifications, setNotifField, saveNotif, savingNotif,
   } = useRestaurantSettings()
@@ -138,6 +158,13 @@ export default function Settings() {
       <Spinner />
     </div>
   )
+
+  // current service's ohindex → into allOH
+  const currentSvc    = services[activeService]
+  const ohindex       = currentSvc?.ohindex ?? activeService
+  const currentOH     = hours.allOH?.[ohindex]
+  const currentSlot   = currentOH?.openhours?.[activeDay]
+  const isDayOpen     = hours.working_dates?.[activeDay] ?? false
 
   return (
     <>
@@ -212,105 +239,122 @@ export default function Settings() {
             </Section>
           </FadeUp>
 
-          {/* ══ 2. JOURS D'OUVERTURE ══ */}
+          {/* ══ 2. PLANNING (jours + horaires combinés) ══ */}
           <FadeUp delay={30}>
-            <Section icon={CalendarClock} title="Jours d'ouverture" action={<SaveBtn onClick={saveHours} saving={savingHours} />}>
-              <Label>Cliquer pour activer / désactiver</Label>
-              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 8 }}>
+            <Section icon={Clock} title="Jours & Horaires" action={<SaveBtn onClick={saveHours} saving={savingHours} />}>
+
+              {/* ── Row 1: day pills ── */}
+              <Label>Jours d'ouverture</Label>
+              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 8, marginBottom: 24 }}>
                 {FR_DAYS.map((day, i) => {
-                  const active = hours.working_dates?.[i] ?? false
+                  const open   = hours.working_dates?.[i] ?? false
+                  const isActive = activeDay === i
                   return (
-                    <button key={i} onClick={() => toggleWorkingDay(i)}
+                    <button key={i}
+                      onClick={() => { setActiveDay(i); if (!open) toggleWorkingDay(i) }}
                       style={{
                         display: 'flex', flexDirection: 'column', alignItems: 'center',
-                        padding: '10px 14px', minWidth: 58, gap: 4,
-                        background: active ? DARK : '#fff',
-                        border: `2px solid ${DARK}`,
-                        color: active ? GOLD : DARK,
+                        padding: '10px 14px', minWidth: 58, gap: 3,
+                        background: isActive ? GOLD : open ? DARK : '#fff',
+                        border: `2px solid ${isActive ? GOLD_DK : DARK}`,
+                        color: isActive ? DARK : open ? GOLD : DARK,
                         cursor: 'pointer', transition: 'all 0.15s', fontFamily: 'inherit',
                       }}
-                      onMouseEnter={e => { if (!active) e.currentTarget.style.background = CREAM }}
-                      onMouseLeave={e => { if (!active) e.currentTarget.style.background = '#fff' }}
+                      onMouseEnter={e => { if (!isActive) e.currentTarget.style.background = open ? '#3d2d1e' : CREAM }}
+                      onMouseLeave={e => { if (!isActive) e.currentTarget.style.background = open ? DARK : '#fff' }}
                     >
                       <span style={{ fontSize: 10, fontWeight: 900, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
-                        {day.slice(0, 3)}
+                        {day}
                       </span>
-                      <span style={{ fontSize: 9, fontWeight: 700, opacity: active ? 0.8 : 0.5 }}>
-                        {active ? 'Ouvert' : 'Fermé'}
+                      <span style={{ fontSize: 9, fontWeight: 700, opacity: 0.75 }}>
+                        {open ? 'Ouvert' : 'Fermé'}
                       </span>
                     </button>
                   )
                 })}
               </div>
-            </Section>
-          </FadeUp>
 
-          {/* ══ 3. HORAIRES DE SERVICE ══ */}
-          <FadeUp delay={40}>
-            <Section icon={Clock} title="Horaires de service" action={<SaveBtn onClick={saveHours} saving={savingHours} />}>
-              <Label>Service</Label>
-              <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', marginBottom: 20, marginTop: 8 }}>
-                {services.map((svc, i) => {
-                  // ohindex tells us which allOH entry this service uses
-                  const ohIdx = svc.ohindex ?? i
-                  const active = activeOH === ohIdx
-                  return (
-                    <button key={i} onClick={() => setActiveService(ohIdx)}
-                      style={{
-                        padding: '9px 18px',
-                        background: active ? DARK : '#fff',
-                        border: `2px solid ${DARK}`,
-                        color: active ? GOLD : DARK,
-                        fontSize: 12, fontWeight: 800,
-                        cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.15s',
-                      }}
-                      onMouseEnter={e => { if (!active) e.currentTarget.style.background = CREAM }}
-                      onMouseLeave={e => { if (!active) e.currentTarget.style.background = '#fff' }}
-                    >
-                      {svc.name}
-                    </button>
-                  )
-                })}
+              {/* ── Row 2: selected day header + open toggle ── */}
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, marginBottom: 16 }}>
+                <div>
+                  <span style={{ fontSize: 16, fontWeight: 900, color: DARK }}>{FR_DAYS_FULL[activeDay]}</span>
+                  <span style={{ marginLeft: 10, fontSize: 11, fontWeight: 800, color: isDayOpen ? '#16a34a' : '#b94040',
+                    background: isDayOpen ? '#f0f7f0' : '#fdf0f0',
+                    padding: '3px 10px', border: `1.5px solid ${isDayOpen ? '#16a34a' : '#b94040'}` }}>
+                    {isDayOpen ? 'Ouvert' : 'Fermé'}
+                  </span>
+                </div>
+                <button onClick={() => toggleWorkingDay(activeDay)}
+                  style={{
+                    padding: '8px 16px', fontSize: 11, fontWeight: 900,
+                    background: isDayOpen ? '#fdf0f0' : '#f0f7f0',
+                    border: `2px solid ${isDayOpen ? '#b94040' : '#16a34a'}`,
+                    color: isDayOpen ? '#b94040' : '#16a34a',
+                    cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.15s',
+                  }}>
+                  {isDayOpen ? '✕ Marquer Fermé' : '✓ Marquer Ouvert'}
+                </button>
               </div>
 
-              {hours.allOH?.[activeOH] && (
+              {/* ── Row 3: service tabs ── */}
+              {services.length > 0 && (
+                <>
+                  <Label>Horaires par service</Label>
+                  <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', marginTop: 8, marginBottom: 16 }}>
+                    {services.map((svc, i) => (
+                      <TabBtn key={i} active={activeService === i} onClick={() => setActiveServiceIdx(i)}>
+                        {svc.name}
+                      </TabBtn>
+                    ))}
+                  </div>
+                </>
+              )}
+
+              {/* ── Row 4: time editor ── */}
+              {isDayOpen && currentSlot ? (
                 <div style={{ background: CREAM, border: `2px solid ${DARK}`, padding: 'clamp(14px,3vw,24px)' }}>
+                  <div style={{ marginBottom: 10, fontSize: 12, fontWeight: 800, color: GOLD_DK }}>
+                    {currentSvc?.name ?? 'Service'} · {FR_DAYS_FULL[activeDay]}
+                  </div>
                   <div style={{ display: 'flex', alignItems: 'flex-end', gap: 20, flexWrap: 'wrap' }}>
                     <div>
                       <Label>Ouverture</Label>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                        <TimeInput max={23} value={hours.allOH[activeOH].openhours[0]?.h1} onChange={v => updateOH(activeOH, 'h1', v)} />
+                        <TimeInput max={23} value={currentSlot.h1} onChange={v => updateDayOH(ohindex, activeDay, 'h1', v)} />
                         <span style={{ fontSize: 18, fontWeight: 900, color: GOLD_DK }}>:</span>
-                        <TimeInput max={59} value={hours.allOH[activeOH].openhours[0]?.m1} onChange={v => updateOH(activeOH, 'm1', v)} />
+                        <TimeInput max={59} value={currentSlot.m1} onChange={v => updateDayOH(ohindex, activeDay, 'm1', v)} />
                       </div>
                     </div>
                     <div style={{ paddingBottom: 12, fontSize: 20, color: DARK, fontWeight: 900 }}>→</div>
                     <div>
                       <Label>Fermeture</Label>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                        <TimeInput max={23} value={hours.allOH[activeOH].openhours[0]?.h2} onChange={v => updateOH(activeOH, 'h2', v)} />
+                        <TimeInput max={23} value={currentSlot.h2} onChange={v => updateDayOH(ohindex, activeDay, 'h2', v)} />
                         <span style={{ fontSize: 18, fontWeight: 900, color: GOLD_DK }}>:</span>
-                        <TimeInput max={59} value={hours.allOH[activeOH].openhours[0]?.m2} onChange={v => updateOH(activeOH, 'm2', v)} />
+                        <TimeInput max={59} value={currentSlot.m2} onChange={v => updateDayOH(ohindex, activeDay, 'm2', v)} />
                       </div>
                     </div>
                     <div>
                       <Label>Aperçu</Label>
                       <div style={{ padding: '10px 16px', background: DARK, fontSize: 14, fontWeight: 900, color: GOLD, letterSpacing: '0.06em', whiteSpace: 'nowrap' }}>
-                        {String(hours.allOH[activeOH].openhours[0]?.h1 ?? 0).padStart(2,'0')}:
-                        {String(hours.allOH[activeOH].openhours[0]?.m1 ?? 0).padStart(2,'0')}
+                        {String(currentSlot.h1 ?? 0).padStart(2,'0')}:{String(currentSlot.m1 ?? 0).padStart(2,'0')}
                         {' — '}
-                        {String(hours.allOH[activeOH].openhours[0]?.h2 ?? 0).padStart(2,'0')}:
-                        {String(hours.allOH[activeOH].openhours[0]?.m2 ?? 0).padStart(2,'0')}
+                        {String(currentSlot.h2 ?? 0).padStart(2,'0')}:{String(currentSlot.m2 ?? 0).padStart(2,'0')}
                       </div>
                     </div>
                   </div>
                 </div>
-              )}
+              ) : !isDayOpen ? (
+                <div style={{ padding: '20px 24px', background: '#fdf0f0', border: `2px solid #fecaca`, fontSize: 13, fontWeight: 700, color: '#b94040' }}>
+                  Ce jour est marqué comme fermé — aucun horaire à configurer.
+                </div>
+              ) : null}
+
             </Section>
           </FadeUp>
 
-          {/* ══ 4. NOTIFICATIONS ══ */}
-          <FadeUp delay={50}>
+          {/* ══ 3. NOTIFICATIONS ══ */}
+          <FadeUp delay={40}>
             <Section icon={Bell} title="Notifications par email" defaultOpen={false} action={<SaveBtn onClick={saveNotif} saving={savingNotif} />}>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
                 <Grid>
@@ -329,17 +373,9 @@ export default function Settings() {
                   <Label>Statut par défaut des nouvelles réservations</Label>
                   <div style={{ display: 'flex', gap: 6, marginTop: 8, flexWrap: 'wrap' }}>
                     {['Pending', 'Confirmed'].map(s => (
-                      <button key={s} onClick={() => setNotifField('defaultstatus', s)}
-                        style={{
-                          padding: '9px 18px',
-                          background: notifications.defaultstatus === s ? DARK : '#fff',
-                          border: `2px solid ${DARK}`,
-                          color: notifications.defaultstatus === s ? GOLD : DARK,
-                          fontSize: 12, fontWeight: 800,
-                          cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.15s',
-                        }}>
+                      <TabBtn key={s} active={notifications.defaultstatus === s} onClick={() => setNotifField('defaultstatus', s)}>
                         {s === 'Pending' ? 'En attente' : 'Confirmée'}
-                      </button>
+                      </TabBtn>
                     ))}
                   </div>
                 </div>
