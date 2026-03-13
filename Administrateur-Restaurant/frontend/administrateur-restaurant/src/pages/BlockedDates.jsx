@@ -231,9 +231,7 @@ export default function BlockedDates() {
               <h2 style={{ margin: '0 0 5px', fontSize: 'clamp(15px,2.5vw,22px)', fontWeight: 900, color: DARK, letterSpacing: '-0.8px' }}>
                 Bloquer une date
               </h2>
-              <p className="page-subtitle" style={{ margin: '0 0 16px', fontSize: 12, fontWeight: 700, color: GOLD_DK }}>
-                
-              </p>
+
               <BlockedDateForm form={form} setForm={setForm} handleBlock={handleBlock} submitting={submitting} getDatesToBlock={getDatesToBlock} />
             </div>
             <div>
