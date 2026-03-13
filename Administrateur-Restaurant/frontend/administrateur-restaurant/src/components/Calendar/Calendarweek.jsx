@@ -236,15 +236,15 @@ function YearView({ currentDate, getByMonth, setCurrentDate, setView }) {
           <div key={i}
             onClick={() => { setCurrentDate(new Date(currentDate.getFullYear(), i, 1)); setView('month') }}
             onMouseEnter={() => setHovIdx(i)} onMouseLeave={() => setHovIdx(null)}
-            style={{ padding:'20px 18px', border:`${isCurrent?2:1}px solid ${isCurrent?GOLD:hov?DARK:'rgba(43,33,24,0.12)'}`, background: isCurrent ? GOLD_BG : hov ? CREAM : '#fff', cursor:'pointer', transition:'all 0.13s' }}>
+            style={{ padding:'20px 18px', border:`2px solid ${isCurrent?GOLD:DARK}`, background: isCurrent ? GOLD_BG : hov ? CREAM : '#fff', cursor:'pointer', transition:'all 0.13s' }}>
             <div style={{ fontSize:9, fontWeight:900, color: isCurrent?GOLD:DARK, letterSpacing:'0.2em', textTransform:'uppercase', marginBottom:10 }}>{month}</div>
             <div style={{ fontSize:40, fontWeight:900, color:DARK, lineHeight:1, letterSpacing:'-2px', marginBottom:4 }}>{res.length}</div>
             <div style={{ fontSize:12, fontWeight:700, color:GOLD, marginBottom: res.length>0?14:0 }}>réservation{res.length!==1?'s':''}</div>
             {res.length > 0 && (
-              <div style={{ borderTop:'1px solid rgba(43,33,24,0.08)', paddingTop:12, display:'flex', flexDirection:'column', gap:5 }}>
-                {confirmed>0 && <div style={{ display:'flex', justifyContent:'space-between' }}><span style={{ fontSize:11, fontWeight:700, color:DARK }}>Confirmées</span><span style={{ fontSize:15, fontWeight:900, color:DARK }}>{confirmed}</span></div>}
+              <div style={{ borderTop:`2px solid ${DARK}`, paddingTop:12, display:'flex', flexDirection:'column', gap:5 }}>
+                {confirmed>0 && <div style={{ display:'flex', justifyContent:'space-between' }}><span style={{ fontSize:11, fontWeight:700, color:'#2d6a2d' }}>Confirmées</span><span style={{ fontSize:15, fontWeight:900, color:'#16a34a' }}>{confirmed}</span></div>}
                 {pending>0   && <div style={{ display:'flex', justifyContent:'space-between' }}><span style={{ fontSize:11, fontWeight:700, color:DARK }}>En attente</span><span style={{ fontSize:15, fontWeight:900, color:GOLD }}>{pending}</span></div>}
-                {cancelled>0 && <div style={{ display:'flex', justifyContent:'space-between' }}><span style={{ fontSize:11, fontWeight:700, color:DARK }}>Annulées</span><span style={{ fontSize:15, fontWeight:900, color:DARK }}>{cancelled}</span></div>}
+                {cancelled>0 && <div style={{ display:'flex', justifyContent:'space-between' }}><span style={{ fontSize:11, fontWeight:700, color:'#b94040' }}>Annulées</span><span style={{ fontSize:15, fontWeight:900, color:'#dc2626' }}>{cancelled}</span></div>}
               </div>
             )}
           </div>
