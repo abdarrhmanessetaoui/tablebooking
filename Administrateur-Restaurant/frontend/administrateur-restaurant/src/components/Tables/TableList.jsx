@@ -89,7 +89,7 @@ function TableRow({ tbl, isEditing, isSelected, onEdit, onDelete, onToggle, onSe
       className="tbl-row"
       style={{
         display: 'grid',
-        gridTemplateColumns: '40px 1fr auto',
+        gridTemplateColumns: '40px minmax(auto, 1fr) auto',
         background: bg,
         borderBottom: `1px solid #e8e0d8`,
         borderLeft: `3px solid ${isSelected || isEditing ? GOLD : 'transparent'}`,
@@ -109,7 +109,7 @@ function TableRow({ tbl, isEditing, isSelected, onEdit, onDelete, onToggle, onSe
       </div>
 
       {/* Content cell */}
-      <div style={{ padding: '14px 16px', minWidth: 0 }}>
+      <div style={{ padding: '14px 16px' }}>
         {/* Name + inactive badge */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8, flexWrap: 'wrap' }}>
           <p style={{ margin: 0, fontSize: 15, fontWeight: 900, color: DARK, letterSpacing: '-0.4px' }}>
@@ -132,6 +132,7 @@ function TableRow({ tbl, isEditing, isSelected, onEdit, onDelete, onToggle, onSe
             display: 'inline-flex', alignItems: 'center', gap: 5,
             padding: '3px 9px', background: '#fdf6ec',
             fontSize: 11, fontWeight: 800, color: GOLD_DK,
+            whiteSpace: 'nowrap',
           }}>
             <Users size={10} strokeWidth={2.5} color={GOLD} />
             {tbl.capacity} pers. max
@@ -140,6 +141,7 @@ function TableRow({ tbl, isEditing, isSelected, onEdit, onDelete, onToggle, onSe
             display: 'inline-flex', alignItems: 'center', gap: 5,
             padding: '3px 9px', background: locStyle.bg,
             fontSize: 11, fontWeight: 700, color: locStyle.color,
+            whiteSpace: 'nowrap',
           }}>
             <MapPin size={10} strokeWidth={2.5} color={locStyle.color} />
             {tbl.location}
@@ -334,7 +336,7 @@ export default function TableList({ tables, editingTbl, onEdit, onDelete, onTogg
 
         {/* Header */}
         <div style={{
-          display: 'grid', gridTemplateColumns: '40px 1fr auto',
+          display: 'grid', gridTemplateColumns: '40px minmax(auto, 1fr) auto',
           padding: '10px 16px', background: DARK, alignItems: 'center',
         }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
