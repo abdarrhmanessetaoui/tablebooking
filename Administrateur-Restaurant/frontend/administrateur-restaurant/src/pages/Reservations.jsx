@@ -250,11 +250,6 @@ export default function Reservations() {
   const filteredLocal = useMemo(() => {
     const base = Array.isArray(filtered) ? filtered : []
     if (!filterDate) return base
-    // YYYY-MM → month match
-    if (/^\d{4}-\d{2}$/.test(filterDate)) {
-      return base.filter(r => (r.date || '').startsWith(filterDate))
-    }
-    // YYYY-MM-DD → exact match
     return base.filter(r => r.date === filterDate)
   }, [filtered, filterDate])
 
