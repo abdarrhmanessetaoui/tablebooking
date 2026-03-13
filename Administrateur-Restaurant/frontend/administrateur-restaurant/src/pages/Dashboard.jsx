@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { FileDown, CheckCircle, Clock, XCircle, CalendarDays, ArrowRight, Users, Utensils, ChevronRight } from 'lucide-react'
+import { FileDown, CheckCircle, Clock, XCircle, CalendarDays, ArrowRight, Users, Utensils, ChevronRight, User2 } from 'lucide-react'
 
 import useDashboardStats from '../hooks/Dashboard/useDashboardStats'
 import useRestaurantInfo from '../hooks/useRestaurantInfo'
@@ -305,12 +305,18 @@ function ResRow({ r, i, tpl, showDate, onRowClick }) {
 
       {/* Name + phone */}
       <div style={{ minWidth: 0 }}>
-        <p style={{ margin: 0, fontSize: 13, fontWeight: 900, color: DARK, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.name}</p>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 5, overflow: 'hidden' }}>
+          <User2 size={11} strokeWidth={2.5} color={DARK} style={{ flexShrink: 0 }} />
+          <p style={{ margin: 0, fontSize: 13, fontWeight: 900, color: DARK, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.name}</p>
+        </div>
         {r.phone && <p style={{ margin: '2px 0 0', fontSize: 10, fontWeight: 700, color: DARK, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.phone}</p>}
       </div>
 
       {/* Heure */}
-      <span style={{ fontSize: 13, fontWeight: 900, color: DARK, fontVariantNumeric: 'tabular-nums' }}>{r.start_time}</span>
+      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '4px 9px', background: '#f5f0eb', fontSize: 11, fontWeight: 700, color: GOLD_DK, whiteSpace: 'nowrap', fontVariantNumeric: 'tabular-nums' }}>
+        <Clock size={11} strokeWidth={2.5} color={GOLD_DK} />
+        {r.start_time}
+      </span>
 
       {/* Personnes — with icon */}
       <span style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 13, fontWeight: 900, color: DARK }}>
