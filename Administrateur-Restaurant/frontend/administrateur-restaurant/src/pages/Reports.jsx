@@ -1,9 +1,11 @@
-import { useState, useEffect } from 'react'
-import { FileDown, BarChart2, Users, CheckCircle, Clock, XCircle, Filter } from 'lucide-react'
-import useReports from '../hooks/Reports/useReports'
-import FadeUp     from '../components/Dashboard/FadeUp'
-import Spinner    from '../components/Dashboard/Spinner'
-import useCountUp from '../hooks/Dashboard/useCountUp'
+import { useState } from 'react'
+import { FileDown, BarChart2, Users, CheckCircle, Clock, XCircle } from 'lucide-react'
+import useReports    from '../hooks/Reports/useReports'
+import useServices   from '../hooks/Reservations/useServices'
+import FadeUp        from '../components/Dashboard/FadeUp'
+import Spinner       from '../components/Dashboard/Spinner'
+import useCountUp    from '../hooks/Dashboard/useCountUp'
+import ReportsFilters from '../components/Reports/ReportsFilters'
 
 const DARK     = '#2b2118'
 const GOLD     = '#c8a97e'
@@ -18,60 +20,6 @@ const AMBER    = '#a8670a'
 const AMBER_BG = '#fff8ec'
 const BORDER   = '#e8e0d6'
 const MUTED    = 'rgba(43,33,24,0.38)'
-
-/* ════ PERIOD HELPERS ════ */
-function getWeekNum(d) {
-  const t = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()))
-  t.setUTCDate(t.getUTCDate() + 4 - (t.getUTCDay() || 7))
-  const y0 = new Date(Date.UTC(t.getUTCFullYear(), 0, 1))
-  return Math.ceil((((t - y0) / 86400000) + 1) / 7)
-}
-const FR_M = ['Janv','Févr','Mars','Avr','Mai','Juin','Juil','Août','Sept','Oct','Nov','Déc']
-const DAYS = ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim']
-
-function applyPeriod(obj = {}, period) {
-  if (period === 'all' || !Object.keys(obj).length) return obj
-  const now = new Date()
-  const yr = now.getFullYear(), mo = now.getMonth(), w = getWeekNum(now)
-  const wKey = `${yr}-W${String(w).padStart(2,'0')}`
-  const mFr  = `${FR_M[mo]} ${yr}`
-  const mNum = `${yr}-${String(mo+1).padStart(2,'0')}`
-  return Object.fromEntries(Object.entries(obj).filter(([k]) => {
-    const isDay  = DAYS.some(d => k.startsWith(d))
-    const isHour = /^\d{1,2}:\d{2}/.test(k)
-    if (period === 'week')  return isDay || isHour || k === wKey
-    if (period === 'month') {
-      if (isDay || isHour) return true
-      if (k === mFr || k === mNum) return true
-      if (k.includes('-W')) {
-        const wn = parseInt(k.split('-W')[1], 10)
-        return wn >= getWeekNum(new Date(yr,mo,1)) && wn <= getWeekNum(new Date(yr,mo+1,0))
-      }
-      return false
-    }
-    if (period === 'today') {
-      if (isHour) return true
-      if (isDay)  return k.startsWith(DAYS[now.getDay()===0?6:now.getDay()-1])
-      return k===wKey||k===mFr||k===mNum||k===String(yr)
-    }
-    return true
-  }))
-}
-
-function scaleSummary(base, period, raw) {
-  if (period === 'all') return base
-  const bm = raw?.by_month || {}
-  const bw = raw?.by_week  || {}
-  const now = new Date(), yr = now.getFullYear(), mo = now.getMonth()
-  const mFr  = `${FR_M[mo]} ${yr}`, mNum = `${yr}-${String(mo+1).padStart(2,'0')}`
-  const wKey = `${yr}-W${String(getWeekNum(now)).padStart(2,'0')}`
-  const tot  = Object.values(bm).reduce((a,v)=>a+v,0) || base.total || 1
-  const mV   = bm[mFr] ?? bm[mNum] ?? 0
-  const wV   = bw[wKey] ?? 0
-  const ratio = period==='month' ? mV/tot : period==='week' ? wV/tot : (mV/tot)/30
-  const sc = v => Math.max(0, Math.round((v||0)*ratio))
-  return { ...base, total:sc(base.total), confirmed:sc(base.confirmed), pending:sc(base.pending), cancelled:sc(base.cancelled) }
-}
 
 /* ════ PDF ════ */
 async function doPDF(summary, pLabel, sLabel) {
@@ -158,35 +106,11 @@ function SectionTitle({ title, sub, count }) {
   )
 }
 
-/* ════ FILTER CHIP ════ */
-function Chip({ label, active, onClick }) {
-  const [h,setH]=useState(false)
-  return (
-    <button onClick={onClick} onMouseEnter={()=>setH(true)} onMouseLeave={()=>setH(false)}
-      style={{
-        height:28,padding:'0 12px',
-        border:`2px solid ${active?DARK:(h?DARK:BORDER)}`,
-        background:active?DARK:(h?CREAM:WHITE),
-        color:active?GOLD:(h?DARK:MUTED),
-        fontSize:10,fontWeight:900,textTransform:'uppercase',letterSpacing:'0.08em',
-        cursor:'pointer',fontFamily:'inherit',transition:'all 0.12s',whiteSpace:'nowrap',
-        display:'inline-flex',alignItems:'center',flexShrink:0,
-      }}>
-      {label}
-    </button>
-  )
-}
-
-/* ════ BAR CHART — FIXED ════ */
+/* ════ BAR CHART ════ */
 function BarChart({ data={}, title, subtitle, highlight=false, barColor=GOLD }) {
   const [mounted, setMounted] = useState(false)
-
-  // Reset + re-animate whenever data changes
-  useEffect(() => {
-    setMounted(false)
-    const id = setTimeout(() => setMounted(true), 80)
-    return () => clearTimeout(id)
-  }, [data])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useState(() => { const id = setTimeout(() => setMounted(true), 80); return () => clearTimeout(id) })
 
   const entries = Object.entries(data || {})
   const max     = Math.max(...entries.map(([,v]) => v), 1)
@@ -212,7 +136,6 @@ function BarChart({ data={}, title, subtitle, highlight=false, barColor=GOLD }) 
 
   return (
     <div style={{border:`2px solid ${DARK}`,background:WHITE,display:'flex',flexDirection:'column',minWidth:0}}>
-      {/* Header */}
       <div style={{padding:'14px 18px 12px',borderBottom:`2px solid ${DARK}`,background:headerBg,display:'flex',alignItems:'flex-start',justifyContent:'space-between',gap:10}}>
         <div style={{minWidth:0}}>
           <div style={{fontSize:9,fontWeight:900,letterSpacing:'0.18em',textTransform:'uppercase',color:GOLD,marginBottom:4}}>{title}</div>
@@ -223,7 +146,6 @@ function BarChart({ data={}, title, subtitle, highlight=false, barColor=GOLD }) 
           <div style={{fontSize:8,fontWeight:900,color:GOLD,textTransform:'uppercase',letterSpacing:'0.1em',marginTop:3}}>max · {topKey}</div>
         </div>
       </div>
-      {/* Bars */}
       <div style={{padding:'18px 16px 0',flex:1}}>
         <div style={{display:'flex',alignItems:'flex-end',gap,height:150}}>
           {entries.map(([label,value]) => {
@@ -237,10 +159,10 @@ function BarChart({ data={}, title, subtitle, highlight=false, barColor=GOLD }) 
                 </span>
                 <div style={{
                   width:'100%',
-                  height: mounted ? `${Math.max(pct,3)}%` : '3%',
+                  height:`${Math.max(pct,3)}%`,
                   background: isTop ? DARK : barColor,
                   opacity: isTop ? 1 : 0.5+(value/max)*0.5,
-                  transition: 'height 0.65s cubic-bezier(0.22,1,0.36,1)',
+                  transition:'height 0.65s cubic-bezier(0.22,1,0.36,1)',
                 }}/>
               </div>
             )
@@ -254,7 +176,6 @@ function BarChart({ data={}, title, subtitle, highlight=false, barColor=GOLD }) 
           ))}
         </div>
       </div>
-      {/* Footer */}
       <div style={{borderTop:`1px solid ${BORDER}`,padding:'10px 18px',display:'flex',justifyContent:'space-between',alignItems:'center',background:CREAM}}>
         <span style={{fontSize:9,fontWeight:900,color:MUTED,textTransform:'uppercase',letterSpacing:'0.1em'}}>Total</span>
         <span style={{fontSize:20,fontWeight:900,color:DARK,letterSpacing:'-1px'}}>{total}</span>
@@ -263,18 +184,14 @@ function BarChart({ data={}, title, subtitle, highlight=false, barColor=GOLD }) 
   )
 }
 
-/* ════ SERVICE CHART — FIXED ════ */
+/* ════ SERVICE CHART ════ */
 function ServiceChart({ data={} }) {
   const entries = Object.entries(data).sort(([,a],[,b]) => b-a)
   const total   = entries.reduce((s,[,v]) => s+v, 0) || 1
   const COLORS  = [DARK,GOLD,GREEN,AMBER,RED,'#6b4f3a','#3d6b5a']
 
   const [mounted, setMounted] = useState(false)
-  useEffect(() => {
-    setMounted(false)
-    const id = setTimeout(() => setMounted(true), 80)
-    return () => clearTimeout(id)
-  }, [data])
+  useState(() => { const id = setTimeout(() => setMounted(true), 80); return () => clearTimeout(id) })
 
   if (!entries.length) return (
     <div style={{border:`2px solid ${DARK}`,background:WHITE,display:'flex',flexDirection:'column',minHeight:200}}>
@@ -300,7 +217,6 @@ function ServiceChart({ data={} }) {
           <div style={{fontSize:8,fontWeight:900,color:GOLD,textTransform:'uppercase',letterSpacing:'0.1em',marginTop:3}}>services</div>
         </div>
       </div>
-      {/* Stacked bar */}
       <div style={{padding:'16px 18px 10px'}}>
         <div style={{height:10,display:'flex',gap:2,overflow:'hidden'}}>
           {entries.map(([name,val],i) => (
@@ -309,12 +225,11 @@ function ServiceChart({ data={} }) {
                 flex: mounted ? val : 0,
                 background: COLORS[i%COLORS.length],
                 minWidth: mounted ? 2 : 0,
-                transition: 'flex 0.75s cubic-bezier(0.22,1,0.36,1)',
+                transition:'flex 0.75s cubic-bezier(0.22,1,0.36,1)',
               }}/>
           ))}
         </div>
       </div>
-      {/* Legend rows */}
       <div style={{padding:'0 18px 16px',display:'flex',flexDirection:'column',gap:10}}>
         {entries.map(([name,val],i) => {
           const pct = Math.round((val/total)*100)
@@ -331,7 +246,7 @@ function ServiceChart({ data={} }) {
                   height:'100%',
                   width: mounted ? `${pct}%` : '0%',
                   background: COLORS[i%COLORS.length],
-                  transition: `width 0.75s cubic-bezier(0.22,1,0.36,1) ${i*60}ms`,
+                  transition:`width 0.75s cubic-bezier(0.22,1,0.36,1) ${i*60}ms`,
                 }}/>
               </div>
             </div>
@@ -346,43 +261,39 @@ function ServiceChart({ data={} }) {
   )
 }
 
-/* ════ FILTER OPTIONS ════ */
-const PERIOD_OPTS=[
-  {key:'all',  label:'Tout'},
-  {key:'month',label:'Ce mois'},
-  {key:'week', label:'Cette semaine'},
-  {key:'today',label:"Aujourd'hui"},
-]
-const STATUS_OPTS=[
-  {key:'all',      label:'Tous'},
-  {key:'confirmed',label:'Confirmées'},
-  {key:'pending',  label:'En attente'},
-  {key:'cancelled',label:'Annulées'},
-]
-
 /* ════ PAGE ════ */
 export default function Reports() {
-  // period, status, setPeriod, setStatus all live in the hook now
-  // data is already filtered+aggregated for the selected period & status
-  const { data, loading, error, period, setPeriod, status, setStatus } = useReports()
+  const {
+    data, loading, error,
+    period, setPeriod,
+    status, setStatus,
+    search, setSearch,
+    filterService, setFilterService,
+    filterDate,    setFilterDate,
+    clearFilters,
+    services: hookServices,
+  } = useReports()
+
+  // Also load services from the dedicated hook so the dropdown always has options
+  const { services: extraServices } = useServices()
+  const services = hookServices?.length ? hookServices : (extraServices || [])
+
   const [exporting, setExporting] = useState(false)
-  const filtered = data
 
   async function handleExport() {
     setExporting(true)
     try {
+      const PERIOD_OPTS=[{key:'all',label:'Tout'},{key:'month',label:'Ce mois'},{key:'week',label:'Cette semaine'},{key:'today',label:"Aujourd'hui"}]
+      const STATUS_OPTS=[{key:'all',label:'Tous'},{key:'confirmed',label:'Confirmées'},{key:'pending',label:'En attente'},{key:'cancelled',label:'Annulées'}]
       const pL = PERIOD_OPTS.find(p=>p.key===period)?.label ?? 'Tout'
       const sL = STATUS_OPTS.find(s=>s.key===status)?.label ?? 'Tous'
-      await doPDF(filtered?.summary||{}, pL, sL)
+      await doPDF(data?.summary||{}, pL, sL)
     } catch(e) { console.error(e) } finally { setExporting(false) }
   }
 
   if (loading) return <Spinner/>
 
-  const s      = filtered?.summary || {}
-  const pLabel = PERIOD_OPTS.find(p=>p.key===period)?.label ?? 'Tout'
-  const sLabel = STATUS_OPTS.find(p=>p.key===status)?.label ?? 'Tous'
-  const hasFilter = period!=='all' || status!=='all'
+  const s = data?.summary || {}
 
   return (
     <>
@@ -391,29 +302,14 @@ export default function Reports() {
           .btn-label     { display:none!important; }
           .page-subtitle { display:none!important; }
         }
-        /* Summary grid */
         .rp-sum{ display:grid; grid-template-columns:repeat(5,1fr); gap:2px; background:${DARK}; border:2px solid ${DARK}; }
         @media(max-width:860px){ .rp-sum{ grid-template-columns:repeat(3,1fr); } }
         @media(max-width:520px){ .rp-sum{ grid-template-columns:repeat(2,1fr); } }
-        /* Chart grids */
         .rp-2{ display:grid; grid-template-columns:1fr 1fr; gap:8px; }
         @media(max-width:720px){ .rp-2{ grid-template-columns:1fr; } }
         .rp-3{ display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
         @media(max-width:860px){ .rp-3{ grid-template-columns:1fr 1fr; } }
         @media(max-width:520px){ .rp-3{ grid-template-columns:1fr; } }
-        /* Filter bar */
-        .rp-fbar{ display:flex; align-items:stretch; border:2px solid ${DARK}; background:${WHITE}; margin-bottom:28px; overflow:hidden; flex-wrap:wrap; }
-        .rp-fbadge{ display:flex; align-items:center; gap:6px; padding:0 16px; background:${DARK}; flex-shrink:0; min-height:42px; }
-        .rp-fgrp{ display:flex; align-items:center; gap:8px; padding:8px 14px; flex-shrink:0; border-left:1px solid ${BORDER}; flex-wrap:wrap; }
-        .rp-flbl{ font-size:8px; font-weight:900; color:${MUTED}; text-transform:uppercase; letter-spacing:0.14em; flex-shrink:0; white-space:nowrap; }
-        .rp-fchips{ display:flex; gap:4px; flex-wrap:wrap; }
-        .rp-freset{ display:flex; align-items:center; justify-content:center; padding:0 14px; border:none; border-left:2px solid ${DARK}; background:transparent; color:${MUTED}; font-size:18px; font-weight:900; cursor:pointer; font-family:inherit; transition:all 0.1s; flex-shrink:0; }
-        .rp-freset:hover{ background:${DARK}; color:${GOLD}; }
-        @media(max-width:680px){
-          .rp-fbadge{ width:100%; border-bottom:1px solid rgba(255,255,255,0.1); }
-          .rp-fgrp{ border-left:none; border-top:1px solid ${BORDER}; width:100%; }
-          .rp-freset{ width:100%; border-left:none; border-top:2px solid ${DARK}; padding:8px; }
-        }
       `}</style>
 
       <div style={{
@@ -458,41 +354,21 @@ export default function Reports() {
           </FadeUp>
         )}
 
-        {/* FILTER BAR */}
+        {/* FILTERS */}
         <FadeUp delay={15}>
-          <div className="rp-fbar">
-            <div className="rp-fbadge">
-              <Filter size={11} strokeWidth={2.5} color={GOLD}/>
-              <span style={{fontSize:8,fontWeight:900,color:GOLD,textTransform:'uppercase',letterSpacing:'0.2em'}}>Filtres</span>
-              {hasFilter && (
-                <span style={{marginLeft:6,padding:'2px 7px',background:GOLD,color:DARK,fontSize:9,fontWeight:900}}>
-                  actifs
-                </span>
-              )}
-            </div>
-            <div className="rp-fgrp">
-              <span className="rp-flbl">Période</span>
-              <div className="rp-fchips">
-                {PERIOD_OPTS.map(o => <Chip key={o.key} label={o.label} active={period===o.key} onClick={()=>setPeriod(o.key)}/>)}
-              </div>
-            </div>
-            <div className="rp-fgrp" style={{flex:1}}>
-              <span className="rp-flbl">Statut</span>
-              <div className="rp-fchips">
-                {STATUS_OPTS.map(o => <Chip key={o.key} label={o.label} active={status===o.key} onClick={()=>setStatus(o.key)}/>)}
-              </div>
-            </div>
-            {hasFilter && (
-              <button className="rp-freset" onClick={()=>{setPeriod('all');setStatus('all')}} title="Réinitialiser les filtres">
-                ×
-              </button>
-            )}
-          </div>
+          <ReportsFilters
+            search={search}               setSearch={setSearch}
+            filterStatus={status}         setFilterStatus={setStatus}
+            filterService={filterService} setFilterService={setFilterService}
+            filterDate={filterDate}       setFilterDate={setFilterDate}
+            clearFilters={clearFilters}
+            services={services}
+          />
         </FadeUp>
 
         {/* SUMMARY */}
         <FadeUp delay={20}>
-          <SectionTitle title="Résumé général" sub={`${pLabel} · ${sLabel}`} count={s.total??0}/>
+          <SectionTitle title="Résumé général" sub="Données filtrées" count={s.total??0}/>
           <div className="rp-sum" style={{marginBottom:32}}>
             <SumCard icon={BarChart2}   value={s.total??0}     label="Total"       accent={DARK}    bg={WHITE}    delay={40} />
             <SumCard icon={CheckCircle} value={s.confirmed??0} label="Confirmées"  accent={GREEN}   bg={GREEN_BG} delay={70} />
@@ -508,8 +384,8 @@ export default function Reports() {
         <FadeUp delay={0}>
           <SectionTitle title="Distribution temporelle" sub="Par heure · Par jour de la semaine"/>
           <div className="rp-2" style={{marginBottom:32}}>
-            <BarChart data={filtered?.by_hour} title="Par heure"  subtitle="Créneaux les plus demandés" barColor={GOLD}/>
-            <BarChart data={filtered?.by_day}  title="Par jour"   subtitle="Jours les plus chargés"     barColor={GOLD}/>
+            <BarChart data={data?.by_hour} title="Par heure"  subtitle="Créneaux les plus demandés" barColor={GOLD}/>
+            <BarChart data={data?.by_day}  title="Par jour"   subtitle="Jours les plus chargés"     barColor={GOLD}/>
           </div>
         </FadeUp>
 
@@ -519,8 +395,8 @@ export default function Reports() {
         <FadeUp delay={0}>
           <SectionTitle title="Services & Couverts" sub="Répartition des formules · Taille des groupes"/>
           <div className="rp-2" style={{marginBottom:32}}>
-            <ServiceChart data={filtered?.by_service??{}}/>
-            <BarChart data={filtered?.by_guests} title="Par couverts" subtitle="Taille des groupes" barColor={AMBER}/>
+            <ServiceChart data={data?.by_service??{}}/>
+            <BarChart data={data?.by_guests} title="Par couverts" subtitle="Taille des groupes" barColor={AMBER}/>
           </div>
         </FadeUp>
 
@@ -530,9 +406,9 @@ export default function Reports() {
         <FadeUp delay={0}>
           <SectionTitle title="Tendances périodiques" sub="Activité semaine · mois · année"/>
           <div className="rp-3" style={{marginBottom:0}}>
-            <BarChart data={filtered?.by_week}  title="Par semaine" subtitle="Activité hebdomadaire" barColor={GOLD}/>
-            <BarChart data={filtered?.by_month} title="Par mois"    subtitle="Activité mensuelle"    barColor={GOLD}/>
-            <BarChart data={filtered?.by_year}  title="Par année"   subtitle="Historique annuel"     barColor={DARK} highlight/>
+            <BarChart data={data?.by_week}  title="Par semaine" subtitle="Activité hebdomadaire" barColor={GOLD}/>
+            <BarChart data={data?.by_month} title="Par mois"    subtitle="Activité mensuelle"    barColor={GOLD}/>
+            <BarChart data={data?.by_year}  title="Par année"   subtitle="Historique annuel"     barColor={DARK} highlight/>
           </div>
         </FadeUp>
 
