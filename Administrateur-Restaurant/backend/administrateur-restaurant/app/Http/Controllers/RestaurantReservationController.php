@@ -333,12 +333,12 @@ class RestaurantReservationController extends Controller
         $form = DB::table('wpjn_cpappbk_forms')
             ->where('id', $this->formId())
             ->first();
-
+    
         if (!$form) return response()->json([]);
-
+    
         $structure = json_decode($form->form_structure, true);
         $services  = [];
-
+    
         foreach ($structure[0] ?? [] as $field) {
             if (($field['ftype'] ?? '') === 'fapp') {
                 foreach ($field['services'] ?? [] as $svc) {
@@ -355,7 +355,7 @@ class RestaurantReservationController extends Controller
                 break;
             }
         }
-
+    
         return response()->json($services);
     }
 }
