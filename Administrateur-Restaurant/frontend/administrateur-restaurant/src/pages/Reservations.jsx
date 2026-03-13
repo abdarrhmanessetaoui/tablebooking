@@ -256,14 +256,22 @@ export default function Reservations() {
   }, []) // eslint-disable-line
   // Re-filter by month locally (hook does exact match, we need startsWith for YYYY-MM)
   const filteredLocal = useMemo(() => {
-    if (!filterDate) return filteredFromHook
-    // If filterDate is YYYY-MM (month picker), match all dates in that month
-    if (/^\d{4}-\d{2}$/.test(filterDate)) {
-      return filteredFromHook.filter(r => (r.date || '').startsWith(filterDate))
+    const base = Array.isArray(filteredFromHook) ? filteredFromHook : []
+
+    // From dashboard row click → show ONLY that reservation
+    const openId = location.state?.openId
+    if (openId) {
+      const match = base.find(r => r.id === openId)
+      return match ? [match] : []
     }
-    // If filterDate is YYYY-MM-DD (exact date), keep exact match
-    return filteredFromHook.filter(r => r.date === filterDate)
-  }, [filteredFromHook, filterDate])
+
+    // Normal filtering by date
+    if (!filterDate) return base
+    if (/^\d{4}-\d{2}$/.test(filterDate)) {
+      return base.filter(r => (r.date || '').startsWith(filterDate))
+    }
+    return base.filter(r => r.date === filterDate)
+  }, [filteredFromHook, filterDate, location.state?.openId])
 
 
 
