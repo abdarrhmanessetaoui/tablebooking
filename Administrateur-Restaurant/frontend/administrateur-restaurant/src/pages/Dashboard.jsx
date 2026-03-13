@@ -175,30 +175,31 @@ function ResCardMobile({ r, i, onRowClick }) {
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 10, marginBottom: 7 }}>
         <div style={{ minWidth: 0 }}>
           <p style={{ margin: 0, fontSize: 13, fontWeight: 900, color: DARK, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.name}</p>
-          {r.phone && <p style={{ margin: '2px 0 0', fontSize: 11, fontWeight: 700, color: MUTED }}>{r.phone}</p>}
+          {r.phone && <p style={{ margin: '2px 0 0', fontSize: 11, fontWeight: 700, color: DARK }}>{r.phone}</p>}
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
           <Badge status={r.status} />
-          <ChevronRight size={13} strokeWidth={2.5} color={MUTED} />
+          <ChevronRight size={13} strokeWidth={2.5} color={DARK} />
         </div>
       </div>
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
-        {r.date && r.date !== TODAY_DATE && r.date !== TOMORROW_DATE && (
-          <span style={{ fontSize: 11, fontWeight: 900, color: GOLD_DK, display: 'flex', alignItems: 'center', gap: 4 }}>
-            <CalendarDays size={11} strokeWidth={2.5} color={GOLD_DK} />{fmtDate(r.date)}
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+        {[
+          { Icon: CalendarDays, value: r.date && r.date !== TODAY_DATE && r.date !== TOMORROW_DATE ? fmtDate(r.date) : null, gold: false },
+          { Icon: Clock,        value: r.start_time,                                                                          gold: false },
+          { Icon: Users,        value: r.guests ? `${r.guests} personnes` : null,                                            gold: false },
+          { Icon: Utensils,     value: r.service || null,                                                                    gold: true  },
+        ].filter(item => item.value).map((item, i) => (
+          <span key={i} style={{
+            display: 'inline-flex', alignItems: 'center', gap: 5,
+            padding: '4px 9px',
+            background: item.gold ? '#f5f0eb' : CREAM,
+            fontSize: 11, fontWeight: 700,
+            color: item.gold ? GOLD_DK : DARK,
+          }}>
+            <item.Icon size={11} strokeWidth={2.5} color={item.gold ? GOLD_DK : DARK} />
+            {item.value}
           </span>
-        )}
-        <span style={{ fontSize: 11, fontWeight: 900, color: DARK, display: 'flex', alignItems: 'center', gap: 4 }}>
-          <Clock size={11} strokeWidth={2.5} color={MUTED} />{r.start_time}
-        </span>
-        <span style={{ fontSize: 11, fontWeight: 900, color: DARK, display: 'flex', alignItems: 'center', gap: 4 }}>
-          <Users size={11} strokeWidth={2.5} color={MUTED} />{r.guests} personnes
-        </span>
-        {r.service && (
-          <span style={{ fontSize: 11, fontWeight: 700, color: MUTED, display: 'flex', alignItems: 'center', gap: 4 }}>
-            <Utensils size={11} strokeWidth={2.5} color={DARK} />{r.service}
-          </span>
-        )}
+        ))}
       </div>
     </div>
   )
@@ -305,7 +306,7 @@ function ResRow({ r, i, tpl, showDate, onRowClick }) {
       {/* Name + phone */}
       <div style={{ minWidth: 0 }}>
         <p style={{ margin: 0, fontSize: 13, fontWeight: 900, color: DARK, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.name}</p>
-        {r.phone && <p style={{ margin: '2px 0 0', fontSize: 10, fontWeight: 700, color: MUTED, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.phone}</p>}
+        {r.phone && <p style={{ margin: '2px 0 0', fontSize: 10, fontWeight: 700, color: DARK, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.phone}</p>}
       </div>
 
       {/* Heure */}
@@ -313,12 +314,15 @@ function ResRow({ r, i, tpl, showDate, onRowClick }) {
 
       {/* Personnes — with icon */}
       <span style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 13, fontWeight: 900, color: DARK }}>
-        <Users size={11} strokeWidth={2.5} color={MUTED} />
+        <Users size={11} strokeWidth={2.5} color={DARK} />
         {r.guests}
       </span>
 
       {/* Service */}
-      <span style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 12, fontWeight: 700, color: DARK, overflow: 'hidden' }}><Utensils size={11} strokeWidth={2.5} color={DARK} style={{ flexShrink: 0 }} /><span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.service || '—'}</span></span>
+      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '4px 9px', background: '#f5f0eb', fontSize: 11, fontWeight: 700, color: GOLD_DK, whiteSpace: 'nowrap', overflow: 'hidden' }}>
+        <Utensils size={11} strokeWidth={2.5} color={GOLD_DK} style={{ flexShrink: 0 }} />
+        <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{r.service || '—'}</span>
+      </span>
 
       {/* Statut */}
       <Badge status={r.status} />
@@ -371,7 +375,7 @@ function TabPanel({ tab, stats, reservations, onViewAll, tabLabel, tabDate, onRo
             <div style={{ padding: '18px 20px 16px', display: 'flex', alignItems: 'center', gap: 20, borderBottom: `1px solid ${BORDER}`, background: WHITE }}>
               <div>
                 <p style={{ margin: 0, fontSize: 'clamp(52px,8vw,80px)', fontWeight: 900, color: DARK, lineHeight: 0.9, letterSpacing: '-4px', fontVariantNumeric: 'tabular-nums' }}>{hero}</p>
-                <p style={{ margin: '10px 0 0', fontSize: 11, fontWeight: 700, color: MUTED }}>réservation{hero !== 1 ? 's' : ''}</p>
+                <p style={{ margin: '10px 0 0', fontSize: 11, fontWeight: 700, color: DARK }}>réservation{hero !== 1 ? 's' : ''}</p>
               </div>
               <Ring c={c} p={p} a={a} size={88} />
             </div>
@@ -505,7 +509,7 @@ export default function Dashboard() {
           padding: 12px clamp(14px, 2.2vw, 26px);
           background: none; border: none;
           border-bottom: 3px solid transparent; margin-bottom: -2px;
-          color: ${MUTED}; font-size: 10px; font-weight: 900;
+          color: ${DARK}; font-size: 10px; font-weight: 900;
           cursor: pointer; font-family: inherit;
           letter-spacing: .14em; text-transform: uppercase;
           transition: color .14s, border-color .14s;
