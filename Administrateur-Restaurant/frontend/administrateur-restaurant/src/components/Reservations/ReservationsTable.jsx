@@ -81,7 +81,7 @@ function PageBtn({ onClick, disabled, active, children }) {
 }
 
 function MobileCard({ r, selected, highlighted, onToggle, openView, openEdit, handleDelete, rowRef }) {
-  const s = STATUS[r.status] || { bg: '#fdf6ec', color: 'rgba(43,33,24,0.5)', label: r.status || '—', dot: '#c8a97e' }
+  const s = STATUS[r.status] || { bg: '#fdf6ec', color: DARK, label: r.status || '—', dot: '#c8a97e' }
   return (
     <div ref={rowRef} style={{
       background: highlighted ? '#fff8ec' : selected ? '#fdf6ec' : '#fff',
@@ -110,7 +110,7 @@ function MobileCard({ r, selected, highlighted, onToggle, openView, openEdit, ha
           <p style={{ margin: 0, fontSize: 14, fontWeight: 800, color: DARK, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
             {r.name || '—'}
           </p>
-          <p style={{ margin: '2px 0 0', fontSize: 11, fontWeight: 600, color: 'rgba(43,33,24,0.4)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+          <p style={{ margin: '2px 0 0', fontSize: 11, fontWeight: 700, color: DARK, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
             {r.phone || r.email || '—'}
           </p>
         </div>
@@ -140,7 +140,7 @@ function MobileCard({ r, selected, highlighted, onToggle, openView, openEdit, ha
             fontSize: 11, fontWeight: 700,
             color: item.gold ? GOLD_DARK : DARK,
           }}>
-            <item.Icon size={11} strokeWidth={2.5} color={item.gold ? GOLD_DARK : 'rgba(43,33,24,0.4)'} />
+            <item.Icon size={11} strokeWidth={2.5} color={item.gold ? GOLD_DARK : DARK} />
             {item.value}
           </span>
         ))}
@@ -181,7 +181,7 @@ function MobileCard({ r, selected, highlighted, onToggle, openView, openEdit, ha
 
 function TableRow({ r, i, selected, highlighted, highlightRef, toggleOne, openView, openEdit, handleDelete }) {
   const [hov, setHov] = useState(false)
-  const s = STATUS[r.status] || { bg: '#fdf6ec', color: 'rgba(43,33,24,0.5)', label: r.status || '—', dot: '#c8a97e' }
+  const s = STATUS[r.status] || { bg: '#fdf6ec', color: DARK, label: r.status || '—', dot: '#c8a97e' }
 
   let rowBg = i % 2 === 0 ? '#fff' : CREAM
   if (selected)    rowBg = '#fdf6ec'
@@ -228,7 +228,7 @@ function TableRow({ r, i, selected, highlighted, highlightRef, toggleOne, openVi
           </span>
         )}
       </td>
-      <td style={{ padding: '11px 14px', fontSize: 12, fontWeight: 600, color: 'rgba(43,33,24,0.4)', whiteSpace: 'nowrap' }}>
+      <td style={{ padding: '11px 14px', fontSize: 12, fontWeight: 700, color: DARK, whiteSpace: 'nowrap' }}>
         {r.phone || '—'}
       </td>
       <td style={{ padding: '11px 14px', fontSize: 12, fontWeight: 700, color: DARK, whiteSpace: 'nowrap' }}>
@@ -255,7 +255,7 @@ function TableRow({ r, i, selected, highlighted, highlightRef, toggleOne, openVi
       </td>
       <td style={{ padding: '11px 14px' }}>
         <span style={{
-          fontSize: 11, fontWeight: 700, color: 'rgba(43,33,24,0.45)',
+          fontSize: 11, fontWeight: 700, color: DARK,
           background: '#f5f0eb', padding: '3px 8px',
           whiteSpace: 'nowrap', display: 'inline-block',
         }}>
@@ -452,7 +452,7 @@ export default function ReservationsTable({
               ))}
               {pageItems.length === 0 && (
                 <tr>
-                  <td colSpan={9} style={{ padding: '52px 24px', textAlign: 'center', fontSize: 13, fontWeight: 700, color: 'rgba(43,33,24,0.25)' }}>
+                  <td colSpan={9} style={{ padding: '52px 24px', textAlign: 'center', fontSize: 13, fontWeight: 700, color: DARK }}>
                     Aucune réservation trouvée
                   </td>
                 </tr>
@@ -484,7 +484,7 @@ export default function ReservationsTable({
           </div>
 
           {pageItems.length === 0 ? (
-            <div style={{ padding: '48px 24px', textAlign: 'center', fontSize: 13, fontWeight: 700, color: 'rgba(43,33,24,0.25)' }}>
+            <div style={{ padding: '48px 24px', textAlign: 'center', fontSize: 13, fontWeight: 700, color: DARK }}>
               Aucune réservation trouvée
             </div>
           ) : pageItems.map(r => (
@@ -509,7 +509,7 @@ export default function ReservationsTable({
             background: CREAM,
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
-              <span style={{ fontSize: 12, fontWeight: 700, color: 'rgba(43,33,24,0.4)' }}>
+              <span style={{ fontSize: 12, fontWeight: 700, color: DARK }}>
                 {start + 1}–{Math.min(start + pageSize, reservations.length)} / {reservations.length}
               </span>
               <select value={pageSize} onChange={e => { setPageSize(Number(e.target.value)); setPage(1) }}
@@ -529,7 +529,7 @@ export default function ReservationsTable({
               <PageBtn onClick={() => setPage(p => Math.max(1, p - 1))} disabled={safePage === 1}><ChevronLeft size={12} strokeWidth={2.5} /></PageBtn>
               {getPages().map((p, i) =>
                 p === '...'
-                  ? <span key={`d${i}`} style={{ padding: '0 4px', fontSize: 12, color: 'rgba(43,33,24,0.3)', userSelect: 'none' }}>…</span>
+                  ? <span key={`d${i}`} style={{ padding: '0 4px', fontSize: 12, color: DARK, userSelect: 'none' }}>…</span>
                   : <PageBtn key={p} active={p === safePage} onClick={() => setPage(p)}>{p}</PageBtn>
               )}
               <PageBtn onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={safePage === totalPages}><ChevronRight size={12} strokeWidth={2.5} /></PageBtn>
