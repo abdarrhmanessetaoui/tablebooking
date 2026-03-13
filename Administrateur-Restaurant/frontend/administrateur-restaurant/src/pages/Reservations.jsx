@@ -220,9 +220,10 @@ export default function Reservations() {
   const [exporting,   setExporting]   = useState(false)
   const [selectedIds, setSelectedIds] = useState([])
 
-  // Track if we arrived from Dashboard — cleared once modal opens so filters work normally
-  const [comingFromDashboard, setComingFromDashboard] = useState(!!location.state?.openId)
-  const [dashboardTarget, setDashboardTarget] = useState(null)
+  // ── Dashboard navigation state ───────────────────────────────────────────
+  // openId: the reservation to show. Once user touches any filter → cleared.
+  const openId = location.state?.openId ?? null
+  const [lockedId, setLockedId] = useState(openId) // stays set until user filters
 
   const { services } = useServices()
 
@@ -240,83 +241,55 @@ export default function Reservations() {
     setReservations,
   } = useReservations(location.state)
 
-  // Wrap every filter setter — as soon as user touches a filter, exit dashboard mode
-  function exitDashboardMode() { setComingFromDashboard(false); setDashboardTarget(null) }
-  function setSearch(v)        { exitDashboardMode(); _setSearch(v) }
-  function setFilterStatus(v)  { exitDashboardMode(); _setFilterStatus(v) }
-  function setFilterService(v) { exitDashboardMode(); _setFilterService(v) }
-  function setFilterDate(v)    { exitDashboardMode(); _setFilterDate(v) }
-  function clearFilters()      { exitDashboardMode(); _clearFilters() }
+  // Any filter interaction exits locked mode
+  function unlock()            { setLockedId(null) }
+  function setSearch(v)        { unlock(); _setSearch(v) }
+  function setFilterStatus(v)  { unlock(); _setFilterStatus(v) }
+  function setFilterService(v) { unlock(); _setFilterService(v) }
+  function setFilterDate(v)    { unlock(); _setFilterDate(v) }
+  function clearFilters()      { unlock(); _clearFilters() }
 
   // ── Default filters on mount ──────────────────────────────────────────────
-  // When coming from Dashboard with openId:
-  //   • keep filterDate as-is (already set to the day from Dashboard)
-  //   • set filterStatus to 'all' so the target reservation is always visible
-  // Otherwise apply normal defaults (current month, Pending)
   useEffect(() => {
-    if (comingFromDashboard) {
-      // Dashboard passes filterDate (YYYY-MM-DD) — keep it, just show all statuses
-      setFilterStatus('all')
-      // If no filterDate came through, default to today
+    if (openId) {
+      // From Dashboard: show all statuses so target is never hidden
+      _setFilterStatus('all')
       if (!location.state?.filterDate) {
-        setFilterDate(new Date().toISOString().slice(0, 10))
+        _setFilterDate(new Date().toISOString().slice(0, 10))
       }
     } else {
-      // Normal entry: default to current month + Pending
+      // Normal entry defaults
       if (!location.state?.filterDate) {
-        setFilterDate(new Date().toISOString().slice(0, 7)) // YYYY-MM (month only)
+        _setFilterDate(new Date().toISOString().slice(0, 7))
       }
       if (!location.state?.filterStatus) {
-        setFilterStatus('Pending')
+        _setFilterStatus('Pending')
       }
     }
   }, []) // eslint-disable-line
 
-  // ── Local date filtering ──────────────────────────────────────────────────
-  // filterDate can be:
-  //   YYYY-MM-DD  → exact day match
-  //   YYYY-MM     → whole month match
-  // Cache the target reservation as soon as data loads (before any filter can hide it)
-  useEffect(() => {
-    if (!comingFromDashboard || !location.state?.openId || loading) return
-    const base = Array.isArray(filtered) ? filtered : []
-    const found = base.find(r => r.id === location.state.openId)
-    if (found && !dashboardTarget) setDashboardTarget(found)
-  }, [filtered, loading]) // eslint-disable-line
-
+  // ── filteredLocal ─────────────────────────────────────────────────────────
+  // When lockedId is set: show ONLY that one reservation (search all of filtered,
+  // ignoring date/status — they were set to 'all' above so it should be there)
   const filteredLocal = useMemo(() => {
-    // Dashboard mode: show only the 1 selected reservation
-    if (comingFromDashboard) {
-      return dashboardTarget ? [dashboardTarget] : []
-    }
-
     const base = Array.isArray(filtered) ? filtered : []
+
+    if (lockedId) {
+      const match = base.find(r => r.id === lockedId)
+      return match ? [match] : []
+    }
+
     if (!filterDate) return base
-    if (filterDate.length === 10) {
-      return base.filter(r => r.date === filterDate)
-    }
-    const month = filterDate.slice(0, 7)
-    return base.filter(r => (r.date || '').startsWith(month))
-  }, [filtered, filterDate, comingFromDashboard, dashboardTarget])
+    if (filterDate.length === 10) return base.filter(r => r.date === filterDate)
+    return base.filter(r => (r.date || '').startsWith(filterDate.slice(0, 7)))
+  }, [filtered, filterDate, lockedId])
 
-  // ── Open reservation modal when navigated from Dashboard ─────────────────
-  // We search ALL reservations (not just filteredLocal) so status filter
-  // never blocks finding the target reservation.
+  // ── Auto-open modal for Dashboard navigation ──────────────────────────────
   useEffect(() => {
-    const openId = location.state?.openId
-    if (!openId || loading) return
-
-    const allRes = Array.isArray(filtered) ? filtered : []
-
-    // Try filteredLocal first; fall back to all reservations
-    const target =
-      filteredLocal.find(r => r.id === openId) ||
-      allRes.find(r => r.id === openId)
-
-    if (target) {
-      openView(target)
-    }
-  }, [location.state?.openId, loading, filtered]) // eslint-disable-line
+    if (!openId || loading || !filtered.length) return
+    const target = (Array.isArray(filtered) ? filtered : []).find(r => r.id === openId)
+    if (target) openView(target)
+  }, [openId, loading, filtered.length]) // eslint-disable-line
 
   async function handleExportPDF() {
     setExporting(true)
