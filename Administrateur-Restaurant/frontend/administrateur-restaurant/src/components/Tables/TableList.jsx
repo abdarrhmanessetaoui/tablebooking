@@ -6,11 +6,9 @@ const GOLD     = '#c8a97e'
 const GOLD_DK  = '#a8834e'
 const BORDER   = '#2b2118'
 const CREAM    = '#faf8f5'
-const RED      = '#dc2626'
-const RED_DARK = '#991b1b'
+const RED      = '#b94040'
 const RED_BG   = '#fdf0f0'
 const GREEN    = '#16a34a'
-const GREEN_DK = '#15803d'
 const GREEN_BG = '#f0f7f0'
 
 const PAGE_SIZE = 10
@@ -72,43 +70,6 @@ function PageBtn({ onClick, disabled, active, children }) {
   )
 }
 
-/* ── Solid action button used in every row ── */
-function ActionBtn({ onClick, title, color, colorDark, bg, bgHover, icon: Icon, label }) {
-  const [hov, setHov] = useState(false)
-  return (
-    <button
-      onClick={onClick}
-      title={title}
-      onMouseEnter={() => setHov(true)}
-      onMouseLeave={() => setHov(false)}
-      style={{
-        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: label ? 5 : 0,
-        height: 32,
-        minWidth: label ? 'auto' : 32,
-        padding: label ? '0 10px' : '0',
-        background: hov ? colorDark : color,
-        border: 'none',
-        color: '#fff',
-        cursor: 'pointer',
-        transition: 'background 0.15s, transform 0.1s',
-        flexShrink: 0,
-        fontFamily: 'inherit',
-        fontSize: 11,
-        fontWeight: 800,
-        letterSpacing: '0.03em',
-        boxShadow: hov
-          ? `0 3px 10px ${color}66`
-          : `0 1px 4px ${color}44`,
-      }}
-      onMouseDown={e => e.currentTarget.style.transform = 'scale(0.94)'}
-      onMouseUp={e => e.currentTarget.style.transform = 'scale(1)'}
-    >
-      <Icon size={13} strokeWidth={2.5} />
-      {label && <span className="tbl-act-label">{label}</span>}
-    </button>
-  )
-}
-
 export default function TableList({ tables, editingTbl, onEdit, onDelete, onToggle, selectedTables, setSelectedTables }) {
   const [page, setPage] = useState(1)
   const isMobile = useIsMobile(600)
@@ -128,11 +89,11 @@ export default function TableList({ tables, editingTbl, onEdit, onDelete, onTogg
     )
   }
 
-  const total       = Math.ceil(tables.length / PAGE_SIZE)
-  const safe        = Math.min(page, total)
-  const items       = tables.slice((safe - 1) * PAGE_SIZE, safe * PAGE_SIZE)
-  const allSel      = tables.length > 0 && tables.every(t => selectedTables.includes(t.idx))
-  const pageAllSel  = items.length > 0 && items.every(t => selectedTables.includes(t.idx))
+  const total      = Math.ceil(tables.length / PAGE_SIZE)
+  const safe       = Math.min(page, total)
+  const items      = tables.slice((safe - 1) * PAGE_SIZE, safe * PAGE_SIZE)
+  const allSel     = tables.length > 0 && tables.every(t => selectedTables.includes(t.idx))
+  const pageAllSel = items.length > 0 && items.every(t => selectedTables.includes(t.idx))
   const pageSomeSel = items.some(t => selectedTables.includes(t.idx)) && !pageAllSel
 
   function togglePage() {
@@ -165,22 +126,22 @@ export default function TableList({ tables, editingTbl, onEdit, onDelete, onTogg
     return p
   }
 
-  const activeCnt = tables.filter(t => t.active).length
-  const totalCap  = tables.filter(t => t.active).reduce((s, t) => s + parseInt(t.capacity||0), 0)
+  const activeCnt   = tables.filter(t => t.active).length
+  const totalCap    = tables.filter(t => t.active).reduce((s, t) => s + parseInt(t.capacity||0), 0)
 
   return (
     <>
       <style>{`
         @media (hover: hover) { .tbl-row:hover { background: #fdf6ec !important; } }
         .tbl-act-label { display: inline; }
-        @media (max-width: 700px) { .tbl-act-label { display: none !important; } }
+        @media (max-width: 599px) { .tbl-act-label { display: none !important; } }
       `}</style>
 
       {/* Stats bar */}
       <div style={{ display: 'flex', gap: 0, marginBottom: 12 }}>
         {[
-          { label: 'Total',    val: tables.length },
-          { label: 'Actives',  val: activeCnt },
+          { label: 'Total', val: tables.length },
+          { label: 'Actives', val: activeCnt },
           { label: 'Capacité', val: `${totalCap} pers.` },
         ].map((s, i) => (
           <div key={i} style={{
@@ -223,7 +184,7 @@ export default function TableList({ tables, editingTbl, onEdit, onDelete, onTogg
         {/* Header */}
         <div style={{
           display: 'grid',
-          gridTemplateColumns: isMobile ? '44px 1fr 90px' : '44px 1fr 110px 110px 130px',
+          gridTemplateColumns: isMobile ? '44px 1fr 80px' : '44px 1fr 110px 110px 120px',
           padding: '10px 12px', background: DARK, alignItems: 'center', gap: 8,
         }}>
           <Checkbox checked={pageAllSel} indeterminate={pageSomeSel} onChange={togglePage} />
@@ -235,24 +196,24 @@ export default function TableList({ tables, editingTbl, onEdit, onDelete, onTogg
 
         {/* Rows */}
         {items.map((tbl, i) => {
-          const selected = selectedTables.includes(tbl.idx)
-          const idx      = (safe - 1) * PAGE_SIZE + i
-          const bg       = selected ? '#fdf6ec' : idx % 2 === 0 ? '#fff' : CREAM
-          const locStyle = LOC_COLORS[tbl.location] || { bg: '#f5f5f5', color: '#666' }
+          const selected  = selectedTables.includes(tbl.idx)
+          const idx       = (safe - 1) * PAGE_SIZE + i
+          const bg        = selected ? '#fdf6ec' : idx % 2 === 0 ? '#fff' : CREAM
+          const locStyle  = LOC_COLORS[tbl.location] || { bg: '#f5f5f5', color: '#666' }
 
           return (
             <div key={tbl.idx} className="tbl-row"
               onClick={() => toggleOne(tbl.idx)}
               style={{
                 display: 'grid',
-                gridTemplateColumns: isMobile ? '44px 1fr 90px' : '44px 1fr 110px 110px 130px',
-                padding: isMobile ? '13px 12px' : '12px 16px',
+                gridTemplateColumns: isMobile ? '44px 1fr 80px' : '44px 1fr 110px 110px 120px',
+                padding: isMobile ? '13px 12px' : '14px 16px',
                 background: bg,
                 borderBottom: `1px solid ${BORDER}`,
                 borderLeft: `3px solid ${selected ? GOLD : tbl.active ? GOLD : 'transparent'}`,
                 alignItems: 'center', gap: 8,
                 cursor: 'pointer', transition: 'background 0.12s',
-                opacity: tbl.active ? 1 : 0.6,
+                opacity: tbl.active ? 1 : 0.55,
                 userSelect: 'none',
               }}>
 
@@ -263,7 +224,7 @@ export default function TableList({ tables, editingTbl, onEdit, onDelete, onTogg
 
               {/* Name + mobile tags */}
               <div style={{ minWidth: 0 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap', marginBottom: isMobile ? 4 : 0 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap', marginBottom: 4 }}>
                   <p style={{ margin: 0, fontWeight: 900, color: DARK, fontSize: isMobile ? 13 : 14, letterSpacing: '-0.3px' }}>
                     Table {tbl.number}
                   </p>
@@ -297,36 +258,57 @@ export default function TableList({ tables, editingTbl, onEdit, onDelete, onTogg
                 </span>
               )}
 
-              {/* ── Action buttons ── */}
-              <div onClick={e => e.stopPropagation()} style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
+              {/* Actions */}
+              <div onClick={e => e.stopPropagation()} style={{ display: 'flex', gap: 3, alignItems: 'center' }}>
+                {/* Toggle active */}
+                <button onClick={() => onToggle(tbl)} title={tbl.active ? 'Désactiver' : 'Activer'}
+                  style={{
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    width: 34, height: 34, background: 'none',
+                    border: `1.5px solid ${tbl.active ? GREEN : '#ddd'}`,
+                    color: tbl.active ? GREEN : '#bbb',
+                    cursor: 'pointer', transition: 'all 0.15s', flexShrink: 0,
+                  }}
+                  onMouseEnter={e => { e.currentTarget.style.background = tbl.active ? GREEN_BG : '#f5f5f5' }}
+                  onMouseLeave={e => { e.currentTarget.style.background = 'none' }}
+                >
+                  {tbl.active ? <ToggleRight size={15} strokeWidth={2} /> : <ToggleLeft size={15} strokeWidth={2} />}
+                </button>
 
-                {/* Toggle active — green / gray */}
-                <ActionBtn
-                  onClick={() => onToggle(tbl)}
-                  title={tbl.active ? 'Désactiver' : 'Activer'}
-                  icon={tbl.active ? ToggleRight : ToggleLeft}
-                  color={tbl.active ? GREEN : '#9ca3af'}
-                  colorDark={tbl.active ? GREEN_DK : '#6b7280'}
-                />
+                {/* Edit */}
+                <button onClick={() => onEdit(tbl)} title="Modifier"
+                  style={{
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    width: 34, height: 34,
+                    background: editingTbl?.idx === tbl.idx ? DARK : 'none',
+                    border: `1.5px solid ${editingTbl?.idx === tbl.idx ? DARK : '#ddd'}`,
+                    color: editingTbl?.idx === tbl.idx ? GOLD : DARK,
+                    cursor: 'pointer', transition: 'all 0.15s', flexShrink: 0,
+                  }}
+                  onMouseEnter={e => { e.currentTarget.style.background = DARK; e.currentTarget.style.color = GOLD; e.currentTarget.style.borderColor = DARK }}
+                  onMouseLeave={e => {
+                    const editing = editingTbl?.idx === tbl.idx
+                    e.currentTarget.style.background = editing ? DARK : 'none'
+                    e.currentTarget.style.color = editing ? GOLD : DARK
+                    e.currentTarget.style.borderColor = editing ? DARK : '#ddd'
+                  }}
+                >
+                  <Pencil size={13} strokeWidth={2.5} />
+                </button>
 
-                {/* Edit — dark gold */}
-                <ActionBtn
-                  onClick={() => onEdit(tbl)}
-                  title="Modifier"
-                  icon={Pencil}
-                  color={editingTbl?.idx === tbl.idx ? GOLD_DK : DARK}
-                  colorDark={GOLD_DK}
-                />
-
-                {/* Delete — solid red */}
-                <ActionBtn
-                  onClick={() => onDelete(tbl)}
-                  title="Supprimer"
-                  icon={Trash2}
-                  color={RED}
-                  colorDark={RED_DARK}
-                />
-
+                {/* Delete */}
+                <button onClick={() => onDelete(tbl)} title="Supprimer"
+                  style={{
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    width: 34, height: 34, background: 'none',
+                    border: `1.5px solid #ddd`,
+                    color: DARK, cursor: 'pointer', transition: 'all 0.15s', flexShrink: 0,
+                  }}
+                  onMouseEnter={e => { e.currentTarget.style.background = RED_BG; e.currentTarget.style.color = RED; e.currentTarget.style.borderColor = RED }}
+                  onMouseLeave={e => { e.currentTarget.style.background = 'none'; e.currentTarget.style.color = DARK; e.currentTarget.style.borderColor = '#ddd' }}
+                >
+                  <Trash2 size={13} strokeWidth={2.5} />
+                </button>
               </div>
             </div>
           )
