@@ -42,4 +42,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put   ('/tables/{idx}',        [TableController::class, 'update']);
     Route::delete('/tables/{idx}',        [TableController::class, 'destroy']);
     Route::patch ('/tables/{idx}/toggle', [TableController::class, 'toggleActive']);
+    Route::put('/restaurant/info',          [RestaurantReservationController::class, 'updateInfo']);
+    Route::put('/restaurant/notifications', [RestaurantReservationController::class, 'updateNotifications']);
 });
