@@ -7,9 +7,11 @@ const GOLD = '#c8a97e'
 const MONTHS_FR = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre']
 const DAYS_FR   = ['Lu','Ma','Me','Je','Ve','Sa','Di']
 
-function CalendarPopup({ filterDate, setFilterDate, onClose }) {
+function CalendarPopup({ filterDate, setFilterDate, onClose, popupStyle = {} }) {
   const today      = new Date()
-  const initDate   = filterDate ? new Date(filterDate + '-01') : today
+  const initDate   = filterDate
+    ? (filterDate.length === 7 ? new Date(filterDate + '-01') : new Date(filterDate))
+    : today
   const [viewYear,  setViewYear]  = useState(initDate.getFullYear())
   const [viewMonth, setViewMonth] = useState(initDate.getMonth())
   const [mode,      setMode]      = useState('day') // 'day' | 'month'
@@ -65,7 +67,7 @@ function CalendarPopup({ filterDate, setFilterDate, onClose }) {
 
   const s = {
     popup: {
-      position: 'absolute', top: 'calc(100% + 4px)', left: 0, zIndex: 200,
+      position: 'fixed', zIndex: 9999,
       background: '#fff', border: `2px solid ${DARK}`,
       width: 280, boxShadow: '0 8px 32px rgba(43,33,24,0.18)',
     },
@@ -131,7 +133,7 @@ function CalendarPopup({ filterDate, setFilterDate, onClose }) {
   }
 
   return (
-    <div style={s.popup}>
+    <div style={{ ...s.popup, ...popupStyle }}>
       {/* Header nav */}
       <div style={s.header}>
         <button style={s.navBtn} onClick={() => setViewYear(y => y - 1)} title="Année précédente">
@@ -213,11 +215,23 @@ export default function ReservationsFilters({
   services = [],
 }) {
   const [calOpen, setCalOpen] = useState(false)
+  const [popupPos, setPopupPos] = useState({})
   const containerRef = useRef(null)
 
   const hasFilters = search || filterStatus !== 'all' || filterDate || (filterService && filterService !== 'all')
 
-  // Close on outside click
+  function openCal() {
+    if (calOpen) { setCalOpen(false); return }
+    if (containerRef.current) {
+      const rect = containerRef.current.getBoundingClientRect()
+      const popupW = 280
+      // Prefer right-aligned to the button; fall back to left-aligned if near left edge
+      let left = rect.right - popupW
+      if (left < 8) left = rect.left
+      setPopupPos({ top: rect.bottom + 4, left })
+    }
+    setCalOpen(true)
+  }
   useEffect(() => {
     function handler(e) {
       if (calOpen && containerRef.current && !containerRef.current.contains(e.target))
@@ -312,7 +326,7 @@ export default function ReservationsFilters({
         {/* Date picker */}
         <div className="filters-date" style={{ position: 'relative' }} ref={containerRef}>
           <button
-            onClick={() => setCalOpen(o => !o)}
+            onClick={openCal}
             style={{
               display: 'flex', alignItems: 'center', justifyContent: 'space-between',
               gap: 8, width: '100%', padding: '10px 14px',
@@ -347,6 +361,7 @@ export default function ReservationsFilters({
               filterDate={filterDate}
               setFilterDate={setFilterDate}
               onClose={() => setCalOpen(false)}
+              popupStyle={popupPos}
             />
           )}
         </div>
