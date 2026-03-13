@@ -80,7 +80,7 @@ export default function Calendar() {
         doc.text(r.name||'—',24,y+6)
         doc.text(r.date?new Date(r.date).toLocaleDateString('fr-FR'):'—',80,y+6)
         doc.text(r.start_time||'—',120,y+6)
-        const sc = {Confirmed:[43,33,24],Pending:[168,131,78],Cancelled:[150,128,112]}[r.status]||[43,33,24]
+        const sc = {Confirmed:[43,33,24],Pending:[168,131,78],Cancelled:[43,33,24]}[r.status]||[43,33,24]
         doc.setTextColor(...sc); doc.setFont('helvetica','bold')
         doc.text(r.status==='Confirmed'?'Confirmée':r.status==='Pending'?'En attente':'Annulée',155,y+6)
         y += 9
