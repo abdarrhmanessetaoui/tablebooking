@@ -15,8 +15,9 @@ import { getToken } from '../utils/auth'
 import { toast }   from '../components/ui/Toast'
 import { confirm } from '../components/ui/ConfirmDialog'
 
-const DARK = '#2b2118'
-const GOLD = '#c8a97e'
+const DARK      = '#2b2118'
+const GOLD      = '#c8a97e'
+const GOLD_DARK = '#a8834e'
 
 function Btn({ children, onClick, primary, disabled, icon: Icon }) {
   const [hov, setHov] = useState(false)
@@ -68,11 +69,11 @@ function BulkBar({ count, onDelete, onStatus, onClear }) {
         background: GOLD, color: DARK,
         fontSize: 12, fontWeight: 900, padding: '0 7px', flexShrink: 0,
       }}>{count}</span>
-      <span className="bulk-label" style={{ fontSize: 12, fontWeight: 700, color: '#2b2118', marginRight: 2 }}>
+      <span className="bulk-label" style={{ fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.6)', marginRight: 2 }}>
         sélectionné{count > 1 ? 's' : ''}
       </span>
 
-      <div style={{ width: 1, height: 20, background: '#2b2118', margin: '0 2px', flexShrink: 0 }} />
+      <div style={{ width: 1, height: 20, background: 'rgba(255,255,255,0.12)', margin: '0 2px', flexShrink: 0 }} />
 
       {[
         { status: 'Confirmed', label: 'Confirmer',  Icon: CheckCircle, color: '#4ade80' },
@@ -83,21 +84,21 @@ function BulkBar({ count, onDelete, onStatus, onClear }) {
           style={{
             display: 'flex', alignItems: 'center', gap: 5,
             padding: '6px 12px',
-            background: '#2b2118',
-            border: '1px solid #2b2118',
+            background: 'rgba(255,255,255,0.07)',
+            border: '1px solid rgba(255,255,255,0.1)',
             color, fontSize: 12, fontWeight: 700,
             cursor: 'pointer', fontFamily: 'inherit',
             transition: 'background 0.15s', flexShrink: 0,
           }}
-          onMouseEnter={e => e.currentTarget.style.background = '#2b2118'}
-          onMouseLeave={e => e.currentTarget.style.background = '#2b2118'}
+          onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.15)'}
+          onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,255,255,0.07)'}
         >
           <Icon size={13} strokeWidth={2.5} />
           <span className="btn-label">{label}</span>
         </button>
       ))}
 
-      <div style={{ width: 1, height: 20, background: '#2b2118', margin: '0 2px', flexShrink: 0 }} />
+      <div style={{ width: 1, height: 20, background: 'rgba(255,255,255,0.12)', margin: '0 2px', flexShrink: 0 }} />
 
       <button onClick={onDelete}
         onMouseEnter={() => setHovDel(true)} onMouseLeave={() => setHovDel(false)}
@@ -120,14 +121,14 @@ function BulkBar({ count, onDelete, onStatus, onClear }) {
         style={{
           marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 5,
           padding: '6px 10px',
-          background: 'none', border: '1px solid #2b2118',
-          color: '#2b2118',
+          background: 'none', border: '1px solid rgba(255,255,255,0.12)',
+          color: 'rgba(255,255,255,0.45)',
           fontSize: 12, fontWeight: 700,
           cursor: 'pointer', fontFamily: 'inherit',
           transition: 'all 0.15s', flexShrink: 0,
         }}
         onMouseEnter={e => e.currentTarget.style.color = '#fff'}
-        onMouseLeave={e => e.currentTarget.style.color = '#2b2118'}
+        onMouseLeave={e => e.currentTarget.style.color = 'rgba(255,255,255,0.45)'}
       >
         <X size={13} strokeWidth={2.5} />
         <span className="btn-label">Désélectionner</span>
@@ -220,76 +221,59 @@ export default function Reservations() {
   const [exporting,   setExporting]   = useState(false)
   const [selectedIds, setSelectedIds] = useState([])
 
-  // ── Dashboard navigation state ───────────────────────────────────────────
-  // openId: the reservation to show. Once user touches any filter → cleared.
-  const openId = location.state?.openId ?? null
-  const [lockedId, setLockedId] = useState(openId) // stays set until user filters
-
-  const { services } = useServices()
+  const { services } = useServices()   // ← dynamic services from API
 
   const {
-    filtered, loading, error,
+    filteredLocal: filteredFromHook, loading, error,
     modalMode, setModalMode,
-    form, setForm, editing,
-    search,           setSearch:        _setSearch,
-    filterStatus,     setFilterStatus:  _setFilterStatus,
-    filterService,    setFilterService: _setFilterService,
-    filterDate,       setFilterDate:    _setFilterDate,
-    clearFilters:     _clearFilters,
+    form, setForm,
+    editing,
+    search,        setSearch,
+    filterStatus,  setFilterStatus,
+    filterService, setFilterService,
+    filterDate,    setFilterDate,
+    clearFilters,
     openView, openEdit, openCreate,
     handleSubmit, handleCreate, handleDelete,
     setReservations,
   } = useReservations(location.state)
 
-  // Any filter interaction exits locked mode
-  function unlock()            { setLockedId(null) }
-  function setSearch(v)        { unlock(); _setSearch(v) }
-  function setFilterStatus(v)  { unlock(); _setFilterStatus(v) }
-  function setFilterService(v) { unlock(); _setFilterService(v) }
-  function setFilterDate(v)    { unlock(); _setFilterDate(v) }
-  function clearFilters()      { unlock(); _clearFilters() }
-
-  // ── Default filters on mount ──────────────────────────────────────────────
+  // Default filters on mount
   useEffect(() => {
-    if (openId) {
-      // From Dashboard: show all statuses so target is never hidden
-      _setFilterStatus('all')
-      if (!location.state?.filterDate) {
-        _setFilterDate(new Date().toISOString().slice(0, 10))
-      }
+    const fromDashboard = !!(location.state?.filterDate || location.state?.openId)
+
+    if (fromDashboard) {
+      // Coming from Dashboard (row click or "Voir tout") → show ALL statuses
+      // so nothing is hidden regardless of what was passed
+      setFilterStatus('all')
     } else {
-      // Normal entry defaults
-      if (!location.state?.filterDate) {
-        _setFilterDate(new Date().toISOString().slice(0, 7))
-      }
-      if (!location.state?.filterStatus) {
-        _setFilterStatus('Pending')
-      }
+      // Normal direct navigation → default Pending + current month
+      if (!location.state?.filterStatus) setFilterStatus('Pending')
+      if (!location.state?.filterDate)   setFilterDate(
+        new Date().toISOString().slice(0, 7)  // YYYY-MM
+      )
     }
   }, []) // eslint-disable-line
-
-  // ── filteredLocal ─────────────────────────────────────────────────────────
-  // When lockedId is set: show ONLY that one reservation (search all of filtered,
-  // ignoring date/status — they were set to 'all' above so it should be there)
+  // Re-filter by month locally (hook does exact match, we need startsWith for YYYY-MM)
   const filteredLocal = useMemo(() => {
-    const base = Array.isArray(filtered) ? filtered : []
-
-    if (lockedId) {
-      const match = base.find(r => r.id === lockedId)
-      return match ? [match] : []
+    if (!filterDate) return filteredFromHook
+    // If filterDate is YYYY-MM (month picker), match all dates in that month
+    if (/^\d{4}-\d{2}$/.test(filterDate)) {
+      return filteredFromHook.filter(r => (r.date || '').startsWith(filterDate))
     }
+    // If filterDate is YYYY-MM-DD (exact date), keep exact match
+    return filteredFromHook.filter(r => r.date === filterDate)
+  }, [filteredFromHook, filterDate])
 
-    if (!filterDate) return base
-    if (filterDate.length === 10) return base.filter(r => r.date === filterDate)
-    return base.filter(r => (r.date || '').startsWith(filterDate.slice(0, 7)))
-  }, [filtered, filterDate, lockedId])
 
-  // ── Auto-open modal for Dashboard navigation ──────────────────────────────
+
+  // If navigated from Dashboard with openId → open that reservation in modal
   useEffect(() => {
-    if (!openId || loading || !filtered.length) return
-    const target = (Array.isArray(filtered) ? filtered : []).find(r => r.id === openId)
+    const openId = location.state?.openId
+    if (!openId || loading || !filteredLocal.length) return
+    const target = filteredLocal.find(r => r.id === openId)
     if (target) openView(target)
-  }, [openId, loading, filtered.length]) // eslint-disable-line
+  }, [location.state?.openId, loading, filteredLocal.length]) // eslint-disable-line
 
   async function handleExportPDF() {
     setExporting(true)
@@ -428,7 +412,7 @@ export default function Reservations() {
             filterService={filterService} setFilterService={setFilterService}
             filterDate={filterDate}       setFilterDate={setFilterDate}
             clearFilters={clearFilters}
-            services={services}
+            services={services}           // ← dynamic list from API
           />
         </FadeUp>
 
@@ -436,7 +420,7 @@ export default function Reservations() {
         <FadeUp delay={50}>
           <p style={{
             margin: '0 0 10px',
-            fontSize: 11, fontWeight: 800, color: '#2b2118',
+            fontSize: 11, fontWeight: 800, color: '#bbb',
             letterSpacing: '0.1em', textTransform: 'uppercase',
           }}>
             {filteredLocal.length} résultat{filteredLocal.length !== 1 ? 's' : ''}
@@ -477,7 +461,7 @@ export default function Reservations() {
             handleCreate={handleCreate}
             handleDelete={handleDelete}
             setModalMode={setModalMode}
-            services={services}
+            services={services}           // ← also pass to modal for create/edit form
           />
         )}
       </div>
