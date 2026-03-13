@@ -17,6 +17,7 @@ const PAGE_TITLES = {
   '/services':      'Services',
   '/reports':       'Rapports',
   '/settings':      'Paramètres',
+  '/tables': 'Tables',
 }
 
 export default function Layout({ children }) {
