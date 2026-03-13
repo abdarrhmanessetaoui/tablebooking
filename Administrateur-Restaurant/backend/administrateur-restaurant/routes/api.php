@@ -36,4 +36,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post  ('/services',         [ServiceController::class, 'store']);
     Route::put   ('/services/{idx}',   [ServiceController::class, 'update']);
     Route::delete('/services/{idx}',   [ServiceController::class, 'destroy']);
+    Route::get   ('/tables',              [TableController::class, 'index']);
+Route::post  ('/tables',              [TableController::class, 'store']);
+Route::put   ('/tables/{idx}',        [TableController::class, 'update']);
+Route::delete('/tables/{idx}',        [TableController::class, 'destroy']);
+Route::patch ('/tables/{idx}/toggle', [TableController::class, 'toggleActive']);
 });
