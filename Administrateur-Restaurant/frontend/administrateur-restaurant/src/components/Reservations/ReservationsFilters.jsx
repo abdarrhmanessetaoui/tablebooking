@@ -1,4 +1,5 @@
-import { Search, X } from 'lucide-react'
+import { useState } from 'react'
+import { Search, X, Calendar, CalendarDays } from 'lucide-react'
 
 const DARK = '#2b2118'
 const GOLD = '#c8a97e'
@@ -9,8 +10,10 @@ export default function ReservationsFilters({
   filterService, setFilterService,
   filterDate, setFilterDate,
   clearFilters,
-  services = [],   // ← dynamic list passed from parent
+  services = [],
 }) {
+  const [dateMode, setDateMode] = useState('month') // 'month' | 'day'
+
   const hasFilters = search || filterStatus !== 'all' || filterDate || (filterService && filterService !== 'all')
 
   const base = {
@@ -20,7 +23,12 @@ export default function ReservationsFilters({
     fontSize: 13, fontWeight: 600,
     color: DARK, fontFamily: 'inherit',
     outline: 'none', boxSizing: 'border-box',
-    width: '100%',
+    width: '100%', borderRadius: 0,
+  }
+
+  function handleDateModeToggle(mode) {
+    setDateMode(mode)
+    setFilterDate('') // reset date when switching mode
   }
 
   return (
@@ -36,7 +44,7 @@ export default function ReservationsFilters({
         .filters-date   { grid-column: 1 / -1; }
         .filters-clear  { grid-column: 1 / -1; }
         @media (min-width: 640px) {
-          .filters-wrap { grid-template-columns: 1fr 1fr 1fr auto auto; }
+          .filters-wrap   { grid-template-columns: 1fr 1fr 1fr 1fr auto; }
           .filters-search { grid-column: auto; }
           .filters-date   { grid-column: auto; }
           .filters-clear  { grid-column: auto; }
@@ -68,24 +76,61 @@ export default function ReservationsFilters({
         </div>
 
         {/* Status */}
-        <select value={filterStatus} onChange={e => setFilterStatus(e.target.value)} style={{ ...base, cursor: 'pointer' }}>
+        <select value={filterStatus} onChange={e => setFilterStatus(e.target.value)}
+          style={{ ...base, cursor: 'pointer' }}>
           <option value="all">Tous les statuts</option>
           <option value="Pending">En attente</option>
           <option value="Confirmed">Confirmées</option>
           <option value="Cancelled">Annulées</option>
         </select>
 
-        {/* Service — built from dynamic list */}
-        <select value={filterService ?? 'all'} onChange={e => setFilterService(e.target.value)} style={{ ...base, cursor: 'pointer' }}>
+        {/* Service */}
+        <select value={filterService ?? 'all'} onChange={e => setFilterService(e.target.value)}
+          style={{ ...base, cursor: 'pointer' }}>
           <option value="all">Tous les services</option>
-          {services.map(s => (
-            <option key={s} value={s}>{s}</option>
-          ))}
+          {services.map(s => <option key={s} value={s}>{s}</option>)}
         </select>
 
-        {/* Date */}
-        <div className="filters-date">
-          <input type="month" value={filterDate} onChange={e => setFilterDate(e.target.value)} style={{ ...base, cursor: 'pointer' }} />
+        {/* Date — mode toggle + input */}
+        <div className="filters-date" style={{ display: 'flex', gap: 0 }}>
+          {/* Mode toggle buttons */}
+          <button
+            onClick={() => handleDateModeToggle('month')}
+            title="Filtrer par mois"
+            style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              padding: '0 12px', flexShrink: 0,
+              background: dateMode === 'month' ? DARK : '#fff',
+              border: '2px solid #e8e0d8',
+              borderRight: 'none',
+              color: dateMode === 'month' ? GOLD : '#bbb',
+              cursor: 'pointer', transition: 'all 0.15s',
+            }}
+          >
+            <Calendar size={14} strokeWidth={2.5} />
+          </button>
+          <button
+            onClick={() => handleDateModeToggle('day')}
+            title="Filtrer par jour"
+            style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              padding: '0 12px', flexShrink: 0,
+              background: dateMode === 'day' ? DARK : '#fff',
+              border: '2px solid #e8e0d8',
+              borderRight: 'none',
+              color: dateMode === 'day' ? GOLD : '#bbb',
+              cursor: 'pointer', transition: 'all 0.15s',
+            }}
+          >
+            <CalendarDays size={14} strokeWidth={2.5} />
+          </button>
+          {/* Input */}
+          <input
+            type={dateMode === 'month' ? 'month' : 'date'}
+            value={filterDate}
+            onChange={e => setFilterDate(e.target.value)}
+            style={{ ...base, flex: 1, minWidth: 0 }}
+          />
         </div>
 
         {/* Clear */}
