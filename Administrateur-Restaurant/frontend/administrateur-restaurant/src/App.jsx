@@ -24,7 +24,7 @@ function App() {
         <Route path="/blocked-dates" element={<ProtectedRoute><Layout><BlockedDates /></Layout></ProtectedRoute>} />
         <Route path="/calendar"      element={<ProtectedRoute><Layout><Calendar     /></Layout></ProtectedRoute>} />
         <Route path="/reports"       element={<ProtectedRoute><Layout><Reports      /></Layout></ProtectedRoute>} />
-        <Route path="/services" element={<Services />} />
+        <Route path="/services" element={<ProtectedRoute><Layout><Services /></Layout></ProtectedRoute>} />
         <Route path="/settings"      element={<ProtectedRoute><Layout><Settings     /></Layout></ProtectedRoute>} />
       </Routes>
     </BrowserRouter>
