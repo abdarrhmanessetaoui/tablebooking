@@ -3,9 +3,20 @@ import { Plus, Check, X, Utensils } from 'lucide-react'
 
 const DARK   = '#2b2118'
 const GOLD   = '#c8a97e'
+const GOLD_DK = '#a8834e'
 const BORDER = '#2b2118'
 
-const EMPTY = { name: '', price: '', capacity: '', duration: '' }
+const EMPTY = { name: '', price: '', capacity: '', duration: '', available_days: [0,1,2,3,4,5,6] }
+
+const DAYS = [
+  { idx: 0, short: 'Dim', full: 'Dimanche' },
+  { idx: 1, short: 'Lun', full: 'Lundi' },
+  { idx: 2, short: 'Mar', full: 'Mardi' },
+  { idx: 3, short: 'Mer', full: 'Mercredi' },
+  { idx: 4, short: 'Jeu', full: 'Jeudi' },
+  { idx: 5, short: 'Ven', full: 'Vendredi' },
+  { idx: 6, short: 'Sam', full: 'Samedi' },
+]
 
 const inp = {
   padding: '12px 14px',
@@ -38,8 +49,64 @@ function Field({ label, children }) {
   )
 }
 
+function DayPicker({ value = [0,1,2,3,4,5,6], onChange }) {
+  function toggle(idx) {
+    if (value.includes(idx)) {
+      // keep at least 1 day
+      if (value.length === 1) return
+      onChange(value.filter(d => d !== idx))
+    } else {
+      onChange([...value, idx].sort((a,b) => a-b))
+    }
+  }
+
+  return (
+    <div>
+      <Label>Jours disponibles</Label>
+      <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', marginTop: 2 }}>
+        {DAYS.map(d => {
+          const active = value.includes(d.idx)
+          return (
+            <button key={d.idx} type="button"
+              onClick={() => toggle(d.idx)}
+              title={d.full}
+              style={{
+                display: 'flex', flexDirection: 'column', alignItems: 'center',
+                padding: '8px 10px', minWidth: 42, gap: 2,
+                background: active ? DARK : '#f5f0eb',
+                border: `2px solid ${active ? DARK : '#e8e0d8'}`,
+                color: active ? GOLD : '#bbb',
+                cursor: 'pointer', transition: 'all 0.15s', fontFamily: 'inherit',
+              }}
+              onMouseEnter={e => {
+                if (!active) { e.currentTarget.style.background = '#e8e0d8'; e.currentTarget.style.color = DARK }
+              }}
+              onMouseLeave={e => {
+                if (!active) { e.currentTarget.style.background = '#f5f0eb'; e.currentTarget.style.color = '#bbb' }
+              }}
+            >
+              <span style={{ fontSize: 10, fontWeight: 900, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+                {d.short}
+              </span>
+              {active && (
+                <div style={{ width: 4, height: 4, background: GOLD, borderRadius: '50%' }} />
+              )}
+            </button>
+          )
+        })}
+      </div>
+      <p style={{ margin: '6px 0 0', fontSize: 10, fontWeight: 700, color: GOLD_DK }}>
+        {value.length === 7
+          ? 'Disponible tous les jours'
+          : `Disponible ${value.length} jour${value.length > 1 ? 's' : ''} / semaine — ${value.map(i => DAYS[i].full).join(', ')}`
+        }
+      </p>
+    </div>
+  )
+}
+
 export default function ServiceForm({ initial = EMPTY, onSave, saving, editingName, onCancel }) {
-  const [form, setForm] = useState(initial)
+  const [form, setForm] = useState({ ...EMPTY, ...initial })
   const set  = k => v => setForm(f => ({ ...f, [k]: v }))
   const fo   = e => e.target.style.borderColor = GOLD
   const bl   = e => e.target.style.borderColor = BORDER
@@ -54,10 +121,7 @@ export default function ServiceForm({ initial = EMPTY, onSave, saving, editingNa
     <div style={{ background: '#fff', border: `1.5px solid ${BORDER}`, overflow: 'hidden' }}>
 
       {/* Header bar */}
-      <div style={{
-        padding: '12px 16px', background: DARK,
-        display: 'flex', alignItems: 'center', gap: 8,
-      }}>
+      <div style={{ padding: '12px 16px', background: DARK, display: 'flex', alignItems: 'center', gap: 8 }}>
         <Utensils size={14} strokeWidth={2.5} color={GOLD} />
         <span style={{ fontSize: 11, fontWeight: 900, color: GOLD, letterSpacing: '0.12em', textTransform: 'uppercase' }}>
           {editingName ? `Modifier — ${editingName}` : 'Nouveau service'}
@@ -68,7 +132,7 @@ export default function ServiceForm({ initial = EMPTY, onSave, saving, editingNa
 
         <Field label="Nom du service">
           <input
-            type="text" value={form.name} placeholder="Ex: A la Carte"
+            type="text" value={form.name} placeholder="Ex: Couscous du Vendredi"
             onChange={e => set('name')(e.target.value)}
             style={inp} onFocus={fo} onBlur={bl}
           />
@@ -76,32 +140,30 @@ export default function ServiceForm({ initial = EMPTY, onSave, saving, editingNa
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
           <Field label="Prix (dh)">
-            <input
-              type="number" value={form.price} placeholder="0"
-              onChange={e => set('price')(e.target.value)}
-              style={inp} onFocus={fo} onBlur={bl}
-            />
+            <input type="number" value={form.price} placeholder="0"
+              onChange={e => set('price')(e.target.value)} style={inp} onFocus={fo} onBlur={bl} />
           </Field>
           <Field label="Capacité (pers.)">
-            <input
-              type="number" value={form.capacity} placeholder="15"
-              onChange={e => set('capacity')(e.target.value)}
-              style={inp} onFocus={fo} onBlur={bl}
-            />
+            <input type="number" value={form.capacity} placeholder="15"
+              onChange={e => set('capacity')(e.target.value)} style={inp} onFocus={fo} onBlur={bl} />
           </Field>
         </div>
 
         <Field label="Durée (min)">
-          <input
-            type="number" value={form.duration} placeholder="60"
-            onChange={e => set('duration')(e.target.value)}
-            style={inp} onFocus={fo} onBlur={bl}
-          />
+          <input type="number" value={form.duration} placeholder="60"
+            onChange={e => set('duration')(e.target.value)} style={inp} onFocus={fo} onBlur={bl} />
         </Field>
 
+        {/* ── Days availability picker ── */}
+        <div style={{ padding: '14px', background: '#faf8f5', border: `1.5px solid #e8e0d8` }}>
+          <DayPicker
+            value={form.available_days ?? [0,1,2,3,4,5,6]}
+            onChange={v => set('available_days')(v)}
+          />
+        </div>
+
         <button
-          onClick={handleSubmit}
-          disabled={!valid || saving}
+          onClick={handleSubmit} disabled={!valid || saving}
           style={{
             display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
             padding: '15px', background: DARK, border: 'none',
@@ -115,11 +177,9 @@ export default function ServiceForm({ initial = EMPTY, onSave, saving, editingNa
           onMouseEnter={e => { if (valid && !saving) e.currentTarget.style.background = '#3d2d1e' }}
           onMouseLeave={e => { e.currentTarget.style.background = DARK }}
         >
-          {saving
-            ? 'Enregistrement…'
-            : editingName
-              ? <><Check size={15} strokeWidth={2.5} /> Enregistrer les modifications</>
-              : <><Plus size={15} strokeWidth={2.5} /> Ajouter le service</>
+          {saving ? 'Enregistrement…'
+            : editingName ? <><Check size={15} strokeWidth={2.5} /> Enregistrer les modifications</>
+            : <><Plus size={15} strokeWidth={2.5} /> Ajouter le service</>
           }
         </button>
 
@@ -130,13 +190,12 @@ export default function ServiceForm({ initial = EMPTY, onSave, saving, editingNa
             fontSize: 12, fontWeight: 800, color: DARK,
             cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.15s', width: '100%',
           }}
-            onMouseEnter={e => { e.currentTarget.style.background = '#fdf6ec'; e.currentTarget.style.color = '#a8834e'; e.currentTarget.style.borderColor = GOLD }}
+            onMouseEnter={e => { e.currentTarget.style.background = '#fdf6ec'; e.currentTarget.style.color = GOLD_DK; e.currentTarget.style.borderColor = GOLD }}
             onMouseLeave={e => { e.currentTarget.style.background = 'none'; e.currentTarget.style.color = DARK; e.currentTarget.style.borderColor = BORDER }}
           >
             <X size={13} strokeWidth={2.5} /> Annuler la modification
           </button>
         )}
-
       </div>
     </div>
   )
