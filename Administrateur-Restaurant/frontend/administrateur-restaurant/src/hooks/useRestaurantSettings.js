@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { getToken } from '../utils/auth'
-import { toast } from '../components/ToastContainer'
+import { toast } from '../components/ui/Toast'
 
 const BASE  = 'http://localhost:8000/api'
 const hGet  = () => ({ 'Accept': 'application/json', 'Authorization': `Bearer ${getToken()}` })
