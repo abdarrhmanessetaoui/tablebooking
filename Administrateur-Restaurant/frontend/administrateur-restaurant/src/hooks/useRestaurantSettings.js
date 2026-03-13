@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { getToken } from '../utils/auth'
-import { toast } from '../components/ui/Toast'
+import { toast } from '../components/ToastContainer'
 
 const BASE  = 'http://localhost:8000/api'
 const hGet  = () => ({ 'Accept': 'application/json', 'Authorization': `Bearer ${getToken()}` })
@@ -84,7 +84,23 @@ export default function useRestaurantSettings() {
   const setNotifField    = (key, val) => setNotifications(p => ({ ...p, [key]: val }))
 
   // activeOH is the index into allOH — clicking a service tab sets it to that service's ohindex
-  const setActiveService = (ohindex) => setActiveOH(ohindex)
+  // If no allOH entry exists at that index yet, create a default one
+  const setActiveService = (ohindex) => {
+    setHours(p => {
+      if (p.allOH[ohindex]) return p   // already exists, nothing to do
+      // fill any gaps up to ohindex with defaults
+      const filled = [...p.allOH]
+      while (filled.length <= ohindex) {
+        const svc = services[filled.length] ?? {}
+        filled.push({
+          name: svc.name ?? `Service ${filled.length + 1}`,
+          openhours: [{ type: 'all', d: '', h1: '12', m1: '0', h2: '23', m2: '0' }],
+        })
+      }
+      return { ...p, allOH: filled }
+    })
+    setActiveOH(ohindex)
+  }
 
   const toggleWorkingDay = (i) =>
     setHours(p => ({ ...p, working_dates: p.working_dates.map((v, idx) => idx === i ? !v : v) }))
