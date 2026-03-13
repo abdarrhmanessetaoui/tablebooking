@@ -416,7 +416,7 @@ export default function Dashboard() {
           background: none; border: none;
           border-bottom: 3px solid transparent;
           margin-bottom: -2px;
-          color: rgba(43,33,24,0.38);
+          color: ${DARK};
           font-size: 10px; font-weight: 900;
           cursor: pointer; font-family: inherit;
           letter-spacing: .14em; text-transform: uppercase;
