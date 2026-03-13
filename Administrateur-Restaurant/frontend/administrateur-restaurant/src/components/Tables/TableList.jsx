@@ -135,7 +135,7 @@ function TableRow({ tbl, isEditing, isSelected, onEdit, onDelete, onToggle, onSe
             whiteSpace: 'nowrap',
           }}>
             <Users size={10} strokeWidth={2.5} color={GOLD} />
-            {tbl.capacity} pers. max
+            {tbl.capacity} Personnes. max
           </span>
           <span style={{
             display: 'inline-flex', alignItems: 'center', gap: 5,
