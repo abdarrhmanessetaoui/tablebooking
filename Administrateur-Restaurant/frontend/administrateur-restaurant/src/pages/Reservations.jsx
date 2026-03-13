@@ -239,7 +239,7 @@ export default function Reservations() {
   // Default filter on mount: current month
   useEffect(() => {
     if (!location.state?.filterDate) {
-      setFilterDate(new Date().toISOString().slice(0, 7)) // YYYY-MM
+      setFilterDate(new Date().toISOString().slice(0, 10)) // YYYY-MM
     }
     if (!location.state?.filterStatus) {
       setFilterStatus('Pending')
