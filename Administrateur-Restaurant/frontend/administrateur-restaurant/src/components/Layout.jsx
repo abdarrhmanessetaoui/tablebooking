@@ -14,6 +14,7 @@ const PAGE_TITLES = {
   '/reservations':  'Réservations',
   '/blocked-dates': 'Dates bloquées',
   '/calendar':      'Planning',
+  '/services':      'Services',
   '/reports':       'Rapports',
   '/settings':      'Paramètres',
 }
