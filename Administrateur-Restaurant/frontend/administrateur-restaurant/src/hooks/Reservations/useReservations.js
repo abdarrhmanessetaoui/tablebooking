@@ -16,8 +16,6 @@ const EMPTY_FORM = {
   guests: '', service: '', status: 'Pending', notes: ''
 }
 
-const CURRENT_MONTH = new Date().toISOString().slice(0, 7)
-
 export default function useReservations(initialFilters = {}) {
   const [reservations, setReservations] = useState([])
   const [loading, setLoading]           = useState(true)
@@ -31,9 +29,6 @@ export default function useReservations(initialFilters = {}) {
   const [filterStatus,  setFilterStatus]  = useState(initialFilters?.filterStatus || 'all')
   const [filterService, setFilterService] = useState('all')
   const [filterDate,    setFilterDate]    = useState(initialFilters?.filterDate || '')
-  const [filterMonth,   setFilterMonth]   = useState(
-    initialFilters?.filterDate ? '' : CURRENT_MONTH
-  )
 
   const fetchReservations = async (silent = false) => {
     if (!silent) setLoading(true)
@@ -48,15 +43,14 @@ export default function useReservations(initialFilters = {}) {
     }
   }
 
-  // Initial load
   useEffect(() => { fetchReservations() }, [])
 
-  // Auto-refresh every 30s (silent — no spinner)
   useEffect(() => {
     const id = setInterval(() => fetchReservations(true), 30000)
     return () => clearInterval(id)
   }, [])
 
+  // Only search + status + service — date filtering handled in Reservations.jsx
   const filtered = useMemo(() => {
     if (!Array.isArray(reservations)) return []
     return reservations
@@ -66,15 +60,13 @@ export default function useReservations(initialFilters = {}) {
           (r.phone && r.phone.includes(search))
         const matchStatus  = filterStatus  === 'all' || r.status  === filterStatus
         const matchService = filterService === 'all' || r.service === filterService
-        const matchDate    = filterDate    === ''    || r.date    === filterDate
-        const matchMonth   = filterMonth   === ''    || (r.date && r.date.startsWith(filterMonth))
-        return matchSearch && matchStatus && matchService && matchDate && matchMonth
+        return matchSearch && matchStatus && matchService
       })
       .sort((a, b) => {
         const d = (b.date || '').localeCompare(a.date || '')
         return d !== 0 ? d : (b.start_time || '').localeCompare(a.start_time || '')
       })
-  }, [reservations, search, filterStatus, filterService, filterDate, filterMonth])
+  }, [reservations, search, filterStatus, filterService])
 
   const openView   = (r) => { setEditing(r); setModalMode('view') }
   const openEdit   = (r) => { setEditing(r); setForm({ ...r }); setModalMode('edit') }
@@ -137,7 +129,6 @@ export default function useReservations(initialFilters = {}) {
     setFilterStatus('all')
     setFilterService('all')
     setFilterDate('')
-    setFilterMonth(CURRENT_MONTH)
   }
 
   return {
@@ -148,7 +139,6 @@ export default function useReservations(initialFilters = {}) {
     filterStatus,  setFilterStatus,
     filterService, setFilterService,
     filterDate,    setFilterDate,
-    filterMonth,   setFilterMonth,
     clearFilters,
     openView, openEdit, openCreate,
     handleSubmit, handleCreate, handleDelete,
