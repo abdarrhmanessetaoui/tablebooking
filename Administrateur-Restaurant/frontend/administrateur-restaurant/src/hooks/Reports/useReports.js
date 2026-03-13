@@ -16,25 +16,27 @@ function inc(obj, key) { obj[key] = (obj[key] || 0) + 1 }
 function filterByPeriod(rows, period) {
   if (period === 'all') return rows
   const now   = new Date()
-  const today = now.toISOString().slice(0,10)
-
+  const today = now.toISOString().slice(0, 10)
   if (period === 'today') return rows.filter(r => r.date === today)
-
   if (period === 'week') {
-    const wn  = getWeekNum(now)
-    const yr  = now.getFullYear()
+    const wn = getWeekNum(now), yr = now.getFullYear()
     return rows.filter(r => {
       if (!r.date) return false
       const d = new Date(r.date)
       return d.getFullYear() === yr && getWeekNum(d) === wn
     })
   }
-
   if (period === 'month') {
-    const ym = today.slice(0,7)
+    const ym = today.slice(0, 7)
     return rows.filter(r => r.date?.startsWith(ym))
   }
+  return rows
+}
 
+function filterByDate(rows, filterDate) {
+  if (!filterDate) return rows
+  if (filterDate.length === 10) return rows.filter(r => r.date === filterDate)
+  if (filterDate.length === 7)  return rows.filter(r => (r.date || '').startsWith(filterDate))
   return rows
 }
 
@@ -55,42 +57,24 @@ function aggregate(rows) {
     else pending++
 
     if (r.guests) { guests_sum += parseInt(r.guests); guests_n++ }
-
-    // hour
-    if (r.start_time) inc(by_hour, r.start_time.slice(0,5))
-
-    // service
-    if (r.service) inc(by_service, r.service)
-
-    // guests
-    if (r.guests) inc(by_guests, parseInt(r.guests) + ' pers.')
+    if (r.start_time) inc(by_hour, r.start_time.slice(0, 5))
+    if (r.service)    inc(by_service, r.service)
+    if (r.guests)     inc(by_guests, parseInt(r.guests) + ' pers.')
 
     if (r.date) {
       const d  = new Date(r.date)
-      const yr = d.getFullYear()
-      const mo = d.getMonth()
-
-      // day of week
+      const yr = d.getFullYear(), mo = d.getMonth()
       inc(by_day, FR_DAYS[d.getDay()])
-
-      // week
-      const wn  = getWeekNum(d)
-      inc(by_week, `S${String(wn).padStart(2,'0')} '${String(yr).slice(2)}`)
-
-      // month
+      const wn = getWeekNum(d)
+      inc(by_week,  `S${String(wn).padStart(2,'0')} '${String(yr).slice(2)}`)
       inc(by_month, `${FR_MONTHS[mo]} ${yr}`)
-
-      // year
-      inc(by_year, String(yr))
+      inc(by_year,  String(yr))
     }
   }
 
-  // sort guests numerically
   const by_guests_sorted = Object.fromEntries(
     Object.entries(by_guests).sort((a,b) => parseInt(a[0]) - parseInt(b[0]))
   )
-
-  // sort service by count desc
   const by_service_sorted = Object.fromEntries(
     Object.entries(by_service).sort((a,b) => b[1] - a[1])
   )
@@ -118,8 +102,13 @@ export default function useReports() {
   const [rows,    setRows]    = useState([])
   const [loading, setLoading] = useState(true)
   const [error,   setError]   = useState('')
-  const [period,  setPeriod]  = useState('all')
-  const [status,  setStatus]  = useState('all')
+
+  // Filters
+  const [period,        setPeriod]        = useState('all')
+  const [status,        setStatus]        = useState('all')
+  const [search,        setSearch]        = useState('')
+  const [filterService, setFilterService] = useState('all')
+  const [filterDate,    setFilterDate]    = useState('')
 
   const fetchAll = useCallback(async () => {
     setLoading(true)
@@ -140,13 +129,56 @@ export default function useReports() {
 
   useEffect(() => { fetchAll() }, [fetchAll])
 
+  // Derive unique services from all rows
+  const services = useMemo(() => {
+    const set = new Set(rows.map(r => r.service).filter(Boolean))
+    return [...set].sort()
+  }, [rows])
+
   const data = useMemo(() => {
     let filtered = filterByPeriod(rows, period)
-    if (status !== 'all') {
-      filtered = filtered.filter(r => r.status?.toLowerCase() === status)
-    }
-    return aggregate(filtered)
-  }, [rows, period, status])
 
-  return { data, loading, error, refetch: fetchAll, period, setPeriod, status, setStatus }
+    // Status
+    if (status !== 'all') {
+      const s = status.charAt(0).toUpperCase() + status.slice(1)
+      filtered = filtered.filter(r => r.status === s)
+    }
+
+    // Search (name or phone)
+    if (search.trim()) {
+      const q = search.trim().toLowerCase()
+      filtered = filtered.filter(r =>
+        (r.name  || '').toLowerCase().includes(q) ||
+        (r.phone || '').toLowerCase().includes(q)
+      )
+    }
+
+    // Service
+    if (filterService && filterService !== 'all') {
+      filtered = filtered.filter(r => r.service === filterService)
+    }
+
+    // Date (exact day or month prefix)
+    filtered = filterByDate(filtered, filterDate)
+
+    return aggregate(filtered)
+  }, [rows, period, status, search, filterService, filterDate])
+
+  function clearFilters() {
+    setPeriod('all')
+    setStatus('all')
+    setSearch('')
+    setFilterService('all')
+    setFilterDate('')
+  }
+
+  return {
+    data, loading, error, refetch: fetchAll, services,
+    period,        setPeriod,
+    status,        setStatus,
+    search,        setSearch,
+    filterService, setFilterService,
+    filterDate,    setFilterDate,
+    clearFilters,
+  }
 }
