@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { FileDown, Trash2, ToggleRight, ToggleLeft } from 'lucide-react'
+import { FileDown, Trash2, ToggleRight, ToggleLeft, X } from 'lucide-react'
 import FadeUp    from '../components/Dashboard/FadeUp'
 import Spinner   from '../components/Dashboard/Spinner'
 import TableForm from '../components/Tables/TableForm'
@@ -45,7 +45,11 @@ function Btn({ children, onClick, primary, disabled, icon: Icon }) {
 }
 
 function BulkBar({ count, onDelete, onActivate, onDeactivate, onClear }) {
-  const [hovDel, setHovDel] = useState(false)
+  const [hovAct,   setHovAct]   = useState(false)
+  const [hovDeact, setHovDeact] = useState(false)
+  const [hovDel,   setHovDel]   = useState(false)
+  const [hovClear, setHovClear] = useState(false)
+
   return (
     <div style={{
       position: 'sticky', top: 8, zIndex: 30,
@@ -57,72 +61,114 @@ function BulkBar({ count, onDelete, onActivate, onDeactivate, onClear }) {
       <style>{`
         @keyframes slideDown { from{opacity:0;transform:translateY(-8px)} to{opacity:1;transform:translateY(0)} }
         @media (max-width: 480px) { .bulk-label { display: none !important; } }
+        .bulk-btn { transition: background 0.15s, box-shadow 0.15s, transform 0.1s !important; }
+        .bulk-btn:active { transform: scale(0.96) !important; }
       `}</style>
 
+      {/* Count badge */}
       <span style={{
         display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-        minWidth: 26, height: 26, background: GOLD, color: DARK,
-        fontSize: 12, fontWeight: 900, padding: '0 7px', flexShrink: 0,
+        minWidth: 28, height: 28, background: GOLD, color: DARK,
+        fontSize: 13, fontWeight: 900, padding: '0 8px', flexShrink: 0,
+        letterSpacing: '-0.5px',
       }}>{count}</span>
       <span className="bulk-label" style={{ fontSize: 12, fontWeight: 700, color: '#fff', marginRight: 2 }}>
         sélectionnée{count > 1 ? 's' : ''}
       </span>
 
-      <div style={{ width: 1, height: 20, background: '#3d2d1e', margin: '0 4px', flexShrink: 0 }} />
+      <div style={{ width: 1, height: 24, background: '#3d2d1e', margin: '0 4px', flexShrink: 0 }} />
 
-      {/* Activate */}
-      <button onClick={onActivate} style={{
-        display: 'flex', alignItems: 'center', gap: 5, padding: '7px 12px',
-        background: 'rgba(22,163,74,0.12)', border: '1px solid rgba(22,163,74,0.25)',
-        color: '#4ade80', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit',
-        transition: 'all 0.15s', flexShrink: 0, minHeight: 34,
-      }}
-        onMouseEnter={e => { e.currentTarget.style.background = '#16a34a'; e.currentTarget.style.color = '#fff' }}
-        onMouseLeave={e => { e.currentTarget.style.background = 'rgba(22,163,74,0.12)'; e.currentTarget.style.color = '#4ade80' }}
+      {/* ── ACTIVER ── solid green */}
+      <button
+        className="bulk-btn"
+        onClick={onActivate}
+        onMouseEnter={() => setHovAct(true)}
+        onMouseLeave={() => setHovAct(false)}
+        style={{
+          display: 'flex', alignItems: 'center', gap: 7,
+          padding: '9px 16px', minHeight: 38,
+          background: hovAct ? '#15803d' : '#16a34a',
+          border: 'none',
+          color: '#fff',
+          fontSize: 12, fontWeight: 800,
+          cursor: 'pointer', fontFamily: 'inherit', flexShrink: 0,
+          letterSpacing: '0.05em', textTransform: 'uppercase',
+          boxShadow: hovAct
+            ? '0 4px 16px rgba(22,163,74,0.5)'
+            : '0 2px 8px rgba(22,163,74,0.3)',
+        }}
       >
-        <ToggleRight size={13} strokeWidth={2.5} />
+        <ToggleRight size={15} strokeWidth={2.5} />
         <span className="bulk-label">Activer</span>
       </button>
 
-      {/* Deactivate */}
-      <button onClick={onDeactivate} style={{
-        display: 'flex', alignItems: 'center', gap: 5, padding: '7px 12px',
-        background: 'rgba(200,169,126,0.12)', border: '1px solid rgba(200,169,126,0.25)',
-        color: GOLD, fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit',
-        transition: 'all 0.15s', flexShrink: 0, minHeight: 34,
-      }}
-        onMouseEnter={e => { e.currentTarget.style.background = GOLD; e.currentTarget.style.color = DARK }}
-        onMouseLeave={e => { e.currentTarget.style.background = 'rgba(200,169,126,0.12)'; e.currentTarget.style.color = GOLD }}
+      {/* ── DÉSACTIVER ── solid gold/amber */}
+      <button
+        className="bulk-btn"
+        onClick={onDeactivate}
+        onMouseEnter={() => setHovDeact(true)}
+        onMouseLeave={() => setHovDeact(false)}
+        style={{
+          display: 'flex', alignItems: 'center', gap: 7,
+          padding: '9px 16px', minHeight: 38,
+          background: hovDeact ? GOLD_DK : GOLD,
+          border: 'none',
+          color: DARK,
+          fontSize: 12, fontWeight: 800,
+          cursor: 'pointer', fontFamily: 'inherit', flexShrink: 0,
+          letterSpacing: '0.05em', textTransform: 'uppercase',
+          boxShadow: hovDeact
+            ? '0 4px 16px rgba(200,169,126,0.55)'
+            : '0 2px 8px rgba(200,169,126,0.3)',
+        }}
       >
-        <ToggleLeft size={13} strokeWidth={2.5} />
+        <ToggleLeft size={15} strokeWidth={2.5} />
         <span className="bulk-label">Désactiver</span>
       </button>
 
-      {/* Delete */}
-      <button onClick={onDelete}
-        onMouseEnter={() => setHovDel(true)} onMouseLeave={() => setHovDel(false)}
+      {/* ── SUPPRIMER ── solid red */}
+      <button
+        className="bulk-btn"
+        onClick={onDelete}
+        onMouseEnter={() => setHovDel(true)}
+        onMouseLeave={() => setHovDel(false)}
         style={{
-          display: 'flex', alignItems: 'center', gap: 5, padding: '7px 12px',
-          background: hovDel ? '#ef4444' : 'rgba(239,68,68,0.12)',
-          border: '1px solid rgba(239,68,68,0.25)',
-          color: hovDel ? '#fff' : '#f87171',
-          fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit',
-          transition: 'all 0.15s', flexShrink: 0, minHeight: 34,
-        }}>
-        <Trash2 size={13} strokeWidth={2.5} />
+          display: 'flex', alignItems: 'center', gap: 7,
+          padding: '9px 16px', minHeight: 38,
+          background: hovDel ? '#991b1b' : '#dc2626',
+          border: 'none',
+          color: '#fff',
+          fontSize: 12, fontWeight: 800,
+          cursor: 'pointer', fontFamily: 'inherit', flexShrink: 0,
+          letterSpacing: '0.05em', textTransform: 'uppercase',
+          boxShadow: hovDel
+            ? '0 4px 16px rgba(220,38,38,0.6)'
+            : '0 2px 8px rgba(220,38,38,0.35)',
+        }}
+      >
+        <Trash2 size={14} strokeWidth={2.5} />
         <span className="bulk-label">Supprimer</span>
       </button>
 
-      <button onClick={onClear} style={{
-        marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 5,
-        padding: '7px 10px', background: 'none', border: `1px solid #3d2d1e`,
-        color: '#fff', fontSize: 12, fontWeight: 700,
-        cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.15s', flexShrink: 0, minHeight: 34,
-      }}
-        onMouseEnter={e => e.currentTarget.style.color = GOLD}
-        onMouseLeave={e => e.currentTarget.style.color = '#fff'}
+      {/* ── DÉSÉLECTIONNER ── ghost/outline, pushed right */}
+      <button
+        className="bulk-btn"
+        onClick={onClear}
+        onMouseEnter={() => setHovClear(true)}
+        onMouseLeave={() => setHovClear(false)}
+        style={{
+          marginLeft: 'auto',
+          display: 'flex', alignItems: 'center', gap: 6,
+          padding: '9px 14px', minHeight: 38,
+          background: hovClear ? 'rgba(255,255,255,0.1)' : 'transparent',
+          border: `2px solid ${hovClear ? 'rgba(255,255,255,0.45)' : 'rgba(255,255,255,0.2)'}`,
+          color: hovClear ? '#fff' : 'rgba(255,255,255,0.6)',
+          fontSize: 12, fontWeight: 800,
+          cursor: 'pointer', fontFamily: 'inherit', flexShrink: 0,
+          letterSpacing: '0.05em', textTransform: 'uppercase',
+        }}
       >
-        <span style={{ fontSize: 16, lineHeight: 1 }}>✕</span>
+        <X size={13} strokeWidth={2.8} />
         <span className="bulk-label">Désélectionner</span>
       </button>
     </div>
@@ -161,7 +207,6 @@ export default function Tables() {
   }
 
   async function handleBulkActivate() {
-    // ✅ FIX 2: was filtering tables already active (wrong) — now filters inactive ones to activate
     const toActivate = selectedTables.filter(idx => !tables.find(t => t.idx === idx)?.active)
     try {
       await Promise.all(
@@ -175,13 +220,12 @@ export default function Tables() {
       toast(`${selectedTables.length} table${selectedTables.length > 1 ? 's activées' : ' activée'}`, 'success')
       setSelectedTables([])
     } catch {
-      toast('Erreur lors de l\'activation', 'error')
+      toast("Erreur lors de l'activation", 'error')
       setSelectedTables([])
     }
   }
 
   async function handleBulkDeactivate() {
-    // ✅ FIX 2: was filtering inactive tables (wrong) — now filters active ones to deactivate
     const toDeactivate = selectedTables.filter(idx => tables.find(t => t.idx === idx)?.active)
     try {
       await Promise.all(
