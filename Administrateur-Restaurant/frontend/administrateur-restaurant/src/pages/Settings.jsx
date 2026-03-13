@@ -49,9 +49,9 @@ function TimeInput({ value, onChange, max }) {
     <input type="number" min="0" max={max} value={value ?? ''}
       onChange={e => onChange(e.target.value)}
       style={{
-        width: 48, textAlign: 'center',
-        border: `2px solid ${BORDER}`, padding: '8px 4px',
-        fontSize: 14, fontWeight: 900, color: DARK,
+        width: 52, textAlign: 'center',
+        border: `2px solid ${BORDER}`, padding: '10px 6px',
+        fontSize: 15, fontWeight: 900, color: DARK,
         fontFamily: 'inherit', outline: 'none',
         background: '#fff', borderRadius: 0, WebkitAppearance: 'none',
         transition: 'border-color 0.15s',
@@ -62,29 +62,24 @@ function TimeInput({ value, onChange, max }) {
   )
 }
 
-// Responsive save button — icon only on mobile, icon+text on desktop
 function SaveBtn({ onClick, saving }) {
   const [hov, setHov] = useState(false)
   return (
     <>
-      <style>{`
-        .save-label { display: inline; }
-        @media (max-width: 600px) { .save-label { display: none; } }
-      `}</style>
+      <style>{`.save-btn-label { display: inline } @media(max-width:600px){ .save-btn-label { display: none } }`}</style>
       <button onClick={onClick} disabled={saving}
         onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
         title="Enregistrer"
         style={{
-          display: 'flex', alignItems: 'center', gap: 6,
-          padding: '8px 12px',
+          display: 'flex', alignItems: 'center', gap: 6, padding: '8px 16px',
           background: saving ? '#3d2d1e' : hov ? GOLD_DK : GOLD,
           border: 'none', color: DARK, fontSize: 11, fontWeight: 900,
           cursor: saving ? 'not-allowed' : 'pointer', opacity: saving ? 0.7 : 1,
           fontFamily: 'inherit', letterSpacing: '0.05em', textTransform: 'uppercase',
           transition: 'background 0.15s', whiteSpace: 'nowrap', flexShrink: 0,
         }}>
-        <Save size={13} strokeWidth={2.5} />
-        <span className="save-label">{saving ? 'Enregistrement…' : 'Enregistrer'}</span>
+        <Save size={12} strokeWidth={2.5} />
+        <span className="save-btn-label">{saving ? 'Enregistrement…' : 'Enregistrer'}</span>
       </button>
     </>
   )
@@ -95,43 +90,34 @@ function Section({ icon: Icon, title, action, children, defaultOpen = true }) {
   return (
     <div style={{ background: '#fff', border: `2px solid ${DARK}`, overflow: 'hidden' }}>
       <div onClick={() => setOpen(o => !o)} style={{
-        padding: '11px 14px', background: DARK,
+        padding: '12px 16px', background: DARK,
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         cursor: 'pointer', userSelect: 'none', gap: 8,
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0, flex: 1 }}>
-          {Icon && <Icon size={13} strokeWidth={2.5} color={GOLD} style={{ flexShrink: 0 }} />}
+          {Icon && <Icon size={14} strokeWidth={2.5} color={GOLD} style={{ flexShrink: 0 }} />}
           <span style={{
-            fontSize: 10, fontWeight: 900, color: GOLD, letterSpacing: '0.1em',
+            fontSize: 11, fontWeight: 900, color: GOLD, letterSpacing: '0.12em',
             textTransform: 'uppercase', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
           }}>
             {title}
           </span>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
           {action && <div onClick={e => e.stopPropagation()}>{action}</div>}
-          {open ? <ChevronUp size={13} strokeWidth={2.5} color={GOLD} /> : <ChevronDown size={13} strokeWidth={2.5} color={GOLD} />}
+          {open ? <ChevronUp size={14} strokeWidth={2.5} color={GOLD} /> : <ChevronDown size={14} strokeWidth={2.5} color={GOLD} />}
         </div>
       </div>
-      {open && <div style={{ padding: 'clamp(14px,3vw,24px)' }}>{children}</div>}
+      {open && <div style={{ padding: 'clamp(16px,3vw,28px)' }}>{children}</div>}
     </div>
   )
 }
 
-function Grid({ cols = 2, children }) {
+function Grid({ children }) {
   return (
     <>
-      <style>{`
-        .settings-grid-${cols} {
-          display: grid;
-          grid-template-columns: repeat(${cols}, 1fr);
-          gap: 12px;
-        }
-        @media (max-width: 500px) {
-          .settings-grid-${cols} { grid-template-columns: 1fr; }
-        }
-      `}</style>
-      <div className={`settings-grid-${cols}`}>{children}</div>
+      <style>{`.settings-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(220px,1fr)); gap: 16px; } @media(max-width:500px){ .settings-grid { grid-template-columns: 1fr; gap: 12px; } }`}</style>
+      <div className="settings-grid">{children}</div>
     </>
   )
 }
@@ -151,15 +137,14 @@ function TabBtn({ active, onClick, children, disabled }) {
     <button onClick={onClick} disabled={disabled}
       onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
       style={{
-        padding: '8px 14px',
+        padding: '9px 16px',
         background: active ? DARK : hov ? CREAM : '#fff',
         border: `2px solid ${active ? DARK : BORDER}`,
         color: active ? GOLD : DARK,
-        fontSize: 11, fontWeight: 800,
+        fontSize: 12, fontWeight: 800,
         cursor: disabled ? 'default' : 'pointer',
         fontFamily: 'inherit', transition: 'all 0.15s',
-        opacity: disabled ? 0.4 : 1,
-        whiteSpace: 'nowrap',
+        opacity: disabled ? 0.4 : 1, whiteSpace: 'nowrap',
       }}>
       {children}
     </button>
@@ -193,36 +178,46 @@ export default function Settings() {
       <style>{`
         * { box-sizing: border-box; }
         .toggle-btn-text { display: inline; }
-        @media (max-width: 500px) { .toggle-btn-text { display: none; } }
+        .day-pill-sub    { display: block; }
+        .day-pill-pad    { padding: 10px 14px !important; min-width: 58px !important; }
+        .time-editor     { gap: 20px; }
+        @media (max-width: 600px) {
+          .toggle-btn-text { display: none; }
+        }
+        @media (max-width: 480px) {
+          .day-pill-pad  { padding: 8px 6px !important; min-width: 36px !important; }
+          .day-pill-sub  { display: none; }
+          .time-editor   { gap: 10px; }
+        }
       `}</style>
+
       <div style={{
-        background: CREAM,
+        minHeight: '100vh', background: CREAM,
         fontFamily: "'Plus Jakarta Sans','DM Sans',system-ui,sans-serif",
-        padding: 'clamp(12px,3vw,40px) clamp(10px,4vw,36px)',
-        width: '100%', boxSizing: 'border-box',
+        padding: 'clamp(14px,3vw,40px) clamp(12px,4vw,36px)', width: '100%',
       }}>
         <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800;900&display=swap" rel="stylesheet" />
 
         <FadeUp delay={0}>
-          <h1 style={{ margin: 0, fontSize: 'clamp(18px,5vw,36px)', fontWeight: 900, color: DARK, letterSpacing: '-1.5px', lineHeight: 1 }}>
+          <h1 style={{ margin: 0, fontSize: 'clamp(20px,5vw,36px)', fontWeight: 900, color: DARK, letterSpacing: '-1.5px', lineHeight: 1 }}>
             Paramètres
           </h1>
-          <p style={{ margin: '6px 0 0', fontSize: 11, fontWeight: 700, color: GOLD_DK }}>
+          <p style={{ margin: '6px 0 0', fontSize: 12, fontWeight: 700, color: GOLD_DK }}>
             Restaurant · Horaires · Notifications
           </p>
         </FadeUp>
 
         <FadeUp delay={10}>
-          <div style={{ height: 2, background: DARK, margin: '14px 0 24px' }} />
+          <div style={{ height: 2, background: DARK, margin: '16px 0 32px' }} />
         </FadeUp>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 16, maxWidth: 900 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 20, maxWidth: 900 }}>
 
           {/* ══ 1. INFOS ══ */}
           <FadeUp delay={20}>
             <Section icon={Store} title="Informations du restaurant" action={<SaveBtn onClick={saveInfo} saving={savingInfo} />}>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                <Grid cols={2}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+                <Grid>
                   <Field label="Nom du restaurant">
                     <TextInput icon={Store} value={info.form_name} onChange={v => setInfoField('form_name', v)} placeholder="Ex: Dal Corso - Marrakech" />
                   </Field>
@@ -233,7 +228,7 @@ export default function Settings() {
                 <Field label="Adresse">
                   <TextInput icon={MapPin} value={info.address} onChange={v => setInfoField('address', v)} placeholder="Ex: 12 Rue de la Liberté, Guéliz, Marrakech" />
                 </Field>
-                <Grid cols={2}>
+                <Grid>
                   <Field label="Lien Google Maps">
                     <TextInput icon={MapPin} value={info.google_maps_link} onChange={v => setInfoField('google_maps_link', v)} placeholder="https://maps.google.com/…" />
                   </Field>
@@ -241,7 +236,7 @@ export default function Settings() {
                     <TextInput icon={Globe} value={info.website} onChange={v => setInfoField('website', v)} placeholder="https://monrestaurant.ma" />
                   </Field>
                 </Grid>
-                <Grid cols={2}>
+                <Grid>
                   <Field label="Téléphone">
                     <TextInput icon={Phone} value={info.phone} onChange={v => setInfoField('phone', v)} placeholder="+212 6XX XXX XXX" type="tel" />
                   </Field>
@@ -272,17 +267,17 @@ export default function Settings() {
 
               {/* ── Day pills ── */}
               <Label>Jours d'ouverture</Label>
-              <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', marginTop: 8, marginBottom: 20 }}>
+              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 8, marginBottom: 24 }}>
                 {FR_DAYS.map((day, i) => {
                   const open     = hours.working_dates?.[i] ?? false
                   const isActive = activeDay === i
                   const svcCount = services.filter(s => (s.available_days ?? [0,1,2,3,4,5,6]).includes(i)).length
                   return (
                     <button key={i}
+                      className="day-pill-pad"
                       onClick={() => { setActiveDay(i); setActiveServiceIdx(0) }}
                       style={{
-                        display: 'flex', flexDirection: 'column', alignItems: 'center',
-                        padding: '8px 10px', minWidth: 46, gap: 2,
+                        display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3,
                         background: isActive ? GOLD : open ? DARK : '#fff',
                         border: `2px solid ${isActive ? GOLD_DK : DARK}`,
                         color: isActive ? DARK : open ? GOLD : DARK,
@@ -291,11 +286,11 @@ export default function Settings() {
                       onMouseEnter={e => { if (!isActive) e.currentTarget.style.background = open ? '#3d2d1e' : CREAM }}
                       onMouseLeave={e => { if (!isActive) e.currentTarget.style.background = open ? DARK : '#fff' }}
                     >
-                      <span style={{ fontSize: 9, fontWeight: 900, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+                      <span style={{ fontSize: 10, fontWeight: 900, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
                         {day}
                       </span>
-                      <span style={{ fontSize: 8, fontWeight: 700, opacity: 0.75 }}>
-                        {open ? `${svcCount}s` : '—'}
+                      <span className="day-pill-sub" style={{ fontSize: 9, fontWeight: 700, opacity: 0.75 }}>
+                        {open ? `${svcCount} svc` : 'Fermé'}
                       </span>
                     </button>
                   )
@@ -303,39 +298,37 @@ export default function Settings() {
               </div>
 
               {/* ── Selected day header + open toggle ── */}
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginBottom: 16, flexWrap: 'wrap' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-                  <span style={{ fontSize: 15, fontWeight: 900, color: DARK }}>{FR_DAYS_FULL[activeDay]}</span>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, marginBottom: 16 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+                  <span style={{ fontSize: 16, fontWeight: 900, color: DARK }}>{FR_DAYS_FULL[activeDay]}</span>
                   <span style={{
-                    fontSize: 10, fontWeight: 800,
+                    fontSize: 11, fontWeight: 800,
                     color: isDayOpen ? '#16a34a' : '#b94040',
                     background: isDayOpen ? '#f0f7f0' : '#fdf0f0',
-                    padding: '3px 8px', border: `1.5px solid ${isDayOpen ? '#16a34a' : '#b94040'}`,
+                    padding: '3px 10px', border: `1.5px solid ${isDayOpen ? '#16a34a' : '#b94040'}`,
                   }}>
                     {isDayOpen ? 'Ouvert' : 'Fermé'}
                   </span>
                   {isDayOpen && servicesOnActiveDay.length > 0 && (
                     <span style={{
-                      fontSize: 10, fontWeight: 800, color: GOLD_DK,
-                      background: '#fdf6ec', padding: '3px 8px',
+                      fontSize: 11, fontWeight: 800, color: GOLD_DK,
+                      background: '#fdf6ec', padding: '3px 10px',
                       border: `1.5px solid #e8c87a`,
                     }}>
-                      {servicesOnActiveDay.length} svc
+                      {servicesOnActiveDay.length} service{servicesOnActiveDay.length > 1 ? 's' : ''}
                     </span>
                   )}
                 </div>
 
-                {/* Toggle open/closed — icon only on mobile */}
                 <button onClick={() => toggleWorkingDay(activeDay)}
                   title={isDayOpen ? 'Marquer Fermé' : 'Marquer Ouvert'}
                   style={{
                     display: 'flex', alignItems: 'center', gap: 6,
-                    padding: '7px 12px',
+                    padding: '8px 16px', fontSize: 11, fontWeight: 900,
                     background: isDayOpen ? '#fdf0f0' : '#f0f7f0',
                     border: `2px solid ${isDayOpen ? '#b94040' : '#16a34a'}`,
                     color: isDayOpen ? '#b94040' : '#16a34a',
-                    cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.15s',
-                    fontSize: 11, fontWeight: 900, flexShrink: 0,
+                    cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.15s', flexShrink: 0,
                   }}>
                   {isDayOpen
                     ? <><X size={12} strokeWidth={2.5} /><span className="toggle-btn-text">Marquer Fermé</span></>
@@ -346,17 +339,18 @@ export default function Settings() {
 
               {/* ── Content ── */}
               {!isDayOpen ? (
-                <div style={{ padding: '16px', background: '#fdf0f0', border: `2px solid #fecaca`, fontSize: 12, fontWeight: 700, color: '#b94040' }}>
-                  Ce jour est fermé — aucun horaire à configurer.
+                <div style={{ padding: '20px 24px', background: '#fdf0f0', border: `2px solid #fecaca`, fontSize: 13, fontWeight: 700, color: '#b94040' }}>
+                  Ce jour est marqué comme fermé — aucun horaire à configurer.
                 </div>
               ) : servicesOnActiveDay.length === 0 ? (
-                <div style={{ padding: '16px', background: '#fdf6ec', border: `2px solid #e8c87a`, fontSize: 12, fontWeight: 700, color: GOLD_DK }}>
-                  Aucun service le {FR_DAYS_FULL[activeDay].toLowerCase()}. Configurez les jours dans <strong>Services</strong>.
+                <div style={{ padding: '20px 24px', background: '#fdf6ec', border: `2px solid #e8c87a`, fontSize: 13, fontWeight: 700, color: GOLD_DK }}>
+                  Aucun service n'est disponible le {FR_DAYS_FULL[activeDay].toLowerCase()}.
+                  Configurez les jours disponibles depuis la page <strong>Services</strong>.
                 </div>
               ) : (
                 <>
                   <Label>Horaires par service</Label>
-                  <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', marginTop: 8, marginBottom: 14 }}>
+                  <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', marginTop: 8, marginBottom: 16 }}>
                     {servicesOnActiveDay.map((svc, i) => (
                       <TabBtn key={svc.idx} active={activeService === i} onClick={() => setActiveServiceIdx(i)}>
                         {svc.name}
@@ -365,32 +359,31 @@ export default function Settings() {
                   </div>
 
                   {currentSlot && (
-                    <div style={{ background: CREAM, border: `2px solid ${DARK}`, padding: 'clamp(12px,3vw,20px)' }}>
-                      <div style={{ marginBottom: 12, fontSize: 11, fontWeight: 800, color: GOLD_DK }}>
+                    <div style={{ background: CREAM, border: `2px solid ${DARK}`, padding: 'clamp(14px,3vw,24px)' }}>
+                      <div style={{ marginBottom: 10, fontSize: 12, fontWeight: 800, color: GOLD_DK }}>
                         {currentSvc?.name ?? 'Service'} · {FR_DAYS_FULL[activeDay]}
                       </div>
-                      {/* Time editor — stacks on small screens */}
-                      <div style={{ display: 'flex', alignItems: 'flex-end', gap: 12, flexWrap: 'wrap' }}>
+                      <div className="time-editor" style={{ display: 'flex', alignItems: 'flex-end', flexWrap: 'wrap' }}>
                         <div>
                           <Label>Ouverture</Label>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                             <TimeInput max={23} value={currentSlot.h1} onChange={v => updateDayOH(ohindex, activeDay, 'h1', v)} />
-                            <span style={{ fontSize: 16, fontWeight: 900, color: GOLD_DK }}>:</span>
+                            <span style={{ fontSize: 18, fontWeight: 900, color: GOLD_DK }}>:</span>
                             <TimeInput max={59} value={currentSlot.m1} onChange={v => updateDayOH(ohindex, activeDay, 'm1', v)} />
                           </div>
                         </div>
-                        <div style={{ paddingBottom: 10, fontSize: 18, color: DARK, fontWeight: 900 }}>→</div>
+                        <div style={{ paddingBottom: 12, fontSize: 20, color: DARK, fontWeight: 900 }}>→</div>
                         <div>
                           <Label>Fermeture</Label>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                             <TimeInput max={23} value={currentSlot.h2} onChange={v => updateDayOH(ohindex, activeDay, 'h2', v)} />
-                            <span style={{ fontSize: 16, fontWeight: 900, color: GOLD_DK }}>:</span>
+                            <span style={{ fontSize: 18, fontWeight: 900, color: GOLD_DK }}>:</span>
                             <TimeInput max={59} value={currentSlot.m2} onChange={v => updateDayOH(ohindex, activeDay, 'm2', v)} />
                           </div>
                         </div>
                         <div>
                           <Label>Aperçu</Label>
-                          <div style={{ padding: '8px 12px', background: DARK, fontSize: 13, fontWeight: 900, color: GOLD, letterSpacing: '0.06em', whiteSpace: 'nowrap' }}>
+                          <div style={{ padding: '10px 16px', background: DARK, fontSize: 14, fontWeight: 900, color: GOLD, letterSpacing: '0.06em', whiteSpace: 'nowrap' }}>
                             {String(currentSlot.h1 ?? 0).padStart(2,'0')}:{String(currentSlot.m1 ?? 0).padStart(2,'0')}
                             {' — '}
                             {String(currentSlot.h2 ?? 0).padStart(2,'0')}:{String(currentSlot.m2 ?? 0).padStart(2,'0')}
@@ -407,8 +400,8 @@ export default function Settings() {
           {/* ══ 3. NOTIFICATIONS ══ */}
           <FadeUp delay={40}>
             <Section icon={Bell} title="Notifications par email" defaultOpen={false} action={<SaveBtn onClick={saveNotif} saving={savingNotif} />}>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                <Grid cols={2}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+                <Grid>
                   <Field label="Nom expéditeur">
                     <TextInput value={notifications.fp_from_name} onChange={v => setNotifField('fp_from_name', v)} placeholder="TableBooking.ma" />
                   </Field>
