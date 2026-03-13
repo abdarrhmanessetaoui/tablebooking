@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { createPortal } from 'react-dom'
-import { Search, X, Calendar, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react'
+import { X, Calendar, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react'
 
 const DARK = '#2b2118'
 const GOLD = '#c8a97e'
@@ -235,7 +235,6 @@ function CalendarPopup({ filterDate, setFilterDate, onClose, anchorRef }) {
 
 /* ── Main ReportsFilters component ── */
 export default function ReportsFilters({
-  search,        setSearch,
   filterStatus,  setFilterStatus,
   filterService, setFilterService,
   filterDate,    setFilterDate,
@@ -245,7 +244,7 @@ export default function ReportsFilters({
   const [calOpen, setCalOpen] = useState(false)
   const anchorRef = useRef(null)
 
-  const hasFilters = search || filterStatus !== 'all' || filterDate || (filterService && filterService !== 'all')
+  const hasFilters = filterStatus !== 'all' || filterDate || (filterService && filterService !== 'all')
 
   function dateLabel() {
     if (!filterDate) return 'Choisir une date'
@@ -277,40 +276,16 @@ export default function ReportsFilters({
           gap: 8px;
           margin-bottom: 14px;
         }
-        .rp-filters-search { grid-column: 1 / -1; }
         .rp-filters-date   { grid-column: 1 / -1; position: relative; }
         .rp-filters-clear  { grid-column: 1 / -1; }
         @media (min-width: 640px) {
           .rp-filters-wrap   { grid-template-columns: 1fr 1fr 1fr auto; }
-          .rp-filters-search { grid-column: auto; }
           .rp-filters-date   { grid-column: auto; }
           .rp-filters-clear  { grid-column: auto; }
         }
       `}</style>
 
       <div className="rp-filters-wrap">
-
-        {/* Search */}
-        <div className="rp-filters-search" style={{ position: 'relative' }}>
-          <Search size={14} color="#bbb" strokeWidth={2.5} style={{
-            position: 'absolute', left: 12, top: '50%',
-            transform: 'translateY(-50%)', pointerEvents: 'none',
-          }} />
-          <input
-            type="text" placeholder="Rechercher…"
-            value={search} onChange={e => setSearch(e.target.value)}
-            style={{ ...base, paddingLeft: 34 }}
-          />
-          {search && (
-            <button onClick={() => setSearch('')} style={{
-              position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)',
-              background: 'none', border: 'none', cursor: 'pointer', padding: 4,
-              display: 'flex', alignItems: 'center',
-            }}>
-              <X size={12} color="#bbb" strokeWidth={2.5} />
-            </button>
-          )}
-        </div>
 
         {/* Status */}
         <select value={filterStatus} onChange={e => setFilterStatus(e.target.value)}
