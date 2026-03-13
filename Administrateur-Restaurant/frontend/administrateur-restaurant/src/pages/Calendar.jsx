@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { FileDown } from 'lucide-react'
 import useCalendar  from '../hooks/Calendar/useCalendar'
 import CalendarNav  from '../components/Calendar/CalendarNav'
-import CalendarWeek from '../components/Calendar/CalendarWeek'
+import CalendarWeek from '../components/Ca'
 import FadeUp  from '../components/Dashboard/FadeUp'
 import Spinner from '../components/Dashboard/Spinner'
 
