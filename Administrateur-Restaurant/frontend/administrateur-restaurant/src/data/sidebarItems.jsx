@@ -1,6 +1,6 @@
 import {
   LayoutDashboard, CalendarDays, BookOpen,
-  BarChart2, Settings, CalendarOff, LogOut, Utensils,Layou
+  BarChart2, Settings, CalendarOff, LogOut, Utensils,LayoutGrid,
 } from 'lucide-react'
 
 export const navItems = [
