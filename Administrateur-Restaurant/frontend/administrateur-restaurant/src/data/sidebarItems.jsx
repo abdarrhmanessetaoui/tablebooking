@@ -1,5 +1,5 @@
 import {
-  LayoutDashboard, CalendarDays, BookOpen,
+  H, CalendarDays, BookOpen,
   BarChart2, Settings, CalendarOff, LogOut, Utensils, LayoutGrid
 } from 'lucide-react'
 
