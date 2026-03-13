@@ -269,13 +269,19 @@ export default function Reservations() {
   //   YYYY-MM     → whole month match
   const filteredLocal = useMemo(() => {
     const base = Array.isArray(filtered) ? filtered : []
+
+    // Dashboard navigation: show ONLY the selected reservation in the table
+    if (comingFromDashboard && location.state?.openId) {
+      return base.filter(r => r.id === location.state.openId)
+    }
+
     if (!filterDate) return base
     if (filterDate.length === 10) {
       return base.filter(r => r.date === filterDate)
     }
     const month = filterDate.slice(0, 7)
     return base.filter(r => (r.date || '').startsWith(month))
-  }, [filtered, filterDate])
+  }, [filtered, filterDate, comingFromDashboard, location.state?.openId])
 
   // ── Open reservation modal when navigated from Dashboard ─────────────────
   // We search ALL reservations (not just filteredLocal) so status filter
