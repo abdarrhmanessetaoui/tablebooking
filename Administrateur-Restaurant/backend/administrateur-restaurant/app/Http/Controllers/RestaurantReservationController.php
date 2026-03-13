@@ -30,6 +30,17 @@ class RestaurantReservationController extends Controller
         }
     }
 
+    private function getFapp(): array
+    {
+        $form = DB::table('wpjn_cpappbk_forms')->where('id', $this->formId())->first();
+        if (!$form) return [];
+        $structure = json_decode($form->form_structure, true);
+        foreach ($structure[0] ?? [] as $field) {
+            if (($field['ftype'] ?? '') === 'fapp') return $field;
+        }
+        return [];
+    }
+
     public function index(Request $request)
     {
         $messages = WpMessage::where('formid', $this->formId())
@@ -211,13 +222,11 @@ class RestaurantReservationController extends Controller
             ->sortKeys()
             ->mapWithKeys(fn($count, $n) => [$n . ' pers.' => $count]);
 
-        // ── by_service ──────────────────────────────────────────────────
         $byService = $clean
             ->filter(fn($r) => !empty($r['service']))
             ->groupBy(fn($r) => $r['service'])
             ->map(fn($g) => $g->count())
             ->sortDesc();
-        // ────────────────────────────────────────────────────────────────
 
         $total     = $clean->count();
         $confirmed = $clean->filter(fn($r) => $r['status'] === 'Confirmed')->count();
@@ -240,7 +249,7 @@ class RestaurantReservationController extends Controller
             'by_month'   => $byMonth,
             'by_year'    => $byYear,
             'by_guests'  => $byGuests,
-            'by_service' => $byService,   // ← added
+            'by_service' => $byService,
             'summary'    => [
                 'total'      => $total,
                 'confirmed'  => $confirmed,
@@ -259,49 +268,58 @@ class RestaurantReservationController extends Controller
 
         if (!$form) return response()->json([]);
 
-        $parts    = explode(' - ', $form->form_name);
-        $name     = trim($parts[0] ?? $form->form_name);
-        $location = trim($parts[1] ?? '');
+        $fapp = $this->getFapp();
 
         return response()->json([
-            'name'           => $name,
-            'location'       => $location,
-            'form_name'      => $form->form_name,
-            'email'          => $form->fp_from_email,
-            'contact_name'   => $form->fp_from_name,
-            'dest_emails'    => $form->fp_destination_emails,
-            'language'       => $form->calendar_language,
-            'default_status' => $form->defaultstatus,
+            'form_name'        => $form->form_name,
+            'contact_email'    => $form->fp_from_email,
+            'contact_name'     => $form->fp_from_name,
+            'dest_emails'      => $form->fp_destination_emails,
+            'default_status'   => $form->defaultstatus,
+            // stored inside form_structure fapp field
+            'address'          => $fapp['address']          ?? '',
+            'phone'            => $fapp['phone']            ?? '',
+            'website'          => $fapp['website']          ?? '',
+            'google_maps_link' => $fapp['google_maps_link'] ?? '',
+            'capacity'         => $fapp['capacity']         ?? '',
+            'description'      => $fapp['description']      ?? '',
         ]);
     }
 
     public function updateInfo(Request $request)
     {
-        $formId = auth()->user()->restaurant_form_id;
- 
-        $updated = DB::table('wpjn_cpappbk_forms')
-            ->where('id', $formId)
-            ->update(array_filter([
-                'form_name'           => $request->form_name,
-                // These columns may not exist yet — add them via migration if needed
-                'address'             => $request->address,
-                'phone'               => $request->phone,
-                'website'             => $request->website,
-                'google_maps_link'    => $request->google_maps_link,
-                'capacity'            => $request->capacity,
-                'description'         => $request->description,
-                // contact_email maps to fp_from_email (already exists)
-                'fp_from_email'       => $request->contact_email,
-            ], fn($v) => !is_null($v)));
- 
-        return response()->json(['message' => 'Saved', 'updated' => $updated]);
+        $formId = $this->formId();
+
+        $form = DB::table('wpjn_cpappbk_forms')->where('id', $formId)->first();
+        if (!$form) return response()->json(['message' => 'Not found'], 404);
+
+        // Real columns
+        $colUpdates = array_filter([
+            'form_name'    => $request->form_name,
+            'fp_from_email'=> $request->contact_email,
+        ], fn($v) => !is_null($v));
+
+        // Fields stored inside form_structure fapp
+        $structure = json_decode($form->form_structure, true);
+        foreach ($structure[0] as &$field) {
+            if (($field['ftype'] ?? '') !== 'fapp') continue;
+            foreach (['address','phone','website','google_maps_link','capacity','description'] as $key) {
+                if ($request->has($key)) $field[$key] = $request->$key;
+            }
+            break;
+        }
+        $colUpdates['form_structure'] = json_encode($structure);
+
+        DB::table('wpjn_cpappbk_forms')->where('id', $formId)->update($colUpdates);
+
+        return response()->json(['message' => 'Saved']);
     }
- 
+
     public function updateNotifications(Request $request)
     {
-        $formId = auth()->user()->restaurant_form_id;
- 
-        $updated = DB::table('wpjn_cpappbk_forms')
+        $formId = $this->formId();
+
+        DB::table('wpjn_cpappbk_forms')
             ->where('id', $formId)
             ->update(array_filter([
                 'fp_from_name'          => $request->fp_from_name,
@@ -309,8 +327,8 @@ class RestaurantReservationController extends Controller
                 'fp_destination_emails' => $request->fp_destination_emails,
                 'defaultstatus'         => $request->defaultstatus,
             ], fn($v) => !is_null($v)));
- 
-        return response()->json(['message' => 'Saved', 'updated' => $updated]);
+
+        return response()->json(['message' => 'Saved']);
     }
 
     public function services()
