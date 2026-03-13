@@ -4,7 +4,8 @@ import {
 } from 'lucide-react'
 
 export const navItems = [
-  { to: '/dashboard',     label: 'Dashboard',      icon: <LayoutDashboard size={22} strokeWidth={2} /> },
+  { to: '/dashboard',     label: ' Tableau de bord
+',      icon: <LayoutDashboard size={22} strokeWidth={2} /> },
   { to: '/reservations',  label: 'Réservations',   icon: <BookOpen        size={22} strokeWidth={2} /> },
   { to: '/calendar',      label: 'Planning',       icon: <CalendarDays    size={22} strokeWidth={2} /> },
   { to: '/blocked-dates', label: 'Dates bloquées', icon: <CalendarOff     size={22} strokeWidth={2} /> },
