@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Store, MapPin, Mail, Users, Phone, Clock, CalendarClock, Bell, Save, ChevronDown, ChevronUp, Globe } from 'lucide-react'
-import useRestaurantSettings from '../hooks/useRestaurantSettings'
+import useRestaurantSettings from './hooks/useRestaurantSettings'
 import FadeUp  from '../components/Dashboard/FadeUp'
 import Spinner from '../components/Dashboard/Spinner'
 
