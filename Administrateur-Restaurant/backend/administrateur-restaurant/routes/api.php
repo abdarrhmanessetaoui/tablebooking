@@ -7,6 +7,7 @@ use App\Http\Controllers\RestaurantReservationController;
 use App\Http\Controllers\BlockedDateController;
 use App\Http\Controllers\TimeSlotController;
 use App\Http\Controllers\ServiceController;
+use App\Http\Controllers\TableController;
 
 Route::post('/login',  [AuthenticatedSessionController::class, 'store']);
 Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->middleware('auth:sanctum');
