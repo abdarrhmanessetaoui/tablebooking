@@ -250,7 +250,8 @@ export default function Reservations() {
   const filteredLocal = useMemo(() => {
     const base = Array.isArray(filtered) ? filtered : []
     if (!filterDate) return base
-    return base.filter(r => r.date === filterDate)
+    const month = filterDate.slice(0, 7) // extract YYYY-MM from YYYY-MM-DD
+    return base.filter(r => (r.date || '').startsWith(month))
   }, [filtered, filterDate])
 
   // If navigated from Dashboard with openId → open that reservation in modal
