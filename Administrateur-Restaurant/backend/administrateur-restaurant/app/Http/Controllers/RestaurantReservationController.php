@@ -276,7 +276,6 @@ class RestaurantReservationController extends Controller
             'contact_name'     => $form->fp_from_name,
             'dest_emails'      => $form->fp_destination_emails,
             'default_status'   => $form->defaultstatus,
-            // stored inside form_structure fapp field
             'address'          => $fapp['address']          ?? '',
             'phone'            => $fapp['phone']            ?? '',
             'website'          => $fapp['website']          ?? '',
@@ -293,13 +292,11 @@ class RestaurantReservationController extends Controller
         $form = DB::table('wpjn_cpappbk_forms')->where('id', $formId)->first();
         if (!$form) return response()->json(['message' => 'Not found'], 404);
 
-        // Real columns
         $colUpdates = array_filter([
-            'form_name'    => $request->form_name,
-            'fp_from_email'=> $request->contact_email,
+            'form_name'     => $request->form_name,
+            'fp_from_email' => $request->contact_email,
         ], fn($v) => !is_null($v));
 
-        // Fields stored inside form_structure fapp
         $structure = json_decode($form->form_structure, true);
         foreach ($structure[0] as &$field) {
             if (($field['ftype'] ?? '') !== 'fapp') continue;
@@ -346,12 +343,16 @@ class RestaurantReservationController extends Controller
             if (($field['ftype'] ?? '') === 'fapp') {
                 foreach ($field['services'] ?? [] as $svc) {
                     $services[] = [
-                        'name'     => $svc['name'],
-                        'price'    => $svc['price'],
-                        'duration' => $svc['duration'],
-                        'capacity' => $svc['capacity'],
+                        'name'           => $svc['name'],
+                        'price'          => $svc['price'],
+                        'duration'       => $svc['duration'],
+                        'capacity'       => $svc['capacity'],
+                        'idx'            => $svc['idx']            ?? null,
+                        'ohindex'        => $svc['ohindex']        ?? null,
+                        'available_days' => $svc['available_days'] ?? [0,1,2,3,4,5,6],
                     ];
                 }
+                break;
             }
         }
 
