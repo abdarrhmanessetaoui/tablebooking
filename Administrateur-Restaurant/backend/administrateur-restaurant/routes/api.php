@@ -2,12 +2,26 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\RestaurantReservationController;
 use App\Http\Controllers\BlockedDateController;
 use App\Http\Controllers\TimeSlotController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\TableController;
+
+// ── ONE-TIME FIX — visit /api/fix-services once in browser, then delete these 10 lines
+Route::get('/fix-services', function () {
+    $row = DB::table('wpjn_cpappbk_forms')->where('id', 13)->first();
+    if (!$row) return 'Not found';
+    $structure = json_decode($row->form_structure, true);
+    foreach ($structure[0][0]['services'] as &$svc) {
+        if (!isset($svc['available_days'])) $svc['available_days'] = [0,1,2,3,4,5,6];
+    }
+    DB::table('wpjn_cpappbk_forms')->where('id', 13)->update(['form_structure' => json_encode($structure)]);
+    return 'Done — ' . count($structure[0][0]['services']) . ' services fixed';
+});
+// ── END ONE-TIME FIX ──────────────────────────────────────────────────────────
 
 // ── Auth ──────────────────────────────────────────────────────────────────────
 Route::post('/login',  [AuthenticatedSessionController::class, 'store']);
@@ -27,12 +41,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/reports', [RestaurantReservationController::class, 'reports']);
 
     // ── Reservations ──────────────────────────────────────────
-    Route::get   ('/reservations/by-date',          [RestaurantReservationController::class, 'byDate']);
-    Route::get   ('/restaurant/reservations',        [RestaurantReservationController::class, 'index']);
-    Route::get   ('/restaurant/reservations/{id}',   [RestaurantReservationController::class, 'show']);
-    Route::post  ('/restaurant/reservations',        [RestaurantReservationController::class, 'store']);
+    Route::get   ('/reservations/by-date',               [RestaurantReservationController::class, 'byDate']);
+    Route::get   ('/restaurant/reservations',             [RestaurantReservationController::class, 'index']);
+    Route::get   ('/restaurant/reservations/{id}',        [RestaurantReservationController::class, 'show']);
+    Route::post  ('/restaurant/reservations',             [RestaurantReservationController::class, 'store']);
     Route::patch ('/restaurant/reservations/{id}/status', [RestaurantReservationController::class, 'updateStatus']);
-    Route::delete('/restaurant/reservations/{id}',   [RestaurantReservationController::class, 'destroy']);
+    Route::delete('/restaurant/reservations/{id}',        [RestaurantReservationController::class, 'destroy']);
 
     // ── Restaurant settings ───────────────────────────────────
     Route::get('/restaurant/info',          [RestaurantReservationController::class, 'info']);
