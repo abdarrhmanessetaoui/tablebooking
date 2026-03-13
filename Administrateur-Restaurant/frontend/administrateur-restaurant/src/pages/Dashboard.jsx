@@ -464,10 +464,12 @@ export default function Dashboard() {
 
   // Click a row → go to Reservations page with that reservation open in modal
   function handleRowClick(r) {
+    // Use the reservation's own date to build the month filter
+    const monthDate = r.date ? r.date.slice(0, 7) : active?.date?.slice(0, 7) ?? null
     navigate('/reservations', {
       state: {
         openId:     r.id,
-        filterDate: active?.date ?? null,
+        filterDate: monthDate, // YYYY-MM — shows whole month so row is visible
       }
     })
   }
