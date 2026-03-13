@@ -92,7 +92,7 @@ function Ring({ c, p, a, size = 88 }) {
       </svg>
       <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
         <span style={{ fontSize: 16, fontWeight: 900, color: DARK, lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>{pct}%</span>
-        <span style={{ fontSize: 7, fontWeight: 900, color: GOLD_DK, textTransform: 'uppercase', letterSpacing: '0.1em', marginTop: 2 }}>conf.</span>
+        <span style={{ fontSize: 7, fontWeight: 900, color: GOLD_DK, textTransform: 'uppercase', letterSpacing: '0.1em', marginTop: 2 }}>Confirmée</span>
       </div>
     </div>
   )
