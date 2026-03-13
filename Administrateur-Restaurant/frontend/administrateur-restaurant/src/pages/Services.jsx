@@ -92,34 +92,12 @@ function ServiceFormPanel({ initial = EMPTY, onSave, saving, editingName }) {
   const set = k => v => setForm(f => ({ ...f, [k]: v }))
   const valid = form.name.trim() && form.price !== '' && form.capacity !== '' && form.duration !== ''
 
-  // Reset form when switching between add/edit
-  useState(() => { setForm(initial) }, [initial])
-
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-      <Field
-        label="Nom du service" icon={Utensils}
-        value={form.name} onChange={set('name')}
-        placeholder="Ex: A la Carte"
-      />
-      <Field
-        label="Prix" icon={DollarSign}
-        value={form.price} onChange={set('price')}
-        type="number" suffix="dh"
-        placeholder="0"
-      />
-      <Field
-        label="Capacité max" icon={Users}
-        value={form.capacity} onChange={set('capacity')}
-        type="number" suffix="pers."
-        placeholder="15"
-      />
-      <Field
-        label="Durée" icon={Clock}
-        value={form.duration} onChange={set('duration')}
-        type="number" suffix="min"
-        placeholder="60"
-      />
+      <Field label="Nom du service" icon={Utensils} value={form.name} onChange={set('name')} placeholder="Ex: A la Carte" />
+      <Field label="Prix" icon={DollarSign} value={form.price} onChange={set('price')} type="number" suffix="dh" placeholder="0" />
+      <Field label="Capacité max" icon={Users} value={form.capacity} onChange={set('capacity')} type="number" suffix="pers." placeholder="15" />
+      <Field label="Durée" icon={Clock} value={form.duration} onChange={set('duration')} type="number" suffix="min" placeholder="60" />
 
       <button
         onClick={() => valid && onSave(form)}
@@ -137,13 +115,10 @@ function ServiceFormPanel({ initial = EMPTY, onSave, saving, editingName }) {
         onMouseEnter={e => { if (valid && !saving) { e.currentTarget.style.background = GOLD; e.currentTarget.style.color = DARK } }}
         onMouseLeave={e => { if (valid && !saving) { e.currentTarget.style.background = DARK; e.currentTarget.style.color = '#fff' } }}
       >
-        {saving ? (
-          <span>Enregistrement…</span>
-        ) : editingName ? (
-          <><Check size={15} strokeWidth={2.5} /> Modifier "{editingName}"</>
-        ) : (
-          <><Plus size={15} strokeWidth={2.5} /> Ajouter le service</>
-        )}
+        {saving ? <span>Enregistrement…</span>
+          : editingName ? <><Check size={15} strokeWidth={2.5} /> Modifier "{editingName}"</>
+          : <><Plus size={15} strokeWidth={2.5} /> Ajouter le service</>
+        }
       </button>
     </div>
   )
@@ -161,10 +136,7 @@ function ServiceCard({ svc, onEdit, onDelete, isEditing }) {
         display: 'grid', gridTemplateColumns: '3px 1fr auto',
       }}
     >
-      {/* Gold left bar */}
       <div style={{ background: isEditing ? GOLD : '#e8e0d8', transition: 'background 0.15s' }} />
-
-      {/* Content */}
       <div style={{ padding: '14px 16px' }}>
         <p style={{ margin: '0 0 8px', fontSize: 15, fontWeight: 900, color: DARK, letterSpacing: '-0.4px' }}>
           {svc.name}
@@ -184,8 +156,6 @@ function ServiceCard({ svc, onEdit, onDelete, isEditing }) {
           </span>
         </div>
       </div>
-
-      {/* Actions */}
       <div style={{ display: 'flex', flexDirection: 'column', borderLeft: '1px solid #e8e0d8' }}>
         <button onClick={() => onEdit(svc)}
           style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 14px', background: isEditing ? '#fdf6ec' : 'none', border: 'none', borderBottom: '1px solid #e8e0d8', color: isEditing ? GOLD : '#aaa', cursor: 'pointer', transition: 'all 0.15s' }}
@@ -207,12 +177,12 @@ function ServiceCard({ svc, onEdit, onDelete, isEditing }) {
 }
 
 export default function Services() {
-  const [services,    setServices]    = useState([])
-  const [loading,     setLoading]     = useState(true)
-  const [error,       setError]       = useState('')
-  const [editingSvc,  setEditingSvc]  = useState(null)
-  const [saving,      setSaving]      = useState(false)
-  const [exporting,   setExporting]   = useState(false)
+  const [services,   setServices]   = useState([])
+  const [loading,    setLoading]    = useState(true)
+  const [error,      setError]      = useState('')
+  const [editingSvc, setEditingSvc] = useState(null)
+  const [saving,     setSaving]     = useState(false)
+  const [exporting,  setExporting]  = useState(false)
 
   async function fetchServices() {
     setLoading(true)
@@ -227,13 +197,13 @@ export default function Services() {
     }
   }
 
+  // useEffect on mount
   useState(() => { fetchServices() }, [])
 
   async function handleSave(form) {
     setSaving(true)
     try {
       if (editingSvc) {
-        // UPDATE
         await fetch(`${API}/${editingSvc.idx}`, {
           method: 'PUT', headers: headers(),
           body: JSON.stringify({ name: form.name, price: parseFloat(form.price) || 0, capacity: parseInt(form.capacity) || 1, duration: parseInt(form.duration) || 60 }),
@@ -246,7 +216,6 @@ export default function Services() {
         toast(`Service "${form.name}" modifié`, 'success')
         setEditingSvc(null)
       } else {
-        // CREATE
         const res  = await fetch(API, {
           method: 'POST', headers: headers(),
           body: JSON.stringify({ name: form.name, price: parseFloat(form.price) || 0, capacity: parseInt(form.capacity) || 1, duration: parseInt(form.duration) || 60 }),
@@ -256,7 +225,7 @@ export default function Services() {
         toast(`Service "${form.name}" ajouté`, 'success')
       }
     } catch {
-      toast(editingSvc ? 'Impossible de modifier' : 'Impossible d\'ajouter', 'error')
+      toast(editingSvc ? 'Impossible de modifier' : "Impossible d'ajouter", 'error')
     } finally {
       setSaving(false)
     }
@@ -264,11 +233,11 @@ export default function Services() {
 
   async function handleDelete(svc) {
     const ok = await confirm({
-      title:        'Supprimer le service',
-      message:      `Voulez-vous supprimer "${svc.name}" ?`,
-      sub:          'Les réservations existantes ne seront pas affectées.',
+      title: 'Supprimer le service',
+      message: `Voulez-vous supprimer "${svc.name}" ?`,
+      sub: 'Les réservations existantes ne seront pas affectées.',
       confirmLabel: 'Supprimer',
-      type:         'danger',
+      type: 'danger',
     })
     if (!ok) return
     try {
@@ -335,14 +304,14 @@ export default function Services() {
         }
         .svc-layout { display: grid; grid-template-columns: 1fr; gap: 0; }
         @media (min-width: 960px) {
-          .svc-layout       { grid-template-columns: 360px 1fr; gap: 48px; align-items: start; }
-          .svc-form-sticky  { position: sticky; top: 24px; }
-          .svc-mob-divider  { display: none !important; }
+          .svc-layout      { grid-template-columns: 360px 1fr; gap: 48px; align-items: start; }
+          .svc-form-sticky { position: sticky; top: 24px; }
+          .svc-mob-divider { display: none !important; }
         }
       `}</style>
 
       <div style={{
-        minHeight: '100vh', background: '#faf8f5',
+        background: '#faf8f5',
         fontFamily: "'Plus Jakarta Sans','DM Sans',system-ui,sans-serif",
         padding: 'clamp(14px,3vw,40px) clamp(12px,4vw,36px)',
         boxSizing: 'border-box', width: '100%', overflowX: 'hidden',
@@ -388,7 +357,7 @@ export default function Services() {
             {/* LEFT — form */}
             <div className="svc-form-sticky" style={{ minWidth: 0 }}>
               <h2 style={{ margin: '0 0 16px', fontSize: 'clamp(15px,2.5vw,20px)', fontWeight: 900, color: DARK, letterSpacing: '-0.8px' }}>
-                {editingSvc ? `Modifier le service` : 'Nouveau service'}
+                {editingSvc ? 'Modifier le service' : 'Nouveau service'}
               </h2>
 
               <ServiceFormPanel
