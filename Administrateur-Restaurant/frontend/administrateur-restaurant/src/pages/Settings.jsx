@@ -1,48 +1,5 @@
 import useTimeSlots from '../hooks/useTimeSlots'
-import { CalendarClock, Save } from 'lucide-react'
-
-const DARK    = '#2b2118'
-const GOLD    = '#c8a97e'
-const GOLD_DK = '#a8834e'
-const CREAM   = '#faf8f5'
-const BORDER  = '#2b2118'
-const GREEN   = '#16a34a'
-const GREEN_BG= '#f0f7f0'
-const RED     = '#b94040'
-const RED_BG  = '#fdf0f0'
-
-function Label({ children }) {
-  return (
-    <p style={{
-      margin: '0 0 8px', fontSize: 9, fontWeight: 900, color: DARK,
-      letterSpacing: '0.18em', textTransform: 'uppercase',
-    }}>
-      {children}
-    </p>
-  )
-}
-
-function TimeInput({ value, onChange, max }) {
-  return (
-    <input
-      type="number" min="0" max={max}
-      value={value ?? ''}
-      onChange={e => onChange(e.target.value)}
-      style={{
-        width: 52, textAlign: 'center',
-        border: `2px solid ${BORDER}`,
-        padding: '10px 6px',
-        fontSize: 15, fontWeight: 900, color: DARK,
-        fontFamily: 'inherit', outline: 'none',
-        background: '#fff', borderRadius: 0,
-        WebkitAppearance: 'none',
-        transition: 'border-color 0.15s',
-      }}
-      onFocus={e => e.target.style.borderColor = GOLD}
-      onBlur={e => e.target.style.borderColor = BORDER}
-    />
-  )
-}
+import { CalendarClock, Save, Settings as SettingsIcon } from 'lucide-react'
 
 export default function Settings() {
   const {
@@ -53,243 +10,173 @@ export default function Settings() {
   } = useTimeSlots()
 
   return (
-    <div style={{
-      background: CREAM,
-      fontFamily: "'Plus Jakarta Sans','DM Sans',system-ui,sans-serif",
-      padding: 'clamp(14px,3vw,40px) clamp(12px,4vw,36px)',
-      boxSizing: 'border-box', width: '100%', maxWidth: 780,
-    }}>
-      <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800;900&display=swap" rel="stylesheet" />
+    <div className="p-4 sm:p-8 max-w-3xl">
 
-      {/* ── Page header ── */}
-      <div style={{ marginBottom: 8 }}>
-        <h1 style={{ margin: 0, fontSize: 'clamp(20px,5vw,36px)', fontWeight: 900, color: DARK, letterSpacing: '-1.5px', lineHeight: 1 }}>
-          Paramètres
-        </h1>
-        <p style={{ margin: '6px 0 0', fontSize: 12, fontWeight: 700, color: GOLD_DK }}>
-          Gérez les horaires d'ouverture et les jours de service.
+      {/* Header */}
+      <div className="mb-8">
+        <p className="text-xs font-semibold uppercase tracking-widest mb-1" style={{ color: '#c8a97e' }}>
+          Configuration
         </p>
+        <h1 className="text-2xl font-bold text-gray-900">Settings</h1>
+        <p className="text-sm text-gray-400 mt-0.5">Manage your restaurant opening hours and working days</p>
       </div>
 
-      <div style={{ height: 2, background: DARK, margin: '16px 0 28px' }} />
-
-      {/* ── Alerts ── */}
-      {success && (
-        <div style={{ marginBottom: 20, padding: '11px 16px', background: GREEN_BG, borderLeft: `3px solid ${GREEN}`, fontSize: 12, fontWeight: 700, color: GREEN }}>
-          ✓ Enregistré avec succès.
-        </div>
-      )}
-      {error && (
-        <div style={{ marginBottom: 20, padding: '11px 16px', background: RED_BG, borderLeft: `3px solid ${RED}`, fontSize: 12, fontWeight: 700, color: RED }}>
-          {error}
-        </div>
-      )}
-
       {loading ? (
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 13, fontWeight: 700, color: GOLD_DK }}>
-          <div style={{
-            width: 16, height: 16,
-            border: `2.5px solid ${GOLD}`,
-            borderTopColor: 'transparent',
-            borderRadius: '50%',
-            animation: 'spin 0.7s linear infinite',
-          }} />
-          Chargement…
-          <style>{`@keyframes spin { to { transform: rotate(360deg) } }`}</style>
+        <div className="flex items-center gap-2 text-sm text-gray-400">
+          <div className="w-4 h-4 border-2 border-gray-200 border-t-gray-400 rounded-full animate-spin" />
+          Loading...
         </div>
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 32 }}>
+        <div className="bg-white rounded-2xl border border-gray-100 p-6">
 
-          {/* ── SECTION: Jours de travail ── */}
-          <div style={{ background: '#fff', border: `1.5px solid ${BORDER}`, overflow: 'hidden' }}>
-
-            {/* Section header */}
-            <div style={{ padding: '12px 16px', background: DARK, display: 'flex', alignItems: 'center', gap: 8 }}>
-              <CalendarClock size={14} strokeWidth={2.5} color={GOLD} />
-              <span style={{ fontSize: 11, fontWeight: 900, color: GOLD, letterSpacing: '0.12em', textTransform: 'uppercase' }}>
-                Jours de travail
-              </span>
-            </div>
-
-            <div style={{ padding: 'clamp(14px,4vw,24px)' }}>
-              <Label>Sélectionnez les jours d'ouverture</Label>
-              <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 4 }}>
-                {DAYS.map((day, i) => {
-                  const active = workingDates[i]
-                  return (
-                    <button
-                      key={day}
-                      onClick={() => toggleWorkingDay(i)}
-                      style={{
-                        display: 'flex', flexDirection: 'column', alignItems: 'center',
-                        padding: '10px 14px', minWidth: 54,
-                        background: active ? DARK : '#fff',
-                        border: `2px solid ${active ? DARK : '#e8e0d8'}`,
-                        color: active ? GOLD : '#aaa',
-                        cursor: 'pointer', transition: 'all 0.15s',
-                        fontFamily: 'inherit',
-                      }}
-                      onMouseEnter={e => {
-                        if (!active) {
-                          e.currentTarget.style.borderColor = DARK
-                          e.currentTarget.style.color = DARK
-                        }
-                      }}
-                      onMouseLeave={e => {
-                        if (!active) {
-                          e.currentTarget.style.borderColor = '#e8e0d8'
-                          e.currentTarget.style.color = '#aaa'
-                        }
-                      }}
-                    >
-                      <span style={{ fontSize: 11, fontWeight: 900, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
-                        {day.slice(0, 3)}
-                      </span>
-                      <span style={{ fontSize: 9, fontWeight: 700, marginTop: 3, opacity: 0.7 }}>
-                        {active ? 'Ouvert' : 'Fermé'}
-                      </span>
-                    </button>
-                  )
-                })}
+          {/* Card header */}
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <div className="flex items-center gap-2 mb-1">
+                <CalendarClock size={18} color="#c8a97e" strokeWidth={1.8} />
+                <h2 className="text-base font-bold text-gray-900">Opening Hours</h2>
               </div>
+              <p className="text-sm text-gray-400">Changes are saved directly to your booking form</p>
+            </div>
+            <button
+              onClick={handleSave}
+              disabled={saving}
+              className="flex items-center gap-2 text-white text-sm font-semibold px-5 py-2.5 rounded-xl hover:opacity-90 transition-all disabled:opacity-40"
+              style={{ backgroundColor: '#c8a97e' }}
+            >
+              <Save size={14} strokeWidth={2} />
+              {saving ? 'Saving...' : 'Save'}
+            </button>
+          </div>
+
+          {success && (
+            <div className="mb-5 px-4 py-3 bg-green-50 border border-green-200 rounded-xl text-xs text-green-700 font-medium">
+              ✓ Saved to database successfully.
+            </div>
+          )}
+
+          {error && (
+            <div className="mb-5 px-4 py-3 bg-red-50 border border-red-200 rounded-xl text-xs text-red-600">
+              {error}
+            </div>
+          )}
+
+          {/* Working days */}
+          <div className="mb-8">
+            <p className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-3">
+              Working Days
+            </p>
+            <div className="flex gap-2 flex-wrap">
+              {DAYS.map((day, i) => (
+                <button
+                  key={day}
+                  onClick={() => toggleWorkingDay(i)}
+                  className="flex flex-col items-center px-4 py-3 rounded-xl border transition-all min-w-[56px]"
+                  style={{
+                    backgroundColor: workingDates[i] ? '#c8a97e'  : '#f9fafb',
+                    color:           workingDates[i] ? '#fff'     : '#9ca3af',
+                    borderColor:     workingDates[i] ? '#c8a97e'  : '#f3f4f6',
+                  }}
+                >
+                  <span className="text-xs font-bold tracking-wider">
+                    {day.slice(0, 3).toUpperCase()}
+                  </span>
+                  <span className="text-xs mt-0.5" style={{ opacity: 0.7 }}>
+                    {workingDates[i] ? 'Open' : 'Off'}
+                  </span>
+                </button>
+              ))}
             </div>
           </div>
 
-          {/* ── SECTION: Horaires de service ── */}
-          <div style={{ background: '#fff', border: `1.5px solid ${BORDER}`, overflow: 'hidden' }}>
+          {/* Divider */}
+          <div className="border-t border-gray-100 mb-8" />
 
-            {/* Section header */}
-            <div style={{ padding: '12px 16px', background: DARK, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <CalendarClock size={14} strokeWidth={2.5} color={GOLD} />
-                <span style={{ fontSize: 11, fontWeight: 900, color: GOLD, letterSpacing: '0.12em', textTransform: 'uppercase' }}>
-                  Horaires de service
-                </span>
-              </div>
-              <button
-                onClick={handleSave}
-                disabled={saving}
-                style={{
-                  display: 'flex', alignItems: 'center', gap: 6,
-                  padding: '7px 14px',
-                  background: saving ? '#3d2d1e' : GOLD,
-                  border: 'none',
-                  color: saving ? GOLD : DARK,
-                  fontSize: 11, fontWeight: 900,
-                  cursor: saving ? 'not-allowed' : 'pointer',
-                  opacity: saving ? 0.7 : 1,
-                  fontFamily: 'inherit', letterSpacing: '0.05em', textTransform: 'uppercase',
-                  transition: 'background 0.15s',
-                }}
-                onMouseEnter={e => { if (!saving) e.currentTarget.style.background = GOLD_DK }}
-                onMouseLeave={e => { if (!saving) e.currentTarget.style.background = GOLD }}
-              >
-                <Save size={12} strokeWidth={2.5} />
-                {saving ? 'Enregistrement…' : 'Enregistrer'}
-              </button>
+          {/* Service hours */}
+          <div>
+            <p className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-3">
+              Service Hours
+            </p>
+
+            {/* Service tabs */}
+            <div className="flex gap-2 mb-5 flex-wrap">
+              {allOH.map((oh, i) => (
+                <button
+                  key={i}
+                  onClick={() => setActiveOH(i)}
+                  className="px-4 py-2 rounded-xl text-xs font-bold border transition-all"
+                  style={{
+                    backgroundColor: activeOH === i ? '#c8a97e' : '#f9fafb',
+                    color:           activeOH === i ? '#fff'    : '#9ca3af',
+                    borderColor:     activeOH === i ? '#c8a97e' : '#f3f4f6',
+                  }}
+                >
+                  {oh.name}
+                </button>
+              ))}
             </div>
 
-            <div style={{ padding: 'clamp(14px,4vw,24px)' }}>
+            {/* Hour editor */}
+            {allOH[activeOH] && (
+              <div className="bg-gray-50 rounded-2xl p-5 flex items-end gap-6 flex-wrap">
 
-              {/* Service tabs */}
-              <Label>Service</Label>
-              <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', marginBottom: 20 }}>
-                {allOH.map((oh, i) => (
-                  <button
-                    key={i}
-                    onClick={() => setActiveOH(i)}
-                    style={{
-                      padding: '8px 16px',
-                      background: activeOH === i ? DARK : '#fff',
-                      border: `2px solid ${activeOH === i ? DARK : '#e8e0d8'}`,
-                      color: activeOH === i ? GOLD : '#888',
-                      fontSize: 12, fontWeight: 800,
-                      cursor: 'pointer', fontFamily: 'inherit',
-                      transition: 'all 0.15s', letterSpacing: '0.03em',
-                    }}
-                    onMouseEnter={e => {
-                      if (activeOH !== i) {
-                        e.currentTarget.style.borderColor = DARK
-                        e.currentTarget.style.color = DARK
-                      }
-                    }}
-                    onMouseLeave={e => {
-                      if (activeOH !== i) {
-                        e.currentTarget.style.borderColor = '#e8e0d8'
-                        e.currentTarget.style.color = '#888'
-                      }
-                    }}
-                  >
-                    {oh.name}
-                  </button>
-                ))}
-              </div>
-
-              {/* Hour editor */}
-              {allOH[activeOH] && (
-                <div style={{ background: CREAM, border: `1.5px solid #e8e0d8`, padding: 'clamp(14px,3vw,24px)' }}>
-                  <div style={{ display: 'flex', alignItems: 'flex-end', gap: 20, flexWrap: 'wrap' }}>
-
-                    {/* Open */}
-                    <div>
-                      <Label>Ouverture</Label>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                        <TimeInput
-                          max={23}
-                          value={allOH[activeOH].openhours[0]?.h1}
-                          onChange={v => updateOH(activeOH, 'h1', v)}
-                        />
-                        <span style={{ fontSize: 18, fontWeight: 900, color: GOLD_DK, lineHeight: 1 }}>:</span>
-                        <TimeInput
-                          max={59}
-                          value={allOH[activeOH].openhours[0]?.m1}
-                          onChange={v => updateOH(activeOH, 'm1', v)}
-                        />
-                      </div>
-                    </div>
-
-                    {/* Arrow */}
-                    <div style={{ paddingBottom: 12, fontSize: 20, color: '#ccc', fontWeight: 900, lineHeight: 1 }}>→</div>
-
-                    {/* Close */}
-                    <div>
-                      <Label>Fermeture</Label>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                        <TimeInput
-                          max={23}
-                          value={allOH[activeOH].openhours[0]?.h2}
-                          onChange={v => updateOH(activeOH, 'h2', v)}
-                        />
-                        <span style={{ fontSize: 18, fontWeight: 900, color: GOLD_DK, lineHeight: 1 }}>:</span>
-                        <TimeInput
-                          max={59}
-                          value={allOH[activeOH].openhours[0]?.m2}
-                          onChange={v => updateOH(activeOH, 'm2', v)}
-                        />
-                      </div>
-                    </div>
-
-                    {/* Preview pill */}
-                    <div>
-                      <Label>Aperçu</Label>
-                      <div style={{
-                        padding: '10px 16px',
-                        background: DARK,
-                        fontSize: 14, fontWeight: 900, color: GOLD,
-                        letterSpacing: '0.06em', whiteSpace: 'nowrap',
-                      }}>
-                        {String(allOH[activeOH].openhours[0]?.h1 ?? 0).padStart(2, '0')}:
-                        {String(allOH[activeOH].openhours[0]?.m1 ?? 0).padStart(2, '0')}
-                        {' — '}
-                        {String(allOH[activeOH].openhours[0]?.h2 ?? 0).padStart(2, '0')}:
-                        {String(allOH[activeOH].openhours[0]?.m2 ?? 0).padStart(2, '0')}
-                      </div>
-                    </div>
-
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Open</label>
+                  <div className="flex items-center gap-1.5">
+                    <input
+                      type="number" min="0" max="23"
+                      value={allOH[activeOH].openhours[0]?.h1 ?? ''}
+                      onChange={e => updateOH(activeOH, 'h1', e.target.value)}
+                      className="w-14 text-center border border-gray-200 rounded-xl px-2 py-2.5 text-sm font-bold text-gray-800 focus:outline-none focus:border-gray-400 bg-white"
+                    />
+                    <span className="text-gray-300 font-bold text-lg">:</span>
+                    <input
+                      type="number" min="0" max="59" step="30"
+                      value={allOH[activeOH].openhours[0]?.m1 ?? ''}
+                      onChange={e => updateOH(activeOH, 'm1', e.target.value)}
+                      className="w-14 text-center border border-gray-200 rounded-xl px-2 py-2.5 text-sm font-bold text-gray-800 focus:outline-none focus:border-gray-400 bg-white"
+                    />
                   </div>
                 </div>
-              )}
-            </div>
+
+                <div className="pb-3 text-gray-300 font-bold text-xl">→</div>
+
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Close</label>
+                  <div className="flex items-center gap-1.5">
+                    <input
+                      type="number" min="0" max="23"
+                      value={allOH[activeOH].openhours[0]?.h2 ?? ''}
+                      onChange={e => updateOH(activeOH, 'h2', e.target.value)}
+                      className="w-14 text-center border border-gray-200 rounded-xl px-2 py-2.5 text-sm font-bold text-gray-800 focus:outline-none focus:border-gray-400 bg-white"
+                    />
+                    <span className="text-gray-300 font-bold text-lg">:</span>
+                    <input
+                      type="number" min="0" max="59" step="30"
+                      value={allOH[activeOH].openhours[0]?.m2 ?? ''}
+                      onChange={e => updateOH(activeOH, 'm2', e.target.value)}
+                      className="w-14 text-center border border-gray-200 rounded-xl px-2 py-2.5 text-sm font-bold text-gray-800 focus:outline-none focus:border-gray-400 bg-white"
+                    />
+                  </div>
+                </div>
+
+                {/* Preview */}
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Preview</label>
+                  <div
+                    className="px-5 py-2.5 rounded-xl text-sm font-bold border"
+                    style={{ backgroundColor: 'rgba(200,169,126,0.08)', borderColor: 'rgba(200,169,126,0.3)', color: '#c8a97e' }}
+                  >
+                    {String(allOH[activeOH].openhours[0]?.h1 ?? 0).padStart(2,'0')}:
+                    {String(allOH[activeOH].openhours[0]?.m1 ?? 0).padStart(2,'0')}
+                    {' → '}
+                    {String(allOH[activeOH].openhours[0]?.h2 ?? 0).padStart(2,'0')}:
+                    {String(allOH[activeOH].openhours[0]?.m2 ?? 0).padStart(2,'0')}
+                  </div>
+                </div>
+
+              </div>
+            )}
           </div>
 
         </div>
