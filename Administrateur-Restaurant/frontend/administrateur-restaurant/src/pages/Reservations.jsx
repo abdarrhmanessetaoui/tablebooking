@@ -224,7 +224,7 @@ export default function Reservations() {
   const { services } = useServices()   // ← dynamic services from API
 
   const {
-    filteredLocal: filteredFromHook, loading, error,
+    filtered: filteredFromHook, loading, error,
     modalMode, setModalMode,
     form, setForm,
     editing,
