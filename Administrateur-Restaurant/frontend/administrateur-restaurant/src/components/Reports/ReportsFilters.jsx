@@ -147,7 +147,7 @@ function CalendarPopup({ filterDate, setFilterDate, onClose, anchorRef }) {
             textTransform: 'uppercase', letterSpacing: '0.08em',
             background: 'none', border: 'none', cursor: 'pointer',
             fontFamily: 'inherit',
-            color: mode === m ? DARK : '#bbb',
+            color: mode === m ? DARK : '#2b2118',
             borderBottom: mode === m ? `2px solid ${DARK}` : 'none',
             marginBottom: mode === m ? -2 : 0,
             transition: 'all 0.12s',
@@ -163,7 +163,7 @@ function CalendarPopup({ filterDate, setFilterDate, onClose, anchorRef }) {
           {DAYS_FR.map(d => (
             <div key={d} style={{
               textAlign: 'center', fontSize: 10, fontWeight: 800,
-              color: '#bbb', padding: '4px 0', letterSpacing: '0.06em',
+              color: '#2b2118', padding: '4px 0', letterSpacing: '0.06em',
             }}>
               {d}
             </div>
@@ -177,7 +177,7 @@ function CalendarPopup({ filterDate, setFilterDate, onClose, anchorRef }) {
               style={{
                 textAlign: 'center', fontSize: 12, borderRadius: 2,
                 fontWeight: c.isSelected ? 800 : c.isToday ? 900 : c.isOther ? 400 : 700,
-                color: c.isSelected ? GOLD : c.isToday ? GOLD : c.isOther ? '#ccc' : DARK,
+                color: c.isSelected ? GOLD : c.isToday ? GOLD : c.isOther ? '#2b2118' : DARK,
                 background: c.isSelected ? DARK : 'transparent',
                 padding: '5px 2px',
                 cursor: c.isOther ? 'default' : 'pointer',
@@ -260,7 +260,7 @@ export default function ReportsFilters({
   }
 
   const base = {
-    background: '#fff', border: '2px solid #e8e0d8',
+    background: '#fff', border: '2px solid #2b2118',
     padding: '10px 14px', fontSize: 13, fontWeight: 600,
     color: DARK, fontFamily: 'inherit',
     outline: 'none', boxSizing: 'border-box',
@@ -313,7 +313,7 @@ export default function ReportsFilters({
               background: filterDate ? DARK : '#fff',
               border: filterDate ? 'none' : '2px solid #e8e0d8',
               fontSize: 13, fontWeight: 800,
-              color: filterDate ? GOLD : '#bbb',
+              color: filterDate ? GOLD : '#2b2118',
               cursor: 'pointer', fontFamily: 'inherit',
               transition: 'all 0.15s',
             }}
