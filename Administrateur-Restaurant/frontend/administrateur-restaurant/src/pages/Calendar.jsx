@@ -111,19 +111,10 @@ export default function Calendar() {
         <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800;900&display=swap" rel="stylesheet" />
         <style>{`* { box-sizing: border-box; }`}</style>
 
-        {/* HEADER */}
         <FadeUp delay={0}>
-          <div style={{
-            display: 'flex', alignItems: 'flex-start',
-            justifyContent: 'space-between', gap: 12,
-            marginBottom: 8, flexWrap: 'wrap',
-          }}>
+          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12, marginBottom: 8, flexWrap: 'wrap' }}>
             <div>
-              <h1 style={{
-                margin: 0, fontSize: 'clamp(22px,4vw,36px)',
-                fontWeight: 900, color: DARK,
-                letterSpacing: '-1.5px', lineHeight: 1,
-              }}>
+              <h1 style={{ margin: 0, fontSize: 'clamp(22px,4vw,36px)', fontWeight: 900, color: DARK, letterSpacing: '-1.5px', lineHeight: 1 }}>
                 Planning
               </h1>
               <p className="page-subtitle" style={{ margin: '6px 0 0', fontSize: 12, fontWeight: 700, color: GOLD_DK }}>
@@ -138,34 +129,22 @@ export default function Calendar() {
           </div>
         </FadeUp>
 
-        {/* DIVIDER */}
         <FadeUp delay={10}>
           <div style={{ height: 2, background: DARK, margin: '16px 0 24px' }} />
         </FadeUp>
 
-        {/* ERROR */}
         {error && (
           <FadeUp delay={15}>
-            <div style={{
-              marginBottom: 16, padding: '11px 16px',
-              background: RED_BG, borderLeft: `3px solid ${RED}`,
-              fontSize: 12, fontWeight: 700, color: RED,
-            }}>
+            <div style={{ marginBottom: 16, padding: '11px 16px', background: RED_BG, borderLeft: `3px solid ${RED}`, fontSize: 12, fontWeight: 700, color: RED }}>
               {error}
             </div>
           </FadeUp>
         )}
 
-        {/* NAV */}
         <FadeUp delay={20}>
-          <CalendarNav
-            view={view} setView={setView}
-            navLabel={navLabel} navigate={navigate}
-            goToday={goToday} currentDate={currentDate}
-          />
+          <CalendarNav view={view} setView={setView} navLabel={navLabel} navigate={navigate} goToday={goToday} currentDate={currentDate} />
         </FadeUp>
 
-        {/* CALENDAR */}
         <FadeUp delay={40}>
           {loading ? <Spinner /> : (
             <CalendarWeek
@@ -176,7 +155,6 @@ export default function Calendar() {
             />
           )}
         </FadeUp>
-
       </div>
     </>
   )
