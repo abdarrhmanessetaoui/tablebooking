@@ -220,6 +220,9 @@ export default function Reservations() {
   const [exporting,   setExporting]   = useState(false)
   const [selectedIds, setSelectedIds] = useState([])
 
+  // Detect if we arrived from Dashboard with a specific reservation to highlight
+  const comingFromDashboard = !!location.state?.openId
+
   const { services } = useServices()
 
   const {
@@ -236,36 +239,60 @@ export default function Reservations() {
     setReservations,
   } = useReservations(location.state)
 
-  // Default filter on mount: current month
+  // ── Default filters on mount ──────────────────────────────────────────────
+  // When coming from Dashboard with openId:
+  //   • keep filterDate as-is (already set to the day from Dashboard)
+  //   • set filterStatus to 'all' so the target reservation is always visible
+  // Otherwise apply normal defaults (current month, Pending)
   useEffect(() => {
-    if (!location.state?.filterDate) {
-      setFilterDate(new Date().toISOString().slice(0, 10)) // YYYY-MM
-    }
-    if (!location.state?.filterStatus) {
-      setFilterStatus('Pending')
+    if (comingFromDashboard) {
+      // Dashboard passes filterDate (YYYY-MM-DD) — keep it, just show all statuses
+      setFilterStatus('all')
+      // If no filterDate came through, default to today
+      if (!location.state?.filterDate) {
+        setFilterDate(new Date().toISOString().slice(0, 10))
+      }
+    } else {
+      // Normal entry: default to current month + Pending
+      if (!location.state?.filterDate) {
+        setFilterDate(new Date().toISOString().slice(0, 7)) // YYYY-MM (month only)
+      }
+      if (!location.state?.filterStatus) {
+        setFilterStatus('Pending')
+      }
     }
   }, []) // eslint-disable-line
 
-  // All date filtering lives here — hook only does search/status/service
+  // ── Local date filtering ──────────────────────────────────────────────────
+  // filterDate can be:
+  //   YYYY-MM-DD  → exact day match
+  //   YYYY-MM     → whole month match
   const filteredLocal = useMemo(() => {
     const base = Array.isArray(filtered) ? filtered : []
     if (!filterDate) return base
     if (filterDate.length === 10) {
-      // Specific day selected → exact match
       return base.filter(r => r.date === filterDate)
     }
-    // Month only selected → match YYYY-MM prefix
     const month = filterDate.slice(0, 7)
     return base.filter(r => (r.date || '').startsWith(month))
   }, [filtered, filterDate])
 
-  // If navigated from Dashboard with openId → open that reservation in modal
+  // ── Open reservation modal when navigated from Dashboard ─────────────────
+  // We search ALL reservations (not just filteredLocal) so status filter
+  // never blocks finding the target reservation.
   useEffect(() => {
     const openId = location.state?.openId
-    if (!openId || loading || !filteredLocal.length) return
-    const target = filteredLocal.find(r => r.id === openId)
+    if (!openId || loading) return
+
+    const allRes = Array.isArray(filtered) ? filtered : []
+
+    // Try filteredLocal first; fall back to all reservations
+    const target =
+      filteredLocal.find(r => r.id === openId) ||
+      allRes.find(r => r.id === openId)
+
     if (target) openView(target)
-  }, [location.state?.openId, loading, filteredLocal.length]) // eslint-disable-line
+  }, [location.state?.openId, loading, filtered]) // eslint-disable-line
 
   async function handleExportPDF() {
     setExporting(true)
