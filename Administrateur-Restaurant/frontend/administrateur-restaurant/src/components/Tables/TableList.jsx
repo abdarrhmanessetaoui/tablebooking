@@ -109,6 +109,64 @@ function ActionBtn({ onClick, title, color, colorDark, bg, bgHover, icon: Icon, 
   )
 }
 
+/* ── Big toggle pill button ── */
+function ToggleBtn({ tbl, onToggle, isMobile }) {
+  const [hov, setHov] = useState(false)
+  const isActive = tbl.active
+
+  return (
+    <button
+      onClick={() => onToggle(tbl)}
+      title={isActive ? 'Désactiver' : 'Activer'}
+      onMouseEnter={() => setHov(true)}
+      onMouseLeave={() => setHov(false)}
+      onMouseDown={e => e.currentTarget.style.transform = 'scale(0.95)'}
+      onMouseUp={e => e.currentTarget.style.transform = 'scale(1)'}
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 6,
+        height: 32,
+        padding: isMobile ? '0 8px' : '0 12px',
+        background: isActive
+          ? (hov ? GREEN_DK : GREEN)
+          : (hov ? '#4b5563' : '#6b7280'),
+        border: 'none',
+        borderRadius: 999,
+        color: '#fff',
+        fontSize: 11,
+        fontWeight: 800,
+        letterSpacing: '0.05em',
+        textTransform: 'uppercase',
+        cursor: 'pointer',
+        fontFamily: 'inherit',
+        flexShrink: 0,
+        transition: 'background 0.15s, transform 0.1s',
+        boxShadow: hov
+          ? `0 3px 12px ${isActive ? GREEN : '#6b7280'}88`
+          : `0 1px 5px ${isActive ? GREEN : '#6b7280'}44`,
+        whiteSpace: 'nowrap',
+      }}
+    >
+      <span style={{
+        width: 7, height: 7,
+        borderRadius: '50%',
+        background: isActive ? '#bbf7d0' : '#d1d5db',
+        flexShrink: 0,
+        boxShadow: isActive ? '0 0 0 2px rgba(187,247,208,0.35)' : 'none',
+        transition: 'background 0.15s',
+      }} />
+      {isActive
+        ? <ToggleRight size={14} strokeWidth={2.5} />
+        : <ToggleLeft  size={14} strokeWidth={2.5} />
+      }
+      {!isMobile && (
+        <span>{isActive ? 'Actif' : 'Inactif'}</span>
+      )}
+    </button>
+  )
+}
+
 export default function TableList({ tables, editingTbl, onEdit, onDelete, onToggle, selectedTables, setSelectedTables }) {
   const [page, setPage] = useState(1)
   const isMobile = useIsMobile(600)
@@ -223,7 +281,7 @@ export default function TableList({ tables, editingTbl, onEdit, onDelete, onTogg
         {/* Header */}
         <div style={{
           display: 'grid',
-          gridTemplateColumns: isMobile ? '44px 1fr 90px' : '44px 1fr 110px 110px 130px',
+          gridTemplateColumns: isMobile ? '44px 1fr 108px' : '44px 1fr 110px 110px 168px',
           padding: '10px 12px', background: DARK, alignItems: 'center', gap: 8,
         }}>
           <Checkbox checked={pageAllSel} indeterminate={pageSomeSel} onChange={togglePage} />
@@ -245,7 +303,7 @@ export default function TableList({ tables, editingTbl, onEdit, onDelete, onTogg
               onClick={() => toggleOne(tbl.idx)}
               style={{
                 display: 'grid',
-                gridTemplateColumns: isMobile ? '44px 1fr 90px' : '44px 1fr 110px 110px 130px',
+                gridTemplateColumns: isMobile ? '44px 1fr 108px' : '44px 1fr 110px 110px 168px',
                 padding: isMobile ? '13px 12px' : '12px 16px',
                 background: bg,
                 borderBottom: `1px solid ${BORDER}`,
@@ -300,14 +358,8 @@ export default function TableList({ tables, editingTbl, onEdit, onDelete, onTogg
               {/* ── Action buttons ── */}
               <div onClick={e => e.stopPropagation()} style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
 
-                {/* Toggle active — green / gray */}
-                <ActionBtn
-                  onClick={() => onToggle(tbl)}
-                  title={tbl.active ? 'Désactiver' : 'Activer'}
-                  icon={tbl.active ? ToggleRight : ToggleLeft}
-                  color={tbl.active ? GREEN : '#9ca3af'}
-                  colorDark={tbl.active ? GREEN_DK : '#6b7280'}
-                />
+                {/* Toggle active — big labeled pill */}
+                <ToggleBtn tbl={tbl} onToggle={onToggle} isMobile={isMobile} />
 
                 {/* Edit — dark gold */}
                 <ActionBtn
