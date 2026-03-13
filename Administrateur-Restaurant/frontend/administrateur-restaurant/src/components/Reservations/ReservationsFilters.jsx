@@ -4,6 +4,8 @@ import { Search, X, Calendar, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsR
 
 const DARK = '#2b2118'
 const GOLD = '#c8a97e'
+const GOLD_DARK = '#a8834e'
+const MUTED = 'rgba(43,33,24,0.35)'
 
 const MONTHS_FR = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre']
 const DAYS_FR   = ['Lu','Ma','Me','Je','Ve','Sa','Di']
@@ -25,35 +27,31 @@ function CalendarPopup({ filterDate, setFilterDate, onClose, anchorRef }) {
   const [pos,       setPos]       = useState({ top: -9999, left: -9999, width: 280 })
   const popupRef = useRef(null)
 
-  // Compute position relative to anchor button
   useEffect(() => {
     function calcPos() {
       if (!anchorRef.current) return
-      const rect  = anchorRef.current.getBoundingClientRect()
-      const pw    = 280
-      const vw    = window.innerWidth
-      const vh    = window.innerHeight
-      const ph    = popupRef.current ? popupRef.current.offsetHeight : 340
-      // Horizontal: right-align to button, clamped inside viewport
-      let left = rect.right - pw
+      const rect = anchorRef.current.getBoundingClientRect()
+      const pw   = 280
+      const vw   = window.innerWidth
+      const vh   = window.innerHeight
+      const ph   = popupRef.current ? popupRef.current.offsetHeight : 340
+      let left   = rect.right - pw
       if (left < 8) left = 8
       if (left + pw > vw - 8) left = vw - pw - 8
-      // Vertical: below if room, above if not
-      const top = (vh - rect.bottom > ph + 8 || vh - rect.bottom > rect.top)
+      const top  = (vh - rect.bottom > ph + 8 || vh - rect.bottom > rect.top)
         ? rect.bottom + 4
         : rect.top - ph - 4
       setPos({ top, left, width: Math.min(pw, vw - 16) })
     }
     calcPos()
-    window.addEventListener('resize',  calcPos)
-    window.addEventListener('scroll',  calcPos, true)
+    window.addEventListener('resize', calcPos)
+    window.addEventListener('scroll', calcPos, true)
     return () => {
-      window.removeEventListener('resize',  calcPos)
-      window.removeEventListener('scroll',  calcPos, true)
+      window.removeEventListener('resize', calcPos)
+      window.removeEventListener('scroll', calcPos, true)
     }
   }, [anchorRef])
 
-  // Close on outside click
   useEffect(() => {
     function handler(e) {
       if (
@@ -108,49 +106,33 @@ function CalendarPopup({ filterDate, setFilterDate, onClose, anchorRef }) {
   for (let d = 1; d <= remaining; d++)
     dayCells.push({ content: d, isOther: true })
 
-  const popup = (
-    <div
-      ref={popupRef}
-      style={{
-        position: 'fixed',
-        top:   pos.top,
-        left:  pos.left,
-        width: pos.width,
-        zIndex: 99999,
-        background: '#fff',
-        border: `2px solid ${DARK}`,
-        boxShadow: '0 8px 32px rgba(43,33,24,0.22)',
-        fontFamily: "'Plus Jakarta Sans','DM Sans',system-ui,sans-serif",
-      }}
-    >
+  return createPortal(
+    <div ref={popupRef} style={{
+      position: 'fixed', top: pos.top, left: pos.left, width: pos.width,
+      zIndex: 99999, background: '#fff',
+      border: `2px solid ${DARK}`,
+      boxShadow: '0 8px 32px rgba(43,33,24,0.22)',
+      fontFamily: "'Plus Jakarta Sans','DM Sans',system-ui,sans-serif",
+    }}>
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', background: DARK, padding: '8px 6px', gap: 2 }}>
-        <button onClick={() => setViewYear(y => y - 1)} style={navBtnStyle} title="Année précédente">
-          <ChevronsLeft size={13} strokeWidth={2.5} />
-        </button>
-        <button onClick={() => navMonth(-1)} style={navBtnStyle} title="Mois précédent">
-          <ChevronLeft size={13} strokeWidth={2.5} />
-        </button>
-        <span style={{ flex: 1, textAlign: 'center', fontSize: 13, fontWeight: 800, color: GOLD, letterSpacing: '0.02em' }}>
+        <button onClick={() => setViewYear(y => y - 1)} style={navBtnStyle}><ChevronsLeft size={13} strokeWidth={2.5} /></button>
+        <button onClick={() => navMonth(-1)} style={navBtnStyle}><ChevronLeft size={13} strokeWidth={2.5} /></button>
+        <span style={{ flex: 1, textAlign: 'center', fontSize: 13, fontWeight: 800, color: GOLD }}>
           {MONTHS_FR[viewMonth]} {viewYear}
         </span>
-        <button onClick={() => navMonth(1)} style={navBtnStyle} title="Mois suivant">
-          <ChevronRight size={13} strokeWidth={2.5} />
-        </button>
-        <button onClick={() => setViewYear(y => y + 1)} style={navBtnStyle} title="Année suivante">
-          <ChevronsRight size={13} strokeWidth={2.5} />
-        </button>
+        <button onClick={() => navMonth(1)} style={navBtnStyle}><ChevronRight size={13} strokeWidth={2.5} /></button>
+        <button onClick={() => setViewYear(y => y + 1)} style={navBtnStyle}><ChevronsRight size={13} strokeWidth={2.5} /></button>
       </div>
 
       {/* Mode toggle */}
-      <div style={{ display: 'flex', borderBottom: '2px solid #e8e0d8' }}>
+      <div style={{ display: 'flex', borderBottom: `2px solid rgba(43,33,24,0.12)` }}>
         {['day', 'month'].map(m => (
           <button key={m} onClick={() => setMode(m)} style={{
             flex: 1, padding: '7px', fontSize: 11, fontWeight: 800,
             textTransform: 'uppercase', letterSpacing: '0.08em',
             background: 'none', border: 'none', cursor: 'pointer',
-            fontFamily: 'inherit',
-            color: mode === m ? DARK : '#2b2118',
+            fontFamily: 'inherit', color: DARK,
             borderBottom: mode === m ? `2px solid ${DARK}` : 'none',
             marginBottom: mode === m ? -2 : 0,
             transition: 'all 0.12s',
@@ -166,29 +148,23 @@ function CalendarPopup({ filterDate, setFilterDate, onClose, anchorRef }) {
           {DAYS_FR.map(d => (
             <div key={d} style={{
               textAlign: 'center', fontSize: 10, fontWeight: 800,
-              color: '#2b2118', padding: '4px 0', letterSpacing: '0.06em',
-            }}>
-              {d}
-            </div>
+              color: GOLD_DARK, padding: '4px 0', letterSpacing: '0.06em',
+            }}>{d}</div>
           ))}
           {dayCells.map((c, i) => (
-            <div
-              key={i}
-              onClick={c.onClick}
+            <div key={i} onClick={c.onClick}
               onMouseEnter={e => { if (!c.isOther && !c.isSelected) e.currentTarget.style.background = '#f5f0eb' }}
               onMouseLeave={e => { if (!c.isSelected) e.currentTarget.style.background = 'transparent' }}
               style={{
                 textAlign: 'center', fontSize: 12, borderRadius: 2,
-                fontWeight: c.isSelected ? 800 : c.isToday ? 900 : c.isOther ? 400 : 700,
-                color: c.isSelected ? GOLD : c.isToday ? GOLD : c.isOther ? '#2b2118' : DARK,
+                fontWeight: c.isSelected ? 800 : c.isToday ? 900 : 600,
+                color: c.isSelected ? GOLD : c.isToday ? GOLD_DARK : c.isOther ? 'rgba(43,33,24,0.2)' : DARK,
                 background: c.isSelected ? DARK : 'transparent',
                 padding: '5px 2px',
                 cursor: c.isOther ? 'default' : 'pointer',
                 transition: 'background 0.1s',
               }}
-            >
-              {c.content}
-            </div>
+            >{c.content}</div>
           ))}
         </div>
       )}
@@ -200,21 +176,17 @@ function CalendarPopup({ filterDate, setFilterDate, onClose, anchorRef }) {
             const isCurrent  = i === today.getMonth() && viewYear === today.getFullYear()
             const isSelected = selMonth && selMon === i && selYear === viewYear
             return (
-              <div
-                key={m}
-                onClick={() => pickMonth(i)}
+              <div key={m} onClick={() => pickMonth(i)}
                 onMouseEnter={e => { if (!isSelected) e.currentTarget.style.background = '#f5f0eb' }}
                 onMouseLeave={e => { e.currentTarget.style.background = isSelected ? DARK : 'transparent' }}
                 style={{
                   padding: '8px 4px', textAlign: 'center', fontSize: 12, cursor: 'pointer',
                   fontWeight: isSelected ? 800 : isCurrent ? 900 : 700,
-                  color: isSelected ? GOLD : isCurrent ? GOLD : DARK,
+                  color: isSelected ? GOLD : isCurrent ? GOLD_DARK : DARK,
                   background: isSelected ? DARK : 'transparent',
                   transition: 'background 0.1s',
                 }}
-              >
-                {m.slice(0, 4)}
-              </div>
+              >{m.slice(0, 4)}</div>
             )
           })}
         </div>
@@ -223,17 +195,16 @@ function CalendarPopup({ filterDate, setFilterDate, onClose, anchorRef }) {
       {/* Selected day badge */}
       {selFull && (
         <div style={{
-          padding: '6px 10px', borderTop: '1px solid #e8e0d8',
+          padding: '6px 10px', borderTop: `1px solid rgba(43,33,24,0.1)`,
           fontSize: 11, fontWeight: 700, color: DARK,
-          background: '#faf8f5', textAlign: 'center', letterSpacing: '0.04em',
+          background: '#faf8f5', textAlign: 'center',
         }}>
           {String(selDay).padStart(2,'0')} {MONTHS_FR[selMon]} {selYear}
         </div>
       )}
-    </div>
+    </div>,
+    document.body
   )
-
-  return createPortal(popup, document.body)
 }
 
 export default function ReservationsFilters({
@@ -263,7 +234,7 @@ export default function ReservationsFilters({
   }
 
   const base = {
-    background: '#fff', border: '2px solid #2b2118',
+    background: '#fff', border: `2px solid ${DARK}`,
     padding: '10px 14px', fontSize: 13, fontWeight: 600,
     color: DARK, fontFamily: 'inherit',
     outline: 'none', boxSizing: 'border-box',
@@ -280,7 +251,7 @@ export default function ReservationsFilters({
           margin-bottom: 14px;
         }
         .filters-search { grid-column: 1 / -1; }
-        .filters-date   { grid-column: 1 / -1; }
+        .filters-date   { grid-column: 1 / -1; position: relative; }
         .filters-clear  { grid-column: 1 / -1; }
         @media (min-width: 640px) {
           .filters-wrap   { grid-template-columns: 1fr 1fr 1fr auto; }
@@ -294,7 +265,7 @@ export default function ReservationsFilters({
 
         {/* Search */}
         <div className="filters-search" style={{ position: 'relative' }}>
-          <Search size={14} color="#2b2118" strokeWidth={2.5} style={{
+          <Search size={14} color={MUTED} strokeWidth={2.5} style={{
             position: 'absolute', left: 12, top: '50%',
             transform: 'translateY(-50%)', pointerEvents: 'none',
           }} />
@@ -309,7 +280,7 @@ export default function ReservationsFilters({
               background: 'none', border: 'none', cursor: 'pointer', padding: 4,
               display: 'flex', alignItems: 'center',
             }}>
-              <X size={12} color="#2b2118" strokeWidth={2.5} />
+              <X size={12} color={MUTED} strokeWidth={2.5} />
             </button>
           )}
         </div>
@@ -332,36 +303,29 @@ export default function ReservationsFilters({
 
         {/* Date picker */}
         <div className="filters-date" ref={anchorRef}>
-          <button
-            onClick={() => setCalOpen(o => !o)}
-            style={{
-              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-              gap: 8, width: '100%', padding: '10px 14px',
-              background: filterDate ? DARK : '#fff',
-              border: filterDate ? 'none' : '2px solid #e8e0d8',
-              fontSize: 13, fontWeight: 800,
-              color: filterDate ? GOLD : '#2b2118',
-              cursor: 'pointer', fontFamily: 'inherit',
-              transition: 'all 0.15s', position: 'relative',
-            }}
-          >
+          <button onClick={() => setCalOpen(o => !o)} style={{
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            gap: 8, width: '100%', padding: '10px 14px',
+            background: filterDate ? DARK : '#fff',
+            border: filterDate ? 'none' : `2px solid ${DARK}`,
+            fontSize: 13, fontWeight: 800,
+            color: filterDate ? GOLD : DARK,
+            cursor: 'pointer', fontFamily: 'inherit',
+            transition: 'all 0.15s',
+          }}>
             <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
               {dateLabel()}
             </span>
             <Calendar size={14} strokeWidth={2.2} style={{ flexShrink: 0 }} />
           </button>
-
           {filterDate && (
-            <button
-              onClick={e => { e.stopPropagation(); setFilterDate(''); setCalOpen(false) }}
-              title="Effacer la date"
+            <button onClick={e => { e.stopPropagation(); setFilterDate(''); setCalOpen(false) }}
               style={{
                 position: 'absolute', right: 36, top: '50%', transform: 'translateY(-50%)',
                 background: 'none', border: 'none', cursor: 'pointer', padding: '4px 6px',
-                display: 'flex', alignItems: 'center', color: 'rgba(200,169,126,0.6)',
+                display: 'flex', alignItems: 'center', color: 'rgba(200,169,126,0.7)',
                 zIndex: 1,
-              }}
-            >
+              }}>
               <X size={11} strokeWidth={2.5} />
             </button>
           )}
@@ -384,7 +348,6 @@ export default function ReservationsFilters({
         )}
       </div>
 
-      {/* Calendar rendered via portal directly into document.body — escapes ALL overflow/clip */}
       {calOpen && (
         <CalendarPopup
           filterDate={filterDate}
