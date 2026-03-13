@@ -159,9 +159,9 @@ export default function Settings() {
     </div>
   )
 
-  // Use only services available on the active day for tabs + time editor
+  // Use only services available on the active day
   const currentSvc  = servicesOnActiveDay[activeService]
-  const ohindex     = currentSvc?.ohindex ?? activeService
+  const ohindex     = currentSvc?.ohindex ?? 0
   const currentOH   = hours.allOH?.[ohindex]
   const currentSlot = currentOH?.openhours?.[activeDay]
   const isDayOpen   = hours.working_dates?.[activeDay] ?? false
@@ -249,10 +249,10 @@ export default function Settings() {
                 {FR_DAYS.map((day, i) => {
                   const open     = hours.working_dates?.[i] ?? false
                   const isActive = activeDay === i
-                  // count services available this day
                   const svcCount = services.filter(s => (s.available_days ?? [0,1,2,3,4,5,6]).includes(i)).length
                   return (
-                    <button key={i} onClick={() => { setActiveDay(i); setActiveServiceIdx(0) }}
+                    <button key={i}
+                      onClick={() => { setActiveDay(i); setActiveServiceIdx(0) }}
                       style={{
                         display: 'flex', flexDirection: 'column', alignItems: 'center',
                         padding: '10px 14px', minWidth: 58, gap: 3,
@@ -309,70 +309,64 @@ export default function Settings() {
                 </button>
               </div>
 
-              {isDayOpen ? (
-                servicesOnActiveDay.length === 0 ? (
-                  /* No services configured for this day */
-                  <div style={{
-                    padding: '20px 24px', background: '#fdf6ec',
-                    border: `2px solid #e8c87a`,
-                    fontSize: 13, fontWeight: 700, color: GOLD_DK,
-                  }}>
-                    Aucun service n'est configuré pour le {FR_DAYS_FULL[activeDay].toLowerCase()}. 
-                    Ajoutez des jours disponibles depuis la page <strong>Services</strong>.
-                  </div>
-                ) : (
-                  <>
-                    {/* ── Service tabs — only services available this day ── */}
-                    <Label>Horaires par service</Label>
-                    <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', marginTop: 8, marginBottom: 16 }}>
-                      {servicesOnActiveDay.map((svc, i) => (
-                        <TabBtn key={svc.idx} active={activeService === i} onClick={() => setActiveServiceIdx(i)}>
-                          {svc.name}
-                        </TabBtn>
-                      ))}
-                    </div>
-
-                    {/* ── Time editor ── */}
-                    {currentSlot ? (
-                      <div style={{ background: CREAM, border: `2px solid ${DARK}`, padding: 'clamp(14px,3vw,24px)' }}>
-                        <div style={{ marginBottom: 10, fontSize: 12, fontWeight: 800, color: GOLD_DK }}>
-                          {currentSvc?.name ?? 'Service'} · {FR_DAYS_FULL[activeDay]}
-                        </div>
-                        <div style={{ display: 'flex', alignItems: 'flex-end', gap: 20, flexWrap: 'wrap' }}>
-                          <div>
-                            <Label>Ouverture</Label>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                              <TimeInput max={23} value={currentSlot.h1} onChange={v => updateDayOH(ohindex, activeDay, 'h1', v)} />
-                              <span style={{ fontSize: 18, fontWeight: 900, color: GOLD_DK }}>:</span>
-                              <TimeInput max={59} value={currentSlot.m1} onChange={v => updateDayOH(ohindex, activeDay, 'm1', v)} />
-                            </div>
-                          </div>
-                          <div style={{ paddingBottom: 12, fontSize: 20, color: DARK, fontWeight: 900 }}>→</div>
-                          <div>
-                            <Label>Fermeture</Label>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                              <TimeInput max={23} value={currentSlot.h2} onChange={v => updateDayOH(ohindex, activeDay, 'h2', v)} />
-                              <span style={{ fontSize: 18, fontWeight: 900, color: GOLD_DK }}>:</span>
-                              <TimeInput max={59} value={currentSlot.m2} onChange={v => updateDayOH(ohindex, activeDay, 'm2', v)} />
-                            </div>
-                          </div>
-                          <div>
-                            <Label>Aperçu</Label>
-                            <div style={{ padding: '10px 16px', background: DARK, fontSize: 14, fontWeight: 900, color: GOLD, letterSpacing: '0.06em', whiteSpace: 'nowrap' }}>
-                              {String(currentSlot.h1 ?? 0).padStart(2,'0')}:{String(currentSlot.m1 ?? 0).padStart(2,'0')}
-                              {' — '}
-                              {String(currentSlot.h2 ?? 0).padStart(2,'0')}:{String(currentSlot.m2 ?? 0).padStart(2,'0')}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    ) : null}
-                  </>
-                )
-              ) : (
+              {/* ── Content depending on day state ── */}
+              {!isDayOpen ? (
                 <div style={{ padding: '20px 24px', background: '#fdf0f0', border: `2px solid #fecaca`, fontSize: 13, fontWeight: 700, color: '#b94040' }}>
                   Ce jour est marqué comme fermé — aucun horaire à configurer.
                 </div>
+              ) : servicesOnActiveDay.length === 0 ? (
+                <div style={{ padding: '20px 24px', background: '#fdf6ec', border: `2px solid #e8c87a`, fontSize: 13, fontWeight: 700, color: GOLD_DK }}>
+                  Aucun service n'est disponible le {FR_DAYS_FULL[activeDay].toLowerCase()}.
+                  Configurez les jours disponibles depuis la page <strong>Services</strong>.
+                </div>
+              ) : (
+                <>
+                  {/* Service tabs — only services for this day */}
+                  <Label>Horaires par service</Label>
+                  <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', marginTop: 8, marginBottom: 16 }}>
+                    {servicesOnActiveDay.map((svc, i) => (
+                      <TabBtn key={svc.idx} active={activeService === i} onClick={() => setActiveServiceIdx(i)}>
+                        {svc.name}
+                      </TabBtn>
+                    ))}
+                  </div>
+
+                  {/* Time editor */}
+                  {currentSlot ? (
+                    <div style={{ background: CREAM, border: `2px solid ${DARK}`, padding: 'clamp(14px,3vw,24px)' }}>
+                      <div style={{ marginBottom: 10, fontSize: 12, fontWeight: 800, color: GOLD_DK }}>
+                        {currentSvc?.name ?? 'Service'} · {FR_DAYS_FULL[activeDay]}
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'flex-end', gap: 20, flexWrap: 'wrap' }}>
+                        <div>
+                          <Label>Ouverture</Label>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                            <TimeInput max={23} value={currentSlot.h1} onChange={v => updateDayOH(ohindex, activeDay, 'h1', v)} />
+                            <span style={{ fontSize: 18, fontWeight: 900, color: GOLD_DK }}>:</span>
+                            <TimeInput max={59} value={currentSlot.m1} onChange={v => updateDayOH(ohindex, activeDay, 'm1', v)} />
+                          </div>
+                        </div>
+                        <div style={{ paddingBottom: 12, fontSize: 20, color: DARK, fontWeight: 900 }}>→</div>
+                        <div>
+                          <Label>Fermeture</Label>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                            <TimeInput max={23} value={currentSlot.h2} onChange={v => updateDayOH(ohindex, activeDay, 'h2', v)} />
+                            <span style={{ fontSize: 18, fontWeight: 900, color: GOLD_DK }}>:</span>
+                            <TimeInput max={59} value={currentSlot.m2} onChange={v => updateDayOH(ohindex, activeDay, 'm2', v)} />
+                          </div>
+                        </div>
+                        <div>
+                          <Label>Aperçu</Label>
+                          <div style={{ padding: '10px 16px', background: DARK, fontSize: 14, fontWeight: 900, color: GOLD, letterSpacing: '0.06em', whiteSpace: 'nowrap' }}>
+                            {String(currentSlot.h1 ?? 0).padStart(2,'0')}:{String(currentSlot.m1 ?? 0).padStart(2,'0')}
+                            {' — '}
+                            {String(currentSlot.h2 ?? 0).padStart(2,'0')}:{String(currentSlot.m2 ?? 0).padStart(2,'0')}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ) : null}
+                </>
               )}
 
             </Section>
