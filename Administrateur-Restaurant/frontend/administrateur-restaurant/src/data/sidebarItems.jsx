@@ -9,7 +9,7 @@ export const navItems = [
   { to: '/calendar',      label: 'Planning',        icon: <CalendarDays    size={22} strokeWidth={2} /> },
   { to: '/blocked-dates', label: 'Dates bloquées',  icon: <CalendarOff     size={22} strokeWidth={2} /> },
   { to: '/services',      label: 'Services',        icon: <Utensils        size={22} strokeWidth={2} /> },
-  { to: '/tables', label: 'Tables', icon: <LayoutGrid size={22} strokeWidth={2} /> },
+  { to: '/tables',       label: 'Tables',         icon: <LayoutGrid     size={22} strokeWidth={2} /> },
   { to: '/reports',       label: 'Rapports',        icon: <BarChart2       size={22} strokeWidth={2} /> },
 /*   { to: '/settings',      label: 'Paramètres',      icon: <Settings        size={22} strokeWidth={2} /> }, */
 ]
