@@ -1,10 +1,10 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Plus, Check, X, Utensils } from 'lucide-react'
 
-const DARK   = '#2b2118'
-const GOLD   = '#c8a97e'
+const DARK    = '#2b2118'
+const GOLD    = '#c8a97e'
 const GOLD_DK = '#a8834e'
-const BORDER = '#2b2118'
+const BORDER  = '#2b2118'
 
 const EMPTY = { name: '', price: '', capacity: '', duration: '', available_days: [0,1,2,3,4,5,6] }
 
@@ -52,11 +52,10 @@ function Field({ label, children }) {
 function DayPicker({ value = [0,1,2,3,4,5,6], onChange }) {
   function toggle(idx) {
     if (value.includes(idx)) {
-      // keep at least 1 day
-      if (value.length === 1) return
+      if (value.length === 1) return  // keep at least 1
       onChange(value.filter(d => d !== idx))
     } else {
-      onChange([...value, idx].sort((a,b) => a-b))
+      onChange([...value, idx].sort((a, b) => a - b))
     }
   }
 
@@ -88,9 +87,7 @@ function DayPicker({ value = [0,1,2,3,4,5,6], onChange }) {
               <span style={{ fontSize: 10, fontWeight: 900, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
                 {d.short}
               </span>
-              {active && (
-                <div style={{ width: 4, height: 4, background: GOLD, borderRadius: '50%' }} />
-              )}
+              {active && <div style={{ width: 4, height: 4, background: GOLD, borderRadius: '50%' }} />}
             </button>
           )
         })}
@@ -107,9 +104,22 @@ function DayPicker({ value = [0,1,2,3,4,5,6], onChange }) {
 
 export default function ServiceForm({ initial = EMPTY, onSave, saving, editingName, onCancel }) {
   const [form, setForm] = useState({ ...EMPTY, ...initial })
-  const set  = k => v => setForm(f => ({ ...f, [k]: v }))
-  const fo   = e => e.target.style.borderColor = GOLD
-  const bl   = e => e.target.style.borderColor = BORDER
+
+  // Re-sync form whenever the edited service changes (or editing starts/stops)
+  useEffect(() => {
+    setForm({
+      ...EMPTY,
+      ...initial,
+      // Ensure available_days is always a proper array
+      available_days: Array.isArray(initial?.available_days)
+        ? initial.available_days
+        : [0, 1, 2, 3, 4, 5, 6],
+    })
+  }, [initial?.idx, editingName])  // triggers on service switch AND on cancel (editingName → undefined)
+
+  const set   = k => v => setForm(f => ({ ...f, [k]: v }))
+  const fo    = e => e.target.style.borderColor = GOLD
+  const bl    = e => e.target.style.borderColor = BORDER
   const valid = form.name.trim() && form.price !== '' && form.capacity !== '' && form.duration !== ''
 
   async function handleSubmit() {
@@ -120,7 +130,7 @@ export default function ServiceForm({ initial = EMPTY, onSave, saving, editingNa
   return (
     <div style={{ background: '#fff', border: `1.5px solid ${BORDER}`, overflow: 'hidden' }}>
 
-      {/* Header bar */}
+      {/* Header */}
       <div style={{ padding: '12px 16px', background: DARK, display: 'flex', alignItems: 'center', gap: 8 }}>
         <Utensils size={14} strokeWidth={2.5} color={GOLD} />
         <span style={{ fontSize: 11, fontWeight: 900, color: GOLD, letterSpacing: '0.12em', textTransform: 'uppercase' }}>
@@ -131,8 +141,7 @@ export default function ServiceForm({ initial = EMPTY, onSave, saving, editingNa
       <div style={{ padding: 'clamp(14px,4vw,24px)', display: 'flex', flexDirection: 'column', gap: 14 }}>
 
         <Field label="Nom du service">
-          <input
-            type="text" value={form.name} placeholder="Ex: Couscous du Vendredi"
+          <input type="text" value={form.name} placeholder="Ex: Couscous du Vendredi"
             onChange={e => set('name')(e.target.value)}
             style={inp} onFocus={fo} onBlur={bl}
           />
@@ -154,7 +163,7 @@ export default function ServiceForm({ initial = EMPTY, onSave, saving, editingNa
             onChange={e => set('duration')(e.target.value)} style={inp} onFocus={fo} onBlur={bl} />
         </Field>
 
-        {/* ── Days availability picker ── */}
+        {/* Days picker */}
         <div style={{ padding: '14px', background: '#faf8f5', border: `1.5px solid #e8e0d8` }}>
           <DayPicker
             value={form.available_days ?? [0,1,2,3,4,5,6]}
@@ -162,8 +171,7 @@ export default function ServiceForm({ initial = EMPTY, onSave, saving, editingNa
           />
         </div>
 
-        <button
-          onClick={handleSubmit} disabled={!valid || saving}
+        <button onClick={handleSubmit} disabled={!valid || saving}
           style={{
             display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
             padding: '15px', background: DARK, border: 'none',
@@ -178,8 +186,9 @@ export default function ServiceForm({ initial = EMPTY, onSave, saving, editingNa
           onMouseLeave={e => { e.currentTarget.style.background = DARK }}
         >
           {saving ? 'Enregistrement…'
-            : editingName ? <><Check size={15} strokeWidth={2.5} /> Enregistrer les modifications</>
-            : <><Plus size={15} strokeWidth={2.5} /> Ajouter le service</>
+            : editingName
+              ? <><Check size={15} strokeWidth={2.5} /> Enregistrer les modifications</>
+              : <><Plus size={15} strokeWidth={2.5} /> Ajouter le service</>
           }
         </button>
 
@@ -196,6 +205,7 @@ export default function ServiceForm({ initial = EMPTY, onSave, saving, editingNa
             <X size={13} strokeWidth={2.5} /> Annuler la modification
           </button>
         )}
+
       </div>
     </div>
   )
