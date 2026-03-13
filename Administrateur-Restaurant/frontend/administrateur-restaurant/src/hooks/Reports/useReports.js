@@ -106,7 +106,6 @@ export default function useReports() {
   // Filters
   const [period,        setPeriod]        = useState('all')
   const [status,        setStatus]        = useState('all')
-  const [search,        setSearch]        = useState('')
   const [filterService, setFilterService] = useState('all')
   const [filterDate,    setFilterDate]    = useState('')
 
@@ -144,15 +143,6 @@ export default function useReports() {
       filtered = filtered.filter(r => r.status === s)
     }
 
-    // Search (name or phone)
-    if (search.trim()) {
-      const q = search.trim().toLowerCase()
-      filtered = filtered.filter(r =>
-        (r.name  || '').toLowerCase().includes(q) ||
-        (r.phone || '').toLowerCase().includes(q)
-      )
-    }
-
     // Service
     if (filterService && filterService !== 'all') {
       filtered = filtered.filter(r => r.service === filterService)
@@ -162,7 +152,7 @@ export default function useReports() {
     filtered = filterByDate(filtered, filterDate)
 
     return aggregate(filtered)
-  }, [rows, period, status, search, filterService, filterDate])
+  }, [rows, period, status, filterService, filterDate])
 
   function clearFilters() {
     setPeriod('all')
@@ -176,7 +166,6 @@ export default function useReports() {
     data, loading, error, refetch: fetchAll, services,
     period,        setPeriod,
     status,        setStatus,
-    search,        setSearch,
     filterService, setFilterService,
     filterDate,    setFilterDate,
     clearFilters,
