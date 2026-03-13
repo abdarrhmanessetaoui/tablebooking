@@ -12,7 +12,7 @@ export default function ReservationsFilters({
   clearFilters,
   services = [],
 }) {
-  const [dateMode, setDateMode] = useState('month') // 'month' | 'day'
+  const [dateMode, setDateMode] = useState('month')
 
   const hasFilters = search || filterStatus !== 'all' || filterDate || (filterService && filterService !== 'all')
 
@@ -26,9 +26,10 @@ export default function ReservationsFilters({
     width: '100%', borderRadius: 0,
   }
 
-  function handleDateModeToggle(mode) {
-    setDateMode(mode)
-    setFilterDate('') // reset date when switching mode
+  function toggleDateMode() {
+    const next = dateMode === 'month' ? 'day' : 'month'
+    setDateMode(next)
+    setFilterDate('')
   }
 
   return (
@@ -91,39 +92,32 @@ export default function ReservationsFilters({
           {services.map(s => <option key={s} value={s}>{s}</option>)}
         </select>
 
-        {/* Date — mode toggle + input */}
-        <div className="filters-date" style={{ display: 'flex', gap: 0 }}>
-          {/* Mode toggle buttons */}
+        {/* Date — single toggle button + input */}
+        <div className="filters-date" style={{ display: 'flex' }}>
+          {/* Single toggle button */}
           <button
-            onClick={() => handleDateModeToggle('month')}
-            title="Filtrer par mois"
+            onClick={toggleDateMode}
+            title={dateMode === 'month' ? 'Passer au filtre par jour' : 'Passer au filtre par mois'}
             style={{
               display: 'flex', alignItems: 'center', justifyContent: 'center',
+              gap: 5,
               padding: '0 12px', flexShrink: 0,
-              background: dateMode === 'month' ? DARK : '#fff',
+              background: filterDate ? DARK : '#f5f0eb',
               border: '2px solid #e8e0d8',
               borderRight: 'none',
-              color: dateMode === 'month' ? GOLD : '#bbb',
+              color: filterDate ? GOLD : '#999',
               cursor: 'pointer', transition: 'all 0.15s',
+              fontSize: 10, fontWeight: 900,
+              letterSpacing: '0.08em', textTransform: 'uppercase',
+              fontFamily: 'inherit',
             }}
           >
-            <Calendar size={14} strokeWidth={2.5} />
+            {dateMode === 'month'
+              ? <><Calendar size={13} strokeWidth={2.5} /><span>Mois</span></>
+              : <><CalendarDays size={13} strokeWidth={2.5} /><span>Jour</span></>
+            }
           </button>
-          <button
-            onClick={() => handleDateModeToggle('day')}
-            title="Filtrer par jour"
-            style={{
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              padding: '0 12px', flexShrink: 0,
-              background: dateMode === 'day' ? DARK : '#fff',
-              border: '2px solid #e8e0d8',
-              borderRight: 'none',
-              color: dateMode === 'day' ? GOLD : '#bbb',
-              cursor: 'pointer', transition: 'all 0.15s',
-            }}
-          >
-            <CalendarDays size={14} strokeWidth={2.5} />
-          </button>
+
           {/* Input */}
           <input
             type={dateMode === 'month' ? 'month' : 'date'}
