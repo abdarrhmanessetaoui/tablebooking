@@ -28,7 +28,7 @@ class ServiceController extends Controller
 
         $services = $structure[0][0]['services'] ?? [];
 
-        // Ensure every service has available_days
+        // Ensure every service has available_days (backfill for old records)
         $services = array_map(function ($svc) {
             if (!isset($svc['available_days'])) {
                 $svc['available_days'] = [0,1,2,3,4,5,6];
