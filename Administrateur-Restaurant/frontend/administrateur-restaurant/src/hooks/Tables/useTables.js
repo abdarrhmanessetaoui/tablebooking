@@ -110,5 +110,7 @@ export default function useTables() {
     tables, loading, error,
     editingTbl, setEditingTbl,
     saving, handleSave, handleDelete, handleToggle,
+    // ✅ FIX 1: export setTables — required by Tables.jsx bulk handlers
+    setTables,
   }
 }
