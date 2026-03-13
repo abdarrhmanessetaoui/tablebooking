@@ -12,14 +12,13 @@ class BlockedDateController extends Controller
         return auth()->user()->restaurant_form_id ?? 0;
     }
 
-    // ── Read dates from form_structure ──────────────────────────────
     private function getInvalidDates(): array
     {
         $form = DB::table('wpjn_cpappbk_forms')->where('id', $this->formId())->first();
         if (!$form) return [];
 
         $structure = json_decode($form->form_structure, true);
-        $raw = '';
+        $raw = null;
         foreach ($structure[0] ?? [] as $field) {
             if (($field['ftype'] ?? '') === 'fapp') {
                 $raw = $field['invalidDates'] ?? '';
@@ -33,6 +32,7 @@ class BlockedDateController extends Controller
         foreach (explode(',', $raw) as $part) {
             $part = trim($part);
             if (!$part) continue;
+
             if (str_contains($part, '-')) {
                 [$start, $end] = explode('-', $part, 2);
                 $s = \DateTime::createFromFormat('m/d/Y', trim($start));
@@ -53,49 +53,24 @@ class BlockedDateController extends Controller
         return array_unique($dates);
     }
 
-    // ── Read reasons map {"2026-04-01": "Fermeture", ...} ───────────
-    private function getReasons(): array
-    {
-        $form = DB::table('wpjn_cpappbk_forms')->where('id', $this->formId())->first();
-        if (!$form) return [];
-
-        $structure = json_decode($form->form_structure, true);
-        foreach ($structure[0] ?? [] as $field) {
-            if (($field['ftype'] ?? '') === 'fapp') {
-                $raw = $field['invalidDatesReasons'] ?? '{}';
-                $decoded = json_decode($raw, true);
-                return is_array($decoded) ? $decoded : [];
-            }
-        }
-        return [];
-    }
-
-    // ── Save dates + reasons back to form_structure ──────────────────
-    private function saveInvalidDates(array $dates, array $reasons = null): void
+    private function saveInvalidDates(array $dates): void
     {
         $form = DB::table('wpjn_cpappbk_forms')->where('id', $this->formId())->first();
         if (!$form) return;
 
         $structure = json_decode($form->form_structure, true);
 
-        // Keep existing reasons if not provided
-        if ($reasons === null) {
-            $reasons = $this->getReasons();
-            // Remove reasons for dates that no longer exist
-            $reasons = array_intersect_key($reasons, array_flip($dates));
-        }
-
-        $converted = array_filter(array_map(function($d) {
+        $converted = array_map(function($d) {
             $dt = \DateTime::createFromFormat('Y-m-d', $d);
             return $dt ? $dt->format('m/d/Y') : null;
-        }, $dates));
+        }, $dates);
+        $converted = array_filter($converted);
 
         $raw = implode(',', $converted);
 
         foreach ($structure[0] as &$field) {
             if (($field['ftype'] ?? '') === 'fapp') {
                 $field['invalidDates'] = $raw;
-                $field['invalidDatesReasons'] = json_encode($reasons);
                 $field['tmpinvalidDatestime'] = array_map(
                     fn($d) => (new \DateTime($d))->getTimestamp() * 1000,
                     array_values(array_filter($dates))
@@ -108,10 +83,8 @@ class BlockedDateController extends Controller
             ->update(['form_structure' => json_encode($structure)]);
     }
 
-    // ── GET /api/admin/blocked-dates ─────────────────────────────────
     public function index(Request $request)
     {
-        // Public access (booking form) — no auth
         $formId = auth('sanctum')->check()
             ? auth('sanctum')->user()->restaurant_form_id
             : $request->query('form_id');
@@ -153,85 +126,49 @@ class BlockedDateController extends Controller
             return response()->json($dates);
         }
 
-        // Authenticated — return dates with reasons
-        $dates   = $this->getInvalidDates();
-        $reasons = $this->getReasons();
-
-        $result = array_map(fn($d) => [
-            'date'   => $d,
-            'reason' => $reasons[$d] ?? null,
-        ], array_values($dates));
-
-        return response()->json($result);
+        $dates = $this->getInvalidDates();
+        return response()->json(array_map(fn($d) => ['date' => $d], $dates));
     }
 
-    // ── POST /api/blocked-dates ──────────────────────────────────────
     public function store(Request $request)
     {
-        $request->validate([
-            'date'   => 'required|date',
-            'reason' => 'nullable|string|max:255',
-        ]);
+        $request->validate(['date' => 'required|date']);
 
-        $date    = $request->date;
-        $reason  = $request->reason;
-        $dates   = $this->getInvalidDates();
-        $reasons = $this->getReasons();
+        $date  = $request->date;
+        $dates = $this->getInvalidDates();
 
         if (!in_array($date, $dates)) {
             $dates[] = $date;
+            $this->saveInvalidDates($dates);
         }
 
-        if ($reason) {
-            $reasons[$date] = $reason;
-        } else {
-            unset($reasons[$date]);
-        }
-
-        $this->saveInvalidDates($dates, $reasons);
-
-        return response()->json(['date' => $date, 'reason' => $reason ?? null], 201);
+        return response()->json(['date' => $date], 201);
     }
 
-    // ── POST /api/blocked-dates/bulk ─────────────────────────────────
     public function storeBulk(Request $request)
     {
         $request->validate([
             'dates'   => 'required|array',
             'dates.*' => 'date',
-            'reason'  => 'nullable|string|max:255',
+            'reason'  => 'nullable|string', // accepted but not stored (no column in wpjn table)
         ]);
 
         $existing = $this->getInvalidDates();
-        $reasons  = $this->getReasons();
-        $reason   = $request->reason;
+        $toAdd    = array_filter($request->dates, fn($d) => !in_array($d, $existing));
+        $merged   = array_values(array_unique(array_merge($existing, array_values($toAdd))));
 
-        $merged = array_values(array_unique(array_merge($existing, $request->dates)));
-
-        // Apply reason to all new dates
-        if ($reason) {
-            foreach ($request->dates as $d) {
-                $reasons[$d] = $reason;
-            }
-        }
-
-        $this->saveInvalidDates($merged, $reasons);
+        $this->saveInvalidDates($merged);
 
         return response()->json(
-            array_map(fn($d) => ['date' => $d, 'reason' => $reasons[$d] ?? null], $request->dates)
+            array_map(fn($d) => ['date' => $d], $request->dates)
         );
     }
 
-    // ── DELETE /api/blocked-dates/{date} ─────────────────────────────
     public function destroy($date)
     {
-        $dates   = $this->getInvalidDates();
-        $reasons = $this->getReasons();
-
+        $dates = $this->getInvalidDates();
         $dates = array_values(array_filter($dates, fn($d) => $d !== $date));
-        unset($reasons[$date]);
-
-        $this->saveInvalidDates($dates, $reasons);
+        $this->saveInvalidDates($dates);
 
         return response()->json(['message' => 'Date unblocked']);
     }
