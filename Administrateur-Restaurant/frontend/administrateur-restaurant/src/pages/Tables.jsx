@@ -230,9 +230,7 @@ export default function Tables() {
         doc.setFillColor(i%2===0?255:250,i%2===0?255:248,i%2===0?255:245); doc.rect(20,y,170,9,'F')
         doc.setTextColor(43,33,24); doc.setFontSize(9); doc.setFont('helvetica','normal')
         doc.text(`Table ${t.number}`,24,y+6)
-        doc.text(`${t.capacity} Personnes
-
-.`,80,y+6)
+        doc.text(`${t.capacity} Personnes`,80,y+6)
         doc.text(t.location||'—',120,y+6)
         doc.text(t.active?'Active':'Inactive',170,y+6)
         y+=9
