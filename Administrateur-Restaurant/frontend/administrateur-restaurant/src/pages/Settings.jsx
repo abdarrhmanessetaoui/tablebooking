@@ -129,6 +129,7 @@ export default function Settings() {
     loading,
     info, setInfoField, saveInfo, savingInfo,
     hours, activeOH, setActiveService, toggleWorkingDay, updateOH, saveHours, savingHours,
+    services,
     notifications, setNotifField, saveNotif, savingNotif,
   } = useRestaurantSettings()
 
@@ -249,22 +250,27 @@ export default function Settings() {
             <Section icon={Clock} title="Horaires de service" action={<SaveBtn onClick={saveHours} saving={savingHours} />}>
               <Label>Service</Label>
               <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', marginBottom: 20, marginTop: 8 }}>
-                {(hours.allOH ?? []).map((oh, i) => (
-                  <button key={i} onClick={() => setActiveService(i)}
-                    style={{
-                      padding: '9px 18px',
-                      background: activeOH === i ? DARK : '#fff',
-                      border: `2px solid ${DARK}`,
-                      color: activeOH === i ? GOLD : DARK,
-                      fontSize: 12, fontWeight: 800,
-                      cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.15s',
-                    }}
-                    onMouseEnter={e => { if (activeOH !== i) e.currentTarget.style.background = CREAM }}
-                    onMouseLeave={e => { if (activeOH !== i) e.currentTarget.style.background = '#fff' }}
-                  >
-                    {oh.name}
-                  </button>
-                ))}
+                {services.map((svc, i) => {
+                  // ohindex tells us which allOH entry this service uses
+                  const ohIdx = svc.ohindex ?? i
+                  const active = activeOH === ohIdx
+                  return (
+                    <button key={i} onClick={() => setActiveService(ohIdx)}
+                      style={{
+                        padding: '9px 18px',
+                        background: active ? DARK : '#fff',
+                        border: `2px solid ${DARK}`,
+                        color: active ? GOLD : DARK,
+                        fontSize: 12, fontWeight: 800,
+                        cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.15s',
+                      }}
+                      onMouseEnter={e => { if (!active) e.currentTarget.style.background = CREAM }}
+                      onMouseLeave={e => { if (!active) e.currentTarget.style.background = '#fff' }}
+                    >
+                      {svc.name}
+                    </button>
+                  )
+                })}
               </div>
 
               {hours.allOH?.[activeOH] && (
