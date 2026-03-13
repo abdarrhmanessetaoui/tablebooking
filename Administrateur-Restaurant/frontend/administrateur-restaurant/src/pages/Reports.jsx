@@ -357,7 +357,6 @@ export default function Reports() {
         {/* FILTERS */}
         <FadeUp delay={15}>
           <ReportsFilters
-            search={search}               setSearch={setSearch}
             filterStatus={status}         setFilterStatus={setStatus}
             filterService={filterService} setFilterService={setFilterService}
             filterDate={filterDate}       setFilterDate={setFilterDate}
