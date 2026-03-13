@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { getToken } from '../utils/auth'
-import { toast } from '../components/ui/Toast'
+import { toast } from '../components/ToastContainer'
 
 const BASE  = 'http://localhost:8000/api'
 const hGet  = () => ({ 'Accept': 'application/json', 'Authorization': `Bearer ${getToken()}` })
@@ -105,11 +105,8 @@ export default function useRestaurantSettings() {
   const setInfoField  = (key, val) => setInfo(p => ({ ...p, [key]: val }))
   const setNotifField = (key, val) => setNotifications(p => ({ ...p, [key]: val }))
 
-  const toggleWorkingDay = (dayIdx) => {
+  const toggleWorkingDay = (dayIdx) =>
     setHours(p => ({ ...p, working_dates: p.working_dates.map((v, i) => i === dayIdx ? !v : v) }))
-    // if activating a closed day, switch to it
-    setActiveDay(dayIdx)
-  }
 
   // Update a specific service + day time field
   const updateDayOH = (ohindex, dayIdx, field, value) => {
