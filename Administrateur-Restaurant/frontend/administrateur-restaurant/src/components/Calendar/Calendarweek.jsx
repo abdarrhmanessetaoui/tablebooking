@@ -11,9 +11,9 @@ const DAYS_FULL   = ['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dim
 const MONTHS_FULL = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre']
 
 const STATUS = {
-  Confirmed: { bg: CREAM,   border: DARK,                    text: DARK,                    dot: DARK,                    label: 'Confirmée'  },
-  Pending:   { bg: GOLD_BG, border: GOLD,                    text: '#a8834e',               dot: GOLD,                    label: 'En attente' },
-  Cancelled: { bg: '#fff',  border: 'rgba(43,33,24,0.15)',   text: 'rgba(43,33,24,0.35)',   dot: 'rgba(43,33,24,0.25)',   label: 'Annulée'    },
+  Confirmed: { bg: '#f0f7f0', border: '#16a34a', text: '#2d6a2d', dot: '#16a34a', label: 'Confirmée'  },
+  Pending:   { bg: '#fdf6ec', border: '#c8a97e', text: '#a8834e', dot: '#c8a97e', label: 'En attente' },
+  Cancelled: { bg: '#fdf0f0', border: '#dc2626', text: '#b94040', dot: '#dc2626', label: 'Annulée'    },
 }
 
 function Badge({ status }) {
