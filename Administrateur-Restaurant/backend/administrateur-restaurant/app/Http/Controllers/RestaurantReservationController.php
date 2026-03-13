@@ -275,6 +275,44 @@ class RestaurantReservationController extends Controller
         ]);
     }
 
+    public function updateInfo(Request $request)
+    {
+        $formId = auth()->user()->restaurant_form_id;
+ 
+        $updated = DB::table('wpjn_cpappbk_forms')
+            ->where('id', $formId)
+            ->update(array_filter([
+                'form_name'           => $request->form_name,
+                // These columns may not exist yet — add them via migration if needed
+                'address'             => $request->address,
+                'phone'               => $request->phone,
+                'website'             => $request->website,
+                'google_maps_link'    => $request->google_maps_link,
+                'capacity'            => $request->capacity,
+                'description'         => $request->description,
+                // contact_email maps to fp_from_email (already exists)
+                'fp_from_email'       => $request->contact_email,
+            ], fn($v) => !is_null($v)));
+ 
+        return response()->json(['message' => 'Saved', 'updated' => $updated]);
+    }
+ 
+    public function updateNotifications(Request $request)
+    {
+        $formId = auth()->user()->restaurant_form_id;
+ 
+        $updated = DB::table('wpjn_cpappbk_forms')
+            ->where('id', $formId)
+            ->update(array_filter([
+                'fp_from_name'          => $request->fp_from_name,
+                'fp_from_email'         => $request->fp_from_email,
+                'fp_destination_emails' => $request->fp_destination_emails,
+                'defaultstatus'         => $request->defaultstatus,
+            ], fn($v) => !is_null($v)));
+ 
+        return response()->json(['message' => 'Saved', 'updated' => $updated]);
+    }
+
     public function services()
     {
         $form = DB::table('wpjn_cpappbk_forms')
