@@ -291,7 +291,7 @@ export default function TableList({ tables, editingTbl, onEdit, onDelete, onTogg
         {[
           { label: 'Total',    val: tables.length },
           { label: 'Actives',  val: activeCnt },
-          { label: 'Capacité', val: `${totalCap} persPersonnes` },
+          { label: 'Capacité', val: `${totalCap} Personnes` },
         ].map((s, i) => (
           <div key={i} style={{
             flex: 1,
