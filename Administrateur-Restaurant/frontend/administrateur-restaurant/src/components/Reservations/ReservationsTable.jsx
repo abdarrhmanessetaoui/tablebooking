@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import {
   Eye, Pencil, Trash2,
   ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight,
-  CalendarDays, Clock3, Users, Utensils, User2,
+  CalendarDays, Clock3, Users, Utensils, User2, Phone,
 } from 'lucide-react'
 
 const DARK      = '#2b2118'
@@ -230,11 +230,17 @@ function TableRow({ r, i, selected, highlighted, highlightRef, toggleOne, openVi
           </span>
         )}
       </td>
-      <td style={{ padding: '11px 14px', fontSize: 12, fontWeight: 700, color: DARK, whiteSpace: 'nowrap' }}>
-        {r.phone || '—'}
+      <td style={{ padding: '11px 14px' }}>
+        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, fontSize: 12, fontWeight: 700, color: DARK, whiteSpace: 'nowrap' }}>
+          <Phone size={11} strokeWidth={2.5} color={DARK} style={{ flexShrink: 0 }} />
+          {r.phone || '—'}
+        </span>
       </td>
-      <td style={{ padding: '11px 14px', fontSize: 12, fontWeight: 700, color: DARK, whiteSpace: 'nowrap' }}>
-        {r.date || '—'}
+      <td style={{ padding: '11px 14px' }}>
+        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, fontSize: 12, fontWeight: 700, color: DARK, whiteSpace: 'nowrap' }}>
+          <CalendarDays size={11} strokeWidth={2.5} color={DARK} style={{ flexShrink: 0 }} />
+          {r.date || '—'}
+        </span>
       </td>
       <td style={{ padding: '11px 14px' }}>
         <span style={{
@@ -246,13 +252,9 @@ function TableRow({ r, i, selected, highlighted, highlightRef, toggleOne, openVi
           {r.start_time || '—'}
         </span>
       </td>
-      <td style={{ padding: '11px 14px', textAlign: 'center' }}>
-        <span style={{
-          display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-          width: 26, height: 26,
-          background: highlighted ? `${GOLD}22` : '#f5f0eb',
-          fontSize: 12, fontWeight: 900, color: DARK,
-        }}>
+      <td style={{ padding: '11px 14px' }}>
+        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, fontSize: 12, fontWeight: 700, color: DARK, whiteSpace: 'nowrap' }}>
+          <Users size={11} strokeWidth={2.5} color={DARK} style={{ flexShrink: 0 }} />
           {r.guests || '—'}
         </span>
       </td>
