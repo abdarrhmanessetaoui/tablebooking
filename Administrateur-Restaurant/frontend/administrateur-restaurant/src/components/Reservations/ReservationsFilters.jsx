@@ -1,36 +1,249 @@
-import { Search, X, ChevronLeft, ChevronRight } from 'lucide-react'
+import { useState, useEffect, useRef } from 'react'
+import { Search, X, Calendar, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react'
 
 const DARK = '#2b2118'
 const GOLD = '#c8a97e'
 
 const MONTHS_FR = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre']
+const DAYS_FR   = ['Lu','Ma','Me','Je','Ve','Sa','Di']
+
+function CalendarPopup({ filterDate, setFilterDate, onClose }) {
+  const today      = new Date()
+  const initDate   = filterDate ? new Date(filterDate + '-01') : today
+  const [viewYear,  setViewYear]  = useState(initDate.getFullYear())
+  const [viewMonth, setViewMonth] = useState(initDate.getMonth())
+  const [mode,      setMode]      = useState('day') // 'day' | 'month'
+
+  // Parse current selection
+  const selFull  = filterDate && filterDate.length === 10  // YYYY-MM-DD
+  const selMonth = filterDate && filterDate.length === 7   // YYYY-MM
+  const selYear  = selFull || selMonth ? parseInt(filterDate.slice(0, 4)) : null
+  const selMon   = selFull || selMonth ? parseInt(filterDate.slice(5, 7)) - 1 : null
+  const selDay   = selFull ? parseInt(filterDate.slice(8, 10)) : null
+
+  function navMonth(d) {
+    let m = viewMonth + d, y = viewYear
+    if (m > 11) { m = 0; y++ }
+    if (m < 0)  { m = 11; y-- }
+    setViewMonth(m); setViewYear(y)
+  }
+
+  function pickDay(d) {
+    const mm = String(viewMonth + 1).padStart(2, '0')
+    const dd = String(d).padStart(2, '0')
+    setFilterDate(`${viewYear}-${mm}-${dd}`)
+    onClose()
+  }
+
+  function pickMonth(m) {
+    const mm = String(m + 1).padStart(2, '0')
+    setFilterDate(`${viewYear}-${mm}`)
+    onClose()
+  }
+
+  const firstDow  = new Date(viewYear, viewMonth, 1).getDay()
+  const offset    = firstDow === 0 ? 6 : firstDow - 1
+  const daysInMon = new Date(viewYear, viewMonth + 1, 0).getDate()
+  const daysInPrev = new Date(viewYear, viewMonth, 0).getDate()
+
+  const cell = (content, onClick, extra = {}) => ({
+    content, onClick,
+    isToday: extra.isToday, isSelected: extra.isSelected, isOther: extra.isOther,
+  })
+
+  const dayCells = []
+  for (let i = 0; i < offset; i++)
+    dayCells.push(cell(daysInPrev - offset + 1 + i, null, { isOther: true }))
+  for (let d = 1; d <= daysInMon; d++) {
+    const isToday    = d === today.getDate() && viewMonth === today.getMonth() && viewYear === today.getFullYear()
+    const isSelected = selFull && selDay === d && selMon === viewMonth && selYear === viewYear
+    dayCells.push(cell(d, () => pickDay(d), { isToday, isSelected }))
+  }
+  const remaining = 42 - dayCells.length
+  for (let d = 1; d <= remaining; d++)
+    dayCells.push(cell(d, null, { isOther: true }))
+
+  const s = {
+    popup: {
+      position: 'absolute', top: 'calc(100% + 4px)', left: 0, zIndex: 200,
+      background: '#fff', border: `2px solid ${DARK}`,
+      width: 280, boxShadow: '0 8px 32px rgba(43,33,24,0.18)',
+    },
+    header: {
+      display: 'flex', alignItems: 'center',
+      background: DARK, padding: '8px 6px', gap: 2,
+    },
+    headerTitle: {
+      flex: 1, textAlign: 'center', fontSize: 13, fontWeight: 800,
+      color: GOLD, letterSpacing: '0.02em',
+    },
+    navBtn: {
+      background: 'none', border: 'none', cursor: 'pointer',
+      color: 'rgba(200,169,126,0.7)', fontSize: 15, padding: '4px 6px',
+      fontFamily: 'inherit', display: 'flex', alignItems: 'center',
+      transition: 'color 0.12s',
+    },
+    modeWrap: {
+      display: 'flex', borderBottom: '2px solid #e8e0d8',
+    },
+    modeBtn: (active) => ({
+      flex: 1, padding: '7px', fontSize: 11, fontWeight: 800,
+      textTransform: 'uppercase', letterSpacing: '0.08em',
+      background: 'none', border: 'none', cursor: 'pointer',
+      fontFamily: 'inherit', color: active ? DARK : '#bbb',
+      borderBottom: active ? `2px solid ${DARK}` : 'none',
+      marginBottom: active ? -2 : 0,
+      transition: 'all 0.12s',
+    }),
+    dayGrid: {
+      display: 'grid', gridTemplateColumns: 'repeat(7,1fr)',
+      padding: '6px 8px 10px',
+    },
+    dayLabel: {
+      textAlign: 'center', fontSize: 10, fontWeight: 800,
+      color: '#bbb', padding: '4px 0', letterSpacing: '0.06em',
+    },
+    dayCell: (isOther, isToday, isSelected) => ({
+      textAlign: 'center', fontSize: 12,
+      fontWeight: isSelected ? 800 : isToday ? 900 : isOther ? 400 : 700,
+      color: isSelected ? GOLD : isToday ? GOLD : isOther ? '#ccc' : DARK,
+      background: isSelected ? DARK : 'transparent',
+      padding: '5px 2px', cursor: isOther ? 'default' : 'pointer',
+      transition: 'background 0.1s',
+      borderRadius: 2,
+    }),
+    monthGrid: {
+      display: 'grid', gridTemplateColumns: 'repeat(3,1fr)',
+      gap: 4, padding: 8,
+    },
+    monthCell: (isSelected, isCurrent) => ({
+      padding: '8px 4px', textAlign: 'center', fontSize: 12,
+      fontWeight: isSelected ? 800 : isCurrent ? 900 : 700,
+      color: isSelected ? GOLD : isCurrent ? GOLD : DARK,
+      background: isSelected ? DARK : 'transparent',
+      cursor: 'pointer', transition: 'background 0.1s',
+    }),
+    selectedBadge: {
+      padding: '6px 10px', borderTop: '1px solid #e8e0d8',
+      fontSize: 11, fontWeight: 700, color: DARK,
+      background: '#faf8f5', textAlign: 'center', letterSpacing: '0.04em',
+    },
+  }
+
+  return (
+    <div style={s.popup}>
+      {/* Header nav */}
+      <div style={s.header}>
+        <button style={s.navBtn} onClick={() => setViewYear(y => y - 1)} title="Année précédente">
+          <ChevronsLeft size={13} strokeWidth={2.5} />
+        </button>
+        <button style={s.navBtn} onClick={() => navMonth(-1)} title="Mois précédent">
+          <ChevronLeft size={13} strokeWidth={2.5} />
+        </button>
+        <span style={s.headerTitle}>{MONTHS_FR[viewMonth]} {viewYear}</span>
+        <button style={s.navBtn} onClick={() => navMonth(1)} title="Mois suivant">
+          <ChevronRight size={13} strokeWidth={2.5} />
+        </button>
+        <button style={s.navBtn} onClick={() => setViewYear(y => y + 1)} title="Année suivante">
+          <ChevronsRight size={13} strokeWidth={2.5} />
+        </button>
+      </div>
+
+      {/* Mode toggle */}
+      <div style={s.modeWrap}>
+        <button style={s.modeBtn(mode === 'day')}   onClick={() => setMode('day')}>Jour</button>
+        <button style={s.modeBtn(mode === 'month')} onClick={() => setMode('month')}>Mois</button>
+      </div>
+
+      {/* Day grid */}
+      {mode === 'day' && (
+        <div style={s.dayGrid}>
+          {DAYS_FR.map(d => <div key={d} style={s.dayLabel}>{d}</div>)}
+          {dayCells.map((c, i) => (
+            <div
+              key={i}
+              style={s.dayCell(c.isOther, c.isToday, c.isSelected)}
+              onClick={c.onClick || undefined}
+              onMouseEnter={e => { if (!c.isOther && !c.isSelected) e.currentTarget.style.background = '#f5f0eb' }}
+              onMouseLeave={e => { if (!c.isSelected) e.currentTarget.style.background = 'transparent' }}
+            >
+              {c.content}
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Month grid */}
+      {mode === 'month' && (
+        <div style={s.monthGrid}>
+          {MONTHS_FR.map((m, i) => {
+            const isCurrent  = i === today.getMonth() && viewYear === today.getFullYear()
+            const isSelected = selMonth && selMon === i && selYear === viewYear
+            return (
+              <div
+                key={m}
+                style={s.monthCell(isSelected, isCurrent)}
+                onClick={() => pickMonth(i)}
+                onMouseEnter={e => { if (!isSelected) e.currentTarget.style.background = '#f5f0eb' }}
+                onMouseLeave={e => { if (!isSelected) e.currentTarget.style.background = isSelected ? DARK : 'transparent' }}
+              >
+                {m.slice(0, 4)}
+              </div>
+            )
+          })}
+        </div>
+      )}
+
+      {/* Show full date when a day is selected */}
+      {selFull && (
+        <div style={s.selectedBadge}>
+          {String(selDay).padStart(2,'0')} {MONTHS_FR[selMon]} {selYear}
+        </div>
+      )}
+    </div>
+  )
+}
 
 export default function ReservationsFilters({
   search, setSearch,
-  filterStatus, setFilterStatus,
+  filterStatus,  setFilterStatus,
   filterService, setFilterService,
-  filterDate, setFilterDate,
+  filterDate,    setFilterDate,
   clearFilters,
   services = [],
 }) {
+  const [calOpen, setCalOpen] = useState(false)
+  const containerRef = useRef(null)
+
   const hasFilters = search || filterStatus !== 'all' || filterDate || (filterService && filterService !== 'all')
 
-  // Parse current month/year from filterDate
-  const currentDate = filterDate ? new Date(filterDate) : new Date()
-  const currentYear  = currentDate.getFullYear()
-  const currentMonth = currentDate.getMonth()
+  // Close on outside click
+  useEffect(() => {
+    function handler(e) {
+      if (calOpen && containerRef.current && !containerRef.current.contains(e.target))
+        setCalOpen(false)
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [calOpen])
 
-  function goMonth(delta) {
-    const d = new Date(currentYear, currentMonth + delta, 1)
-    // Set filterDate to first day of that month
-    setFilterDate(d.toISOString().slice(0, 10))
+  // Format button label
+  function dateLabel() {
+    if (!filterDate) return 'Choisir une date'
+    if (filterDate.length === 7) {
+      const [y, m] = filterDate.split('-')
+      return `${MONTHS_FR[parseInt(m) - 1]} ${y}`
+    }
+    if (filterDate.length === 10) {
+      const [y, m, d] = filterDate.split('-')
+      return `${parseInt(d)} ${MONTHS_FR[parseInt(m) - 1]} ${y}`
+    }
+    return filterDate
   }
 
   const base = {
-    background: '#fff',
-    border: '2px solid #e8e0d8',
-    padding: '10px 14px',
-    fontSize: 13, fontWeight: 600,
+    background: '#fff', border: '2px solid #e8e0d8',
+    padding: '10px 14px', fontSize: 13, fontWeight: 600,
     color: DARK, fontFamily: 'inherit',
     outline: 'none', boxSizing: 'border-box',
     width: '100%', borderRadius: 0,
@@ -49,24 +262,10 @@ export default function ReservationsFilters({
         .filters-date   { grid-column: 1 / -1; }
         .filters-clear  { grid-column: 1 / -1; }
         @media (min-width: 640px) {
-          .filters-wrap   { grid-template-columns: 1fr 1fr 1fr 1fr auto; }
+          .filters-wrap   { grid-template-columns: 1fr 1fr 1fr auto; }
           .filters-search { grid-column: auto; }
           .filters-date   { grid-column: auto; }
           .filters-clear  { grid-column: auto; }
-        }
-        .month-nav-btn {
-          display: flex; align-items: center; justify-content: center;
-          width: 40px; flex-shrink: 0;
-          background: #f5f0eb;
-          border: 2px solid #e8e0d8;
-          color: #999;
-          cursor: pointer;
-          transition: all 0.15s;
-        }
-        .month-nav-btn:hover {
-          background: ${DARK};
-          border-color: ${DARK};
-          color: ${GOLD};
         }
       `}</style>
 
@@ -110,37 +309,49 @@ export default function ReservationsFilters({
           {services.map(s => <option key={s} value={s}>{s}</option>)}
         </select>
 
-        {/* Month navigator — prev arrow + label + next arrow */}
-        <div className="filters-date" style={{ display: 'flex' }}>
-          <button className="month-nav-btn" onClick={() => goMonth(-1)} title="Mois précédent">
-            <ChevronLeft size={15} strokeWidth={2.5} />
-          </button>
-
-          <div style={{
-            flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center',
-            background: filterDate ? DARK : '#fff',
-            border: '2px solid #e8e0d8',
-            borderLeft: 'none', borderRight: 'none',
-            fontSize: 13, fontWeight: 800,
-            color: filterDate ? GOLD : '#bbb',
-            letterSpacing: '0.02em',
-            whiteSpace: 'nowrap',
-            padding: '0 12px',
-            cursor: 'pointer',
-            transition: 'all 0.15s',
-          }}
-            onClick={() => setFilterDate(new Date().toISOString().slice(0, 10))}
-            title="Revenir au mois actuel"
+        {/* Date picker */}
+        <div className="filters-date" style={{ position: 'relative' }} ref={containerRef}>
+          <button
+            onClick={() => setCalOpen(o => !o)}
+            style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+              gap: 8, width: '100%', padding: '10px 14px',
+              background: filterDate ? DARK : '#fff',
+              border: filterDate ? 'none' : '2px solid #e8e0d8',
+              fontSize: 13, fontWeight: 800,
+              color: filterDate ? GOLD : '#bbb',
+              cursor: 'pointer', fontFamily: 'inherit',
+              transition: 'all 0.15s',
+            }}
           >
-            {MONTHS_FR[currentMonth]} {currentYear}
-          </div>
-
-          <button className="month-nav-btn" onClick={() => goMonth(1)} title="Mois suivant">
-            <ChevronRight size={15} strokeWidth={2.5} />
+            <span>{dateLabel()}</span>
+            <Calendar size={14} strokeWidth={2.2} style={{ flexShrink: 0 }} />
           </button>
+
+          {filterDate && (
+            <button
+              onClick={() => { setFilterDate(''); setCalOpen(false) }}
+              title="Effacer la date"
+              style={{
+                position: 'absolute', right: 36, top: '50%', transform: 'translateY(-50%)',
+                background: 'none', border: 'none', cursor: 'pointer', padding: '4px 6px',
+                display: 'flex', alignItems: 'center', color: 'rgba(200,169,126,0.6)',
+              }}
+            >
+              <X size={11} strokeWidth={2.5} />
+            </button>
+          )}
+
+          {calOpen && (
+            <CalendarPopup
+              filterDate={filterDate}
+              setFilterDate={setFilterDate}
+              onClose={() => setCalOpen(false)}
+            />
+          )}
         </div>
 
-        {/* Clear */}
+        {/* Clear all */}
         {hasFilters && (
           <div className="filters-clear">
             <button onClick={clearFilters} style={{
