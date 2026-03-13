@@ -6,17 +6,13 @@ const BASE  = 'http://localhost:8000/api'
 const hGet  = () => ({ 'Accept': 'application/json', 'Authorization': `Bearer ${getToken()}` })
 const hJson = () => ({ 'Content-Type': 'application/json', 'Accept': 'application/json', 'Authorization': `Bearer ${getToken()}` })
 
-// Ensure an allOH entry has 7 day slots (one per day of week)
 function normalizeDaySlots(oh) {
   const base = oh.openhours?.[0] ?? { type:'all', h1:'12', m1:'0', h2:'23', m2:'0' }
-  // If already has 7 slots keep them, else expand the single global slot to 7 days
   if (oh.openhours?.length === 7) return oh
   return {
     ...oh,
     openhours: Array.from({ length: 7 }, (_, d) => ({
-      ...base,
-      type: 'day',
-      d: String(d),
+      ...base, type: 'day', d: String(d),
     })),
   }
 }
@@ -31,13 +27,11 @@ export default function useRestaurantSettings() {
   const [infoLoading, setInfoLoading] = useState(true)
   const [savingInfo,  setSavingInfo]  = useState(false)
 
-  // hours.allOH[serviceIdx].openhours[dayIdx] = { h1,m1,h2,m2 }
-  // hours.working_dates[dayIdx] = true/false
-  const [hours,        setHours]        = useState({ allOH: [], working_dates: [] })
-  const [activeService, setActiveServiceIdx] = useState(0)  // which service tab
-  const [activeDay,     setActiveDay]        = useState(1)  // which day (0=Sun..6=Sat)
-  const [hoursLoading,  setHoursLoading]     = useState(true)
-  const [savingHours,   setSavingHours]      = useState(false)
+  const [hours,             setHours]            = useState({ allOH: [], working_dates: [] })
+  const [activeService,     setActiveServiceIdx] = useState(0)
+  const [activeDay,         setActiveDay]         = useState(1)
+  const [hoursLoading,      setHoursLoading]      = useState(true)
+  const [savingHours,       setSavingHours]       = useState(false)
 
   const [services,        setServices]        = useState([])
   const [servicesLoading, setServicesLoading] = useState(true)
@@ -48,7 +42,7 @@ export default function useRestaurantSettings() {
   })
   const [savingNotif, setSavingNotif] = useState(false)
 
-  // ── Fetches ───────────────────────────────────────────────────
+  // ── Fetches ──────────────────────────────────────────────────
 
   useEffect(() => {
     fetch(`${BASE}/restaurant/info`, { headers: hGet() })
@@ -84,7 +78,6 @@ export default function useRestaurantSettings() {
           allOH:         normalized,
           working_dates: d.working_dates ?? [false,true,true,true,true,true,true],
         })
-        // default active day = first open day
         const firstOpen = (d.working_dates ?? [false,true,true,true,true,true,true]).findIndex(Boolean)
         if (firstOpen >= 0) setActiveDay(firstOpen)
       })
@@ -100,7 +93,7 @@ export default function useRestaurantSettings() {
       .finally(() => setServicesLoading(false))
   }, [])
 
-  // ── Actions ───────────────────────────────────────────────────
+  // ── Actions ──────────────────────────────────────────────────
 
   const setInfoField  = (key, val) => setInfo(p => ({ ...p, [key]: val }))
   const setNotifField = (key, val) => setNotifications(p => ({ ...p, [key]: val }))
@@ -108,7 +101,6 @@ export default function useRestaurantSettings() {
   const toggleWorkingDay = (dayIdx) =>
     setHours(p => ({ ...p, working_dates: p.working_dates.map((v, i) => i === dayIdx ? !v : v) }))
 
-  // Update a specific service + day time field
   const updateDayOH = (ohindex, dayIdx, field, value) => {
     setHours(p => ({
       ...p,
@@ -119,6 +111,21 @@ export default function useRestaurantSettings() {
       ),
     }))
   }
+
+  // Check if a service is available on a given day
+  // Uses the service's own available_days array
+  const isServiceOnDay = (dayIdx, serviceIdx) => {
+    const svc = services.find(s => s.idx === serviceIdx)
+    if (!svc) return false
+    const days = svc.available_days ?? [0,1,2,3,4,5,6]
+    return days.includes(dayIdx)
+  }
+
+  // Services visible on the currently selected day
+  const servicesOnActiveDay = services.filter(svc => {
+    const days = svc.available_days ?? [0,1,2,3,4,5,6]
+    return days.includes(activeDay)
+  })
 
   async function saveInfo() {
     setSavingInfo(true)
@@ -158,7 +165,7 @@ export default function useRestaurantSettings() {
     info, setInfoField, saveInfo, savingInfo,
     hours, activeService, setActiveServiceIdx, activeDay, setActiveDay,
     toggleWorkingDay, updateDayOH, saveHours, savingHours,
-    services,
+    services, servicesOnActiveDay, isServiceOnDay,
     notifications, setNotifField, saveNotif, savingNotif,
   }
 }
