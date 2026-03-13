@@ -222,6 +222,7 @@ export default function Reservations() {
 
   // Track if we arrived from Dashboard — cleared once modal opens so filters work normally
   const [comingFromDashboard, setComingFromDashboard] = useState(!!location.state?.openId)
+  const [dashboardTarget, setDashboardTarget] = useState(null)
 
   const { services } = useServices()
 
@@ -240,11 +241,12 @@ export default function Reservations() {
   } = useReservations(location.state)
 
   // Wrap every filter setter — as soon as user touches a filter, exit dashboard mode
-  function setSearch(v)        { setComingFromDashboard(false); _setSearch(v) }
-  function setFilterStatus(v)  { setComingFromDashboard(false); _setFilterStatus(v) }
-  function setFilterService(v) { setComingFromDashboard(false); _setFilterService(v) }
-  function setFilterDate(v)    { setComingFromDashboard(false); _setFilterDate(v) }
-  function clearFilters()      { setComingFromDashboard(false); _clearFilters() }
+  function exitDashboardMode() { setComingFromDashboard(false); setDashboardTarget(null) }
+  function setSearch(v)        { exitDashboardMode(); _setSearch(v) }
+  function setFilterStatus(v)  { exitDashboardMode(); _setFilterStatus(v) }
+  function setFilterService(v) { exitDashboardMode(); _setFilterService(v) }
+  function setFilterDate(v)    { exitDashboardMode(); _setFilterDate(v) }
+  function clearFilters()      { exitDashboardMode(); _clearFilters() }
 
   // ── Default filters on mount ──────────────────────────────────────────────
   // When coming from Dashboard with openId:
@@ -274,21 +276,28 @@ export default function Reservations() {
   // filterDate can be:
   //   YYYY-MM-DD  → exact day match
   //   YYYY-MM     → whole month match
-  const filteredLocal = useMemo(() => {
+  // Cache the target reservation as soon as data loads (before any filter can hide it)
+  useEffect(() => {
+    if (!comingFromDashboard || !location.state?.openId || loading) return
     const base = Array.isArray(filtered) ? filtered : []
+    const found = base.find(r => r.id === location.state.openId)
+    if (found && !dashboardTarget) setDashboardTarget(found)
+  }, [filtered, loading]) // eslint-disable-line
 
-    // Dashboard navigation: show ONLY the selected reservation in the table
-    if (comingFromDashboard && location.state?.openId) {
-      return base.filter(r => r.id === location.state.openId)
+  const filteredLocal = useMemo(() => {
+    // Dashboard mode: show only the 1 selected reservation
+    if (comingFromDashboard) {
+      return dashboardTarget ? [dashboardTarget] : []
     }
 
+    const base = Array.isArray(filtered) ? filtered : []
     if (!filterDate) return base
     if (filterDate.length === 10) {
       return base.filter(r => r.date === filterDate)
     }
     const month = filterDate.slice(0, 7)
     return base.filter(r => (r.date || '').startsWith(month))
-  }, [filtered, filterDate, comingFromDashboard, location.state?.openId])
+  }, [filtered, filterDate, comingFromDashboard, dashboardTarget])
 
   // ── Open reservation modal when navigated from Dashboard ─────────────────
   // We search ALL reservations (not just filteredLocal) so status filter
