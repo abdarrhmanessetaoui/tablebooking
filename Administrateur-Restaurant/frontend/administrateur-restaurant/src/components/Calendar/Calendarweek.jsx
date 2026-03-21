@@ -61,7 +61,7 @@ function CompactCard({ r }) {
   )
 }
 
-function Empty({ msg = 'Aucune réservation' }) {
+function Empty({ msg = 'Aucune Reservationervation' }) {
   return (
     <div style={{ padding:'56px 0', textAlign:'center' }}>
       <CalendarOff size={38} color='rgba(43,33,24,0.12)' strokeWidth={1.5} style={{ display:'block', margin:'0 auto 14px' }} />
@@ -91,12 +91,12 @@ function DayView({ date, getByDate }) {
           <h3 style={{ margin:'0 0 4px', fontSize:'clamp(15px,2.2vw,20px)', fontWeight:900, color:'#fff', letterSpacing:'-0.6px', textTransform:'capitalize' }}>
             {date.toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'long', year:'numeric' })}
           </h3>
-          <span style={{ fontSize:13, fontWeight:800, color:GOLD }}>{reservations.length} réservation{reservations.length!==1?'s':''}</span>
+          <span style={{ fontSize:13, fontWeight:800, color:GOLD }}>{reservations.length} Reservationervation{reservations.length!==1?'s':''}</span>
         </div>
         {reservations.length > 0 && (
           <div style={{ display:'flex', gap:20 }}>
-            {confirmed>0 && <div style={{ textAlign:'center' }}><div style={{ fontSize:22, fontWeight:900, color:'#fff', lineHeight:1, letterSpacing:'-1px' }}>{confirmed}</div><div style={{ fontSize:9, fontWeight:800, color:'rgba(200,169,126,0.7)', textTransform:'uppercase', letterSpacing:'0.1em', marginTop:3 }}>Conf.</div></div>}
-            {pending>0   && <div style={{ textAlign:'center' }}><div style={{ fontSize:22, fontWeight:900, color:GOLD, lineHeight:1, letterSpacing:'-1px' }}>{pending}</div><div style={{ fontSize:9, fontWeight:800, color:'rgba(200,169,126,0.7)', textTransform:'uppercase', letterSpacing:'0.1em', marginTop:3 }}>Att.</div></div>}
+            {confirmed>0 && <div style={{ textAlign:'center' }}><div style={{ fontSize:22, fontWeight:900, color:'#fff', lineHeight:1, letterSpacing:'-1px' }}>{confirmed}</div><div style={{ fontSize:9, fontWeight:800, color:'rgba(200,169,126,0.7)', textTransform:'uppercase', letterSpacing:'0.1em', marginTop:3 }}>Confirmée</div></div>}
+            {pending>0   && <div style={{ textAlign:'center' }}><div style={{ fontSize:22, fontWeight:900, color:GOLD, lineHeight:1, letterSpacing:'-1px' }}>{pending}</div><div style={{ fontSize:9, fontWeight:800, color:'rgba(200,169,126,0.7)', textTransform:'uppercase', letterSpacing:'0.1em', marginTop:3 }}>Attente</div></div>}
             {cancelled>0 && <div style={{ textAlign:'center' }}><div style={{ fontSize:22, fontWeight:900, color:'rgba(255,255,255,0.3)', lineHeight:1, letterSpacing:'-1px' }}>{cancelled}</div><div style={{ fontSize:9, fontWeight:800, color:'rgba(200,169,126,0.7)', textTransform:'uppercase', letterSpacing:'0.1em', marginTop:3 }}>Ann.</div></div>}
           </div>
         )}
@@ -106,7 +106,7 @@ function DayView({ date, getByDate }) {
           <div style={{ display:'flex', alignItems:'center', gap:16, padding:'12px 24px', background:'#fff', borderTop: hi>0 ? `2px solid ${DARK}` : '1px solid rgba(43,33,24,0.08)' }}>
             <span style={{ fontSize:13, fontWeight:900, color:GOLD, minWidth:44 }}>{h}:00</span>
             <div style={{ flex:1, height:1, background:'rgba(43,33,24,0.07)' }} />
-            <span style={{ fontSize:11, fontWeight:800, color:'rgba(43,33,24,0.3)' }}>{groups[h].length} rés.</span>
+            <span style={{ fontSize:11, fontWeight:800, color:'rgba(43,33,24,0.3)' }}>{groups[h].length} Reservation</span>
           </div>
           {groups[h].map((r, i) => <ResRow key={r.id} r={r} last={i===groups[h].length-1} />)}
         </div>
@@ -157,7 +157,7 @@ function WeekView({ weekDays, getByDate, onDayChange }) {
             <span style={{ fontSize:14, fontWeight:900, color:'#fff', letterSpacing:'-0.4px', textTransform:'capitalize' }}>
               {DAYS_FULL[activeDay]}, {weekDays[activeDay]?.toLocaleDateString('fr-FR', { day:'numeric', month:'long' })}
             </span>
-            <span style={{ fontSize:12, fontWeight:800, color:GOLD }}>{getByDate(weekDays[activeDay]).length} rés.</span>
+            <span style={{ fontSize:12, fontWeight:800, color:GOLD }}>{getByDate(weekDays[activeDay]).length} Reservation.</span>
           </div>
           {(() => {
             const res = getByDate(weekDays[activeDay])
@@ -175,7 +175,7 @@ function WeekView({ weekDays, getByDate, onDayChange }) {
               <div style={{ padding:'12px 10px', background: isToday ? GOLD : DARK }}>
                 <div style={{ fontSize:8, fontWeight:900, letterSpacing:'0.2em', color: isToday ? DARK : GOLD, marginBottom:5 }}>{DAYS_SHORT[i]}</div>
                 <div style={{ fontSize:22, fontWeight:900, color: isToday ? DARK : '#fff', lineHeight:1, letterSpacing:'-1px' }}>{day.getDate()}</div>
-                {res.length > 0 && <div style={{ marginTop:4, fontSize:10, fontWeight:800, color: isToday ? DARK : GOLD }}>{res.length} rés.</div>}
+                {res.length > 0 && <div style={{ marginTop:4, fontSize:10, fontWeight:800, color: isToday ? DARK : GOLD }}>{res.length} Reservation.</div>}
               </div>
               <div style={{ padding:6, display:'flex', flexDirection:'column', gap:3, minHeight:140, background:'#fff' }}>
                 {res.length === 0
@@ -246,7 +246,7 @@ function YearView({ currentDate, getByMonth, setCurrentDate, setView }) {
             style={{ padding:'20px 18px', border:`2px solid ${isCurrent?GOLD:DARK}`, background: isCurrent ? GOLD_BG : hov ? CREAM : '#fff', cursor:'pointer', transition:'all 0.13s' }}>
             <div style={{ fontSize:9, fontWeight:900, color: isCurrent?GOLD:DARK, letterSpacing:'0.2em', textTransform:'uppercase', marginBottom:10 }}>{month}</div>
             <div style={{ fontSize:40, fontWeight:900, color:DARK, lineHeight:1, letterSpacing:'-2px', marginBottom:4 }}>{res.length}</div>
-            <div style={{ fontSize:12, fontWeight:700, color:GOLD, marginBottom: res.length>0?14:0 }}>réservation{res.length!==1?'s':''}</div>
+            <div style={{ fontSize:12, fontWeight:700, color:GOLD, marginBottom: res.length>0?14:0 }}>Reservationervation{res.length!==1?'s':''}</div>
             {res.length > 0 && (
               <div style={{ borderTop:`2px solid ${DARK}`, paddingTop:12, display:'flex', flexDirection:'column', gap:5 }}>
                 {confirmed>0 && <div style={{ display:'flex', justifyContent:'space-between' }}><span style={{ fontSize:11, fontWeight:700, color:'#2d6a2d' }}>Confirmées</span><span style={{ fontSize:15, fontWeight:900, color:'#16a34a' }}>{confirmed}</span></div>}

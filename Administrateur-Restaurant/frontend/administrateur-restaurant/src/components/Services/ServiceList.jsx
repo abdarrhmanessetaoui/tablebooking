@@ -38,7 +38,7 @@ function ServiceRow({ svc, isEditing, onEdit, onDelete, idx }) {
           </span>
           <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '3px 9px', background: '#fdf6ec', fontSize: 11, fontWeight: 700, color: GOLD_DK }}>
             <Users size={10} strokeWidth={2.5} color={GOLD} />
-            {svc.capacity} pers. max
+            {svc.capacity} personnes max
           </span>
           <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '3px 9px', background: '#fdf6ec', fontSize: 11, fontWeight: 700, color: GOLD_DK }}>
             <Clock size={10} strokeWidth={2.5} color={GOLD} />
