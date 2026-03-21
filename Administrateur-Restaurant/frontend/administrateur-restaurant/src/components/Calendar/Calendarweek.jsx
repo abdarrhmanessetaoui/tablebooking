@@ -79,7 +79,7 @@ function DayView({ date, getByDate }) {
     if (!groups[h]) groups[h] = []
     groups[h].push(r)
   })
-  const hours = Object.keys(groups).sort()
+  const hours     = Object.keys(groups).sort()
   const confirmed = reservations.filter(r => r.status === 'Confirmed').length
   const pending   = reservations.filter(r => r.status === 'Pending').length
   const cancelled = reservations.filter(r => r.status === 'Cancelled').length
@@ -96,7 +96,7 @@ function DayView({ date, getByDate }) {
         {reservations.length > 0 && (
           <div style={{ display:'flex', gap:20 }}>
             {confirmed>0 && <div style={{ textAlign:'center' }}><div style={{ fontSize:22, fontWeight:900, color:'#fff', lineHeight:1, letterSpacing:'-1px' }}>{confirmed}</div><div style={{ fontSize:9, fontWeight:800, color:'rgba(200,169,126,0.7)', textTransform:'uppercase', letterSpacing:'0.1em', marginTop:3 }}>Conf.</div></div>}
-            {pending>0   && <div style={{ textAlign:'center' }}><div style={{ fontSize:22, fontWeight:900, color:GOLD,  lineHeight:1, letterSpacing:'-1px' }}>{pending}</div><div style={{ fontSize:9, fontWeight:800, color:'rgba(200,169,126,0.7)', textTransform:'uppercase', letterSpacing:'0.1em', marginTop:3 }}>Att.</div></div>}
+            {pending>0   && <div style={{ textAlign:'center' }}><div style={{ fontSize:22, fontWeight:900, color:GOLD, lineHeight:1, letterSpacing:'-1px' }}>{pending}</div><div style={{ fontSize:9, fontWeight:800, color:'rgba(200,169,126,0.7)', textTransform:'uppercase', letterSpacing:'0.1em', marginTop:3 }}>Att.</div></div>}
             {cancelled>0 && <div style={{ textAlign:'center' }}><div style={{ fontSize:22, fontWeight:900, color:'rgba(255,255,255,0.3)', lineHeight:1, letterSpacing:'-1px' }}>{cancelled}</div><div style={{ fontSize:9, fontWeight:800, color:'rgba(200,169,126,0.7)', textTransform:'uppercase', letterSpacing:'0.1em', marginTop:3 }}>Ann.</div></div>}
           </div>
         )}
@@ -116,10 +116,17 @@ function DayView({ date, getByDate }) {
 }
 
 /* ══ WEEK ══ */
-function WeekView({ weekDays, getByDate }) {
+// ── onDayChange is NEW — called whenever the active day tab changes
+function WeekView({ weekDays, getByDate, onDayChange }) {
   const today    = new Date().toDateString()
   const todayIdx = weekDays.findIndex(d => d.toDateString() === today)
   const [activeDay, setActiveDay] = useState(todayIdx >= 0 ? todayIdx : 0)
+
+  // ── NEW: notify parent when day changes
+  function selectDay(i) {
+    setActiveDay(i)
+    if (onDayChange) onDayChange(weekDays[i])
+  }
 
   return (
     <>
@@ -136,7 +143,7 @@ function WeekView({ weekDays, getByDate }) {
             const active  = activeDay === i
             const count   = getByDate(day).length
             return (
-              <button key={i} onClick={() => setActiveDay(i)}
+              <button key={i} onClick={() => selectDay(i)}
                 style={{ flexShrink:0, display:'flex', flexDirection:'column', alignItems:'center', padding:'10px 14px', gap:3, background: active ? DARK : '#fff', border:`2px solid ${active ? DARK : isToday ? GOLD : 'rgba(43,33,24,0.15)'}`, color: active ? '#fff' : DARK, cursor:'pointer', transition:'all 0.13s', fontFamily:'inherit' }}>
                 <span style={{ fontSize:8, fontWeight:900, letterSpacing:'0.2em', color: active ? GOLD : isToday ? GOLD : 'rgba(43,33,24,0.4)' }}>{DAYS_SHORT[i]}</span>
                 <span style={{ fontSize:20, fontWeight:900, lineHeight:1 }}>{day.getDate()}</span>
@@ -191,7 +198,7 @@ function MonthView({ monthDays, currentDate, getByDate, setCurrentDate, setView 
   return (
     <div style={{ border:`2px solid ${DARK}` }}>
       <div style={{ display:'grid', gridTemplateColumns:'repeat(7,1fr)', background:DARK }}>
-        {DAYS_SHORT.map(d => (
+        {['LUN','MAR','MER','JEU','VEN','SAM','DIM'].map(d => (
           <div key={d} style={{ padding:'10px 4px', textAlign:'center', fontSize:9, fontWeight:900, color:GOLD, letterSpacing:'0.15em' }}>{d}</div>
         ))}
       </div>
@@ -254,11 +261,12 @@ function YearView({ currentDate, getByMonth, setCurrentDate, setView }) {
   )
 }
 
-export default function CalendarWeek({ view, weekDays, monthDays, currentDate, setCurrentDate, setView, getByDate, getByMonth }) {
+// ── onDayChange is NEW prop threaded from Calendar page
+export default function CalendarWeek({ view, weekDays, monthDays, currentDate, setCurrentDate, setView, getByDate, getByMonth, onDayChange }) {
   return (
     <div>
       {view==='day'   && <DayView   date={currentDate} getByDate={getByDate} />}
-      {view==='week'  && <WeekView  weekDays={weekDays} getByDate={getByDate} />}
+      {view==='week'  && <WeekView  weekDays={weekDays} getByDate={getByDate} onDayChange={onDayChange} />}
       {view==='month' && <MonthView monthDays={monthDays} currentDate={currentDate} getByDate={getByDate} setCurrentDate={setCurrentDate} setView={setView} />}
       {view==='year'  && <YearView  currentDate={currentDate} getByMonth={getByMonth} setCurrentDate={setCurrentDate} setView={setView} />}
     </div>

@@ -40,19 +40,64 @@ export default function Calendar() {
     view, setView, currentDate, setCurrentDate,
     weekDays, monthDays, loading, error,
     navigate, goToday, getByDate, getByMonth,
-    navLabel, reservations, refetch,
+    navLabel, reservations,
   } = useCalendar()
 
   const [exporting, setExporting] = useState(false)
 
-  // ISO date string for the timeline to follow
-  // In week view, use Monday of the current week (weekDays[0])
-  const timelineDate = view === 'week'
-    ? weekDays[0]?.toISOString().slice(0, 10)
-    : currentDate.toISOString().slice(0, 10)
+  // ── NEW: track which day is selected inside week view
+  const [weekSelectedDay, setWeekSelectedDay] = useState(null)
 
-  // Only show timeline in day and week views
-  const showTimeline = view === 'day' || view === 'week'
+  // Reset selected day when view or week changes
+  // so it always defaults to today or Monday
+  function handleNavigate(dir) {
+    setWeekSelectedDay(null)
+    navigate(dir)
+  }
+  function handleGoToday() {
+    setWeekSelectedDay(null)
+    goToday()
+  }
+  function handleSetView(v) {
+    setWeekSelectedDay(null)
+    setView(v)
+  }
+
+  // ── Compute the correct ISO date for the timeline ──────────────
+  function getTimelineDate() {
+    if (view === 'day') {
+      return currentDate.toISOString().slice(0, 10)
+    }
+    if (view === 'week') {
+      // Use the day the user clicked in week view
+      // Fall back to today if in current week, else Monday
+      if (weekSelectedDay) return weekSelectedDay.toISOString().slice(0, 10)
+      const today     = new Date()
+      const todayInWeek = weekDays.find(d => d.toDateString() === today.toDateString())
+      if (todayInWeek) return todayInWeek.toISOString().slice(0, 10)
+      return weekDays[0]?.toISOString().slice(0, 10)
+    }
+    if (view === 'month') {
+      // Use today if in this month, else first day of month
+      const today = new Date()
+      const sameMonth = today.getMonth() === currentDate.getMonth() &&
+                        today.getFullYear() === currentDate.getFullYear()
+      if (sameMonth) return today.toISOString().slice(0, 10)
+      return new Date(currentDate.getFullYear(), currentDate.getMonth(), 1)
+        .toISOString().slice(0, 10)
+    }
+    if (view === 'year') {
+      // Use today if in this year, else Jan 1
+      const today = new Date()
+      if (today.getFullYear() === currentDate.getFullYear()) {
+        return today.toISOString().slice(0, 10)
+      }
+      return `${currentDate.getFullYear()}-01-01`
+    }
+    return currentDate.toISOString().slice(0, 10)
+  }
+
+  const timelineDate = getTimelineDate()
 
   async function handleExport() {
     setExporting(true)
@@ -80,7 +125,10 @@ export default function Calendar() {
       doc.text('NOM',24,y+6); doc.text('DATE',80,y+6); doc.text('HEURE',120,y+6); doc.text('STATUT',155,y+6)
       y += 9
 
-      const allRes = view==='day' ? getByDate(currentDate) : view==='week' ? weekDays.flatMap(d => getByDate(d)) : reservations||[]
+      const allRes = view==='day' ? getByDate(currentDate)
+        : view==='week' ? weekDays.flatMap(d => getByDate(d))
+        : reservations || []
+
       allRes.forEach((r,i) => {
         if (y>270) { doc.addPage(); y=20 }
         doc.setFillColor(i%2===0?255:250, i%2===0?255:248, i%2===0?255:245)
@@ -121,7 +169,6 @@ export default function Calendar() {
         <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800;900&display=swap" rel="stylesheet" />
         <style>{`* { box-sizing: border-box; }`}</style>
 
-        {/* Header */}
         <FadeUp delay={0}>
           <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12, marginBottom: 8, flexWrap: 'wrap' }}>
             <div>
@@ -152,46 +199,47 @@ export default function Calendar() {
           </FadeUp>
         )}
 
-        {/* Calendar nav */}
         <FadeUp delay={20}>
           <CalendarNav
-            view={view} setView={setView}
-            navLabel={navLabel} navigate={navigate}
-            goToday={goToday} currentDate={currentDate}
+            view={view}
+            setView={handleSetView}
+            navLabel={navLabel}
+            navigate={handleNavigate}
+            goToday={handleGoToday}
+            currentDate={currentDate}
           />
         </FadeUp>
 
-        {/* Calendar content */}
         <FadeUp delay={40}>
           {loading ? <Spinner /> : (
             <CalendarWeek
-              view={view} setView={setView}
-              weekDays={weekDays} monthDays={monthDays}
-              currentDate={currentDate} setCurrentDate={setCurrentDate}
-              getByDate={getByDate} getByMonth={getByMonth}
+              view={view}
+              setView={handleSetView}
+              weekDays={weekDays}
+              monthDays={monthDays}
+              currentDate={currentDate}
+              setCurrentDate={setCurrentDate}
+              getByDate={getByDate}
+              getByMonth={getByMonth}
+              onDayChange={setWeekSelectedDay}
             />
           )}
         </FadeUp>
 
-        {/* ── Table Timeline — only in day/week views, synced to calendar date ── */}
-        {showTimeline && (
-          <FadeUp delay={50}>
-            {/* Separator */}
-            <div style={{ margin: '40px 0 0', display: 'flex', alignItems: 'center', gap: 14 }}>
-              <div style={{ height: 2, background: DARK, flex: 1 }} />
-              <span style={{
-                fontSize: 9, fontWeight: 900, color: DARK,
-                letterSpacing: '0.2em', textTransform: 'uppercase',
-                whiteSpace: 'nowrap',
-              }}>
-                Occupation des tables
-              </span>
-              <div style={{ height: 2, background: DARK, flex: 1 }} />
-            </div>
-
-            <TableTimeline controlledDate={timelineDate} />
-          </FadeUp>
-        )}
+        {/* ── Timeline — always shown, synced to correct date ── */}
+        <FadeUp delay={50}>
+          <div style={{ margin: '40px 0 0', display: 'flex', alignItems: 'center', gap: 14 }}>
+            <div style={{ height: 2, background: DARK, flex: 1 }} />
+            <span style={{
+              fontSize: 9, fontWeight: 900, color: DARK,
+              letterSpacing: '0.2em', textTransform: 'uppercase', whiteSpace: 'nowrap',
+            }}>
+              Occupation des tables
+            </span>
+            <div style={{ height: 2, background: DARK, flex: 1 }} />
+          </div>
+          <TableTimeline controlledDate={timelineDate} />
+        </FadeUp>
 
       </div>
     </>
