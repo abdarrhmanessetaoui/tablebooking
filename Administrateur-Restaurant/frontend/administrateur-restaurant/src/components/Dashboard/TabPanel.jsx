@@ -96,7 +96,7 @@ export default function TabPanel({ tab, stats, reservations, onViewAll, tabLabel
           </div>
 
           {/* ── Right: reservations ───────────────────────────── */}
-          <div>
+          <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
 
             {/* Desktop table */}
             <div className="res-desktop">
