@@ -1,13 +1,14 @@
 import { useState } from 'react'
 import { FileDown, Trash2, ToggleRight, ToggleLeft } from 'lucide-react'
-import FadeUp    from '../components/Dashboard/FadeUp'
-import Spinner   from '../components/Dashboard/Spinner'
-import TableForm from '../components/Tables/TableForm'
-import TableList from '../components/Tables/TableList'
-import useTables from '../hooks/Tables/useTables'
-import { confirm } from '../components/ui/ConfirmDialog'
-import { toast }   from '../components/ui/Toast'
-import { getToken } from '../utils/auth'
+import FadeUp        from '../components/Dashboard/FadeUp'
+import Spinner       from '../components/Dashboard/Spinner'
+import TableForm     from '../components/Tables/TableForm'
+import TableList     from '../components/Tables/TableList'
+import TableTimeline from '../components/Tables/TableTimeline'   // ← NEW
+import useTables     from '../hooks/Tables/useTables'
+import { confirm }   from '../components/ui/ConfirmDialog'
+import { toast }     from '../components/ui/Toast'
+import { getToken }  from '../utils/auth'
 
 const DARK    = '#2b2118'
 const GOLD    = '#c8a97e'
@@ -70,7 +71,6 @@ function BulkBar({ count, onDelete, onActivate, onDeactivate, onClear }) {
 
       <div style={{ width: 1, height: 20, background: '#3d2d1e', margin: '0 4px', flexShrink: 0 }} />
 
-      {/* Activate */}
       <button onClick={onActivate} style={{
         display: 'flex', alignItems: 'center', gap: 5, padding: '7px 12px',
         background: 'rgba(22,163,74,0.12)', border: '1px solid rgba(22,163,74,0.25)',
@@ -84,7 +84,6 @@ function BulkBar({ count, onDelete, onActivate, onDeactivate, onClear }) {
         <span className="bulk-label">Activer</span>
       </button>
 
-      {/* Deactivate */}
       <button onClick={onDeactivate} style={{
         display: 'flex', alignItems: 'center', gap: 5, padding: '7px 12px',
         background: 'rgba(200,169,126,0.12)', border: '1px solid rgba(200,169,126,0.25)',
@@ -98,7 +97,6 @@ function BulkBar({ count, onDelete, onActivate, onDeactivate, onClear }) {
         <span className="bulk-label">Désactiver</span>
       </button>
 
-      {/* Delete */}
       <button onClick={onDelete}
         onMouseEnter={() => setHovDel(true)} onMouseLeave={() => setHovDel(false)}
         style={{
@@ -161,7 +159,6 @@ export default function Tables() {
   }
 
   async function handleBulkActivate() {
-    // ✅ FIX 2: was filtering tables already active (wrong) — now filters inactive ones to activate
     const toActivate = selectedTables.filter(idx => !tables.find(t => t.idx === idx)?.active)
     try {
       await Promise.all(
@@ -181,7 +178,6 @@ export default function Tables() {
   }
 
   async function handleBulkDeactivate() {
-    // ✅ FIX 2: was filtering inactive tables (wrong) — now filters active ones to deactivate
     const toDeactivate = selectedTables.filter(idx => tables.find(t => t.idx === idx)?.active)
     try {
       await Promise.all(
@@ -355,6 +351,12 @@ export default function Tables() {
 
           </div>
         </FadeUp>
+
+        {/* ── NEW: Timeline section ── */}
+        <FadeUp delay={30}>
+          <TableTimeline />
+        </FadeUp>
+
       </div>
     </>
   )

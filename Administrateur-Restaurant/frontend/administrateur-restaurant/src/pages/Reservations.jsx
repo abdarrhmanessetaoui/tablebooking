@@ -222,7 +222,7 @@ export default function Reservations() {
   const [exporting,   setExporting]   = useState(false)
   const [selectedIds, setSelectedIds] = useState([])
 
-  const { services } = useServices()   // ← dynamic services from API
+  const { services } = useServices()
 
   const {
     filtered: filteredFromHook, loading, error,
@@ -239,40 +239,28 @@ export default function Reservations() {
     setReservations,
   } = useReservations(location.state)
 
-  // Clear filters AND wipe dashboard navigation state so openId no longer locks the view
   function clearFilters() {
     _clearFilters()
     navigate('/reservations', { replace: true, state: null })
   }
 
-  // Default filters on mount
   useEffect(() => {
     const fromDashboard = !!(location.state?.filterDate || location.state?.openId)
-
     if (fromDashboard) {
-      // Coming from Dashboard (row click or "Voir tout") → show ALL statuses
-      // so nothing is hidden regardless of what was passed
       setFilterStatus('all')
     } else {
-      // Normal direct navigation → default Pending + current month
       if (!location.state?.filterStatus) setFilterStatus('Pending')
-      if (!location.state?.filterDate)   setFilterDate(
-        new Date().toISOString().slice(0, 7)  // YYYY-MM
-      )
+      if (!location.state?.filterDate)   setFilterDate(new Date().toISOString().slice(0, 7))
     }
   }, []) // eslint-disable-line
-  // Re-filter by month locally (hook does exact match, we need startsWith for YYYY-MM)
+
   const filteredLocal = useMemo(() => {
     const base = Array.isArray(filteredFromHook) ? filteredFromHook : []
-
-    // From dashboard row click → show ONLY that reservation
     const openId = location.state?.openId
     if (openId) {
       const match = base.find(r => r.id === openId)
       return match ? [match] : []
     }
-
-    // Normal filtering by date
     if (!filterDate) return base
     if (/^\d{4}-\d{2}$/.test(filterDate)) {
       return base.filter(r => (r.date || '').startsWith(filterDate))
@@ -280,9 +268,6 @@ export default function Reservations() {
     return base.filter(r => r.date === filterDate)
   }, [filteredFromHook, filterDate, location.state?.openId])
 
-
-
-  // If navigated from Dashboard with openId → open that reservation in modal
   useEffect(() => {
     const openId = location.state?.openId
     if (!openId || loading || !filteredLocal.length) return
@@ -313,11 +298,11 @@ export default function Reservations() {
 
   async function handleBulkDelete() {
     const ok = await confirm({
-      title:        'Supprimer la sélection',
-      message:      `Voulez-vous supprimer ${selectedIds.length} réservation${selectedIds.length > 1 ? 's' : ''} ?`,
-      sub:          'Cette action est irréversible.',
+      title: 'Supprimer la sélection',
+      message: `Voulez-vous supprimer ${selectedIds.length} réservation${selectedIds.length > 1 ? 's' : ''} ?`,
+      sub: 'Cette action est irréversible.',
       confirmLabel: 'Tout supprimer',
-      type:         'danger',
+      type: 'danger',
     })
     if (!ok) return
     const h = { 'Content-Type': 'application/json', 'Accept': 'application/json', 'Authorization': `Bearer ${getToken()}` }
@@ -351,6 +336,13 @@ export default function Reservations() {
     }
   }
 
+  // ── CHANGE 1: new handler ──────────────────────────────────────
+  function handleTableAssigned(updatedReservation) {
+    setReservations(prev =>
+      prev.map(r => r.id === updatedReservation.id ? updatedReservation : r)
+    )
+  }
+
   if (loading) return <Spinner />
 
   return (
@@ -369,19 +361,10 @@ export default function Reservations() {
       }}>
         <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800;900&display=swap" rel="stylesheet" />
 
-        {/* HEADER */}
         <FadeUp delay={0}>
-          <div style={{
-            display: 'flex', alignItems: 'center',
-            justifyContent: 'space-between', gap: 12,
-            marginBottom: 28, flexWrap: 'wrap',
-          }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, marginBottom: 28, flexWrap: 'wrap' }}>
             <div>
-              <h1 style={{
-                margin: 0, fontSize: 'clamp(22px,4vw,36px)',
-                fontWeight: 900, color: DARK,
-                letterSpacing: '-1.5px', lineHeight: 1,
-              }}>
+              <h1 style={{ margin: 0, fontSize: 'clamp(22px,4vw,36px)', fontWeight: 900, color: DARK, letterSpacing: '-1.5px', lineHeight: 1 }}>
                 Réservations
               </h1>
               <p className="page-subtitle" style={{ margin: '6px 0 0', fontSize: 12, fontWeight: 700, color: GOLD }}>
@@ -399,27 +382,19 @@ export default function Reservations() {
           </div>
         </FadeUp>
 
-        {/* DIVIDER */}
         <FadeUp delay={10}>
           <div style={{ height: 2, background: DARK, marginBottom: 24 }} />
         </FadeUp>
 
-        {/* ERROR */}
         {error && (
           <FadeUp delay={20}>
-            <div style={{
-              marginBottom: 16, padding: '11px 16px',
-              background: '#fdf0f0', borderLeft: '3px solid #b94040',
-              fontSize: 12, fontWeight: 700, color: '#b94040',
-              display: 'flex', alignItems: 'center', gap: 8,
-            }}>
+            <div style={{ marginBottom: 16, padding: '11px 16px', background: '#fdf0f0', borderLeft: '3px solid #b94040', fontSize: 12, fontWeight: 700, color: '#b94040', display: 'flex', alignItems: 'center', gap: 8 }}>
               <XCircle size={14} strokeWidth={2.5} />
               {error}
             </div>
           </FadeUp>
         )}
 
-        {/* FILTERS */}
         <FadeUp delay={30}>
           <ReservationsFilters
             search={search}               setSearch={setSearch}
@@ -427,22 +402,16 @@ export default function Reservations() {
             filterService={filterService} setFilterService={setFilterService}
             filterDate={filterDate}       setFilterDate={setFilterDate}
             clearFilters={clearFilters}
-            services={services}           // ← dynamic list from API
+            services={services}
           />
         </FadeUp>
 
-        {/* COUNT */}
         <FadeUp delay={50}>
-          <p style={{
-            margin: '0 0 10px',
-            fontSize: 11, fontWeight: 800, color: '#bbb',
-            letterSpacing: '0.1em', textTransform: 'uppercase',
-          }}>
+          <p style={{ margin: '0 0 10px', fontSize: 11, fontWeight: 800, color: '#bbb', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
             {filteredLocal.length} résultat{filteredLocal.length !== 1 ? 's' : ''}
           </p>
         </FadeUp>
 
-        {/* BULK BAR */}
         {selectedIds.length > 0 && (
           <BulkBar
             count={selectedIds.length}
@@ -452,7 +421,6 @@ export default function Reservations() {
           />
         )}
 
-        {/* TABLE */}
         <FadeUp delay={70}>
           <ReservationsTable
             reservations={filteredLocal}
@@ -462,10 +430,10 @@ export default function Reservations() {
             selectedIds={selectedIds}
             setSelectedIds={setSelectedIds}
             highlightId={location.state?.openId ?? null}
+            onTableAssigned={handleTableAssigned}  {/* ── CHANGE 2 ── */}
           />
         </FadeUp>
 
-        {/* MODAL */}
         {modalMode && (
           <ReservationModal
             modalMode={modalMode}
@@ -476,7 +444,7 @@ export default function Reservations() {
             handleCreate={handleCreate}
             handleDelete={handleDelete}
             setModalMode={setModalMode}
-            services={services}           // ← also pass to modal for create/edit form
+            services={services}
           />
         )}
       </div>
