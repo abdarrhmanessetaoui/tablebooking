@@ -3,10 +3,9 @@ import { DARK, BORDER } from './tokens'
 export const wrapper = (bg, accent) => ({
   background:   bg,
   padding:      '12px 20px',
-  display:      'grid',
-  gridTemplateColumns: '1fr auto',
-  alignItems:   'center',
-  gap:          12,
+  display:      'flex',
+  flexDirection: 'column',
+  gap:           6,
   borderLeft:   `3px solid ${accent}`,
   borderBottom: `1px solid ${BORDER}`,
 })
@@ -15,7 +14,7 @@ export const labelRow = {
   display:    'flex',
   alignItems: 'center',
   gap:        5,
-  marginBottom: 4,
+  marginBottom: 2,
 }
 
 export const labelText = (accent) => ({
@@ -48,13 +47,19 @@ export const valuePct = (accent) => ({
   opacity:    0.8,
 })
 
+// ── Progress row: bar + pct side by side ──────────────────────────
+export const progressRow = {
+  display:    'flex',
+  alignItems: 'center',
+  gap:        8,
+}
+
 export const progressTrack = {
-  width:      48,
-  height:     3,
+  flex:       1,          // ← takes available width
+  height:     6,          // ← was 3, now taller
   background: BORDER,
   overflow:   'hidden',
   flexShrink: 0,
-  alignSelf:  'center',
 }
 
 export const progressFill = (w, accent) => ({
@@ -62,6 +67,15 @@ export const progressFill = (w, accent) => ({
   width:      `${w}%`,
   background: accent,
   transition: 'width 0.9s ease',
+})
+
+export const progressPct = (accent) => ({
+  fontSize:   10,
+  fontWeight: 900,
+  color:      accent,
+  flexShrink: 0,
+  minWidth:   28,
+  textAlign:  'right',
 })
 
 export const accentBar = () => ({})

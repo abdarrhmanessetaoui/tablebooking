@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react'
 import useCountUp from '../../hooks/Dashboard/useCountUp'
 import {
   wrapper, labelRow, labelText,
-  valueRow, valueNumber, valuePct,
-  progressTrack, progressFill,
+  valueRow, valueNumber,
+  progressRow, progressTrack, progressFill, progressPct,
 } from '../../styles/dashboard/statBlock.styles'
 
 export default function StatBlock({ icon: Icon, value, label, accent, bg, delay = 0, total = 0 }) {
@@ -19,24 +19,24 @@ export default function StatBlock({ icon: Icon, value, label, accent, bg, delay 
   return (
     <div style={wrapper(bg, accent)}>
 
-      {/* Left: label + number */}
-      <div>
-        <div style={labelRow}>
-          <Icon size={10} strokeWidth={2.5} color={accent} />
-          <span style={labelText(accent)}>{label}</span>
-        </div>
-        <div style={valueRow}>
-          <span style={valueNumber}>{n}</span>
-          {pct !== null && (
-            <span style={valuePct(accent)}>{pct}%</span>
-          )}
-        </div>
+      {/* Label */}
+      <div style={labelRow}>
+        <Icon size={10} strokeWidth={2.5} color={accent} />
+        <span style={labelText(accent)}>{label}</span>
       </div>
 
-      {/* Right: mini progress bar */}
+      {/* Number */}
+      <div style={valueRow}>
+        <span style={valueNumber}>{n}</span>
+      </div>
+
+      {/* Progress bar + pct side by side */}
       {pct !== null && (
-        <div style={progressTrack}>
-          <div style={progressFill(w, accent)} />
+        <div style={progressRow}>
+          <div style={progressTrack}>
+            <div style={progressFill(w, accent)} />
+          </div>
+          <span style={progressPct(accent)}>{pct}%</span>
         </div>
       )}
 
