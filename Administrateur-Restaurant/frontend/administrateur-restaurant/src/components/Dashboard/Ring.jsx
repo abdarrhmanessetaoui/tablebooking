@@ -1,11 +1,12 @@
 import {
   ringWrapper, svg, trackCircle,
-  segment, centerOverlay, centerLabel,
+  segment, centerOverlay, centerPct, centerLabel,
 } from '../../styles/dashboard/ring.styles'
-import { GREEN, RED, GOLD } from '../../styles/dashboard/tokens'
+import { GREEN, RED, GOLD, DARK } from '../../styles/dashboard/tokens'
 
 export default function Ring({ c, p, a, size = 88 }) {
   const total = c + p + a || 1
+  const pct   = Math.round((c / total) * 100)
   const r     = 30
   const circ  = 2 * Math.PI * r
 
@@ -41,15 +42,10 @@ export default function Ring({ c, p, a, size = 88 }) {
         })}
       </svg>
 
-      {/* Center: just a simple dot — no text duplication */}
+      {/* Center label */}
       <div style={centerOverlay}>
-        <div style={{
-          width:        10,
-          height:       10,
-          borderRadius: '50%',
-          background:   GREEN,
-          boxShadow:    `0 0 0 3px rgba(22,163,74,0.2)`,
-        }} />
+        <span style={centerPct}>{pct}%</span>
+        <span style={centerLabel}>Confirmées</span>
       </div>
     </div>
   )

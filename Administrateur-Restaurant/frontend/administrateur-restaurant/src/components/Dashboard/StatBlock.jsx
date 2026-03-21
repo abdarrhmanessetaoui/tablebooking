@@ -22,8 +22,8 @@ export default function StatBlock({ icon: Icon, value, label, accent, bg, delay 
 
       {/* Label */}
       <div style={labelRow}>
-        <Icon size={10} strokeWidth={2.5} color="rgba(255,255,255,0.75)" />
-        <span style={labelText()}>{label}</span>
+        <Icon size={10} strokeWidth={2.5} color={accent} />
+        <span style={labelText(accent)}>{label}</span>
       </div>
 
       {/* Number */}
@@ -35,9 +35,9 @@ export default function StatBlock({ icon: Icon, value, label, accent, bg, delay 
       {pct !== null && (
         <div style={progressRow}>
           <div style={progressTrack}>
-            <div style={progressFill(w)} />
+            <div style={progressFill(w, accent)} />
           </div>
-          <span style={progressPct()}>{pct}%</span>
+          <span style={progressPct(accent)}>{pct}%</span>
         </div>
       )}
 

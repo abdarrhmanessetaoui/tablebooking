@@ -1,12 +1,13 @@
-import { BORDER } from './tokens'
+import { DARK, BORDER, WHITE } from './tokens'
 
 export const wrapper = (bg, accent) => ({
-  background:    accent,
-  padding:       '10px 20px',      // ← was 16px, now compact
+  background:    WHITE,
+  padding:       '14px 20px',
   display:       'flex',
   flexDirection: 'column',
-  gap:           6,
-  borderBottom:  `1px solid rgba(255,255,255,0.15)`,
+  gap:           8,
+  borderLeft:    `4px solid ${accent}`,
+  borderBottom:  `1px solid ${BORDER}`,
 })
 
 export const labelRow = {
@@ -15,10 +16,10 @@ export const labelRow = {
   gap:        5,
 }
 
-export const labelText = () => ({
+export const labelText = (accent) => ({
   fontSize:      9,
   fontWeight:    900,
-  color:         'rgba(255,255,255,0.75)',
+  color:         accent,
   textTransform: 'uppercase',
   letterSpacing: '0.18em',
 })
@@ -30,18 +31,19 @@ export const valueRow = {
 }
 
 export const valueNumber = {
-  fontSize:           24,          // ← was 32, now smaller
+  fontSize:           28,
   fontWeight:         900,
-  color:              '#fff',
+  color:              DARK,
   letterSpacing:      '-1px',
   lineHeight:         1,
   fontVariantNumeric: 'tabular-nums',
 }
 
-export const valuePct = () => ({
+export const valuePct = (accent) => ({
   fontSize:   10,
   fontWeight: 800,
-  color:      'rgba(255,255,255,0.7)',
+  color:      accent,
+  opacity:    0.8,
 })
 
 export const progressRow = {
@@ -53,22 +55,22 @@ export const progressRow = {
 export const progressTrack = {
   flex:       1,
   height:     4,
-  background: 'rgba(255,255,255,0.25)',
+  background: BORDER,
   overflow:   'hidden',
   flexShrink: 0,
 }
 
-export const progressFill = (w) => ({
+export const progressFill = (w, accent) => ({
   height:     '100%',
   width:      `${w}%`,
-  background: '#fff',
+  background: accent,
   transition: 'width 0.9s ease',
 })
 
-export const progressPct = () => ({
+export const progressPct = (accent) => ({
   fontSize:   9,
   fontWeight: 900,
-  color:      'rgba(255,255,255,0.85)',
+  color:      accent,
   flexShrink: 0,
   minWidth:   24,
   textAlign:  'right',
