@@ -9,7 +9,6 @@ class WpMessage extends Model
     protected $table      = 'wpjn_cpappbk_messages';
     public    $timestamps = false;
 
-    
     protected $fillable = [
         'formid',
         'time',
@@ -21,6 +20,7 @@ class WpMessage extends Model
         'reminderstatus',
         'reminderstatussnd',
         'isold',
+        'table_idx',   // ← NEW
     ];
 
     public function form()
@@ -60,6 +60,7 @@ class WpMessage extends Model
             'service'    => $d['app_service_1']   ?? null,
             'status'     => $d['app_status_1']    ?? null,
             'notes'      => $d['fieldname8']      ?? null,
+            'table_idx'  => $this->table_idx,      // ← NEW
         ];
     }
 }
