@@ -4,10 +4,12 @@ import FadeUp        from '../components/Dashboard/FadeUp'
 import Spinner       from '../components/Dashboard/Spinner'
 import TableForm     from '../components/Tables/TableForm'
 import TableList     from '../components/Tables/TableList'
+import TableTimeline from '../components/Tables/TableTimeline'
 import useTables     from '../hooks/Tables/useTables'
 import { confirm }   from '../components/ui/ConfirmDialog'
 import { toast }     from '../components/ui/Toast'
 import { getToken }  from '../utils/auth'
+
 
 const DARK    = '#2b2118'
 const GOLD    = '#c8a97e'
@@ -349,6 +351,22 @@ export default function Tables() {
             </div>
 
           </div>
+        </FadeUp>
+
+
+        {/* ── Timeline — always shown, synced to correct date ── */}
+        <FadeUp delay={50}>
+          <div style={{ margin: '40px 0 0', display: 'flex', alignItems: 'center', gap: 14 }}>
+            <div style={{ height: 2, background: DARK, flex: 1 }} />
+            <span style={{
+              fontSize: 9, fontWeight: 900, color: DARK,
+              letterSpacing: '0.2em', textTransform: 'uppercase', whiteSpace: 'nowrap',
+            }}>
+              Occupation des tables
+            </span>
+            <div style={{ height: 2, background: DARK, flex: 1 }} />
+          </div>
+          <TableTimeline />
         </FadeUp>
 
 
