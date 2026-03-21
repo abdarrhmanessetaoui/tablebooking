@@ -82,8 +82,6 @@ function PageBtn({ onClick, disabled, active, children }) {
   )
 }
 
-// ── Assign table cell ──────────────────────────────────────────────
-
 function AssignTableCell({ r, onOpenAssign }) {
   const [hov, setHov] = useState(false)
   const hasTable = !!r.table_idx
@@ -102,6 +100,7 @@ function AssignTableCell({ r, onOpenAssign }) {
           fontSize: 11, fontWeight: 800,
           color: hov ? GOLD : GOLD_DARK,
           cursor: 'pointer', transition: 'all 0.12s',
+          whiteSpace: 'nowrap',
         }}
       >
         <LayoutGrid size={10} strokeWidth={2.5} />
@@ -123,7 +122,7 @@ function AssignTableCell({ r, onOpenAssign }) {
         fontSize: 11, fontWeight: 800,
         color: hov ? DARK : 'rgba(43,33,24,0.35)',
         cursor: 'pointer', fontFamily: 'inherit',
-        transition: 'all 0.12s',
+        transition: 'all 0.12s', whiteSpace: 'nowrap',
       }}
     >
       <Link2 size={10} strokeWidth={2.5} />
@@ -157,7 +156,7 @@ function MobileCard({ r, selected, highlighted, onToggle, openView, openEdit, ha
         </div>
       )}
 
-      {/* Row 1: checkbox + name + status */}
+      {/* Row 1 */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
         <Checkbox checked={selected} onChange={onToggle} />
         <div style={{ flex: 1, minWidth: 0, paddingRight: highlighted ? 90 : 0 }}>
@@ -198,7 +197,6 @@ function MobileCard({ r, selected, highlighted, onToggle, openView, openEdit, ha
             {item.value}
           </span>
         ))}
-        {/* Table chip — always visible on mobile */}
         <AssignTableCell r={r} onOpenAssign={onOpenAssign} />
       </div>
 
@@ -264,10 +262,12 @@ function TableRow({ r, i, selected, highlighted, highlightRef, toggleOne, openVi
         cursor: 'pointer',
       }}
     >
-      <td style={{ padding: '11px 16px' }} onClick={e => e.stopPropagation()}>
+      <td style={{ padding: '10px 12px' }} onClick={e => e.stopPropagation()}>
         <Checkbox checked={selected} onChange={() => toggleOne(r.id)} />
       </td>
-      <td style={{ padding: '11px 14px' }}>
+
+      {/* NOM — always visible */}
+      <td style={{ padding: '10px 12px', maxWidth: 160 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 5, overflow: 'hidden' }}>
           <User2 size={11} strokeWidth={2.5} color={highlighted ? GOLD_DARK : DARK} style={{ flexShrink: 0 }} />
           <span style={{
@@ -284,19 +284,25 @@ function TableRow({ r, i, selected, highlighted, highlightRef, toggleOne, openVi
           </span>
         )}
       </td>
-      <td style={{ padding: '11px 14px' }}>
+
+      {/* TÉLÉPHONE — hidden below 1100px */}
+      <td className="col-phone" style={{ padding: '10px 12px' }}>
         <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, fontSize: 12, fontWeight: 700, color: DARK, whiteSpace: 'nowrap' }}>
           <Phone size={11} strokeWidth={2.5} color={DARK} style={{ flexShrink: 0 }} />
           {r.phone || '—'}
         </span>
       </td>
-      <td style={{ padding: '11px 14px' }}>
+
+      {/* DATE — always visible */}
+      <td style={{ padding: '10px 12px' }}>
         <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, fontSize: 12, fontWeight: 700, color: DARK, whiteSpace: 'nowrap' }}>
           <CalendarDays size={11} strokeWidth={2.5} color={DARK} style={{ flexShrink: 0 }} />
           {r.date || '—'}
         </span>
       </td>
-      <td style={{ padding: '11px 14px' }}>
+
+      {/* HEURE — always visible */}
+      <td style={{ padding: '10px 12px' }}>
         <span style={{
           display: 'inline-flex', alignItems: 'center', gap: 5,
           padding: '4px 9px', background: highlighted ? `${GOLD}22` : '#f5f0eb',
@@ -306,13 +312,17 @@ function TableRow({ r, i, selected, highlighted, highlightRef, toggleOne, openVi
           {r.start_time || '—'}
         </span>
       </td>
-      <td style={{ padding: '11px 14px' }}>
+
+      {/* PERSONNES — hidden below 900px */}
+      <td className="col-guests" style={{ padding: '10px 12px' }}>
         <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, fontSize: 12, fontWeight: 700, color: DARK, whiteSpace: 'nowrap' }}>
           <Users size={11} strokeWidth={2.5} color={DARK} style={{ flexShrink: 0 }} />
           {r.guests || '—'}
         </span>
       </td>
-      <td style={{ padding: '11px 14px' }}>
+
+      {/* SERVICE — hidden below 1200px */}
+      <td className="col-service" style={{ padding: '10px 12px' }}>
         <span style={{
           display: 'inline-flex', alignItems: 'center', gap: 5,
           padding: '4px 9px', background: '#f5f0eb',
@@ -323,12 +333,13 @@ function TableRow({ r, i, selected, highlighted, highlightRef, toggleOne, openVi
         </span>
       </td>
 
-      {/* Table column — hidden below 1024px via CSS */}
-      <td className="col-table" style={{ padding: '11px 14px' }} onClick={e => e.stopPropagation()}>
+      {/* TABLE — hidden below 1300px */}
+      <td className="col-table" style={{ padding: '10px 12px' }} onClick={e => e.stopPropagation()}>
         <AssignTableCell r={r} onOpenAssign={onOpenAssign} />
       </td>
 
-      <td style={{ padding: '11px 14px' }}>
+      {/* STATUT — always visible */}
+      <td style={{ padding: '10px 12px' }}>
         <span style={{
           display: 'inline-flex', alignItems: 'center', gap: 4,
           padding: '4px 10px',
@@ -338,7 +349,9 @@ function TableRow({ r, i, selected, highlighted, highlightRef, toggleOne, openVi
           {s.label}
         </span>
       </td>
-      <td style={{ padding: '11px 14px' }}>
+
+      {/* ACTIONS — always visible */}
+      <td style={{ padding: '10px 12px' }}>
         <div style={{ display: 'flex', gap: 4 }}>
           <ActionBtn icon={Eye}    title="Voir"      onClick={() => openView(r)} />
           <ActionBtn icon={Pencil} title="Modifier"  onClick={() => openEdit(r)} />
@@ -411,6 +424,19 @@ export default function ReservationsTable({
     return pages
   }
 
+  // Column headers matching the responsive cols above
+  const HEADERS = [
+    { label: 'Nom',       cls: ''            },
+    { label: 'Téléphone', cls: 'col-phone'   },
+    { label: 'Date',      cls: ''            },
+    { label: 'Heure',     cls: ''            },
+    { label: 'Personnes', cls: 'col-guests'  },
+    { label: 'Service',   cls: 'col-service' },
+    { label: 'Table',     cls: 'col-table'   },
+    { label: 'Statut',    cls: ''            },
+    { label: 'Actions',   cls: ''            },
+  ]
+
   return (
     <>
       <style>{`
@@ -420,10 +446,13 @@ export default function ReservationsTable({
           .res-table-wrap { display: none;  }
           .res-cards-wrap { display: block; }
         }
-        .col-table { }
-        @media (max-width: 1024px) {
-          .col-table { display: none; }
-        }
+
+        /* Progressive column hiding */
+        @media (max-width: 1300px) { .col-table   { display: none; } }
+        @media (max-width: 1200px) { .col-service { display: none; } }
+        @media (max-width: 1100px) { .col-phone   { display: none; } }
+        @media (max-width: 900px)  { .col-guests  { display: none; } }
+
         @keyframes pulse-gold {
           0%   { box-shadow: inset 3px 0 0 ${GOLD}, 0 0 0 3px ${GOLD}33; }
           50%  { box-shadow: inset 3px 0 0 ${GOLD}, 0 0 0 6px ${GOLD}11; }
@@ -465,19 +494,22 @@ export default function ReservationsTable({
           </div>
         )}
 
-        {/* Desktop table */}
-        <div className="res-table-wrap" style={{ overflowX: 'auto' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 700 }}>
+        {/* Desktop table — NO minWidth so it never forces horizontal scroll */}
+        <div className="res-table-wrap">
+          <table style={{ width: '100%', borderCollapse: 'collapse', tableLayout: 'fixed' }}>
             <thead>
               <tr style={{ background: DARK }}>
-                <th style={{ padding: '12px 16px', width: 40 }}>
+                <th style={{ padding: '12px 12px', width: 36 }}>
                   <Checkbox checked={pageAllSel} indeterminate={pageSomeSel} onChange={togglePage} />
                 </th>
-                {['Nom', 'Téléphone', 'Date', 'Heure', 'Personnes', 'Service', 'Table', 'Statut', 'Actions'].map(c => (
-                  <th key={c}
-                    className={c === 'Table' ? 'col-table' : ''}
-                    style={{ padding: '12px 14px', textAlign: 'left', fontSize: 9, fontWeight: 900, color: GOLD, letterSpacing: '0.15em', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>
-                    {c}
+                {HEADERS.map(({ label, cls }) => (
+                  <th key={label} className={cls} style={{
+                    padding: '12px 12px', textAlign: 'left',
+                    fontSize: 9, fontWeight: 900, color: GOLD,
+                    letterSpacing: '0.15em', textTransform: 'uppercase',
+                    whiteSpace: 'nowrap', overflow: 'hidden',
+                  }}>
+                    {label}
                   </th>
                 ))}
               </tr>
