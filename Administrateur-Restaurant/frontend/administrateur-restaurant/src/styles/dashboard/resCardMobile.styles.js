@@ -58,7 +58,7 @@ export const chip = (gold) => ({
   alignItems: 'center',
   gap:        5,
   padding:    '4px 9px',
-  background: gold ? '#f5f0eb' : CREAM,
+  background: gold ? '#fdf0d5' : CREAM,
   fontSize:   11,
   fontWeight: 700,
   color:      gold ? GOLD_DK : DARK,

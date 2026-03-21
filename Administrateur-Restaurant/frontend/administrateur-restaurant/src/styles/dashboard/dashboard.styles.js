@@ -128,7 +128,7 @@ import {
       flex-shrink: 0;
     }
     .db-tab:hover:not(.active) {
-      background: #f5f0eb;
+      background: #fdf0d5;
     }
     .db-tab.active {
       background: ${DARK};
