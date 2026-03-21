@@ -29,7 +29,7 @@ function EmptyState({ onViewAll, tabLabel }) {
       <div style={emptyInner}>
         <CalendarDays
           size={36}
-          color="rgba(43,33,24,0.1)"
+          color="rgba(200,169,126,0.9)"
           style={{ marginBottom: 14 }}
         />
         <p style={emptyTitle}>Aucune réservation</p>
