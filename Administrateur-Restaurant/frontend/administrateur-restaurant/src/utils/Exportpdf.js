@@ -1,5 +1,4 @@
-const DARK = '#2b2118'
-const GOLD = '#c8a97e'
+import { DARK, GOLD, GREEN, RED, AMBER } from '../styles/dashboard/tokens'
 
 function hexToRgb(hex) {
   const r = parseInt(hex.slice(1,3),16)
@@ -8,14 +7,12 @@ function hexToRgb(hex) {
   return [r,g,b]
 }
 
-// status → label + color
 function statusMeta(status) {
-  if (status === 'Confirmed') return { label: 'Confirmée',  rgb: [26,110,66]  }
-  if (status === 'Cancelled') return { label: 'Annulée',    rgb: [185,64,64]  }
-  return                             { label: 'En attente', rgb: [168,103,10] }
+  if (status === 'Confirmed') return { label: 'Confirmée',  rgb: hexToRgb(GREEN) }
+  if (status === 'Cancelled') return { label: 'Annulée',    rgb: hexToRgb(RED)   }
+  return                             { label: 'En attente', rgb: hexToRgb(AMBER) }
 }
 
-// truncate text to fit column
 function trunc(doc, text, maxW) {
   if (!text) return ''
   let t = String(text)
@@ -42,220 +39,338 @@ export function exportPDF(stats, reservations = [], tabLabel = "Aujourd'hui") {
   const setGold  = () => doc.setTextColor(...hexToRgb(GOLD))
   const setWhite = () => doc.setTextColor(255,255,255)
   const fillDark = () => doc.setFillColor(...hexToRgb(DARK))
+  const fillGold = () => doc.setFillColor(...hexToRgb(GOLD))
 
+  // ── Footer ────────────────────────────────────────────────────────
   function footer() {
-    doc.setDrawColor(...hexToRgb(GOLD))
-    doc.setLineWidth(0.3)
-    doc.line(PAD, FOOTER_Y, W-PAD, FOOTER_Y)
-    doc.setFont('helvetica','bold'); doc.setFontSize(7); setGold()
-    doc.text('TableBooking.ma — Rapport automatique', PAD, FOOTER_Y+5)
-    doc.setFont('helvetica','normal'); setDark()
-    doc.text(`Généré le ${today} à ${now}`, W-PAD, FOOTER_Y+5, { align:'right' })
+    fillGold()
+    doc.rect(0, FOOTER_Y, W, FOOTER_H, 'F')
+    doc.setFont('helvetica','bold')
+    doc.setFontSize(7)
+    setDark()
+    doc.text('TableBooking.ma', PAD, FOOTER_Y + 5.5)
+    doc.setFont('helvetica','normal')
+    doc.text(`Généré le ${today} à ${now}`, W - PAD, FOOTER_Y + 5.5, { align: 'right' })
+
+    // Second line
+    doc.setFontSize(6.5)
+    doc.setTextColor(...hexToRgb(DARK), 0.6)
+    doc.text('Rapport automatique · Confidentiel', PAD, FOOTER_Y + 10)
   }
 
-  function hline(y) {
-    doc.setDrawColor(220,210,200); doc.setLineWidth(0.3)
-    doc.line(PAD, y, W-PAD, y)
+  // ── Page header ───────────────────────────────────────────────────
+  function pageHeader(subtitle = 'TABLEAU DE BORD') {
+    fillDark()
+    doc.rect(0, 0, W, 30, 'F')
+
+    // Gold accent bar
+    fillGold()
+    doc.rect(0, 30, W, 2, 'F')
+
+    // Logo
+    doc.setFont('helvetica','bold')
+    doc.setFontSize(16)
+    setGold()
+    doc.text('TableBooking', PAD, 19)
+    const tbW = doc.getTextWidth('TableBooking')
+    setWhite()
+    doc.text('.ma', PAD + tbW, 19)
+
+    // Right: subtitle + date
+    doc.setFont('helvetica','bold')
+    doc.setFontSize(7)
+    setGold()
+    doc.text(subtitle, W - PAD, 12, { align: 'right' })
+    doc.setFont('helvetica','normal')
+    doc.setFontSize(7.5)
+    setWhite()
+    doc.text(`${today}  ·  ${now}`, W - PAD, 22, { align: 'right' })
   }
 
+  // ── Section title ─────────────────────────────────────────────────
   function sectionTitle(title, sub, y) {
-    doc.setFont('helvetica','bold'); doc.setFontSize(14); setDark()
+    doc.setFont('helvetica','bold')
+    doc.setFontSize(13)
+    setDark()
     doc.text(title, PAD, y)
-    doc.setFont('helvetica','normal'); doc.setFontSize(8); setGold()
-    doc.text(sub, PAD, y+5.5)
-    return y + 13
+
+    doc.setFont('helvetica','normal')
+    doc.setFontSize(8)
+    setGold()
+    doc.text(sub, PAD, y + 5.5)
+    return y + 14
   }
 
-  function statCell(value, label, x, y, gold) {
-    doc.setFont('helvetica','bold'); doc.setFontSize(26)
-    gold ? setGold() : setDark()
-    doc.text(String(value), x, y)
-    doc.setFont('helvetica','normal'); doc.setFontSize(8); setDark()
-    doc.text(label, x, y+6)
+  // ── KPI card ──────────────────────────────────────────────────────
+  function kpiCard(value, label, accent, x, y, w, h = 22) {
+    // White background
+    doc.setFillColor(255, 255, 255)
+    doc.rect(x, y, w, h, 'F')
+
+    // Colored left border
+    doc.setFillColor(...hexToRgb(accent))
+    doc.rect(x, y, 3, h, 'F')
+
+    // Outer border
+    doc.setDrawColor(232, 213, 183)
+    doc.setLineWidth(0.3)
+    doc.rect(x, y, w, h, 'S')
+
+    // Value
+    doc.setFont('helvetica','bold')
+    doc.setFontSize(20)
+    setDark()
+    doc.text(String(value), x + 7, y + 13)
+
+    // Label
+    doc.setFont('helvetica','normal')
+    doc.setFontSize(7)
+    doc.setTextColor(...hexToRgb(accent))
+    doc.text(label.toUpperCase(), x + 7, y + 19)
   }
 
-  /* ══ PAGE 1 — STATS ══════════════════════════════════ */
-  const colW3 = COL/3
-  const colW2 = COL/2
+  // ── Divider ───────────────────────────────────────────────────────
+  function hline(y) {
+    doc.setDrawColor(232, 213, 183)
+    doc.setLineWidth(0.3)
+    doc.line(PAD, y, W - PAD, y)
+  }
 
-  // Header
-  fillDark(); doc.rect(0,0,W,28,'F')
-  doc.setFont('helvetica','bold'); doc.setFontSize(15); setGold()
-  doc.text('TableBooking', PAD, 18)
-  const tbW = doc.getTextWidth('TableBooking')
-  setWhite(); doc.text('.ma', PAD+tbW, 18)
-  doc.setFont('helvetica','bold'); doc.setFontSize(7); setGold()
-  doc.text('TABLEAU DE BORD', W-PAD, 11, { align:'right' })
-  doc.setFont('helvetica','normal'); doc.setFontSize(7.5); setWhite()
-  doc.text(`${today}  ·  ${now}`, W-PAD, 20, { align:'right' })
+  // ═════════════════════════════════════════════════════════════════
+  // PAGE 1 — STATS DASHBOARD
+  // ═════════════════════════════════════════════════════════════════
+  pageHeader('TABLEAU DE BORD')
 
-  let y = 37
+  let y = 42
 
-  // Aujourd'hui big number
-  y = sectionTitle("Aujourd'hui", "Total des réservations du jour", y)
-  doc.setFont('helvetica','bold'); doc.setFontSize(44); setDark()
-  doc.text(String(stats.today), PAD, y+15)
-  doc.setFont('helvetica','bold'); doc.setFontSize(9); setGold()
-  doc.text("réservations aujourd'hui", PAD, y+22)
-  y += 28; hline(y); y += 11
+  // ── Hero number ───────────────────────────────────────────────────
+  y = sectionTitle("Réservations aujourd'hui", 'Vue d\'ensemble du jour', y)
 
-  // Détail du jour
+  // Big number box
+  doc.setFillColor(253, 246, 236)
+  doc.rect(PAD, y, COL, 28, 'F')
+  doc.setFillColor(...hexToRgb(GOLD))
+  doc.rect(PAD, y, 4, 28, 'F')
+
+  doc.setFont('helvetica','bold')
+  doc.setFontSize(38)
+  setDark()
+  doc.text(String(stats.today), PAD + 10, y + 20)
+
+  doc.setFont('helvetica','normal')
+  doc.setFontSize(9)
+  setGold()
+  doc.text("réservations aujourd'hui", PAD + 32, y + 20)
+
+  y += 34
+  hline(y)
+  y += 10
+
+  // ── KPI row 1: today detail ───────────────────────────────────────
   y = sectionTitle('Détail du jour', 'Confirmées · En attente · Annulées', y)
-  ;[
-    { v:stats.today_confirmed, l:'Confirmées', g:false },
-    { v:stats.today_pending,   l:'En attente', g:true  },
-    { v:stats.today_cancelled, l:'Annulées',   g:false },
-  ].forEach((s,i) => statCell(s.v, s.l, PAD+i*colW3, y+11, s.g))
-  y += 22; hline(y); y += 11
 
-  // À venir
+  const kpiW  = (COL - 4) / 3
+  const kpiH  = 24
+  ;[
+    { v: stats.today_confirmed, l: 'Confirmées', accent: GREEN },
+    { v: stats.today_pending,   l: 'En attente', accent: AMBER },
+    { v: stats.today_cancelled, l: 'Annulées',   accent: RED   },
+  ].forEach((s, i) => {
+    kpiCard(s.v, s.l, s.accent, PAD + i * (kpiW + 2), y, kpiW, kpiH)
+  })
+
+  y += kpiH + 10
+  hline(y)
+  y += 10
+
+  // ── KPI row 2: tomorrow + total ───────────────────────────────────
   y = sectionTitle('À venir', 'Demain et total du mois', y)
-  ;[
-    { v:stats.tomorrow, l:'Réservations demain', g:true  },
-    { v:stats.total,    l:'Total ce mois',       g:false },
-  ].forEach((s,i) => statCell(s.v, s.l, PAD+i*colW2, y+11, s.g))
-  y += 22; hline(y); y += 11
 
-  // Ce mois
+  const kpiW2 = (COL - 2) / 2
+  ;[
+    { v: stats.tomorrow, l: 'Demain',        accent: GOLD },
+    { v: stats.total,    l: 'Total ce mois', accent: DARK },
+  ].forEach((s, i) => {
+    kpiCard(s.v, s.l, s.accent, PAD + i * (kpiW2 + 2), y, kpiW2, kpiH)
+  })
+
+  y += kpiH + 10
+  hline(y)
+  y += 10
+
+  // ── KPI row 3: monthly detail ─────────────────────────────────────
   y = sectionTitle('Ce mois', 'Bilan mensuel des réservations', y)
-  ;[
-    { v:stats.confirmed, l:'Confirmées', g:false },
-    { v:stats.pending,   l:'En attente', g:true  },
-    { v:stats.cancelled, l:'Annulées',   g:false },
-  ].forEach((s,i) => statCell(s.v, s.l, PAD+i*colW3, y+11, s.g))
-  y += 22
 
-  // Summary bar
-  const rate = stats.total > 0 ? Math.round(stats.confirmed/stats.total*100) : 0
-  const barY  = Math.max(y+8, FOOTER_Y-22)
-  fillDark(); doc.rect(PAD, barY, COL, 12, 'F')
-  doc.setFont('helvetica','bold'); doc.setFontSize(8); setGold()
-  doc.text('Total du mois :', PAD+5, barY+7.5)
-  const lw = doc.getTextWidth('Total du mois :')
-  setWhite(); doc.text(` ${stats.total} réservations`, PAD+5+lw, barY+7.5)
-  const rl = 'Taux de confirmation :'
-  const rv = `  ${rate}%`
-  const rvW = doc.getTextWidth(rv), rlW = doc.getTextWidth(rl)
-  setGold(); doc.text(rl, W-PAD-5-rvW-rlW, barY+7.5)
-  setWhite(); doc.text(rv, W-PAD-5-rvW, barY+7.5)
+  ;[
+    { v: stats.confirmed, l: 'Confirmées', accent: GREEN },
+    { v: stats.pending,   l: 'En attente', accent: AMBER },
+    { v: stats.cancelled, l: 'Annulées',   accent: RED   },
+  ].forEach((s, i) => {
+    kpiCard(s.v, s.l, s.accent, PAD + i * (kpiW + 2), y, kpiW, kpiH)
+  })
+
+  y += kpiH + 12
+
+  // ── Summary bar ───────────────────────────────────────────────────
+  const rate = stats.total > 0 ? Math.round(stats.confirmed / stats.total * 100) : 0
+  const barY = Math.max(y, FOOTER_Y - 24)
+
+  fillDark()
+  doc.rect(PAD, barY, COL, 14, 'F')
+  fillGold()
+  doc.rect(PAD, barY, 3, 14, 'F')
+
+  doc.setFont('helvetica','bold')
+  doc.setFontSize(8)
+  setGold()
+  doc.text('Taux de confirmation :', PAD + 7, barY + 6)
+  const rateW = doc.getTextWidth('Taux de confirmation :')
+  setWhite()
+  doc.text(` ${rate}%`, PAD + 7 + rateW, barY + 6)
+
+  doc.setFont('helvetica','normal')
+  doc.setFontSize(7.5)
+  setWhite()
+  doc.text(`${stats.total} réservations ce mois`, W - PAD - 5, barY + 6, { align: 'right' })
+
+  // Progress bar
+  const barTrackW = COL - 14
+  doc.setFillColor(255,255,255,0.15)
+  doc.rect(PAD + 7, barY + 8, barTrackW, 3, 'F')
+  fillGold()
+  doc.rect(PAD + 7, barY + 8, barTrackW * (rate / 100), 3, 'F')
 
   footer()
 
-  /* ══ PAGE 2 — TABLE DES RÉSERVATIONS ════════════════ */
+  // ═════════════════════════════════════════════════════════════════
+  // PAGE 2 — RESERVATIONS TABLE
+  // ═════════════════════════════════════════════════════════════════
   if (reservations && reservations.length > 0) {
     doc.addPage()
+    pageHeader(`RÉSERVATIONS — ${tabLabel.toUpperCase()}`)
 
-    // Header same style
-    fillDark(); doc.rect(0,0,W,28,'F')
-    doc.setFont('helvetica','bold'); doc.setFontSize(15); setGold()
-    doc.text('TableBooking', PAD, 18)
-    const tbW2 = doc.getTextWidth('TableBooking')
-    setWhite(); doc.text('.ma', PAD+tbW2, 18)
-    doc.setFont('helvetica','bold'); doc.setFontSize(7); setGold()
-    doc.text(`RÉSERVATIONS — ${tabLabel.toUpperCase()}`, W-PAD, 11, { align:'right' })
-    doc.setFont('helvetica','normal'); doc.setFontSize(7.5); setWhite()
-    doc.text(`${today}  ·  ${now}`, W-PAD, 20, { align:'right' })
+    let ty = 42
 
-    let ty = 36
-
-    // Section title
     ty = sectionTitle(
       `Réservations — ${tabLabel}`,
-      `${reservations.length} réservation(s) · ${tabLabel}`,
+      `${reservations.length} réservation(s)`,
       ty
     )
 
-    // Table header
-    const ROW_H  = 10
+    const ROW_H = 11
     const cols = {
-      name:    { x: PAD,      w: 44, label: 'NOM' },
-      time:    { x: PAD+44,   w: 18, label: 'HEURE' },
-      guests:  { x: PAD+62,   w: 20, label: 'COUVERTS' },
-      service: { x: PAD+82,   w: 52, label: 'SERVICE' },
-      status:  { x: PAD+134,  w: 32, label: 'STATUT' },
+      name:    { x: PAD,     w: 46, label: 'NOM'      },
+      time:    { x: PAD+46,  w: 20, label: 'HEURE'    },
+      guests:  { x: PAD+66,  w: 18, label: 'COUVERTS' },
+      service: { x: PAD+84,  w: 50, label: 'SERVICE'  },
+      status:  { x: PAD+134, w: 48, label: 'STATUT'   },
     }
 
+    // Table header
     fillDark()
     doc.rect(PAD, ty, COL, ROW_H, 'F')
-    doc.setFont('helvetica','bold'); doc.setFontSize(7); setGold()
-    Object.values(cols).forEach(c => doc.text(c.label, c.x+2, ty+6.5))
+    fillGold()
+    doc.rect(PAD, ty, 3, ROW_H, 'F')
+    doc.setFont('helvetica','bold')
+    doc.setFontSize(7)
+    setGold()
+    Object.values(cols).forEach(c => doc.text(c.label, c.x + 5, ty + 7))
     ty += ROW_H
 
-    // Rows
     reservations.forEach((r, idx) => {
-      // New page if needed
+      // New page check
       if (ty + ROW_H > FOOTER_Y - 6) {
         footer()
         doc.addPage()
-        fillDark(); doc.rect(0,0,W,28,'F')
-        doc.setFont('helvetica','bold'); doc.setFontSize(15); setGold()
-        doc.text('TableBooking', PAD, 18)
-        const tbW3 = doc.getTextWidth('TableBooking')
-        setWhite(); doc.text('.ma', PAD+tbW3, 18)
-        ty = 36
-        // Reprint table header
-        fillDark(); doc.rect(PAD, ty, COL, ROW_H, 'F')
-        doc.setFont('helvetica','bold'); doc.setFontSize(7); setGold()
-        Object.values(cols).forEach(c => doc.text(c.label, c.x+2, ty+6.5))
+        pageHeader(`RÉSERVATIONS — ${tabLabel.toUpperCase()}`)
+        ty = 42
+        fillDark()
+        doc.rect(PAD, ty, COL, ROW_H, 'F')
+        fillGold()
+        doc.rect(PAD, ty, 3, ROW_H, 'F')
+        doc.setFont('helvetica','bold')
+        doc.setFontSize(7)
+        setGold()
+        Object.values(cols).forEach(c => doc.text(c.label, c.x + 5, ty + 7))
         ty += ROW_H
       }
 
-      // Row background (alternating)
+      const sm     = statusMeta(r.status)
       const isEven = idx % 2 === 0
-      doc.setFillColor(isEven ? 255:250, isEven ? 255:248, isEven ? 255:245)
+
+      // Row background
+      doc.setFillColor(isEven ? 255 : 253, isEven ? 255 : 246, isEven ? 255 : 236)
       doc.rect(PAD, ty, COL, ROW_H, 'F')
 
-      // Left accent bar by status
-      const sm = statusMeta(r.status)
+      // Status left bar
       doc.setFillColor(...sm.rgb)
-      doc.rect(PAD, ty, 2, ROW_H, 'F')
+      doc.rect(PAD, ty, 3, ROW_H, 'F')
 
-      doc.setFont('helvetica','normal'); doc.setFontSize(8.5); setDark()
+      // Bottom border
+      doc.setDrawColor(232, 213, 183)
+      doc.setLineWidth(0.2)
+      doc.line(PAD, ty + ROW_H, PAD + COL, ty + ROW_H)
 
-      // Name (bold) + phone
+      // Name
       doc.setFont('helvetica','bold')
-      doc.text(trunc(doc, r.name, cols.name.w-4), cols.name.x+4, ty+5)
+      doc.setFontSize(8.5)
+      setDark()
+      doc.text(trunc(doc, r.name, cols.name.w - 8), cols.name.x + 5, ty + 6)
       if (r.phone) {
-        doc.setFont('helvetica','normal'); doc.setFontSize(6.5)
-        doc.setTextColor(140,120,100)
-        doc.text(trunc(doc, r.phone, cols.name.w-4), cols.name.x+4, ty+8.5)
+        doc.setFont('helvetica','normal')
+        doc.setFontSize(6.5)
+        doc.setTextColor(160, 130, 100)
+        doc.text(trunc(doc, r.phone, cols.name.w - 8), cols.name.x + 5, ty + 9.5)
       }
 
       // Time
-      doc.setFont('helvetica','bold'); doc.setFontSize(9); setDark()
-      doc.text(r.start_time || r.time || '—', cols.time.x+2, ty+6)
+      doc.setFont('helvetica','bold')
+      doc.setFontSize(8.5)
+      setGold()
+      doc.text(r.start_time || '—', cols.time.x + 5, ty + 7)
 
       // Guests
-      doc.setFont('helvetica','bold'); doc.setFontSize(9)
-      doc.text(String(r.guests || '—'), cols.guests.x+2, ty+6)
+      setDark()
+      doc.text(String(r.guests || '—'), cols.guests.x + 5, ty + 7)
 
       // Service
-      doc.setFont('helvetica','normal'); doc.setFontSize(7.5); setDark()
-      doc.text(trunc(doc, r.service || '—', cols.service.w-4), cols.service.x+2, ty+6)
+      doc.setFont('helvetica','normal')
+      doc.setFontSize(8)
+      setDark()
+      doc.text(trunc(doc, r.service || '—', cols.service.w - 4), cols.service.x + 5, ty + 7)
 
       // Status pill
       doc.setFillColor(...sm.rgb)
-      doc.roundedRect(cols.status.x+2, ty+2.5, 26, 5.5, 1, 1, 'F')
-      doc.setFont('helvetica','bold'); doc.setFontSize(6.5)
-      doc.setTextColor(255,255,255)
-      doc.text(sm.label, cols.status.x+15, ty+6.2, { align:'center' })
-
-      // Bottom border
-      doc.setDrawColor(230,222,212); doc.setLineWidth(0.2)
-      doc.line(PAD, ty+ROW_H, PAD+COL, ty+ROW_H)
+      doc.roundedRect(cols.status.x + 5, ty + 2.5, 28, 6, 1, 1, 'F')
+      doc.setFont('helvetica','bold')
+      doc.setFontSize(6.5)
+      setWhite()
+      doc.text(sm.label, cols.status.x + 19, ty + 6.5, { align: 'center' })
 
       ty += ROW_H
     })
 
-    // Total row
-    fillDark(); doc.rect(PAD, ty, COL, 9, 'F')
-    doc.setFont('helvetica','bold'); doc.setFontSize(8); setGold()
-    doc.text(`Total : ${reservations.length} réservation(s)`, PAD+5, ty+6)
-    const confirmed = reservations.filter(r=>r.status==='Confirmed').length
-    const pending   = reservations.filter(r=>r.status==='Pending').length
-    const cancelled = reservations.filter(r=>r.status==='Cancelled').length
+    // ── Totals row ────────────────────────────────────────────────
+    fillDark()
+    doc.rect(PAD, ty, COL, 11, 'F')
+    fillGold()
+    doc.rect(PAD, ty, 3, 11, 'F')
+
+    doc.setFont('helvetica','bold')
+    doc.setFontSize(8)
+    setGold()
+    doc.text(`Total : ${reservations.length} réservation(s)`, PAD + 7, ty + 7)
+
+    const confirmed = reservations.filter(r => r.status === 'Confirmed').length
+    const pending   = reservations.filter(r => r.status === 'Pending').length
+    const cancelled = reservations.filter(r => r.status === 'Cancelled').length
+
     setWhite()
-    doc.text(`${confirmed} conf. · ${pending} att. · ${cancelled} ann.`, W-PAD-5, ty+6, { align:'right' })
+    doc.setFont('helvetica','normal')
+    doc.text(
+      `${confirmed} conf. · ${pending} att. · ${cancelled} ann.`,
+      W - PAD - 5, ty + 7, { align: 'right' }
+    )
 
     footer()
   }
