@@ -10,6 +10,7 @@ export const tabPanelCSS = `
   .db-body {
     display: grid;
     grid-template-columns: 280px 1fr;
+    align-items: stretch;
   }
   .db-left {
     border-right: 2px solid ${DARK};
@@ -18,12 +19,17 @@ export const tabPanelCSS = `
     position: sticky;
     top: 24px;
   }
+  .db-right {
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
+  }
   @media (max-width: 860px) {
     .db-body              { grid-template-columns: 1fr; }
     .db-left              { border-right: none; border-bottom: 2px solid ${DARK}; }
     .db-stats-sticky      { position: static; }
   }
-  .res-desktop { display: block; }
+  .res-desktop { display: block; height: 100%; }
   .res-mobile  { display: none;  }
   @media (max-width: 640px) {
     .res-desktop { display: none;  }
