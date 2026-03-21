@@ -1,10 +1,10 @@
 import { useState } from 'react'
 import { FileDown } from 'lucide-react'
-import useCalendar  from '../hooks/Calendar/useCalendar'
-import CalendarNav  from '../components/Calendar/CalendarNav'
-import CalendarWeek from '../components/Calendar/CalendarWeek'
-import FadeUp  from '../components/Dashboard/FadeUp'
-import Spinner from '../components/Dashboard/Spinner'
+import useCalendar   from '../hooks/Calendar/useCalendar'
+import CalendarNav   from '../components/Calendar/CalendarNav'
+import CalendarWeek  from '../components/Calendar/CalendarWeek'
+import FadeUp        from '../components/Dashboard/FadeUp'
+import Spinner       from '../components/Dashboard/Spinner'
 import TableTimeline from '../components/Tables/TableTimeline'
 
 const DARK    = '#2b2118'
@@ -44,6 +44,15 @@ export default function Calendar() {
   } = useCalendar()
 
   const [exporting, setExporting] = useState(false)
+
+  // ISO date string for the timeline to follow
+  // In week view, use Monday of the current week (weekDays[0])
+  const timelineDate = view === 'week'
+    ? weekDays[0]?.toISOString().slice(0, 10)
+    : currentDate.toISOString().slice(0, 10)
+
+  // Only show timeline in day and week views
+  const showTimeline = view === 'day' || view === 'week'
 
   async function handleExport() {
     setExporting(true)
@@ -112,6 +121,7 @@ export default function Calendar() {
         <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800;900&display=swap" rel="stylesheet" />
         <style>{`* { box-sizing: border-box; }`}</style>
 
+        {/* Header */}
         <FadeUp delay={0}>
           <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12, marginBottom: 8, flexWrap: 'wrap' }}>
             <div>
@@ -142,10 +152,16 @@ export default function Calendar() {
           </FadeUp>
         )}
 
+        {/* Calendar nav */}
         <FadeUp delay={20}>
-          <CalendarNav view={view} setView={setView} navLabel={navLabel} navigate={navigate} goToday={goToday} currentDate={currentDate} />
+          <CalendarNav
+            view={view} setView={setView}
+            navLabel={navLabel} navigate={navigate}
+            goToday={goToday} currentDate={currentDate}
+          />
         </FadeUp>
 
+        {/* Calendar content */}
         <FadeUp delay={40}>
           {loading ? <Spinner /> : (
             <CalendarWeek
@@ -157,10 +173,26 @@ export default function Calendar() {
           )}
         </FadeUp>
 
-        <FadeUp delay={50}>
-          <TableTimeline />
-        </FadeUp>
-        
+        {/* ── Table Timeline — only in day/week views, synced to calendar date ── */}
+        {showTimeline && (
+          <FadeUp delay={50}>
+            {/* Separator */}
+            <div style={{ margin: '40px 0 0', display: 'flex', alignItems: 'center', gap: 14 }}>
+              <div style={{ height: 2, background: DARK, flex: 1 }} />
+              <span style={{
+                fontSize: 9, fontWeight: 900, color: DARK,
+                letterSpacing: '0.2em', textTransform: 'uppercase',
+                whiteSpace: 'nowrap',
+              }}>
+                Occupation des tables
+              </span>
+              <div style={{ height: 2, background: DARK, flex: 1 }} />
+            </div>
+
+            <TableTimeline controlledDate={timelineDate} />
+          </FadeUp>
+        )}
+
       </div>
     </>
   )

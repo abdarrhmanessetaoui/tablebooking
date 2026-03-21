@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import {
   CalendarDays, ChevronLeft, ChevronRight,
   RefreshCw, LayoutGrid, Users, MapPin, Clock,
@@ -36,10 +36,10 @@ function toDecimal(time) {
 function blockPosition(startTime, endTime) {
   const start = toDecimal(startTime)
   if (start === null) return null
-  const end         = toDecimal(endTime) ?? (start + 2)
-  const totalHours  = HOUR_END - HOUR_START
-  const left        = ((start - HOUR_START) / totalHours) * 100
-  const width       = ((end - start) / totalHours) * 100
+  const end        = toDecimal(endTime) ?? (start + 2)
+  const totalHours = HOUR_END - HOUR_START
+  const left       = ((start - HOUR_START) / totalHours) * 100
+  const width      = ((end - start) / totalHours) * 100
   return {
     left:  Math.max(0, Math.min(left, 100)).toFixed(2) + '%',
     width: Math.max(1, Math.min(width, 100 - parseFloat(left))).toFixed(2) + '%',
@@ -59,13 +59,10 @@ function offsetDate(iso, days) {
   return d.toISOString().slice(0, 10)
 }
 
-// ── Nav button ─────────────────────────────────────────────────────
-
 function NavBtn({ onClick, title, children }) {
   const [hov, setHov] = useState(false)
   return (
-    <button
-      onClick={onClick} title={title}
+    <button onClick={onClick} title={title}
       onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
       style={{
         width: 34, height: 34,
@@ -79,8 +76,6 @@ function NavBtn({ onClick, title, children }) {
     </button>
   )
 }
-
-// ── Reservation block ──────────────────────────────────────────────
 
 function ResBlock({ res }) {
   const [hov, setHov] = useState(false)
@@ -118,21 +113,18 @@ function ResBlock({ res }) {
   )
 }
 
-// ── Table row ──────────────────────────────────────────────────────
-
 function TimelineRow({ row }) {
   const locStyle = LOC_COLORS[row.location] ?? { bg: '#f5f5f5', color: '#666' }
   const hasRes   = row.reservations.length > 0
 
   return (
     <div style={{
-      display: 'grid', gridTemplateColumns: '160px 1fr',
+      display: 'grid', gridTemplateColumns: '150px 1fr',
       borderBottom: `1px solid ${BORDER}`,
       minHeight: 52,
     }}>
-      {/* Info cell */}
       <div style={{
-        padding: '10px 14px', borderRight: `2px solid ${DARK}`,
+        padding: '10px 12px', borderRight: `2px solid ${DARK}`,
         display: 'flex', flexDirection: 'column', justifyContent: 'center',
         background: '#fff', flexShrink: 0,
       }}>
@@ -142,7 +134,7 @@ function TimelineRow({ row }) {
             {row.table_name}
           </span>
         </div>
-        <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
           <span style={{
             display: 'inline-flex', alignItems: 'center', gap: 3,
             padding: '2px 6px', background: '#fdf6ec',
@@ -162,9 +154,7 @@ function TimelineRow({ row }) {
         </div>
       </div>
 
-      {/* Timeline track */}
       <div style={{ position: 'relative', overflow: 'hidden', background: hasRes ? '#fff' : CREAM }}>
-        {/* Hour grid lines */}
         {HOURS.map((h, i) => (
           <div key={h} style={{
             position: 'absolute', left: `${(i / (HOUR_END - HOUR_START)) * 100}%`,
@@ -173,8 +163,6 @@ function TimelineRow({ row }) {
             pointerEvents: 'none',
           }} />
         ))}
-
-        {/* Free label */}
         {!hasRes && (
           <span style={{
             position: 'absolute', top: '50%', left: '50%',
@@ -187,8 +175,6 @@ function TimelineRow({ row }) {
             libre
           </span>
         )}
-
-        {/* Blocks */}
         {row.reservations.map(res => (
           <ResBlock key={res.id} res={res} />
         ))}
@@ -197,81 +183,71 @@ function TimelineRow({ row }) {
   )
 }
 
-// ── Main component ─────────────────────────────────────────────────
+// ── Main ───────────────────────────────────────────────────────────
+// controlledDate: ISO string passed from parent (Calendar page)
+// When set, hides the internal date nav — Calendar controls the date
 
-export default function TableTimeline() {
+export default function TableTimeline({ controlledDate = null }) {
   const { timeline, loading, error, date, setDate, refresh } = useTablesTimeline()
+
+  // Sync to external date when Calendar controls it
+  useEffect(() => {
+    if (controlledDate && controlledDate !== date) {
+      setDate(controlledDate)
+    }
+  }, [controlledDate]) // eslint-disable-line
 
   const today    = new Date().toISOString().slice(0, 10)
   const occupied = timeline.filter(t => t.reservations.length > 0).length
   const free     = timeline.length - occupied
+  const isControlled = !!controlledDate
 
   return (
-    <div style={{ fontFamily: "'Plus Jakarta Sans','DM Sans',system-ui,sans-serif", marginTop: 48 }}>
+    <div style={{ fontFamily: "'Plus Jakarta Sans','DM Sans',system-ui,sans-serif", marginTop: 32 }}>
 
-      {/* Section header */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, marginBottom: 16, flexWrap: 'wrap' }}>
-        <div>
-          <h2 style={{ margin: 0, fontSize: 22, fontWeight: 900, color: DARK, letterSpacing: '-0.8px' }}>
-            Planning des tables
-          </h2>
-          <p style={{ margin: '4px 0 0', fontSize: 12, fontWeight: 700, color: GOLD_DARK }}>
-            Vue journalière · {formatDate(date)}
-          </p>
-        </div>
-        {!loading && (
-          <div style={{ display: 'flex', gap: 6 }}>
-            <span style={{ padding: '4px 12px', background: '#1a6e42', fontSize: 11, fontWeight: 900, color: '#fff' }}>
-              {occupied} occupée{occupied !== 1 ? 's' : ''}
+      {/* ── Header ── */}
+      <div style={{
+        display: 'flex', alignItems: 'center',
+        justifyContent: 'space-between', gap: 12,
+        marginBottom: 14, flexWrap: 'wrap',
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+          {/* Dark label pill */}
+          <div style={{
+            display: 'inline-flex', alignItems: 'center', gap: 8,
+            padding: '7px 14px', background: DARK,
+          }}>
+            <LayoutGrid size={13} color={GOLD} strokeWidth={2.5} />
+            <span style={{ fontSize: 12, fontWeight: 900, color: '#fff', letterSpacing: '-0.3px' }}>
+              Planning des tables
             </span>
-            <span style={{ padding: '4px 12px', background: CREAM, border: `1.5px solid ${BORDER}`, fontSize: 11, fontWeight: 900, color: DARK }}>
-              {free} libre{free !== 1 ? 's' : ''}
-            </span>
+            {/* Date shown in header when controlled externally */}
+            {isControlled && (
+              <span style={{
+                fontSize: 11, fontWeight: 700,
+                color: 'rgba(200,169,126,0.7)',
+                textTransform: 'capitalize',
+              }}>
+                · {formatDate(date)}
+              </span>
+            )}
           </div>
-        )}
-      </div>
 
-      {/* Divider */}
-      <div style={{ height: 2, background: DARK, marginBottom: 16 }} />
-
-      {/* Date nav */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16, flexWrap: 'wrap' }}>
-        <NavBtn onClick={() => setDate(offsetDate(date, -1))} title="Jour précédent">
-          <ChevronLeft size={15} strokeWidth={2.5} color={DARK} />
-        </NavBtn>
-
-        <div style={{
-          display: 'flex', alignItems: 'center', gap: 8,
-          padding: '6px 14px', background: DARK, flex: 1, minWidth: 180,
-        }}>
-          <CalendarDays size={13} color={GOLD} strokeWidth={2.5} />
-          <span style={{ fontSize: 13, fontWeight: 900, color: '#fff', flex: 1, letterSpacing: '-0.3px' }}>
-            {formatDate(date)}
-          </span>
+          {/* Occupied / free pills */}
+          {!loading && (
+            <div style={{ display: 'flex', gap: 6 }}>
+              <span style={{ padding: '4px 10px', background: '#1a6e42', fontSize: 11, fontWeight: 900, color: '#fff' }}>
+                {occupied} occupée{occupied !== 1 ? 's' : ''}
+              </span>
+              <span style={{ padding: '4px 10px', background: CREAM, border: `1.5px solid ${BORDER}`, fontSize: 11, fontWeight: 900, color: DARK }}>
+                {free} libre{free !== 1 ? 's' : ''}
+              </span>
+            </div>
+          )}
         </div>
 
-        <NavBtn onClick={() => setDate(offsetDate(date, 1))} title="Jour suivant">
-          <ChevronRight size={15} strokeWidth={2.5} color={DARK} />
-        </NavBtn>
-
-        {date !== today && (
-          <button
-            onClick={() => setDate(today)}
-            style={{
-              padding: '6px 14px', background: GOLD, border: 'none',
-              fontSize: 11, fontWeight: 900, color: DARK,
-              cursor: 'pointer', fontFamily: 'inherit',
-            }}
-            onMouseEnter={e => e.currentTarget.style.background = GOLD_DARK}
-            onMouseLeave={e => e.currentTarget.style.background = GOLD}
-          >
-            Aujourd'hui
-          </button>
-        )}
-
-        <button
-          onClick={refresh}
-          title="Actualiser"
+        {/* Refresh button always visible */}
+        <button onClick={refresh} title="Actualiser"
           style={{
             width: 34, height: 34, display: 'flex', alignItems: 'center', justifyContent: 'center',
             background: '#fff', border: `2px solid ${BORDER}`, cursor: 'pointer',
@@ -283,31 +259,60 @@ export default function TableTimeline() {
         </button>
       </div>
 
-      {/* Error */}
+      {/* ── Standalone date nav — only shown when NOT controlled by Calendar ── */}
+      {!isControlled && (
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14, flexWrap: 'wrap' }}>
+          <NavBtn onClick={() => setDate(offsetDate(date, -1))} title="Jour précédent">
+            <ChevronLeft size={15} strokeWidth={2.5} color={DARK} />
+          </NavBtn>
+          <div style={{
+            display: 'flex', alignItems: 'center', gap: 8,
+            padding: '6px 14px', background: DARK, flex: 1, minWidth: 180,
+          }}>
+            <CalendarDays size={13} color={GOLD} strokeWidth={2.5} />
+            <span style={{ fontSize: 13, fontWeight: 900, color: '#fff', flex: 1, letterSpacing: '-0.3px', textTransform: 'capitalize' }}>
+              {formatDate(date)}
+            </span>
+          </div>
+          <NavBtn onClick={() => setDate(offsetDate(date, 1))} title="Jour suivant">
+            <ChevronRight size={15} strokeWidth={2.5} color={DARK} />
+          </NavBtn>
+          {date !== today && (
+            <button onClick={() => setDate(today)} style={{
+              padding: '6px 14px', background: GOLD, border: 'none',
+              fontSize: 11, fontWeight: 900, color: DARK,
+              cursor: 'pointer', fontFamily: 'inherit',
+            }}
+              onMouseEnter={e => e.currentTarget.style.background = GOLD_DARK}
+              onMouseLeave={e => e.currentTarget.style.background = GOLD}
+            >
+              Aujourd'hui
+            </button>
+          )}
+        </div>
+      )}
+
+      {/* ── Error ── */}
       {error && (
-        <div style={{ marginBottom: 14, padding: '10px 14px', background: '#fdf0f0', borderLeft: '3px solid #b94040', fontSize: 12, fontWeight: 700, color: '#b94040' }}>
+        <div style={{ marginBottom: 12, padding: '10px 14px', background: '#fdf0f0', borderLeft: '3px solid #b94040', fontSize: 12, fontWeight: 700, color: '#b94040' }}>
           {error}
         </div>
       )}
 
-      {/* Timeline */}
+      {/* ── Timeline grid ── */}
       <div style={{ border: `2px solid ${DARK}`, overflow: 'hidden' }}>
 
-        {/* Header with hour labels */}
-        <div style={{ display: 'grid', gridTemplateColumns: '160px 1fr', background: DARK, position: 'sticky', top: 0, zIndex: 5 }}>
-          <div style={{ padding: '8px 14px', borderRight: `2px solid rgba(200,169,126,0.2)`, display: 'flex', alignItems: 'center', gap: 6 }}>
+        {/* Hour header */}
+        <div style={{ display: 'grid', gridTemplateColumns: '150px 1fr', background: DARK, position: 'sticky', top: 0, zIndex: 5 }}>
+          <div style={{ padding: '8px 12px', borderRight: `2px solid rgba(200,169,126,0.2)`, display: 'flex', alignItems: 'center', gap: 6 }}>
             <Clock size={11} color={GOLD} strokeWidth={2.5} />
-            <span style={{ fontSize: 9, fontWeight: 900, color: GOLD, letterSpacing: '0.16em', textTransform: 'uppercase' }}>
-              Table
-            </span>
+            <span style={{ fontSize: 9, fontWeight: 900, color: GOLD, letterSpacing: '0.16em', textTransform: 'uppercase' }}>Table</span>
           </div>
           <div style={{ position: 'relative', height: 34 }}>
             {HOURS.map((h, i) => (
               <div key={h} style={{
-                position: 'absolute',
-                left: `${(i / (HOUR_END - HOUR_START)) * 100}%`,
-                top: 0, bottom: 0,
-                display: 'flex', alignItems: 'center', paddingLeft: 4,
+                position: 'absolute', left: `${(i / (HOUR_END - HOUR_START)) * 100}%`,
+                top: 0, bottom: 0, display: 'flex', alignItems: 'center', paddingLeft: 4,
                 borderLeft: i > 0 ? '1px solid rgba(200,169,126,0.2)' : 'none',
               }}>
                 <span style={{ fontSize: 9, fontWeight: 900, color: GOLD, letterSpacing: '0.06em', whiteSpace: 'nowrap' }}>
@@ -322,18 +327,14 @@ export default function TableTimeline() {
         {loading && (
           <div style={{ padding: '48px 0', textAlign: 'center' }}>
             <style>{`@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}`}</style>
-            <div style={{
-              width: 22, height: 22, borderRadius: '50%',
-              border: `2.5px solid ${BORDER}`, borderTopColor: GOLD,
-              animation: 'spin 0.8s linear infinite', margin: '0 auto',
-            }} />
+            <div style={{ width: 22, height: 22, borderRadius: '50%', border: `2.5px solid ${BORDER}`, borderTopColor: GOLD, animation: 'spin 0.8s linear infinite', margin: '0 auto' }} />
           </div>
         )}
 
         {/* Empty */}
         {!loading && timeline.length === 0 && (
-          <div style={{ padding: '52px 24px', textAlign: 'center' }}>
-            <LayoutGrid size={36} color={DARK} strokeWidth={1.5} style={{ display: 'block', margin: '0 auto 12px' }} />
+          <div style={{ padding: '48px 24px', textAlign: 'center' }}>
+            <LayoutGrid size={34} color={DARK} strokeWidth={1.5} style={{ display: 'block', margin: '0 auto 12px' }} />
             <p style={{ margin: 0, fontSize: 14, fontWeight: 900, color: DARK }}>Aucune table active</p>
             <p style={{ margin: '4px 0 0', fontSize: 12, fontWeight: 700, color: GOLD_DARK }}>
               Configurez vos tables dans la section Tables.
@@ -349,10 +350,8 @@ export default function TableTimeline() {
 
       {/* Legend */}
       {!loading && timeline.length > 0 && (
-        <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap', marginTop: 10, padding: '10px 14px', background: CREAM, border: `1px solid ${BORDER}` }}>
-          <span style={{ fontSize: 9, fontWeight: 900, color: DARK, letterSpacing: '0.14em', textTransform: 'uppercase', alignSelf: 'center' }}>
-            Légende
-          </span>
+        <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap', marginTop: 10, padding: '8px 14px', background: CREAM, border: `1px solid ${BORDER}` }}>
+          <span style={{ fontSize: 9, fontWeight: 900, color: DARK, letterSpacing: '0.14em', textTransform: 'uppercase', alignSelf: 'center' }}>Légende</span>
           {[
             { bg: '#1a6e42', border: '#22c55e', label: 'Confirmée'  },
             { bg: '#7a5c1e', border: '#c8a97e', label: 'En attente' },
