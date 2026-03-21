@@ -430,7 +430,7 @@ export default function Reservations() {
             selectedIds={selectedIds}
             setSelectedIds={setSelectedIds}
             highlightId={location.state?.openId ?? null}
-            onTableAssigned={handleTableAssigned}  {/* ── CHANGE 2 ── */}
+            onTableAssigned={handleTableAssigned}
           />
         </FadeUp>
 
