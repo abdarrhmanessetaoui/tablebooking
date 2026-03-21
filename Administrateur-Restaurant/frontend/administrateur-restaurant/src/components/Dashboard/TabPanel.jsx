@@ -63,36 +63,36 @@ export default function TabPanel({ tab, stats, reservations, onViewAll, tabLabel
               <Ring c={c} p={p} a={a} size={88} />
             </div>
 
-            {/* Stat blocks */}
-            <div style={statsList}>
-              <StatBlock
-                icon={CheckCircle}
-                value={c}
-                label="Confirmées"
-                accent={GREEN}
-                bg={GREEN_BG}
-                delay={50}
-                total={total}
-              />
-              <StatBlock
-                icon={Clock}
-                value={p}
-                label="En attente"
-                accent={AMBER}
-                bg={AMBER_BG}
-                delay={80}
-                total={total}
-              />
-              <StatBlock
-                icon={XCircle}
-                value={a}
-                label="Annulées"
-                accent={RED}
-                bg={RED_BG}
-                delay={110}
-                total={total}
-              />
-            </div>
+{/* Stat blocks — horizontal KPI row */}
+<div className="db-stats-row">
+  <StatBlock
+    icon={CheckCircle}
+    value={c}
+    label="Confirmées"
+    accent={GREEN}
+    bg={GREEN_BG}
+    delay={50}
+    total={total}
+  />
+  <StatBlock
+    icon={Clock}
+    value={p}
+    label="En attente"
+    accent={AMBER}
+    bg={AMBER_BG}
+    delay={80}
+    total={total}
+  />
+  <StatBlock
+    icon={XCircle}
+    value={a}
+    label="Annulées"
+    accent={RED}
+    bg={RED_BG}
+    delay={110}
+    total={total}
+  />
+</div>
           </div>
 
           {/* ── Right: reservations ───────────────────────────── */}
