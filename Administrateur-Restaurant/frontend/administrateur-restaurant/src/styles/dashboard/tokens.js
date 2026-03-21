@@ -1,15 +1,16 @@
 // ─────────────────────────────────────────────────────────────────
 // Design tokens — single source of truth for the Dashboard UI
-// Import from here in ALL dashboard components and style files
 // ─────────────────────────────────────────────────────────────────
 
 // ── Core palette ─────────────────────────────────────────────────
 export const DARK     = '#2b2118'
 export const GOLD     = '#c8a97e'
 export const GOLD_DK  = '#a8834e'
-export const CREAM    = '#faf8f5'
 export const WHITE    = '#ffffff'
-export const BORDER   = '#e8e0d6'
+
+// ── Brown replaces all grays ──────────────────────────────────────
+export const CREAM    = '#fdf6ec'   // was #faf8f5 — brown tint background
+export const BORDER   = '#e8d5b7'   // was #e8e0d6 — brown border
 
 // ── Semantic colors ───────────────────────────────────────────────
 export const GREEN    = '#16A34A'
