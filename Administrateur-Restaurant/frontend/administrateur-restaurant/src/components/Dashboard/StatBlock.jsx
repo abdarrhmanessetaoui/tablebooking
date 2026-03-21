@@ -3,7 +3,8 @@ import useCountUp from '../../hooks/Dashboard/useCountUp'
 import {
   wrapper, labelRow, labelText,
   valueRow, valueNumber,
-  progressRow, progressTrack, progressFill, progressPct,
+  progressRow, progressTrack,
+  progressFill, progressPct,
 } from '../../styles/dashboard/statBlock.styles'
 
 export default function StatBlock({ icon: Icon, value, label, accent, bg, delay = 0, total = 0 }) {
@@ -21,8 +22,8 @@ export default function StatBlock({ icon: Icon, value, label, accent, bg, delay 
 
       {/* Label */}
       <div style={labelRow}>
-        <Icon size={10} strokeWidth={2.5} color={accent} />
-        <span style={labelText(accent)}>{label}</span>
+        <Icon size={10} strokeWidth={2.5} color="rgba(255,255,255,0.75)" />
+        <span style={labelText()}>{label}</span>
       </div>
 
       {/* Number */}
@@ -30,13 +31,13 @@ export default function StatBlock({ icon: Icon, value, label, accent, bg, delay 
         <span style={valueNumber}>{n}</span>
       </div>
 
-      {/* Progress bar + pct side by side */}
+      {/* Progress bar + pct */}
       {pct !== null && (
         <div style={progressRow}>
           <div style={progressTrack}>
-            <div style={progressFill(w, accent)} />
+            <div style={progressFill(w)} />
           </div>
-          <span style={progressPct(accent)}>{pct}%</span>
+          <span style={progressPct()}>{pct}%</span>
         </div>
       )}
 

@@ -1,26 +1,24 @@
-import { DARK, BORDER } from './tokens'
+import { BORDER } from './tokens'
 
 export const wrapper = (bg, accent) => ({
-  background:   bg,
-  padding:      '12px 20px',
-  display:      'flex',
+  background:    accent,        // ← solid colored background
+  padding:       '16px 20px',
+  display:       'flex',
   flexDirection: 'column',
-  gap:           6,
-  borderLeft:   `3px solid ${accent}`,
-  borderBottom: `1px solid ${BORDER}`,
+  gap:           8,
+  borderBottom:  `1px solid rgba(255,255,255,0.15)`,
 })
 
 export const labelRow = {
   display:    'flex',
   alignItems: 'center',
   gap:        5,
-  marginBottom: 2,
 }
 
-export const labelText = (accent) => ({
+export const labelText = () => ({
   fontSize:      9,
   fontWeight:    900,
-  color:         accent,
+  color:         'rgba(255,255,255,0.75)',
   textTransform: 'uppercase',
   letterSpacing: '0.18em',
 })
@@ -32,22 +30,21 @@ export const valueRow = {
 }
 
 export const valueNumber = {
-  fontSize:           28,
+  fontSize:           32,
   fontWeight:         900,
-  color:              DARK,
+  color:              '#fff',
   letterSpacing:      '-1.5px',
   lineHeight:         1,
   fontVariantNumeric: 'tabular-nums',
 }
 
-export const valuePct = (accent) => ({
+export const valuePct = () => ({
   fontSize:   10,
   fontWeight: 800,
-  color:      accent,
-  opacity:    0.8,
+  color:      'rgba(255,255,255,0.7)',
 })
 
-// ── Progress row: bar + pct side by side ──────────────────────────
+// ── Progress row ──────────────────────────────────────────────────
 export const progressRow = {
   display:    'flex',
   alignItems: 'center',
@@ -55,24 +52,24 @@ export const progressRow = {
 }
 
 export const progressTrack = {
-  flex:       1,          // ← takes available width
-  height:     6,          // ← was 3, now taller
-  background: BORDER,
+  flex:       1,
+  height:     4,
+  background: 'rgba(255,255,255,0.25)',
   overflow:   'hidden',
   flexShrink: 0,
 }
 
-export const progressFill = (w, accent) => ({
+export const progressFill = (w) => ({
   height:     '100%',
   width:      `${w}%`,
-  background: accent,
+  background: '#fff',
   transition: 'width 0.9s ease',
 })
 
-export const progressPct = (accent) => ({
+export const progressPct = () => ({
   fontSize:   10,
   fontWeight: 900,
-  color:      accent,
+  color:      '#fff',
   flexShrink: 0,
   minWidth:   28,
   textAlign:  'right',

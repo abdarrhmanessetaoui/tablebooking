@@ -51,12 +51,12 @@ export const tabPanelCSS = `
 
 // ── Hero section (big number + ring) ─────────────────────────────
 export const heroSection = {
-  padding:       '18px 20px 16px',
-  display:       'flex',
-  alignItems:    'center',
-  gap:           20,
-  borderBottom:  `1px solid ${BORDER}`,
-  background:    WHITE,
+  padding:      '20px 20px 18px',
+  display:      'flex',
+  alignItems:   'center',
+  gap:          20,
+  borderBottom: `2px solid #2b2118`,
+  background:   '#fff',
 }
 
 export const heroNumber = {
