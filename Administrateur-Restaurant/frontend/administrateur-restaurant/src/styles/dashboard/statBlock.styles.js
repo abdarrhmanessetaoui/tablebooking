@@ -1,11 +1,11 @@
 import { BORDER } from './tokens'
 
 export const wrapper = (bg, accent) => ({
-  background:    accent,        // ← solid colored background
-  padding:       '16px 20px',
+  background:    accent,
+  padding:       '10px 20px',      // ← was 16px, now compact
   display:       'flex',
   flexDirection: 'column',
-  gap:           8,
+  gap:           6,
   borderBottom:  `1px solid rgba(255,255,255,0.15)`,
 })
 
@@ -30,10 +30,10 @@ export const valueRow = {
 }
 
 export const valueNumber = {
-  fontSize:           32,
+  fontSize:           24,          // ← was 32, now smaller
   fontWeight:         900,
   color:              '#fff',
-  letterSpacing:      '-1.5px',
+  letterSpacing:      '-1px',
   lineHeight:         1,
   fontVariantNumeric: 'tabular-nums',
 }
@@ -44,7 +44,6 @@ export const valuePct = () => ({
   color:      'rgba(255,255,255,0.7)',
 })
 
-// ── Progress row ──────────────────────────────────────────────────
 export const progressRow = {
   display:    'flex',
   alignItems: 'center',
@@ -67,11 +66,11 @@ export const progressFill = (w) => ({
 })
 
 export const progressPct = () => ({
-  fontSize:   10,
+  fontSize:   9,
   fontWeight: 900,
-  color:      '#fff',
+  color:      'rgba(255,255,255,0.85)',
   flexShrink: 0,
-  minWidth:   28,
+  minWidth:   24,
   textAlign:  'right',
 })
 

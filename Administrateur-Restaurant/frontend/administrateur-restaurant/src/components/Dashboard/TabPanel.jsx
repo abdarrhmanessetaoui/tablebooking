@@ -63,8 +63,8 @@ export default function TabPanel({ tab, stats, reservations, onViewAll, tabLabel
               <Ring c={c} p={p} a={a} size={88} />
             </div>
 
-{/* Stat blocks — horizontal KPI row */}
-<div>
+{/* Stat blocks — stretch to fill remaining height */}
+<div className="db-stat-blocks">
   <StatBlock
     icon={CheckCircle}
     value={c}

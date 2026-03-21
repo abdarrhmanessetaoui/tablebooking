@@ -19,8 +19,8 @@ export const GREEN_BG = '#edfaf4'
 export const RED      = '#DC2626'
 export const RED_BG   = '#fdf0f0'
 
-export const AMBER    = '#a8670a'
-export const AMBER_BG = '#fff8ec'
+export const AMBER    = '#c2410c'
+export const AMBER_BG = '#fff7ed'
 
 // ── Typography ────────────────────────────────────────────────────
 export const FONT_FAMILY = "'Plus Jakarta Sans','DM Sans',system-ui,sans-serif"
