@@ -5,6 +5,7 @@ import CalendarNav  from '../components/Calendar/CalendarNav'
 import CalendarWeek from '../components/Calendar/CalendarWeek'
 import FadeUp  from '../components/Dashboard/FadeUp'
 import Spinner from '../components/Dashboard/Spinner'
+import TableTimeline from '../components/Tables/TableTimeline'
 
 const DARK    = '#2b2118'
 const GOLD    = '#c8a97e'
@@ -155,6 +156,11 @@ export default function Calendar() {
             />
           )}
         </FadeUp>
+
+        <FadeUp delay={50}>
+          <TableTimeline />
+        </FadeUp>
+        
       </div>
     </>
   )

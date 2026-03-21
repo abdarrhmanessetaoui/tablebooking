@@ -4,7 +4,6 @@ import FadeUp        from '../components/Dashboard/FadeUp'
 import Spinner       from '../components/Dashboard/Spinner'
 import TableForm     from '../components/Tables/TableForm'
 import TableList     from '../components/Tables/TableList'
-import TableTimeline from '../components/Tables/TableTimeline'   // ← NEW
 import useTables     from '../hooks/Tables/useTables'
 import { confirm }   from '../components/ui/ConfirmDialog'
 import { toast }     from '../components/ui/Toast'
@@ -352,10 +351,7 @@ export default function Tables() {
           </div>
         </FadeUp>
 
-        {/* ── NEW: Timeline section ── */}
-        <FadeUp delay={30}>
-          <TableTimeline />
-        </FadeUp>
+
 
       </div>
     </>
