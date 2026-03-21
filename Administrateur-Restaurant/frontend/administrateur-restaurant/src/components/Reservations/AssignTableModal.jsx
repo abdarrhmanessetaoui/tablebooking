@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { X, LayoutGrid, Users, MapPin, Check, Loader, AlertTriangle, Clock } from 'lucide-react'
 import { getToken } from '../../utils/auth'
 import { GREEN, RED } from '../../styles/dashboard/tokens'
@@ -33,7 +34,6 @@ export default function AssignTableModal({ reservation, onClose, onAssigned }) {
     'Authorization': `Bearer ${getToken()}`,
   })
 
-  // ── Load tables + busy list in parallel ───────────────────────
   useEffect(() => {
     const params = new URLSearchParams({
       date:       reservation?.date       ?? '',
@@ -43,7 +43,7 @@ export default function AssignTableModal({ reservation, onClose, onAssigned }) {
     })
 
     Promise.all([
-      fetch(`${BASE}/tables`,              { headers: hdrs() }).then(r => r.json()),
+      fetch(`${BASE}/tables`,               { headers: hdrs() }).then(r => r.json()),
       fetch(`${BASE}/tables/busy?${params}`, { headers: hdrs() }).then(r => r.json()),
     ])
       .then(([tableData, busyData]) => {
@@ -54,7 +54,6 @@ export default function AssignTableModal({ reservation, onClose, onAssigned }) {
       .finally(() => setLoading(false))
   }, []) // eslint-disable-line
 
-  // ── Sort: available + sufficient first ────────────────────────
   const sortedTables = [...tables].sort((a, b) => {
     const aOk = !busyIdxs.includes(a.idx) && parseInt(a.capacity) >= guestCount
     const bOk = !busyIdxs.includes(b.idx) && parseInt(b.capacity) >= guestCount
@@ -63,7 +62,6 @@ export default function AssignTableModal({ reservation, onClose, onAssigned }) {
     return String(a.number).localeCompare(String(b.number))
   })
 
-  // ── Table state ───────────────────────────────────────────────
   function tableState(table) {
     const isBusy         = busyIdxs.includes(table.idx)
     const isInsufficient = parseInt(table.capacity) < guestCount
@@ -132,7 +130,6 @@ export default function AssignTableModal({ reservation, onClose, onAssigned }) {
     },
   }
 
-  // ── Assign ────────────────────────────────────────────────────
   async function handleAssign() {
     setSaving(true)
     setError(null)
@@ -154,10 +151,10 @@ export default function AssignTableModal({ reservation, onClose, onAssigned }) {
 
   const hasChanged = selected !== reservation?.table_idx
 
-  return (
+  return createPortal(
     <div
       style={{
-        position: 'fixed', inset: 0, zIndex: 60,
+        position: 'fixed', inset: 0, zIndex: 9999,
         background: 'rgba(43,33,24,0.65)',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         padding: 16,
@@ -174,11 +171,10 @@ export default function AssignTableModal({ reservation, onClose, onAssigned }) {
         boxShadow: '0 24px 64px rgba(43,33,24,0.35)',
       }}>
 
-        {/* ── Header ─────────────────────────────────────────── */}
+        {/* Header */}
         <div style={{
-          background: DARK, padding: '18px 22px',
-          flexShrink: 0, display: 'flex',
-          alignItems: 'center', justifyContent: 'space-between',
+          background: DARK, padding: '18px 22px', flexShrink: 0,
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         }}>
           <div>
             <p style={{ margin: 0, fontSize: 9, fontWeight: 700, color: GOLD, letterSpacing: '0.18em', textTransform: 'uppercase' }}>
@@ -188,79 +184,53 @@ export default function AssignTableModal({ reservation, onClose, onAssigned }) {
               {reservation?.name ?? '—'}
             </h2>
           </div>
-          <button onClick={onClose} style={{
-            background: 'rgba(255,255,255,0.1)', border: 'none',
-            width: 32, height: 32, display: 'flex',
-            alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
-          }}>
+          <button onClick={onClose} style={{ background: 'rgba(255,255,255,0.1)', border: 'none', width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
             <X size={16} color="#fff" strokeWidth={2.5} />
           </button>
         </div>
 
-        {/* ── Reservation summary ─────────────────────────────── */}
-        <div style={{
-          background: CREAM, padding: '10px 22px',
-          borderBottom: `1px solid ${BORDER}`,
-          display: 'flex', gap: 20, flexShrink: 0,
-        }}>
+        {/* Summary */}
+        <div style={{ background: CREAM, padding: '10px 22px', borderBottom: `1px solid ${BORDER}`, display: 'flex', gap: 20, flexShrink: 0 }}>
           {[
             ['Date',     reservation?.date       ?? '—'],
             ['Heure',    reservation?.start_time ?? '—'],
             ['Couverts', `${guestCount} pers.`        ],
           ].map(([label, val]) => (
             <div key={label}>
-              <p style={{ margin: 0, fontSize: 9, fontWeight: 900, color: GOLD, letterSpacing: '0.14em', textTransform: 'uppercase' }}>
-                {label}
-              </p>
-              <p style={{ margin: '2px 0 0', fontSize: 13, fontWeight: 900, color: DARK }}>
-                {val}
-              </p>
+              <p style={{ margin: 0, fontSize: 9, fontWeight: 900, color: GOLD, letterSpacing: '0.14em', textTransform: 'uppercase' }}>{label}</p>
+              <p style={{ margin: '2px 0 0', fontSize: 13, fontWeight: 900, color: DARK }}>{val}</p>
             </div>
           ))}
         </div>
 
-        {/* ── Error ──────────────────────────────────────────── */}
+        {/* Error */}
         {error && (
-          <div style={{
-            margin: '10px 22px 0', padding: '10px 12px',
-            background: '#fef2f2', borderLeft: `3px solid ${RED}`,
-            fontSize: 12, fontWeight: 700, color: RED,
-            display: 'flex', alignItems: 'center', gap: 8,
-          }}>
+          <div style={{ margin: '10px 22px 0', padding: '10px 12px', background: '#fef2f2', borderLeft: `3px solid ${RED}`, fontSize: 12, fontWeight: 700, color: RED, display: 'flex', alignItems: 'center', gap: 8 }}>
             <AlertTriangle size={14} strokeWidth={2.5} />
             {error}
           </div>
         )}
 
-        {/* ── Table list ─────────────────────────────────────── */}
+        {/* Table list */}
         <div style={{ padding: '14px 22px', flex: 1 }}>
 
-          {/* Section header */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
             <p style={{ margin: 0, fontSize: 9, fontWeight: 900, color: DARK, letterSpacing: '0.18em', textTransform: 'uppercase' }}>
               Tables disponibles
             </p>
             {reservation?.table_idx && (
-              <button
-                onClick={() => setSelected(null)}
-                style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, fontSize: 11, fontWeight: 800, color: RED, textDecoration: 'underline', fontFamily: 'inherit' }}
-              >
+              <button onClick={() => setSelected(null)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, fontSize: 11, fontWeight: 800, color: RED, textDecoration: 'underline', fontFamily: 'inherit' }}>
                 Retirer la table
               </button>
             )}
           </div>
 
-          {/* Legend */}
           {!loading && (
-            <div style={{
-              display: 'flex', gap: 12, flexWrap: 'wrap',
-              marginBottom: 12, padding: '7px 10px',
-              background: CREAM, border: `1px solid ${BORDER}`,
-            }}>
+            <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 12, padding: '7px 10px', background: CREAM, border: `1px solid ${BORDER}` }}>
               {[
-                { dot: GREEN,                    label: 'Disponible'      },
-                { dot: RED,                      label: 'Occupée'         },
-                { dot: 'rgba(43,33,24,0.18)',    label: 'Capac. insuf.'   },
+                { dot: GREEN,                 label: 'Disponible'    },
+                { dot: RED,                   label: 'Occupée'       },
+                { dot: 'rgba(43,33,24,0.18)', label: 'Capac. insuf.' },
               ].map(s => (
                 <span key={s.label} style={{ display: 'inline-flex', alignItems: 'center', gap: 5, fontSize: 10, fontWeight: 700, color: DARK }}>
                   <span style={{ width: 8, height: 8, borderRadius: '50%', background: s.dot, flexShrink: 0 }} />
@@ -270,7 +240,6 @@ export default function AssignTableModal({ reservation, onClose, onAssigned }) {
             </div>
           )}
 
-          {/* Loading */}
           {loading ? (
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '32px 0' }}>
               <Loader size={22} color={GOLD} style={{ animation: 'spin 1s linear infinite' }} />
@@ -282,9 +251,9 @@ export default function AssignTableModal({ reservation, onClose, onAssigned }) {
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
               {sortedTables.map(table => {
-                const state      = tableState(table)
-                const cfg        = stateConfig[state]
-                const locStyle   = LOC_COLORS[table.location] ?? { bg: '#f5f5f5', color: '#666' }
+                const state       = tableState(table)
+                const cfg         = stateConfig[state]
+                const locStyle    = LOC_COLORS[table.location] ?? { bg: '#f5f5f5', color: '#666' }
                 const isClickable = state === 'available' || state === 'current' || state === 'selected'
                 const isDisabled  = state === 'busy' || state === 'insufficient'
 
@@ -297,35 +266,20 @@ export default function AssignTableModal({ reservation, onClose, onAssigned }) {
                       setSelected(selected === table.idx ? null : table.idx)
                     }}
                     style={{
-                      position:       'relative',
-                      display:        'flex',
-                      alignItems:     'center',
-                      justifyContent: 'space-between',
-                      padding:        '10px 14px',
-                      cursor:         cfg.cursor,
-                      background:     cfg.background,
-                      border:         `1.5px solid ${cfg.border}`,
-                      borderLeft:     `4px solid ${cfg.border}`,
-                      transition:     'all 0.12s',
-                      filter:         isDisabled ? 'grayscale(0.2)' : 'none',
+                      position: 'relative', display: 'flex', alignItems: 'center',
+                      justifyContent: 'space-between', padding: '10px 14px',
+                      cursor: cfg.cursor, background: cfg.background,
+                      border: `1.5px solid ${cfg.border}`,
+                      borderLeft: `4px solid ${cfg.border}`,
+                      transition: 'all 0.12s',
+                      filter: isDisabled ? 'grayscale(0.2)' : 'none',
                     }}
-                    onMouseEnter={e => {
-                      if (isClickable && state !== 'selected')
-                        e.currentTarget.style.background = CREAM
-                    }}
-                    onMouseLeave={e => {
-                      if (state !== 'selected')
-                        e.currentTarget.style.background = cfg.background
-                    }}
+                    onMouseEnter={e => { if (isClickable && state !== 'selected') e.currentTarget.style.background = CREAM }}
+                    onMouseLeave={e => { if (state !== 'selected') e.currentTarget.style.background = cfg.background }}
                   >
-                    {/* Left: icon + name + badge */}
+                    {/* Left */}
                     <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                      <div style={{
-                        width: 30, height: 30, flexShrink: 0,
-                        background: cfg.iconBg,
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        opacity: isDisabled ? 0.7 : 1,
-                      }}>
+                      <div style={{ width: 30, height: 30, flexShrink: 0, background: cfg.iconBg, display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: isDisabled ? 0.7 : 1 }}>
                         {state === 'busy'
                           ? <Clock size={14} color={RED} strokeWidth={2.5} />
                           : <LayoutGrid size={14} color={cfg.iconColor} strokeWidth={2.5} />
@@ -337,12 +291,7 @@ export default function AssignTableModal({ reservation, onClose, onAssigned }) {
                             Table {table.number}
                           </p>
                           {cfg.badge && (
-                            <span style={{
-                              fontSize: 9, fontWeight: 900,
-                              padding: '1px 6px',
-                              background: cfg.badge.bg,
-                              color: cfg.badge.color,
-                            }}>
+                            <span style={{ fontSize: 9, fontWeight: 900, padding: '1px 6px', background: cfg.badge.bg, color: cfg.badge.color }}>
                               {cfg.badge.text}
                             </span>
                           )}
@@ -360,60 +309,29 @@ export default function AssignTableModal({ reservation, onClose, onAssigned }) {
                       </div>
                     </div>
 
-                    {/* Right: capacity + location + check */}
+                    {/* Right */}
                     <div style={{ display: 'flex', alignItems: 'center', gap: 5, flexShrink: 0, opacity: isDisabled ? 0.5 : 1 }}>
-                      <span style={{
-                        display: 'inline-flex', alignItems: 'center', gap: 3,
-                        padding: '2px 7px',
-                        background: cfg.capacityBg,
-                        fontSize: 10, fontWeight: 800,
-                        color: cfg.capacityColor,
-                      }}>
+                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 3, padding: '2px 7px', background: cfg.capacityBg, fontSize: 10, fontWeight: 800, color: cfg.capacityColor }}>
                         <Users size={9} strokeWidth={2.5} />
                         {table.capacity}
                       </span>
-                      <span style={{
-                        display: 'inline-flex', alignItems: 'center', gap: 3,
-                        padding: '2px 7px',
-                        background: state === 'selected' ? 'rgba(200,169,126,0.1)' : locStyle.bg,
-                        fontSize: 10, fontWeight: 700,
-                        color: state === 'selected' ? 'rgba(200,169,126,0.8)' : locStyle.color,
-                      }}>
+                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 3, padding: '2px 7px', background: state === 'selected' ? 'rgba(200,169,126,0.1)' : locStyle.bg, fontSize: 10, fontWeight: 700, color: state === 'selected' ? 'rgba(200,169,126,0.8)' : locStyle.color }}>
                         <MapPin size={9} strokeWidth={2.5} />
                         {table.location}
                       </span>
                       {state === 'selected' && (
-                        <div style={{
-                          width: 20, height: 20, background: GOLD,
-                          display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        }}>
+                        <div style={{ width: 20, height: 20, background: GOLD, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                           <Check size={11} color={DARK} strokeWidth={3} />
                         </div>
                       )}
                     </div>
 
-                    {/* Stripe overlay for disabled */}
+                    {/* Stripe overlays */}
                     {state === 'busy' && (
-                      <div style={{
-                        position: 'absolute', inset: 0, pointerEvents: 'none',
-                        backgroundImage: `repeating-linear-gradient(
-                          -45deg,
-                          transparent, transparent 5px,
-                          rgba(220,38,38,0.05) 5px,
-                          rgba(220,38,38,0.05) 10px
-                        )`,
-                      }} />
+                      <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', backgroundImage: `repeating-linear-gradient(-45deg, transparent, transparent 5px, rgba(220,38,38,0.05) 5px, rgba(220,38,38,0.05) 10px)` }} />
                     )}
                     {state === 'insufficient' && (
-                      <div style={{
-                        position: 'absolute', inset: 0, pointerEvents: 'none',
-                        backgroundImage: `repeating-linear-gradient(
-                          -45deg,
-                          transparent, transparent 5px,
-                          rgba(0,0,0,0.03) 5px,
-                          rgba(0,0,0,0.03) 10px
-                        )`,
-                      }} />
+                      <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', backgroundImage: `repeating-linear-gradient(-45deg, transparent, transparent 5px, rgba(0,0,0,0.03) 5px, rgba(0,0,0,0.03) 10px)` }} />
                     )}
                   </div>
                 )
@@ -422,21 +340,10 @@ export default function AssignTableModal({ reservation, onClose, onAssigned }) {
           )}
         </div>
 
-        {/* ── Footer ─────────────────────────────────────────── */}
-        <div style={{
-          padding: '12px 22px',
-          borderTop: `2px solid ${BORDER}`,
-          background: CREAM,
-          display: 'flex', gap: 8, flexShrink: 0,
-        }}>
-          <button
-            onClick={onClose}
-            style={{
-              flex: 1, padding: '11px',
-              background: '#fff', border: `2px solid ${DARK}`,
-              fontSize: 13, fontWeight: 800, color: DARK,
-              cursor: 'pointer', fontFamily: 'inherit',
-            }}
+        {/* Footer */}
+        <div style={{ padding: '12px 22px', borderTop: `2px solid ${BORDER}`, background: CREAM, display: 'flex', gap: 8, flexShrink: 0 }}>
+          <button onClick={onClose}
+            style={{ flex: 1, padding: '11px', background: '#fff', border: `2px solid ${DARK}`, fontSize: 13, fontWeight: 800, color: DARK, cursor: 'pointer', fontFamily: 'inherit' }}
             onMouseEnter={e => e.currentTarget.style.background = CREAM}
             onMouseLeave={e => e.currentTarget.style.background = '#fff'}
           >
@@ -445,34 +352,20 @@ export default function AssignTableModal({ reservation, onClose, onAssigned }) {
           <button
             onClick={handleAssign}
             disabled={saving || !hasChanged}
-            style={{
-              flex: 2, padding: '11px',
-              background: DARK, border: 'none',
-              fontSize: 13, fontWeight: 800, color: GOLD,
-              cursor: saving || !hasChanged ? 'not-allowed' : 'pointer',
-              opacity: saving || !hasChanged ? 0.5 : 1,
-              fontFamily: 'inherit',
-              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-              transition: 'opacity 0.15s',
-            }}
+            style={{ flex: 2, padding: '11px', background: DARK, border: 'none', fontSize: 13, fontWeight: 800, color: GOLD, cursor: saving || !hasChanged ? 'not-allowed' : 'pointer', opacity: saving || !hasChanged ? 0.5 : 1, fontFamily: 'inherit', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, transition: 'opacity 0.15s' }}
           >
             {saving ? (
-              <>
-                <Loader size={14} style={{ animation: 'spin 1s linear infinite' }} />
-                Enregistrement…
-              </>
+              <><Loader size={14} style={{ animation: 'spin 1s linear infinite' }} />Enregistrement…</>
             ) : selected === null ? (
               'Retirer la table'
             ) : (
-              <>
-                <Check size={14} strokeWidth={2.5} />
-                Confirmer
-              </>
+              <><Check size={14} strokeWidth={2.5} />Confirmer</>
             )}
           </button>
         </div>
 
       </div>
-    </div>
+    </div>,
+    document.body
   )
 }
