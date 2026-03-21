@@ -82,7 +82,7 @@ function PageBtn({ onClick, disabled, active, children }) {
   )
 }
 
-// ── NEW: Table assignment cell ─────────────────────────────────────
+// ── Assign table cell ──────────────────────────────────────────────
 
 function AssignTableCell({ r, onOpenAssign }) {
   const [hov, setHov] = useState(false)
@@ -184,7 +184,7 @@ function MobileCard({ r, selected, highlighted, onToggle, openView, openEdit, ha
         {[
           { Icon: CalendarDays, value: r.date,       gold: false },
           { Icon: Clock3,       value: r.start_time, gold: false },
-          { Icon: Users,        value: r.guests ? `${r.guests} personnes` : null, gold: false },
+          { Icon: Users,        value: r.guests ? `${r.guests} pers.` : null, gold: false },
           { Icon: Utensils,     value: r.service,    gold: true  },
         ].filter(item => item.value).map((item, i) => (
           <span key={i} style={{
@@ -198,7 +198,7 @@ function MobileCard({ r, selected, highlighted, onToggle, openView, openEdit, ha
             {item.value}
           </span>
         ))}
-        {/* Table chip */}
+        {/* Table chip — always visible on mobile */}
         <AssignTableCell r={r} onOpenAssign={onOpenAssign} />
       </div>
 
@@ -323,8 +323,8 @@ function TableRow({ r, i, selected, highlighted, highlightRef, toggleOne, openVi
         </span>
       </td>
 
-      {/* ── NEW: Table column ── */}
-      <td style={{ padding: '11px 14px' }} onClick={e => e.stopPropagation()}>
+      {/* Table column — hidden below 1024px via CSS */}
+      <td className="col-table" style={{ padding: '11px 14px' }} onClick={e => e.stopPropagation()}>
         <AssignTableCell r={r} onOpenAssign={onOpenAssign} />
       </td>
 
@@ -387,7 +387,7 @@ export default function ReservationsTable({
   const pageAllSel   = pageItems.length > 0 && pageItems.every(r => selectedIds.includes(r.id))
   const pageSomeSel  = pageItems.some(r => selectedIds.includes(r.id)) && !pageAllSel
 
-  function toggleAll()  {
+  function toggleAll() {
     if (allSelected) setSelectedIds([])
     else setSelectedIds(reservations.map(r => r.id))
   }
@@ -419,6 +419,10 @@ export default function ReservationsTable({
         @media (max-width: 700px) {
           .res-table-wrap { display: none;  }
           .res-cards-wrap { display: block; }
+        }
+        .col-table { }
+        @media (max-width: 1024px) {
+          .col-table { display: none; }
         }
         @keyframes pulse-gold {
           0%   { box-shadow: inset 3px 0 0 ${GOLD}, 0 0 0 3px ${GOLD}33; }
@@ -463,14 +467,16 @@ export default function ReservationsTable({
 
         {/* Desktop table */}
         <div className="res-table-wrap" style={{ overflowX: 'auto' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 780 }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 700 }}>
             <thead>
               <tr style={{ background: DARK }}>
                 <th style={{ padding: '12px 16px', width: 40 }}>
                   <Checkbox checked={pageAllSel} indeterminate={pageSomeSel} onChange={togglePage} />
                 </th>
                 {['Nom', 'Téléphone', 'Date', 'Heure', 'Personnes', 'Service', 'Table', 'Statut', 'Actions'].map(c => (
-                  <th key={c} style={{ padding: '12px 14px', textAlign: 'left', fontSize: 9, fontWeight: 900, color: GOLD, letterSpacing: '0.15em', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>
+                  <th key={c}
+                    className={c === 'Table' ? 'col-table' : ''}
+                    style={{ padding: '12px 14px', textAlign: 'left', fontSize: 9, fontWeight: 900, color: GOLD, letterSpacing: '0.15em', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>
                     {c}
                   </th>
                 ))}
