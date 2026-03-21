@@ -76,14 +76,14 @@ export const mobileEmptyTitle = {
   margin:     0,
   fontSize:   13,
   fontWeight: 900,
-  color:      'rgba(43,33,24,0.18)',
+  color:      'rgba(43,33,24,0.25)',
 }
 
 export const mobileEmptySubtitle = {
   margin:     '5px 0 0',
   fontSize:   11,
   fontWeight: 700,
-  color:      'rgba(43,33,24,0.12)',
+  color:      'rgba(200,169,126,0.6)',
 }
 
 // ── Mobile view-all button ────────────────────────────────────────
