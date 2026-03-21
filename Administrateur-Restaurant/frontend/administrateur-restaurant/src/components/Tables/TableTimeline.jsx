@@ -132,7 +132,7 @@ function TimelineRow({ row, isLast }) {
             fontSize: 9, fontWeight: 800, color: GOLD_DARK,
           }}>
             <Users size={8} strokeWidth={2.5} />
-            {row.capacity} pers.
+            {row.capacity} 
           </span>
           <span style={{
             display: 'inline-flex', alignItems: 'center', gap: 3,
