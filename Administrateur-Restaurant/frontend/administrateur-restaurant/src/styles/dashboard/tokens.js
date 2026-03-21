@@ -12,10 +12,10 @@ export const WHITE    = '#ffffff'
 export const BORDER   = '#e8e0d6'
 
 // ── Semantic colors ───────────────────────────────────────────────
-export const GREEN    = '#1a6e42'
+export const GREEN    = '#16A34A'
 export const GREEN_BG = '#edfaf4'
 
-export const RED      = '#b94040'
+export const RED      = '#DC2626'
 export const RED_BG   = '#fdf0f0'
 
 export const AMBER    = '#a8670a'
