@@ -19,21 +19,21 @@ export default function StatBlock({ icon: Icon, value, label, accent, bg, delay 
   return (
     <div style={wrapper(bg, accent)}>
 
-      {/* Label */}
-      <div style={labelRow}>
-        <Icon size={11} strokeWidth={2.5} color={accent} />
-        <span style={labelText(accent)}>{label}</span>
+      {/* Left: label + number */}
+      <div>
+        <div style={labelRow}>
+          <Icon size={10} strokeWidth={2.5} color={accent} />
+          <span style={labelText(accent)}>{label}</span>
+        </div>
+        <div style={valueRow}>
+          <span style={valueNumber}>{n}</span>
+          {pct !== null && (
+            <span style={valuePct(accent)}>{pct}%</span>
+          )}
+        </div>
       </div>
 
-      {/* Big number + pct */}
-      <div style={valueRow}>
-        <span style={valueNumber}>{n}</span>
-        {pct !== null && (
-          <span style={valuePct(accent)}>{pct}%</span>
-        )}
-      </div>
-
-      {/* Progress bar */}
+      {/* Right: mini progress bar */}
       {pct !== null && (
         <div style={progressTrack}>
           <div style={progressFill(w, accent)} />

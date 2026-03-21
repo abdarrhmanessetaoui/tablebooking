@@ -64,7 +64,7 @@ export default function TabPanel({ tab, stats, reservations, onViewAll, tabLabel
             </div>
 
 {/* Stat blocks — horizontal KPI row */}
-<div className="db-stats-row">
+<div>
   <StatBlock
     icon={CheckCircle}
     value={c}

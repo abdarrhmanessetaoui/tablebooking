@@ -1,24 +1,21 @@
 import { DARK, BORDER } from './tokens'
 
-// ── KPI card wrapper ──────────────────────────────────────────────
 export const wrapper = (bg, accent) => ({
-  flex:          1,
-  minWidth:      0,
-  background:    bg,
-  padding:       '18px 20px',
-  display:       'flex',
-  flexDirection: 'column',
-  gap:           10,
-  borderTop:     `3px solid ${accent}`,
-  position:      'relative',
-  overflow:      'hidden',
+  background:   bg,
+  padding:      '12px 20px',
+  display:      'grid',
+  gridTemplateColumns: '1fr auto',
+  alignItems:   'center',
+  gap:          12,
+  borderLeft:   `3px solid ${accent}`,
+  borderBottom: `1px solid ${BORDER}`,
 })
 
-// ── Label row ─────────────────────────────────────────────────────
 export const labelRow = {
   display:    'flex',
   alignItems: 'center',
-  gap:        6,
+  gap:        5,
+  marginBottom: 4,
 }
 
 export const labelText = (accent) => ({
@@ -29,36 +26,35 @@ export const labelText = (accent) => ({
   letterSpacing: '0.18em',
 })
 
-// ── Value row ─────────────────────────────────────────────────────
 export const valueRow = {
   display:    'flex',
   alignItems: 'baseline',
-  gap:        8,
+  gap:        6,
 }
 
 export const valueNumber = {
-  fontSize:           36,
+  fontSize:           28,
   fontWeight:         900,
   color:              DARK,
-  letterSpacing:      '-2px',
+  letterSpacing:      '-1.5px',
   lineHeight:         1,
   fontVariantNumeric: 'tabular-nums',
 }
 
 export const valuePct = (accent) => ({
-  fontSize:   11,
+  fontSize:   10,
   fontWeight: 800,
   color:      accent,
   opacity:    0.8,
 })
 
-// ── Full-width progress bar at bottom ─────────────────────────────
 export const progressTrack = {
-  width:      '100%',
+  width:      48,
   height:     3,
   background: BORDER,
   overflow:   'hidden',
   flexShrink: 0,
+  alignSelf:  'center',
 }
 
 export const progressFill = (w, accent) => ({
@@ -68,6 +64,5 @@ export const progressFill = (w, accent) => ({
   transition: 'width 0.9s ease',
 })
 
-// ── These are no longer used but kept to avoid import errors ──────
 export const accentBar = () => ({})
 export const content   = {}
