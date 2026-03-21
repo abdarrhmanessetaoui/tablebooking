@@ -1,15 +1,17 @@
-import { useState, useEffect } from 'react'
-import { X, User, Phone, Mail, Users, Utensils, FileText, CalendarDays, Clock, Trash2, ChevronLeft, ChevronRight } from 'lucide-react'
+import { useState, useEffect, useMemo } from 'react'
+import { createPortal } from 'react-dom'
+import { X, User, Phone, Mail, Users, Utensils, FileText, CalendarDays, Clock, Trash2, ChevronLeft, ChevronRight, AlertTriangle } from 'lucide-react'
 import { getToken } from '../../utils/auth'
 
 const DARK      = '#2b2118'
 const GOLD      = '#c8a97e'
 const GOLD_DARK = '#a8834e'
+const BASE      = 'http://localhost:8000/api'
 
 const STATUS_CONFIG = {
-  Confirmed: { bg: '#f0f7f0', color: '#2d6a2d', label: 'Confirmée'  },
+  Confirmed: { bg: '#f0fdf4', color: '#16a34a', label: 'Confirmée'  },
   Pending:   { bg: '#fdf6ec', color: GOLD_DARK,  label: 'En attente' },
-  Cancelled: { bg: '#fdf0f0', color: '#b94040',  label: 'Annulée'   },
+  Cancelled: { bg: '#fef2f2', color: '#dc2626',  label: 'Annulée'   },
 }
 
 const inputStyle = {
@@ -19,30 +21,37 @@ const inputStyle = {
   color: DARK, fontFamily: 'inherit', outline: 'none',
 }
 
-// Generate 30-min time slots between start and end hour
-function generateSlots(startH = 12, endH = 23) {
+// ── Generate slots from open hours + duration ──────────────────────
+function generateSlotsFromOH(oh, durationMin = 30) {
+  if (!oh) return []
+  const h1 = parseInt(oh.h1 ?? 12)
+  const m1 = parseInt(oh.m1 ?? 0)
+  const h2 = parseInt(oh.h2 ?? 23)
+  const m2 = parseInt(oh.m2 ?? 0)
+  const start = h1 * 60 + m1
+  const end   = h2 * 60 + m2
+  const dur   = Math.max(15, parseInt(durationMin) || 30)
   const slots = []
-  for (let h = startH; h <= endH; h++) {
-    slots.push(`${String(h).padStart(2,'0')}:00`)
-    if (h < endH) slots.push(`${String(h).padStart(2,'0')}:30`)
+  for (let t = start; t + dur <= end; t += dur) {
+    const hh = Math.floor(t / 60)
+    const mm = t % 60
+    slots.push(`${String(hh).padStart(2,'0')}:${String(mm).padStart(2,'0')}`)
   }
   return slots
 }
 
-const ALL_SLOTS = generateSlots(12, 23)
-
-// ── Mini Calendar ────────────────────────────────────────────────────
-function Calendar({ value, onChange, blockedDates }) {
-  const today  = new Date(); today.setHours(0,0,0,0)
-  const init   = value ? new Date(value + 'T00:00:00') : today
+// ── Mini Calendar ──────────────────────────────────────────────────
+function Calendar({ value, onChange, blockedDates, disabledDays = [] }) {
+  const today = new Date(); today.setHours(0,0,0,0)
+  const init  = value ? new Date(value + 'T00:00:00') : today
   const [cur, setCur] = useState({ y: init.getFullYear(), m: init.getMonth() })
 
   const MONTHS = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre']
   const DAYS   = ['L','M','M','J','V','S','D']
 
-  const dim = (y, m) => new Date(y, m+1, 0).getDate()
-  const first = (y, m) => { const d = new Date(y,m,1).getDay(); return d===0?6:d-1 }
-  const toISO = (y, m, d) => `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`
+  const dim    = (y,m) => new Date(y,m+1,0).getDate()
+  const first  = (y,m) => { const d = new Date(y,m,1).getDay(); return d===0?6:d-1 }
+  const toISO  = (y,m,d) => `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`
   const todayISO = today.toISOString().slice(0,10)
 
   const cells = []
@@ -50,20 +59,23 @@ function Calendar({ value, onChange, blockedDates }) {
   for (let d=1; d<=dim(cur.y,cur.m); d++) cells.push(d)
 
   function prev() { setCur(c => c.m===0 ? {y:c.y-1,m:11} : {y:c.y,m:c.m-1}) }
-  function next() { setCur(c => c.m===11 ? {y:c.y+1,m:0}  : {y:c.y,m:c.m+1}) }
+  function next() { setCur(c => c.m===11? {y:c.y+1,m:0}  : {y:c.y,m:c.m+1}) }
 
   function pick(day) {
     const iso = toISO(cur.y, cur.m, day)
     const dt  = new Date(iso+'T00:00:00')
+    // 0=Sun,1=Mon...6=Sat → convert to Mon=0..Sun=6
+    const jsDay = dt.getDay()
+    const appDay = jsDay === 0 ? 6 : jsDay - 1
     if (dt < today) return
     if (blockedDates.includes(iso)) return
+    if (disabledDays.includes(appDay)) return
     onChange(iso)
   }
 
   return (
-    <div style={{ border: `2px solid #e8e0d8`, background: '#fff' }}>
-      {/* Nav */}
-      <div style={{ background: DARK, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 14px' }}>
+    <div style={{ border:`2px solid #e8e0d8`, background:'#fff' }}>
+      <div style={{ background:DARK, display:'flex', alignItems:'center', justifyContent:'space-between', padding:'10px 14px' }}>
         <button onClick={prev} style={{ background:'none', border:'none', cursor:'pointer', display:'flex', padding:4 }}>
           <ChevronLeft size={16} color={GOLD} />
         </button>
@@ -75,50 +87,49 @@ function Calendar({ value, onChange, blockedDates }) {
         </button>
       </div>
 
-      {/* Day headers */}
       <div style={{ display:'grid', gridTemplateColumns:'repeat(7,1fr)', background:'#faf8f5', borderBottom:`1px solid #e8e0d8` }}>
         {DAYS.map((d,i) => (
-          <div key={i} style={{ padding:'6px 0', textAlign:'center', fontSize:10, fontWeight:900, color:GOLD_DARK }}>
-            {d}
-          </div>
+          <div key={i} style={{ padding:'6px 0', textAlign:'center', fontSize:10, fontWeight:900, color:GOLD_DARK }}>{d}</div>
         ))}
       </div>
 
-      {/* Days */}
       <div style={{ display:'grid', gridTemplateColumns:'repeat(7,1fr)', padding:'6px 4px' }}>
         {cells.map((day, i) => {
           if (!day) return <div key={`e${i}`} />
-          const iso      = toISO(cur.y, cur.m, day)
-          const isPast   = new Date(iso+'T00:00:00') < today
-          const isBlock  = blockedDates.includes(iso)
-          const isSel    = iso === value
-          const isToday  = iso === todayISO
-          const disabled = isPast || isBlock
+          const iso     = toISO(cur.y, cur.m, day)
+          const dt      = new Date(iso+'T00:00:00')
+          const jsDay   = dt.getDay()
+          const appDay  = jsDay === 0 ? 6 : jsDay - 1
+          const isPast  = dt < today
+          const isBlock = blockedDates.includes(iso)
+          const isOff   = disabledDays.includes(appDay)
+          const isSel   = iso === value
+          const isToday = iso === todayISO
+          const disabled = isPast || isBlock || isOff
 
           return (
             <button key={day} onClick={() => pick(day)} disabled={disabled}
               style={{
                 padding:'7px 0', border:'none', borderRadius:2,
-                background: isSel ? DARK : isBlock ? '#fdf0f0' : 'transparent',
-                color: isSel ? GOLD : isBlock ? '#e0a0a0' : isPast ? '#ccc' : isToday ? GOLD_DARK : DARK,
+                background: isSel ? DARK : isBlock||isOff ? '#fdf0f0' : 'transparent',
+                color: isSel ? GOLD : isBlock||isOff ? '#e0a0a0' : isPast ? '#ccc' : isToday ? GOLD_DARK : DARK,
                 fontSize:13, fontWeight: isSel||isToday ? 900 : 600,
                 cursor: disabled ? 'not-allowed' : 'pointer',
-                textDecoration: isBlock ? 'line-through' : 'none',
+                textDecoration: (isBlock||isOff) ? 'line-through' : 'none',
                 position:'relative', transition:'background 0.1s',
+                opacity: isOff ? 0.4 : 1,
               }}
             >
               {day}
-              {isBlock && <span style={{ position:'absolute', bottom:2, left:'50%', transform:'translateX(-50%)', width:3, height:3, borderRadius:'50%', background:'#b94040', display:'block' }} />}
             </button>
           )
         })}
       </div>
 
-      {/* Legend */}
-      <div style={{ padding:'6px 12px 10px', borderTop:`1px solid #f0ebe4`, display:'flex', gap:12 }}>
+      <div style={{ padding:'6px 12px 10px', borderTop:`1px solid #f0ebe4`, display:'flex', gap:12, flexWrap:'wrap' }}>
         <span style={{ fontSize:10, fontWeight:700, color:'#b94040', display:'flex', alignItems:'center', gap:4 }}>
           <span style={{ width:7, height:7, borderRadius:'50%', background:'#b94040', display:'inline-block' }} />
-          Date bloquée
+          Date bloquée / Fermé
         </span>
         <span style={{ fontSize:10, fontWeight:700, color:GOLD_DARK, display:'flex', alignItems:'center', gap:4 }}>
           <span style={{ width:7, height:7, borderRadius:'50%', background:GOLD_DARK, display:'inline-block' }} />
@@ -129,20 +140,27 @@ function Calendar({ value, onChange, blockedDates }) {
   )
 }
 
-// ── Time Slot Grid ───────────────────────────────────────────────────
-function TimeSlots({ value, onChange }) {
+// ── Time Slot Grid ─────────────────────────────────────────────────
+function TimeSlots({ value, onChange, slots }) {
+  if (!slots.length) return (
+    <div style={{ padding:'12px 14px', background:'#fdf6ec', borderLeft:`3px solid ${GOLD}`, fontSize:12, fontWeight:700, color:GOLD_DARK, display:'flex', alignItems:'center', gap:8 }}>
+      <AlertTriangle size={13} strokeWidth={2.5} />
+      Aucun créneau disponible pour ce service ce jour-là.
+    </div>
+  )
+
   return (
-    <div style={{ display:'flex', flexWrap:'wrap', gap:8, marginTop:4 }}>
-      {ALL_SLOTS.map(slot => {
+    <div style={{ display:'flex', flexWrap:'wrap', gap:7, marginTop:4 }}>
+      {slots.map(slot => {
         const active = value === slot
         return (
           <button key={slot} onClick={() => onChange(slot)}
             style={{
-              padding:'8px 14px',
+              padding:'7px 13px',
               background: active ? DARK : GOLD,
               border: 'none',
               borderRadius: 999,
-              fontSize:13, fontWeight:800,
+              fontSize:12, fontWeight:800,
               color: active ? GOLD : DARK,
               cursor:'pointer',
               transition:'background 0.15s, color 0.15s',
@@ -156,7 +174,7 @@ function TimeSlots({ value, onChange }) {
   )
 }
 
-// ── Info Row (view mode) ─────────────────────────────────────────────
+// ── Info Row ───────────────────────────────────────────────────────
 function InfoRow({ icon:Icon, label, value }) {
   if (!value) return null
   return (
@@ -180,49 +198,109 @@ function TextInput({ label, value, onChange, type='text', required }) {
   return (
     <div>
       <Label text={label + (required ? ' *' : '')} />
-      <input type={type} value={value ?? ''} onChange={e => onChange(e.target.value)} style={inputStyle} />
+      <input
+        type={type} value={value ?? ''} onChange={e => onChange(e.target.value)}
+        style={inputStyle}
+        onFocus={e => e.target.style.borderColor = GOLD}
+        onBlur={e => e.target.style.borderColor = '#e8e0d8'}
+      />
     </div>
   )
 }
 
-// ── STEPS for create mode ────────────────────────────────────────────
-// Step 1: Service + Guests
-// Step 2: Date + Time
-// Step 3: Contact info
-
-export default function ReservationModal({ modalMode, editing, form, setForm, handleSubmit, handleCreate, handleDelete, setModalMode }) {
-  const [hovSave, setHovSave]       = useState(false)
-  const [hovDel,  setHovDel]        = useState(false)
-  const [services, setServices]     = useState([])
+// ── Main ───────────────────────────────────────────────────────────
+export default function ReservationModal({
+  modalMode, editing, form, setForm,
+  handleSubmit, handleCreate, handleDelete, setModalMode,
+}) {
+  const [hovSave,      setHovSave]      = useState(false)
+  const [hovDel,       setHovDel]       = useState(false)
+  const [services,     setServices]     = useState([])
   const [blockedDates, setBlockedDates] = useState([])
-  const [step, setStep]             = useState(1) // 1=formule, 2=date/time, 3=contact
+  const [allOH,        setAllOH]        = useState([])
+  const [workingDates, setWorkingDates] = useState([true,true,true,true,true,true,true])
+  const [step,         setStep]         = useState(1)
 
   const close = () => { setModalMode(null); setStep(1) }
 
+  // ── Fetch services + time-slots + blocked dates ────────────────
   useEffect(() => {
-    fetch('http://localhost:8000/api/restaurant/services', {
-      headers: { 'Authorization': `Bearer ${getToken()}`, 'Accept': 'application/json' }
-    }).then(r=>r.json()).then(d=>setServices(Array.isArray(d)?d:[])).catch(()=>{})
+    const h = { 'Authorization': `Bearer ${getToken()}`, 'Accept': 'application/json' }
+
+    Promise.all([
+      fetch(`${BASE}/restaurant/services`, { headers: h }).then(r => r.json()),
+      fetch(`${BASE}/time-slots`,          { headers: h }).then(r => r.json()),
+      fetch(`${BASE}/admin/blocked-dates`, { headers: h }).then(r => r.json()),
+    ]).then(([svcs, slots, blocked]) => {
+      setServices(Array.isArray(svcs) ? svcs : [])
+      setAllOH(slots?.allOH ?? [])
+      setWorkingDates(slots?.working_dates ?? [true,true,true,true,true,true,true])
+      setBlockedDates(Array.isArray(blocked) ? blocked.map(x => x.date) : [])
+    }).catch(() => {})
   }, [])
 
+  // ── Compute which days are disabled for selected service ───────
+  const disabledDays = useMemo(() => {
+    const svc = services.find(s => s.name === form.service)
+    const availDays = svc?.available_days ?? [0,1,2,3,4,5,6]
+
+    // A day is disabled if:
+    // 1. Not in service's available_days OR
+    // 2. working_dates marks it as closed
+    // working_dates uses Sun=0..Sat=6, our app uses Mon=0..Sun=6
+    // Convert: appDay 0=Mon..6=Sun → jsDay 1=Mon..0=Sun
+    return [0,1,2,3,4,5,6].filter(appDay => {
+      const jsDay = appDay === 6 ? 0 : appDay + 1
+      const isWorking = workingDates[jsDay] ?? true
+      return !availDays.includes(appDay) || !isWorking
+    })
+  }, [form.service, services, workingDates])
+
+  // ── Compute slots for selected service + date ──────────────────
+  const timeSlots = useMemo(() => {
+    if (!form.date || !form.service) return []
+
+    const svc = services.find(s => s.name === form.service)
+    if (!svc) return []
+
+    const dt     = new Date(form.date + 'T00:00:00')
+    const jsDay  = dt.getDay() // 0=Sun..6=Sat
+    const appDay = jsDay === 0 ? 6 : jsDay - 1 // Mon=0..Sun=6
+
+    const ohIndex = svc.ohindex ?? 0
+    const oh      = allOH[ohIndex]
+    if (!oh) return []
+
+    const daySlot = oh.openhours?.[appDay] ?? oh.openhours?.[0]
+    if (!daySlot) return []
+
+    return generateSlotsFromOH(daySlot, svc.duration ?? 30)
+  }, [form.date, form.service, services, allOH])
+
+  // Reset start_time when date/service changes if slot no longer valid
   useEffect(() => {
-    fetch('http://localhost:8000/api/admin/blocked-dates', {
-      headers: { 'Authorization': `Bearer ${getToken()}`, 'Accept': 'application/json' }
-    }).then(r=>r.json()).then(d=>setBlockedDates(Array.isArray(d)?d.map(x=>x.date):[])).catch(()=>{})
-  }, [])
+    if (form.start_time && timeSlots.length && !timeSlots.includes(form.start_time)) {
+      setForm(f => ({ ...f, start_time: '' }))
+    }
+  }, [timeSlots]) // eslint-disable-line
 
   const titles = { view:'Détail', edit:'Modifier le statut', create:'Nouvelle réservation' }
 
-  return (
+  return createPortal(
     <div style={{
-      position:'fixed', inset:0, zIndex:50,
+      position:'fixed', inset:0, zIndex:9999,
       background:'rgba(43,33,24,0.6)',
       display:'flex', alignItems:'center', justifyContent:'center', padding:16,
       fontFamily:"'Plus Jakarta Sans','DM Sans',system-ui,sans-serif",
     }}>
-      <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800;900&display=swap" rel="stylesheet" />
+      <style>{`@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}`}</style>
 
-      <div style={{ background:'#fff', width:'100%', maxWidth:480, maxHeight:'92vh', overflow:'auto', display:'flex', flexDirection:'column' }}>
+      <div style={{
+        background:'#fff', width:'100%', maxWidth:480,
+        maxHeight:'92vh', overflow:'auto',
+        display:'flex', flexDirection:'column',
+        boxShadow:'0 24px 64px rgba(43,33,24,0.35)',
+      }}>
 
         {/* Header */}
         <div style={{ background:DARK, padding:'20px 26px', display:'flex', alignItems:'center', justifyContent:'space-between', flexShrink:0 }}>
@@ -232,9 +310,10 @@ export default function ReservationModal({ modalMode, editing, form, setForm, ha
               {modalMode === 'create' && ` — Étape ${step}/3`}
             </p>
             <h2 style={{ margin:'3px 0 0', fontSize:18, fontWeight:900, color:'#fff', letterSpacing:'-0.5px' }}>
-              {modalMode === 'create' ? (
-                step===1 ? 'Formule & couverts' : step===2 ? 'Date & heure' : 'Coordonnées'
-              ) : (editing?.name || '—')}
+              {modalMode === 'create'
+                ? (step===1 ? 'Formule & couverts' : step===2 ? 'Date & heure' : 'Coordonnées')
+                : (editing?.name || '—')
+              }
             </h2>
           </div>
           <button onClick={close} style={{ background:'rgba(255,255,255,0.1)', border:'none', width:34, height:34, display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer' }}>
@@ -242,18 +321,18 @@ export default function ReservationModal({ modalMode, editing, form, setForm, ha
           </button>
         </div>
 
-        {/* Step indicator (create only) */}
+        {/* Step progress bar */}
         {modalMode === 'create' && (
           <div style={{ display:'flex', height:3 }}>
             {[1,2,3].map(s => (
-              <div key={s} style={{ flex:1, background: s <= step ? GOLD : '#e8e0d8', transition:'background 0.3s' }} />
+              <div key={s} style={{ flex:1, background: s<=step ? GOLD : '#e8e0d8', transition:'background 0.3s' }} />
             ))}
           </div>
         )}
 
         <div style={{ padding:'24px 26px', display:'flex', flexDirection:'column', gap:20 }}>
 
-          {/* ── VIEW ──────────────────────────────────────────── */}
+          {/* ── VIEW ─────────────────────────────────────────── */}
           {modalMode === 'view' && editing && (
             <>
               <div style={{ display:'flex', flexDirection:'column', gap:14 }}>
@@ -268,7 +347,11 @@ export default function ReservationModal({ modalMode, editing, form, setForm, ha
               </div>
               {editing.status && (() => {
                 const s = STATUS_CONFIG[editing.status] || { bg:'#f5f5f5', color:'#888', label:editing.status }
-                return <div style={{ padding:'10px 16px', background:s.bg, display:'inline-flex' }}><span style={{ fontSize:12, fontWeight:900, color:s.color }}>{s.label}</span></div>
+                return (
+                  <div style={{ padding:'10px 16px', background:s.bg, display:'inline-flex' }}>
+                    <span style={{ fontSize:12, fontWeight:900, color:s.color }}>{s.label}</span>
+                  </div>
+                )
               })()}
               <div style={{ height:2, background:'#f0ebe4' }} />
               <div style={{ display:'flex', gap:8 }}>
@@ -278,18 +361,18 @@ export default function ReservationModal({ modalMode, editing, form, setForm, ha
                 </button>
                 <button onClick={() => handleDelete(editing.id)}
                   onMouseEnter={() => setHovDel(true)} onMouseLeave={() => setHovDel(false)}
-                  style={{ padding:'12px 16px', background: hovDel?'#b94040':'#fdf0f0', border:'none', cursor:'pointer', transition:'background 0.15s', display:'flex', alignItems:'center' }}>
-                  <Trash2 size={16} strokeWidth={2.5} color={hovDel?'#fff':'#b94040'} />
+                  style={{ padding:'12px 16px', background:hovDel?'#dc2626':'#fef2f2', border:'none', cursor:'pointer', transition:'background 0.15s', display:'flex', alignItems:'center' }}>
+                  <Trash2 size={16} strokeWidth={2.5} color={hovDel?'#fff':'#dc2626'} />
                 </button>
               </div>
             </>
           )}
 
-          {/* ── EDIT ──────────────────────────────────────────── */}
+          {/* ── EDIT ─────────────────────────────────────────── */}
           {modalMode === 'edit' && (
             <>
               <div style={{ background:'#faf8f5', padding:'14px 18px', display:'flex', flexDirection:'column', gap:8 }}>
-                {[['Date', editing?.date],['Heure', editing?.start_time],['Couverts', editing?.guests]].map(([l,v]) => v ? (
+                {[['Date',editing?.date],['Heure',editing?.start_time],['Couverts',editing?.guests]].map(([l,v]) => v ? (
                   <div key={l} style={{ display:'flex', justifyContent:'space-between' }}>
                     <span style={{ fontSize:12, fontWeight:700, color:'#aaa' }}>{l}</span>
                     <span style={{ fontSize:13, fontWeight:800, color:DARK }}>{v}</span>
@@ -301,10 +384,11 @@ export default function ReservationModal({ modalMode, editing, form, setForm, ha
                 <div style={{ display:'flex', gap:6 }}>
                   {['Confirmed','Pending','Cancelled'].map(s => {
                     const active = form.status === s
+                    const cfg = STATUS_CONFIG[s]
                     return (
                       <button key={s} onClick={() => setForm({...form, status:s})}
-                        style={{ flex:1, padding:'11px 6px', background: active?DARK:'#f5f0eb', border:'none', fontSize:12, fontWeight:900, color: active?GOLD:'#888', cursor:'pointer', transition:'all 0.15s' }}>
-                        {STATUS_CONFIG[s]?.label}
+                        style={{ flex:1, padding:'11px 6px', background:active?DARK:'#f5f0eb', border:'none', fontSize:12, fontWeight:900, color:active?GOLD:'#888', cursor:'pointer', transition:'all 0.15s' }}>
+                        {cfg?.label}
                       </button>
                     )
                   })}
@@ -314,33 +398,43 @@ export default function ReservationModal({ modalMode, editing, form, setForm, ha
                 <button onClick={close} style={{ flex:1, padding:'12px', background:'#f5f0eb', border:'none', fontSize:13, fontWeight:800, color:DARK, cursor:'pointer' }}>Annuler</button>
                 <button onClick={handleSubmit}
                   onMouseEnter={() => setHovSave(true)} onMouseLeave={() => setHovSave(false)}
-                  style={{ flex:2, padding:'12px', background: hovSave?GOLD_DARK:GOLD, border:'none', fontSize:14, fontWeight:900, color:DARK, cursor:'pointer', transition:'background 0.15s' }}>
+                  style={{ flex:2, padding:'12px', background:hovSave?GOLD_DARK:GOLD, border:'none', fontSize:14, fontWeight:900, color:DARK, cursor:'pointer', transition:'background 0.15s' }}>
                   Enregistrer
                 </button>
               </div>
             </>
           )}
 
-          {/* ── CREATE STEP 1: Formule + Couverts ─────────────── */}
+          {/* ── CREATE STEP 1: Service + Guests ──────────────── */}
           {modalMode === 'create' && step === 1 && (
             <>
-              {/* Service */}
               <div>
                 <Label text="Nos Formules" />
-                <select value={form.service ?? ''} onChange={e => setForm({...form, service:e.target.value})}
-                  style={{ ...inputStyle, appearance:'none', cursor:'pointer', fontSize:15 }}>
-                  <option value="">— Choisir —</option>
+                <select
+                  value={form.service ?? ''}
+                  onChange={e => setForm({...form, service:e.target.value, start_time:''})}
+                  style={{ ...inputStyle, appearance:'none', cursor:'pointer', fontSize:15 }}
+                  onFocus={e => e.target.style.borderColor = GOLD}
+                  onBlur={e => e.target.style.borderColor = '#e8e0d8'}
+                >
+                  <option value="">— Choisir une formule —</option>
                   {services.map(s => (
-                    <option key={s.name} value={s.name}>{s.name}{s.price>0?` — ${s.price} dh`:''}</option>
+                    <option key={s.name} value={s.name}>
+                      {s.name}{s.price>0?` — ${s.price} dh`:''}
+                    </option>
                   ))}
                 </select>
               </div>
 
-              {/* Guests */}
               <div>
                 <Label text="Nombre de personnes" />
-                <select value={form.guests ?? ''} onChange={e => setForm({...form, guests:e.target.value})}
-                  style={{ ...inputStyle, appearance:'none', cursor:'pointer', fontSize:15 }}>
+                <select
+                  value={form.guests ?? ''}
+                  onChange={e => setForm({...form, guests:e.target.value})}
+                  style={{ ...inputStyle, appearance:'none', cursor:'pointer', fontSize:15 }}
+                  onFocus={e => e.target.style.borderColor = GOLD}
+                  onBlur={e => e.target.style.borderColor = '#e8e0d8'}
+                >
                   <option value="">— Choisir —</option>
                   {[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15].map(n => (
                     <option key={n} value={n}>{n} personne{n>1?'s':''}</option>
@@ -348,11 +442,15 @@ export default function ReservationModal({ modalMode, editing, form, setForm, ha
                 </select>
               </div>
 
-              <button onClick={() => {
-                if (!form.guests) { alert('Veuillez choisir le nombre de personnes.'); return }
-                setStep(2)
-              }}
-                style={{ padding:'14px', background:GOLD, border:'none', fontSize:14, fontWeight:900, color:DARK, cursor:'pointer' }}>
+              <button
+                onClick={() => {
+                  if (!form.guests) { alert('Veuillez choisir le nombre de personnes.'); return }
+                  setStep(2)
+                }}
+                style={{ padding:'14px', background:GOLD, border:'none', fontSize:14, fontWeight:900, color:DARK, cursor:'pointer' }}
+                onMouseEnter={e => e.currentTarget.style.background = GOLD_DARK}
+                onMouseLeave={e => e.currentTarget.style.background = GOLD}
+              >
                 Suivant →
               </button>
             </>
@@ -361,23 +459,51 @@ export default function ReservationModal({ modalMode, editing, form, setForm, ha
           {/* ── CREATE STEP 2: Date + Heure ───────────────────── */}
           {modalMode === 'create' && step === 2 && (
             <>
-              <Calendar value={form.date} onChange={v => setForm({...form, date:v})} blockedDates={blockedDates} />
+              {/* Show info if no service selected */}
+              {!form.service && (
+                <div style={{ padding:'10px 14px', background:'#fdf6ec', borderLeft:`3px solid ${GOLD}`, fontSize:12, fontWeight:700, color:GOLD_DARK }}>
+                  Sélectionnez d'abord une formule pour voir les créneaux disponibles.
+                </div>
+              )}
+
+              <Calendar
+                value={form.date}
+                onChange={v => setForm({...form, date:v, start_time:''})}
+                blockedDates={blockedDates}
+                disabledDays={disabledDays}
+              />
 
               {form.date && (
                 <div>
                   <Label text="Heure" />
-                  <TimeSlots value={form.start_time} onChange={v => setForm({...form, start_time:v})} />
+                  {form.service ? (
+                    <TimeSlots
+                      value={form.start_time}
+                      onChange={v => setForm({...form, start_time:v})}
+                      slots={timeSlots}
+                    />
+                  ) : (
+                    <div style={{ padding:'10px 14px', background:'#faf8f5', fontSize:12, fontWeight:700, color:'rgba(43,33,24,0.4)' }}>
+                      Choisissez d'abord une formule à l'étape précédente.
+                    </div>
+                  )}
                 </div>
               )}
 
               <div style={{ display:'flex', gap:8 }}>
-                <button onClick={() => setStep(1)} style={{ flex:1, padding:'12px', background:'#f5f0eb', border:'none', fontSize:13, fontWeight:800, color:DARK, cursor:'pointer' }}>← Retour</button>
-                <button onClick={() => {
-                  if (!form.date)       { alert('Veuillez choisir une date.'); return }
-                  if (!form.start_time) { alert('Veuillez choisir une heure.'); return }
-                  setStep(3)
-                }}
-                  style={{ flex:2, padding:'12px', background:GOLD, border:'none', fontSize:14, fontWeight:900, color:DARK, cursor:'pointer' }}>
+                <button onClick={() => setStep(1)} style={{ flex:1, padding:'12px', background:'#f5f0eb', border:'none', fontSize:13, fontWeight:800, color:DARK, cursor:'pointer' }}>
+                  ← Retour
+                </button>
+                <button
+                  onClick={() => {
+                    if (!form.date)       { alert('Veuillez choisir une date.'); return }
+                    if (!form.start_time) { alert('Veuillez choisir une heure.'); return }
+                    setStep(3)
+                  }}
+                  style={{ flex:2, padding:'12px', background:GOLD, border:'none', fontSize:14, fontWeight:900, color:DARK, cursor:'pointer' }}
+                  onMouseEnter={e => e.currentTarget.style.background = GOLD_DARK}
+                  onMouseLeave={e => e.currentTarget.style.background = GOLD}
+                >
                   Suivant →
                 </button>
               </div>
@@ -388,12 +514,12 @@ export default function ReservationModal({ modalMode, editing, form, setForm, ha
           {modalMode === 'create' && step === 3 && (
             <>
               {/* Summary */}
-              <div style={{ background:'#faf8f5', padding:'14px 18px', display:'flex', flexDirection:'column', gap:8 }}>
+              <div style={{ background:'#faf8f5', padding:'14px 18px', display:'flex', flexDirection:'column', gap:8, borderLeft:`3px solid ${GOLD}` }}>
                 {[
-                  ['Service',  form.service    || '—'],
+                  ['Service',  form.service   || '—'],
                   ['Couverts', form.guests ? `${form.guests} personne${form.guests>1?'s':''}` : '—'],
-                  ['Date',     form.date        || '—'],
-                  ['Heure',    form.start_time  || '—'],
+                  ['Date',     form.date       || '—'],
+                  ['Heure',    form.start_time || '—'],
                 ].map(([l,v]) => (
                   <div key={l} style={{ display:'flex', justifyContent:'space-between' }}>
                     <span style={{ fontSize:12, fontWeight:700, color:'#aaa' }}>{l}</span>
@@ -408,14 +534,16 @@ export default function ReservationModal({ modalMode, editing, form, setForm, ha
                 <TextInput label="Email"         value={form.email} onChange={v => setForm({...form, email:v})} type="email" />
               </div>
 
-              {/* Notes */}
               <div>
                 <Label text="Demande spéciale (optionnel)" />
-                <textarea value={form.notes ?? ''} onChange={e => setForm({...form, notes:e.target.value})}
-                  rows={2} style={{ ...inputStyle, resize:'vertical' }} />
+                <textarea
+                  value={form.notes ?? ''} onChange={e => setForm({...form, notes:e.target.value})}
+                  rows={2} style={{ ...inputStyle, resize:'vertical' }}
+                  onFocus={e => e.target.style.borderColor = GOLD}
+                  onBlur={e => e.target.style.borderColor = '#e8e0d8'}
+                />
               </div>
 
-              {/* Status */}
               <div>
                 <Label text="Statut" />
                 <div style={{ display:'flex', gap:6 }}>
@@ -423,7 +551,7 @@ export default function ReservationModal({ modalMode, editing, form, setForm, ha
                     const active = form.status === s
                     return (
                       <button key={s} onClick={() => setForm({...form, status:s})}
-                        style={{ flex:1, padding:'10px 4px', background: active?DARK:'#f5f0eb', border:'none', fontSize:12, fontWeight:900, color: active?GOLD:'#888', cursor:'pointer', transition:'all 0.15s' }}>
+                        style={{ flex:1, padding:'10px 4px', background:active?DARK:'#f5f0eb', border:'none', fontSize:12, fontWeight:900, color:active?GOLD:'#888', cursor:'pointer', transition:'all 0.15s' }}>
                         {STATUS_CONFIG[s]?.label}
                       </button>
                     )
@@ -432,7 +560,9 @@ export default function ReservationModal({ modalMode, editing, form, setForm, ha
               </div>
 
               <div style={{ display:'flex', gap:8 }}>
-                <button onClick={() => setStep(2)} style={{ flex:1, padding:'12px', background:'#f5f0eb', border:'none', fontSize:13, fontWeight:800, color:DARK, cursor:'pointer' }}>← Retour</button>
+                <button onClick={() => setStep(2)} style={{ flex:1, padding:'12px', background:'#f5f0eb', border:'none', fontSize:13, fontWeight:800, color:DARK, cursor:'pointer' }}>
+                  ← Retour
+                </button>
                 <button
                   onClick={() => {
                     if (!form.name) { alert('Le nom est obligatoire.'); return }
@@ -440,7 +570,8 @@ export default function ReservationModal({ modalMode, editing, form, setForm, ha
                     setStep(1)
                   }}
                   onMouseEnter={() => setHovSave(true)} onMouseLeave={() => setHovSave(false)}
-                  style={{ flex:2, padding:'12px', background: hovSave?GOLD_DARK:GOLD, border:'none', fontSize:14, fontWeight:900, color:DARK, cursor:'pointer', transition:'background 0.15s' }}>
+                  style={{ flex:2, padding:'12px', background:hovSave?GOLD_DARK:GOLD, border:'none', fontSize:14, fontWeight:900, color:DARK, cursor:'pointer', transition:'background 0.15s' }}
+                >
                   Créer la réservation
                 </button>
               </div>
@@ -449,6 +580,7 @@ export default function ReservationModal({ modalMode, editing, form, setForm, ha
 
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   )
 }
