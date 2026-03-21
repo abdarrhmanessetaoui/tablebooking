@@ -43,7 +43,8 @@ export const viewAllBtn = {
   justifyContent: 'space-between',
   fontFamily:     'inherit',
   transition:     'background 0.15s',
-  marginBottom:      'auto',
+  marginTop:      'auto',   // ← pushes to bottom
+  flexShrink:     0,        // ← never shrinks
 }
 
 // ── Empty state ───────────────────────────────────────────────────
@@ -51,10 +52,11 @@ export const emptyWrapper = {
   display:        'flex',
   flexDirection:  'column',
   height:         '100%',
+  minHeight:      300,      // ← same as tableWrapper
 }
 
 export const emptyInner = {
-  flex:           1,
+  flex:           1,        // ← takes all available space
   display:        'flex',
   flexDirection:  'column',
   alignItems:     'center',
@@ -79,7 +81,8 @@ export const emptySubtitle = {
 
 // ── Full table wrapper ────────────────────────────────────────────
 export const tableWrapper = {
-  display:       'flex',
-  flexDirection: 'column',
-  height:        '100%',
+  display:        'flex',
+  flexDirection:  'column',
+  height:         '100%',   // ← must fill parent
+  minHeight:      300,      // ← ensures space when empty
 }
