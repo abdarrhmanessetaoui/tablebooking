@@ -43,7 +43,7 @@ export const viewAllBtn = {
   justifyContent: 'space-between',
   fontFamily:     'inherit',
   transition:     'background 0.15s',
-  marginTop:      'auto',
+  marginBottom:      'auto',
 }
 
 // ── Empty state ───────────────────────────────────────────────────
