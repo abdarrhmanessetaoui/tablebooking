@@ -64,15 +64,18 @@ export default function AssignTableModal({ reservation, onClose, onAssigned }) {
         `${BASE}/restaurant/reservations/${reservation.id}/assign-table`,
         { method: 'PATCH', headers: hdrs(), body: JSON.stringify({ table_idx: selected }) }
       )
+      const data = await res.json()
+  
       if (!res.ok) {
-        const data = await res.json().catch(() => ({}))
-        throw new Error(data.message ?? `HTTP ${res.status}`)
+        // ── Show backend conflict message directly ─────────────────
+        setError(data.message ?? `Erreur ${res.status}`)
+        return
       }
-      const updated = await res.json()
-      onAssigned(updated)
+  
+      onAssigned(data)
       onClose()
     } catch (e) {
-      setError(e.message ?? "Erreur lors de l'assignation.")
+      setError("Erreur de connexion. Veuillez réessayer.")
     } finally {
       setSaving(false)
     }

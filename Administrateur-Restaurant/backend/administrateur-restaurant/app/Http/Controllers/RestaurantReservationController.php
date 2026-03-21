@@ -369,38 +369,95 @@ class RestaurantReservationController extends Controller
         $request->validate([
             'table_idx' => 'nullable|integer',
         ]);
-
-        $message = WpMessage::where('formid', $this->formId())->findOrFail($id);
-
-        // If assigning (not unassigning), verify the table exists in form_structure
+    
+        $message  = WpMessage::where('formid', $this->formId())->findOrFail($id);
         $tableIdx = $request->input('table_idx');
-
+    
         if (!is_null($tableIdx)) {
-            $form      = DB::table('wpjn_cpappbk_forms')->where('id', $this->formId())->first();
+    
+            // ── Validate table exists and is active ───────────────────
+            $form      = DB::table('wpjn_cpappbk_forms')->where('id', $this->formId())->first();;
             $structure = json_decode($form->form_structure, true);
             $tables    = [];
-
+    
             foreach ($structure[0] ?? [] as $field) {
                 if (($field['ftype'] ?? '') === 'fapp') {
                     $tables = $field['tables'] ?? [];
                     break;
                 }
             }
-
+    
             $table = collect($tables)->firstWhere('idx', (int) $tableIdx);
-
+    
             if (!$table) {
                 return response()->json(['message' => 'Table introuvable.'], 404);
             }
-
+    
             if (!($table['active'] ?? true)) {
                 return response()->json(['message' => 'Cette table est inactive.'], 422);
             }
+    
+            // ── Get current reservation details ───────────────────────
+            $current     = $message->toCleanArray();
+            $currentDate = $current['date']       ?? null;
+            $startTime   = $current['start_time'] ?? null;
+            $endTime     = $current['end_time']   ?? null;
+    
+            // ── Check for time conflicts on the same table ────────────
+            if ($currentDate && $startTime) {
+    
+                // Load all reservations for same date with same table
+                $conflicts = WpMessage::where('formid', $this->formId())
+                    ->where('id', '!=', $id)           // exclude self
+                    ->where('table_idx', $tableIdx)
+                    ->get()
+                    ->map(fn($m) => $m->toCleanArray())
+                    ->filter(function ($r) use ($currentDate, $startTime, $endTime) {
+    
+                        // Must be same date
+                        if (($r['date'] ?? '') !== $currentDate) return false;
+    
+                        // Skip cancelled reservations
+                        if ($r['status'] === 'Cancelled') return false;
+    
+                        $rStart = $r['start_time'] ?? null;
+                        $rEnd   = $r['end_time']   ?? null;
+    
+                        if (!$rStart) return false;
+    
+                        // Convert to comparable decimal hours
+                        $toDecimal = function (string $t): float {
+                            [$h, $m] = explode(':', $t);
+                            return (int)$h + (int)$m / 60;
+                        };
+    
+                        $aStart = $toDecimal($startTime);
+                        // Default slot = 2h if no end_time
+                        $aEnd   = $endTime ? $toDecimal($endTime) : $aStart + 2;
+    
+                        $bStart = $toDecimal($rStart);
+                        $bEnd   = $rEnd ? $toDecimal($rEnd) : $bStart + 2;
+    
+                        // Overlap: A starts before B ends AND A ends after B starts
+                        return $aStart < $bEnd && $aEnd > $bStart;
+                    });
+    
+                if ($conflicts->isNotEmpty()) {
+                    $conflict    = $conflicts->first();
+                    $conflictTime = $conflict['start_time'] ?? '?';
+                    $conflictName = $conflict['name']       ?? 'un client';
+    
+                    return response()->json([
+                        'message' => "Conflit : cette table est déjà assignée à {$conflictName} à {$conflictTime} le {$currentDate}.",
+                    ], 422);
+                }
+            }
         }
-
+    
+        // ── All good — assign ─────────────────────────────────────────
         $message->table_idx = $tableIdx;
         $message->save();
-
+    
         return response()->json($message->toCleanArray());
     }
 
