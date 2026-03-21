@@ -1,74 +1,64 @@
 import { DARK, BORDER } from './tokens'
 
-// ── Wrapper ───────────────────────────────────────────────────────
-export const wrapper = (bg) => ({
-  background:  bg,
-  padding:     '10px 16px',
-  display:     'flex',
-  alignItems:  'center',
-  gap:         12,
+// ── KPI card wrapper ──────────────────────────────────────────────
+export const wrapper = (bg, accent) => ({
+  flex:          1,
+  minWidth:      0,
+  background:    bg,
+  padding:       '18px 20px',
+  display:       'flex',
+  flexDirection: 'column',
+  gap:           10,
+  borderTop:     `3px solid ${accent}`,
+  position:      'relative',
+  overflow:      'hidden',
 })
 
-// ── Left accent bar ───────────────────────────────────────────────
-export const accentBar = (accent) => ({
-  width:        3,
-  height:       36,
-  background:   accent,
-  flexShrink:   0,
-  borderRadius: 2,
-})
-
-// ── Text content ──────────────────────────────────────────────────
-export const content = {
-  flex:     1,
-  minWidth: 0,
-}
-
+// ── Label row ─────────────────────────────────────────────────────
 export const labelRow = {
-  display:     'flex',
-  alignItems:  'center',
-  gap:         4,
-  marginBottom: 3,
+  display:    'flex',
+  alignItems: 'center',
+  gap:        6,
 }
 
 export const labelText = (accent) => ({
-  fontSize:      8,
+  fontSize:      9,
   fontWeight:    900,
   color:         accent,
   textTransform: 'uppercase',
   letterSpacing: '0.18em',
 })
 
+// ── Value row ─────────────────────────────────────────────────────
 export const valueRow = {
   display:    'flex',
   alignItems: 'baseline',
-  gap:        10,
+  gap:        8,
 }
 
 export const valueNumber = {
-  fontSize:           22,
+  fontSize:           36,
   fontWeight:         900,
   color:              DARK,
-  letterSpacing:      '-1px',
+  letterSpacing:      '-2px',
   lineHeight:         1,
   fontVariantNumeric: 'tabular-nums',
 }
 
 export const valuePct = (accent) => ({
-  fontSize:   9,
-  fontWeight: 900,
+  fontSize:   11,
+  fontWeight: 800,
   color:      accent,
-  opacity:    0.7,
+  opacity:    0.8,
 })
 
-// ── Progress bar ──────────────────────────────────────────────────
+// ── Full-width progress bar at bottom ─────────────────────────────
 export const progressTrack = {
-  width:      36,
+  width:      '100%',
   height:     3,
   background: BORDER,
   overflow:   'hidden',
   flexShrink: 0,
-  alignSelf:  'center',
 }
 
 export const progressFill = (w, accent) => ({
@@ -77,3 +67,7 @@ export const progressFill = (w, accent) => ({
   background: accent,
   transition: 'width 0.9s ease',
 })
+
+// ── These are no longer used but kept to avoid import errors ──────
+export const accentBar = () => ({})
+export const content   = {}

@@ -24,6 +24,18 @@ export const tabPanelCSS = `
     flex-direction: column;
     min-height: 100%;
   }
+  .db-stats-row {
+    display: flex;
+    flex-direction: row;
+    gap: 1px;
+    background: ${BORDER};
+    border-top: 1px solid ${BORDER};
+  }
+  @media (max-width: 480px) {
+    .db-stats-row {
+      flex-direction: column;
+    }
+  }
   @media (max-width: 860px) {
     .db-body              { grid-template-columns: 1fr; }
     .db-left              { border-right: none; border-bottom: 2px solid ${DARK}; }
@@ -64,12 +76,13 @@ export const heroLabel = {
   color:      DARK,
 }
 
-// ── Stat blocks list ──────────────────────────────────────────────
+// ── Stat blocks — horizontal row ──────────────────────────────────
 export const statsList = {
   display:       'flex',
-  flexDirection: 'column',
-  gap:           1,
+  flexDirection: 'row',       // ← was column
+  gap:           0,
   background:    BORDER,
+  borderTop:     `1px solid ${BORDER}`,
 }
 
 // ── Mobile empty state ────────────────────────────────────────────
