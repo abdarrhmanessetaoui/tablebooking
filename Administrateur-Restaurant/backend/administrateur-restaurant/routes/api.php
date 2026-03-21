@@ -35,6 +35,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::patch ('/restaurant/reservations/{id}/status', [RestaurantReservationController::class, 'updateStatus']);
     Route::delete('/restaurant/reservations/{id}',        [RestaurantReservationController::class, 'destroy']);
 
+    // ── NEW ───────────────────────────────────────────────────
+    Route::patch('/restaurant/reservations/{id}/assign-table', [RestaurantReservationController::class, 'assignTable']);
+    Route::get  ('/tables/timeline',                           [RestaurantReservationController::class, 'timeline']);
+
     // ── Restaurant settings ───────────────────────────────────
     Route::get('/restaurant/info',          [RestaurantReservationController::class, 'info']);
     Route::put('/restaurant/info',          [RestaurantReservationController::class, 'updateInfo']);

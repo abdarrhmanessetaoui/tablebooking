@@ -333,12 +333,12 @@ class RestaurantReservationController extends Controller
         $form = DB::table('wpjn_cpappbk_forms')
             ->where('id', $this->formId())
             ->first();
-    
+
         if (!$form) return response()->json([]);
-    
+
         $structure = json_decode($form->form_structure, true);
         $services  = [];
-    
+
         foreach ($structure[0] ?? [] as $field) {
             if (($field['ftype'] ?? '') === 'fapp') {
                 foreach ($field['services'] ?? [] as $svc) {
@@ -355,7 +355,111 @@ class RestaurantReservationController extends Controller
                 break;
             }
         }
-    
+
         return response()->json($services);
+    }
+
+    // =========================================================================
+    // NEW METHOD #1 — Assign a table to a reservation
+    // PATCH /api/restaurant/reservations/{id}/assign-table
+    // Body: { "table_idx": 3 }  — send null to unassign
+    // =========================================================================
+    public function assignTable(Request $request, int $id)
+    {
+        $request->validate([
+            'table_idx' => 'nullable|integer',
+        ]);
+
+        $message = WpMessage::where('formid', $this->formId())->findOrFail($id);
+
+        // If assigning (not unassigning), verify the table exists in form_structure
+        $tableIdx = $request->input('table_idx');
+
+        if (!is_null($tableIdx)) {
+            $form      = DB::table('wpjn_cpappbk_forms')->where('id', $this->formId())->first();
+            $structure = json_decode($form->form_structure, true);
+            $tables    = [];
+
+            foreach ($structure[0] ?? [] as $field) {
+                if (($field['ftype'] ?? '') === 'fapp') {
+                    $tables = $field['tables'] ?? [];
+                    break;
+                }
+            }
+
+            $table = collect($tables)->firstWhere('idx', (int) $tableIdx);
+
+            if (!$table) {
+                return response()->json(['message' => 'Table introuvable.'], 404);
+            }
+
+            if (!($table['active'] ?? true)) {
+                return response()->json(['message' => 'Cette table est inactive.'], 422);
+            }
+        }
+
+        $message->table_idx = $tableIdx;
+        $message->save();
+
+        return response()->json($message->toCleanArray());
+    }
+
+    // =========================================================================
+    // NEW METHOD #2 — Table occupancy timeline for a given date
+    // GET /api/tables/timeline?date=YYYY-MM-DD
+    // =========================================================================
+    public function timeline(Request $request)
+    {
+        $date = $request->query('date', now()->toDateString());
+
+        if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)) {
+            $date = now()->toDateString();
+        }
+
+        // Load tables from form_structure JSON
+        $form = DB::table('wpjn_cpappbk_forms')->where('id', $this->formId())->first();
+        if (!$form) return response()->json([]);
+
+        $structure = json_decode($form->form_structure, true);
+        $tables    = [];
+
+        foreach ($structure[0] ?? [] as $field) {
+            if (($field['ftype'] ?? '') === 'fapp') {
+                $tables = $field['tables'] ?? [];
+                break;
+            }
+        }
+
+        // Only active tables
+        $tables = collect($tables)->filter(fn($t) => $t['active'] ?? true)->values();
+
+        // Load reservations for this date that have a table assigned
+        $messages = WpMessage::where('formid', $this->formId())
+            ->whereNotNull('table_idx')
+            ->get()
+            ->map(fn($m) => $m->toCleanArray())
+            ->filter(fn($r) => $r['date'] === $date && in_array($r['status'], ['Confirmed', 'Pending']))
+            ->groupBy('table_idx');
+
+        $timeline = $tables->map(function ($table) use ($messages) {
+            $tableReservations = $messages->get($table['idx'], collect());
+
+            return [
+                'table_id'     => $table['idx'],
+                'table_name'   => 'Table ' . $table['number'],
+                'capacity'     => (int) $table['capacity'],
+                'location'     => $table['location'],
+                'reservations' => collect($tableReservations)->map(fn($r) => [
+                    'id'            => $r['id'],
+                    'start_time'    => $r['start_time'],
+                    'end_time'      => $r['end_time'],
+                    'customer_name' => $r['name'],
+                    'guests'        => (int) $r['guests'],
+                    'status'        => $r['status'],
+                ])->values(),
+            ];
+        });
+
+        return response()->json($timeline->values());
     }
 }
