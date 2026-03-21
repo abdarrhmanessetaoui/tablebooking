@@ -187,7 +187,7 @@ function MobileCard({ r, selected, highlighted, onToggle, openView, openEdit, ha
         {[
           { Icon: CalendarDays, value: r.date,       gold: false },
           { Icon: Clock3,       value: r.start_time, gold: false },
-          { Icon: Users,        value: r.guests ? `${r.guests} pers.` : null, gold: false },
+          { Icon: Users,        value: r.guests ? `${r.guests} personne` : null, gold: false },
           { Icon: Utensils,     value: r.service ? trunc(r.service, 16) : null, gold: true },
         ].filter(item => item.value).map((item, i) => (
           <span key={i} style={{
@@ -433,10 +433,10 @@ export default function ReservationsTable({
 
   const HEADERS = [
     { label: 'Nom',       cls: ''            },
-    { label: 'Tél.',      cls: 'col-phone'   },
+    { label: 'Téléphone',      cls: 'col-phone'   },
     { label: 'Date',      cls: ''            },
     { label: 'Heure',     cls: ''            },
-    { label: 'Pers.',     cls: 'col-guests'  },
+    { label: 'personne',     cls: 'col-guests'  },
     { label: 'Service',   cls: 'col-service' },
     { label: 'Table',     cls: 'col-table'   },
     { label: 'Statut',    cls: ''            },
