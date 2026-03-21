@@ -453,6 +453,8 @@ class RestaurantReservationController extends Controller
                 }
             }
         }
+
+        
     
         // ── All good — assign ─────────────────────────────────────────
         $message->table_idx = $tableIdx;
@@ -460,6 +462,52 @@ class RestaurantReservationController extends Controller
     
         return response()->json($message->toCleanArray());
     }
+
+    /**
+ * GET /api/tables/busy?date=YYYY-MM-DD&start_time=HH:MM&end_time=HH:MM&exclude_id=123
+ * Returns array of table_idx values that are already taken at that time.
+ */
+public function busyTables(Request $request)
+{
+    $date      = $request->query('date');
+    $startTime = $request->query('start_time');
+    $endTime   = $request->query('end_time');
+    $excludeId = (int) $request->query('exclude_id', 0);
+
+    if (!$date || !$startTime) {
+        return response()->json([]);
+    }
+
+    $toDecimal = function (string $t): float {
+        [$h, $m] = explode(':', $t);
+        return (int)$h + (int)$m / 60;
+    };
+
+    $aStart = $toDecimal($startTime);
+    $aEnd   = $endTime ? $toDecimal($endTime) : $aStart + 2;
+
+    $busy = WpMessage::where('formid', $this->formId())
+        ->whereNotNull('table_idx')
+        ->where('id', '!=', $excludeId)
+        ->get()
+        ->map(fn($m) => $m->toCleanArray())
+        ->filter(function ($r) use ($date, $aStart, $aEnd, $toDecimal) {
+            if (($r['date'] ?? '') !== $date) return false;
+            if ($r['status'] === 'Cancelled') return false;
+            $rStart = $r['start_time'] ?? null;
+            if (!$rStart) return false;
+            $bStart = $toDecimal($rStart);
+            $bEnd   = isset($r['end_time']) && $r['end_time']
+                ? $toDecimal($r['end_time'])
+                : $bStart + 2;
+            return $aStart < $bEnd && $aEnd > $bStart;
+        })
+        ->pluck('table_idx')
+        ->unique()
+        ->values();
+
+    return response()->json($busy);
+}
 
     // =========================================================================
     // NEW METHOD #2 — Table occupancy timeline for a given date

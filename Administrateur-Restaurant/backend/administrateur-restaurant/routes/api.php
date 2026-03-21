@@ -66,5 +66,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put   ('/tables/{idx}',        [TableController::class, 'update']);
     Route::delete('/tables/{idx}',        [TableController::class, 'destroy']);
     Route::patch ('/tables/{idx}/toggle', [TableController::class, 'toggleActive']);
+    Route::get('/tables/busy', [RestaurantReservationController::class, 'busyTables']);
 
 });

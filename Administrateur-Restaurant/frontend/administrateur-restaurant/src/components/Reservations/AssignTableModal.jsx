@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { X, LayoutGrid, Users, MapPin, Check, Loader, AlertTriangle } from 'lucide-react'
+import { X, LayoutGrid, Users, MapPin, Check, Loader, AlertTriangle, Clock } from 'lucide-react'
 import { getToken } from '../../utils/auth'
 import { GREEN, RED } from '../../styles/dashboard/tokens'
 
@@ -18,11 +18,12 @@ const LOC_COLORS = {
 }
 
 export default function AssignTableModal({ reservation, onClose, onAssigned }) {
-  const [tables,   setTables]   = useState([])
-  const [loading,  setLoading]  = useState(true)
-  const [saving,   setSaving]   = useState(false)
-  const [error,    setError]    = useState(null)
-  const [selected, setSelected] = useState(reservation?.table_idx ?? null)
+  const [tables,     setTables]     = useState([])
+  const [busyIdxs,   setBusyIdxs]   = useState([])   // ← NEW
+  const [loading,    setLoading]    = useState(true)
+  const [saving,     setSaving]     = useState(false)
+  const [error,      setError]      = useState(null)
+  const [selected,   setSelected]   = useState(reservation?.table_idx ?? null)
 
   const guestCount = parseInt(reservation?.guests ?? 1)
 
@@ -32,50 +33,50 @@ export default function AssignTableModal({ reservation, onClose, onAssigned }) {
     'Authorization': `Bearer ${getToken()}`,
   })
 
+  // ── Load tables + busy table list in parallel ──────────────────
   useEffect(() => {
-    fetch(`${BASE}/tables`, { headers: hdrs() })
-      .then(r => r.json())
-      .then(d => setTables(Array.isArray(d) ? d.filter(t => t.active) : []))
+    const params = new URLSearchParams({
+      date:       reservation?.date       ?? '',
+      start_time: reservation?.start_time ?? '',
+      ...(reservation?.end_time ? { end_time: reservation.end_time } : {}),
+      exclude_id: reservation?.id ?? 0,
+    })
+
+    Promise.all([
+      fetch(`${BASE}/tables`,        { headers: hdrs() }).then(r => r.json()),
+      fetch(`${BASE}/tables/busy?${params}`, { headers: hdrs() }).then(r => r.json()),
+    ])
+      .then(([tableData, busyData]) => {
+        setTables(Array.isArray(tableData) ? tableData.filter(t => t.active) : [])
+        setBusyIdxs(Array.isArray(busyData) ? busyData : [])
+      })
       .catch(() => setError('Impossible de charger les tables.'))
       .finally(() => setLoading(false))
   }, []) // eslint-disable-line
 
-  // ── Sort: sufficient capacity first, then by number ──────────────
+  // ── Sort: available + sufficient first ────────────────────────
   const sortedTables = [...tables].sort((a, b) => {
-    const aOk = parseInt(a.capacity) >= guestCount
-    const bOk = parseInt(b.capacity) >= guestCount
+    const aOk = !busyIdxs.includes(a.idx) && parseInt(a.capacity) >= guestCount
+    const bOk = !busyIdxs.includes(b.idx) && parseInt(b.capacity) >= guestCount
     if (aOk && !bOk) return -1
     if (!aOk && bOk) return 1
     return String(a.number).localeCompare(String(b.number))
   })
 
   async function handleAssign() {
-    if (selected !== null) {
-      const table = tables.find(t => t.idx === selected)
-      if (table && parseInt(table.capacity) < guestCount) {
-        setError(`La table ${table.number} ne peut accueillir que ${table.capacity} personnes pour ${guestCount} invités.`)
-        return
-      }
-    }
     setSaving(true)
     setError(null)
     try {
-      const res = await fetch(
+      const res  = await fetch(
         `${BASE}/restaurant/reservations/${reservation.id}/assign-table`,
         { method: 'PATCH', headers: hdrs(), body: JSON.stringify({ table_idx: selected }) }
       )
       const data = await res.json()
-  
-      if (!res.ok) {
-        // ── Show backend conflict message directly ─────────────────
-        setError(data.message ?? `Erreur ${res.status}`)
-        return
-      }
-  
+      if (!res.ok) { setError(data.message ?? `Erreur ${res.status}`); return }
       onAssigned(data)
       onClose()
-    } catch (e) {
-      setError("Erreur de connexion. Veuillez réessayer.")
+    } catch {
+      setError('Erreur de connexion. Veuillez réessayer.')
     } finally {
       setSaving(false)
     }
@@ -83,22 +84,82 @@ export default function AssignTableModal({ reservation, onClose, onAssigned }) {
 
   const hasChanged = selected !== reservation?.table_idx
 
+  // ── Determine table state ──────────────────────────────────────
+  function tableState(table) {
+    const isBusy        = busyIdxs.includes(table.idx)
+    const isInsufficient = parseInt(table.capacity) < guestCount
+    const isSelected    = selected === table.idx
+    const isCurrent     = reservation?.table_idx === table.idx
+
+    if (isBusy)         return 'busy'
+    if (isInsufficient) return 'insufficient'
+    if (isSelected)     return 'selected'
+    if (isCurrent)      return 'current'
+    return 'available'
+  }
+
+  const stateConfig = {
+    busy: {
+      border:     RED,
+      background: '#fef2f2',
+      opacity:    0.65,
+      cursor:     'not-allowed',
+      iconBg:     '#fef2f2',
+      iconColor:  RED,
+      textColor:  DARK,
+      badge:      { bg: RED,   color: '#fff',      text: 'Occupée' },
+      capacityBg: '#fef2f2', capacityColor: RED,
+    },
+    insufficient: {
+      border:     'rgba(43,33,24,0.15)',
+      background: '#fafafa',
+      opacity:    0.55,
+      cursor:     'not-allowed',
+      iconBg:     '#f5f5f5',
+      iconColor:  'rgba(43,33,24,0.3)',
+      textColor:  'rgba(43,33,24,0.5)',
+      badge:      { bg: '#e5e7eb', color: '#6b7280', text: 'Capacité insuffisante' },
+      capacityBg: '#fee2e2', capacityColor: RED,
+    },
+    selected: {
+      border:     GOLD,
+      background: DARK,
+      opacity:    1,
+      cursor:     'pointer',
+      iconBg:     'rgba(200,169,126,0.15)',
+      iconColor:  GOLD,
+      textColor:  '#fff',
+      capacityBg: 'rgba(200,169,126,0.15)', capacityColor: GOLD,
+    },
+    current: {
+      border:     GREEN,
+      background: '#f0fdf4',
+      opacity:    1,
+      cursor:     'pointer',
+      iconBg:     '#f0fdf4',
+      iconColor:  GREEN,
+      textColor:  DARK,
+      badge:      { bg: GREEN, color: '#fff', text: 'Actuelle' },
+      capacityBg: '#f0fdf4', capacityColor: '#16a34a',
+    },
+    available: {
+      border:     BORDER,
+      background: '#fff',
+      opacity:    1,
+      cursor:     'pointer',
+      iconBg:     '#f5f0eb',
+      iconColor:  DARK,
+      textColor:  DARK,
+      capacityBg: '#f0fdf4', capacityColor: '#16a34a',
+    },
+  }
+
   return (
     <div
-      style={{
-        position: 'fixed', inset: 0, zIndex: 60,
-        background: 'rgba(43,33,24,0.65)',
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        padding: 16,
-        fontFamily: "'Plus Jakarta Sans','DM Sans',system-ui,sans-serif",
-      }}
+      style={{ position: 'fixed', inset: 0, zIndex: 60, background: 'rgba(43,33,24,0.65)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16, fontFamily: "'Plus Jakarta Sans','DM Sans',system-ui,sans-serif" }}
       onClick={e => { if (e.target === e.currentTarget) onClose() }}
     >
-      <div style={{
-        background: '#fff', width: '100%', maxWidth: 420,
-        maxHeight: '88vh', overflow: 'auto',
-        display: 'flex', flexDirection: 'column',
-      }}>
+      <div style={{ background: '#fff', width: '100%', maxWidth: 420, maxHeight: '88vh', overflow: 'auto', display: 'flex', flexDirection: 'column' }}>
 
         {/* Header */}
         <div style={{ background: DARK, padding: '18px 22px', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -106,7 +167,7 @@ export default function AssignTableModal({ reservation, onClose, onAssigned }) {
             <p style={{ margin: 0, fontSize: 9, fontWeight: 700, color: GOLD, letterSpacing: '0.18em', textTransform: 'uppercase' }}>
               Assigner une table
             </p>
-            <h2 style={{ margin: '3px 0 0', fontSize: 16, fontWeight: 900, color: '#fff', letterSpacing: '-0.4px' }}>
+            <h2 style={{ margin: '3px 0 0', fontSize: 16, fontWeight: 900, color: '#fff' }}>
               {reservation?.name ?? '—'}
             </h2>
           </div>
@@ -131,7 +192,7 @@ export default function AssignTableModal({ reservation, onClose, onAssigned }) {
 
         {/* Error */}
         {error && (
-          <div style={{ margin: '10px 22px 0', padding: '10px 12px', background: '#fdf0f0', borderLeft: `3px solid ${RED}`, fontSize: 12, fontWeight: 700, color: RED, display: 'flex', alignItems: 'center', gap: 8 }}>
+          <div style={{ margin: '10px 22px 0', padding: '10px 12px', background: '#fef2f2', borderLeft: `3px solid ${RED}`, fontSize: 12, fontWeight: 700, color: RED, display: 'flex', alignItems: 'center', gap: 8 }}>
             <AlertTriangle size={14} strokeWidth={2.5} />
             {error}
           </div>
@@ -139,6 +200,7 @@ export default function AssignTableModal({ reservation, onClose, onAssigned }) {
 
         {/* Table list */}
         <div style={{ padding: '14px 22px', flex: 1 }}>
+
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
             <p style={{ margin: 0, fontSize: 9, fontWeight: 900, color: DARK, letterSpacing: '0.18em', textTransform: 'uppercase' }}>
               Tables disponibles
@@ -149,6 +211,22 @@ export default function AssignTableModal({ reservation, onClose, onAssigned }) {
               </button>
             )}
           </div>
+
+          {/* Legend */}
+          {!loading && (
+            <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginBottom: 12, padding: '7px 10px', background: CREAM, border: `1px solid ${BORDER}` }}>
+              {[
+                { dot: GREEN, label: 'Disponible'   },
+                { dot: RED,   label: 'Occupée'       },
+                { dot: 'rgba(43,33,24,0.2)', label: 'Capacité insuf.' },
+              ].map(s => (
+                <span key={s.label} style={{ display: 'inline-flex', alignItems: 'center', gap: 5, fontSize: 10, fontWeight: 700, color: DARK }}>
+                  <span style={{ width: 8, height: 8, borderRadius: '50%', background: s.dot, flexShrink: 0 }} />
+                  {s.label}
+                </span>
+              ))}
+            </div>
+          )}
 
           {loading ? (
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '32px 0' }}>
@@ -162,77 +240,96 @@ export default function AssignTableModal({ reservation, onClose, onAssigned }) {
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
               {sortedTables.map(table => {
-                const isSelected   = selected === table.idx
-                const sufficient   = parseInt(table.capacity) >= guestCount
-                const locStyle     = LOC_COLORS[table.location] ?? { bg: '#f5f5f5', color: '#666' }
-                const isCurrently  = reservation?.table_idx === table.idx
+                const state   = tableState(table)
+                const cfg     = stateConfig[state]
+                const locStyle = LOC_COLORS[table.location] ?? { bg: '#f5f5f5', color: '#666' }
+                const isClickable = state === 'available' || state === 'current' || state === 'selected'
 
                 return (
                   <div
                     key={table.idx}
                     onClick={() => {
-                      // ── Block insufficient capacity ──────────────
-                      if (!sufficient) {
-                        setError(`Table ${table.number} : capacité ${table.capacity} insuffisante pour ${guestCount} personne${guestCount > 1 ? 's' : ''}.`)
-                        return
-                      }
+                      if (!isClickable) return
                       setError(null)
-                      setSelected(isSelected ? null : table.idx)
+                      setSelected(selected === table.idx ? null : table.idx)
                     }}
                     style={{
-                      display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                      padding: '11px 14px',
-                      cursor: sufficient ? 'pointer' : 'not-allowed',
-                      background: isSelected ? DARK : '#fff',
-                      border: `1.5px solid ${isSelected ? DARK : sufficient ? BORDER : '#fecaca'}`,
-                      borderLeft: `4px solid ${isSelected ? GOLD : sufficient ? GREEN : RED}`,
-                      opacity: sufficient ? 1 : 0.6,
-                      transition: 'all 0.12s',
+                      display:        'flex',
+                      alignItems:     'center',
+                      justifyContent: 'space-between',
+                      padding:        '10px 14px',
+                      cursor:         cfg.cursor,
+                      background:     cfg.background,
+                      border:         `1.5px solid ${cfg.border}`,
+                      borderLeft:     `4px solid ${cfg.border}`,
+                      opacity:        cfg.opacity,
+                      transition:     'all 0.12s',
+                      position:       'relative',
                     }}
-                    onMouseEnter={e => { if (sufficient && !isSelected) e.currentTarget.style.background = CREAM }}
-                    onMouseLeave={e => { if (!isSelected) e.currentTarget.style.background = '#fff' }}
+                    onMouseEnter={e => { if (isClickable && state !== 'selected') e.currentTarget.style.background = CREAM }}
+                    onMouseLeave={e => { if (state !== 'selected') e.currentTarget.style.background = cfg.background }}
                   >
-                    {/* Left */}
+                    {/* Left: icon + name + badge */}
                     <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                      <div style={{ width: 30, height: 30, flexShrink: 0, background: isSelected ? 'rgba(200,169,126,0.15)' : sufficient ? '#f5f0eb' : '#fef2f2', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        <LayoutGrid size={14} color={isSelected ? GOLD : sufficient ? DARK : RED} strokeWidth={2.5} />
+                      <div style={{ width: 30, height: 30, flexShrink: 0, background: cfg.iconBg, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        {state === 'busy'
+                          ? <Clock size={14} color={RED} strokeWidth={2.5} />
+                          : <LayoutGrid size={14} color={cfg.iconColor} strokeWidth={2.5} />
+                        }
                       </div>
                       <div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                          <p style={{ margin: 0, fontSize: 13, fontWeight: 900, color: isSelected ? '#fff' : DARK }}>
+                          <p style={{ margin: 0, fontSize: 13, fontWeight: 900, color: cfg.textColor }}>
                             Table {table.number}
                           </p>
-                          {isCurrently && (
-                            <span style={{ fontSize: 9, fontWeight: 900, padding: '1px 6px', background: GOLD, color: DARK }}>
-                              ACTUELLE
+                          {cfg.badge && (
+                            <span style={{ fontSize: 9, fontWeight: 900, padding: '1px 6px', background: cfg.badge.bg, color: cfg.badge.color }}>
+                              {cfg.badge.text}
                             </span>
                           )}
                         </div>
-                        {!sufficient && (
-                          <p style={{ margin: '2px 0 0', fontSize: 10, fontWeight: 700, color: RED, display: 'flex', alignItems: 'center', gap: 4 }}>
-                            <AlertTriangle size={10} strokeWidth={2.5} />
-                            Capacité insuffisante
+                        {state === 'busy' && (
+                          <p style={{ margin: '2px 0 0', fontSize: 10, fontWeight: 700, color: RED }}>
+                            Déjà assignée à cet horaire
+                          </p>
+                        )}
+                        {state === 'insufficient' && (
+                          <p style={{ margin: '2px 0 0', fontSize: 10, fontWeight: 700, color: 'rgba(43,33,24,0.4)' }}>
+                            Max {table.capacity} · besoin de {guestCount}
                           </p>
                         )}
                       </div>
                     </div>
 
-                    {/* Right: tags + check */}
+                    {/* Right: capacity + location + check */}
                     <div style={{ display: 'flex', alignItems: 'center', gap: 5, flexShrink: 0 }}>
-                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 3, padding: '2px 7px', background: isSelected ? 'rgba(200,169,126,0.15)' : sufficient ? '#f0fdf4' : '#fef2f2', fontSize: 10, fontWeight: 800, color: isSelected ? GOLD : sufficient ? '#16a34a' : RED }}>
+                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 3, padding: '2px 7px', background: cfg.capacityBg, fontSize: 10, fontWeight: 800, color: cfg.capacityColor }}>
                         <Users size={9} strokeWidth={2.5} />
                         {table.capacity}
                       </span>
-                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 3, padding: '2px 7px', background: isSelected ? 'rgba(200,169,126,0.1)' : locStyle.bg, fontSize: 10, fontWeight: 700, color: isSelected ? 'rgba(200,169,126,0.8)' : locStyle.color }}>
+                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 3, padding: '2px 7px', background: state === 'selected' ? 'rgba(200,169,126,0.1)' : locStyle.bg, fontSize: 10, fontWeight: 700, color: state === 'selected' ? 'rgba(200,169,126,0.8)' : locStyle.color }}>
                         <MapPin size={9} strokeWidth={2.5} />
                         {table.location}
                       </span>
-                      {isSelected && (
+                      {state === 'selected' && (
                         <div style={{ width: 20, height: 20, background: GOLD, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                           <Check size={11} color={DARK} strokeWidth={3} />
                         </div>
                       )}
                     </div>
+
+                    {/* Overlay for disabled states */}
+                    {(state === 'busy' || state === 'insufficient') && (
+                      <div style={{
+                        position:     'absolute',
+                        inset:        0,
+                        background:   state === 'busy'
+                          ? 'repeating-linear-gradient(45deg, transparent, transparent 4px, rgba(220,38,38,0.04) 4px, rgba(220,38,38,0.04) 8px)'
+                          : 'repeating-linear-gradient(45deg, transparent, transparent 4px, rgba(0,0,0,0.02) 4px, rgba(0,0,0,0.02) 8px)',
+                        pointerEvents: 'none',
+                        borderRadius:  'inherit',
+                      }} />
+                    )}
                   </div>
                 )
               })}
@@ -242,7 +339,8 @@ export default function AssignTableModal({ reservation, onClose, onAssigned }) {
 
         {/* Footer */}
         <div style={{ padding: '12px 22px', borderTop: `2px solid ${BORDER}`, background: CREAM, display: 'flex', gap: 8, flexShrink: 0 }}>
-          <button onClick={onClose} style={{ flex: 1, padding: '11px', background: '#fff', border: `2px solid ${DARK}`, fontSize: 13, fontWeight: 800, color: DARK, cursor: 'pointer', fontFamily: 'inherit' }}
+          <button onClick={onClose}
+            style={{ flex: 1, padding: '11px', background: '#fff', border: `2px solid ${DARK}`, fontSize: 13, fontWeight: 800, color: DARK, cursor: 'pointer', fontFamily: 'inherit' }}
             onMouseEnter={e => e.currentTarget.style.background = CREAM}
             onMouseLeave={e => e.currentTarget.style.background = '#fff'}
           >
@@ -253,13 +351,15 @@ export default function AssignTableModal({ reservation, onClose, onAssigned }) {
             disabled={saving || !hasChanged}
             style={{ flex: 2, padding: '11px', background: DARK, border: 'none', fontSize: 13, fontWeight: 800, color: GOLD, cursor: saving || !hasChanged ? 'not-allowed' : 'pointer', opacity: saving || !hasChanged ? 0.5 : 1, fontFamily: 'inherit', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, transition: 'opacity 0.15s' }}
           >
-            {saving ? (
-              <><Loader size={14} style={{ animation: 'spin 1s linear infinite' }} />Enregistrement…</>
-            ) : selected === null ? 'Retirer la table' : (
-              <><Check size={14} strokeWidth={2.5} />Confirmer</>
-            )}
+            {saving
+              ? <><Loader size={14} style={{ animation: 'spin 1s linear infinite' }} />Enregistrement…</>
+              : selected === null
+              ? 'Retirer la table'
+              : <><Check size={14} strokeWidth={2.5} />Confirmer</>
+            }
           </button>
         </div>
+
       </div>
     </div>
   )
