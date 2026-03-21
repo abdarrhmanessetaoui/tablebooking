@@ -67,14 +67,14 @@ export const emptyTitle = {
   margin:     0,
   fontSize:   14,
   fontWeight: 900,
-  color:      'rgba(43,33,24,0.25)',
+  color:      'rgba(200,169,126,0.9)',
 }
 
 export const emptySubtitle = {
   margin:     '5px 0 0',
   fontSize:   11,
   fontWeight: 700,
-  color:      'rgba(200,169,126,0.6)',
+  color:      'rgba(200,169,126,0.9)',
 }
 
 // ── Full table wrapper ────────────────────────────────────────────
