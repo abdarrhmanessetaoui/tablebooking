@@ -13,16 +13,15 @@ export default function useTablesTimeline(initialDate = null) {
   const [loading,  setLoading]  = useState(true)
   const [error,    setError]    = useState(null)
 
-  const headers = () => ({
+  const hdrs = () => ({
     'Accept':        'application/json',
     'Authorization': `Bearer ${getToken()}`,
   })
 
-  // ── Fetch open hours + services once ──────────────────────────
   useEffect(() => {
     Promise.all([
-      fetch(`${BASE}/time-slots`,          { headers: headers() }).then(r => r.json()),
-      fetch(`${BASE}/restaurant/services`, { headers: headers() }).then(r => r.json()),
+      fetch(`${BASE}/time-slots`,          { headers: hdrs() }).then(r => r.json()),
+      fetch(`${BASE}/restaurant/services`, { headers: hdrs() }).then(r => r.json()),
     ]).then(([slots, svcs]) => {
       setAllOH(Array.isArray(slots?.allOH) ? slots.allOH : [])
       setServices(Array.isArray(svcs) ? svcs : [])
@@ -33,12 +32,12 @@ export default function useTablesTimeline(initialDate = null) {
     setLoading(true)
     setError(null)
     try {
-      const res  = await fetch(`${BASE}/tables/timeline?date=${d}`, { headers: headers() })
+      const res  = await fetch(`${BASE}/tables/timeline?date=${d}`, { headers: hdrs() })
       if (!res.ok) throw new Error(`HTTP ${res.status}`)
       const data = await res.json()
       setTimeline(Array.isArray(data) ? data : [])
     } catch {
-      setError('Impossible de charger le planning des tables.')
+      setError('Impossible de charger le planning.')
       setTimeline([])
     } finally {
       setLoading(false)
