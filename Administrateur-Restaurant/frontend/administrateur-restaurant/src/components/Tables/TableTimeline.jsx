@@ -1,8 +1,5 @@
 import { useState, useEffect, useMemo } from 'react'
-import {
-  ChevronLeft, ChevronRight, LayoutGrid,
-  Clock, CalendarDays, Utensils, Users,
-} from 'lucide-react'
+import { ChevronLeft, ChevronRight, LayoutGrid, Clock, CalendarDays, Utensils, Users } from 'lucide-react'
 import useTablesTimeline from '../../hooks/Tables/useTablesTimeline'
 import { RED } from '../../styles/dashboard/tokens'
 
@@ -105,17 +102,22 @@ function assignLanes(reservations, services) {
   })
 }
 
-// ── Tooltip ───────────────────────────────────────────────────────
+// ── Tooltip — always readable regardless of block size ────────────
 function Tooltip({ res, endTime }) {
   const sc = STATUS_BLOCK[res.status] ?? STATUS_BLOCK.Pending
   return (
     <div style={{
-      position: 'absolute', bottom: 'calc(100% + 10px)', left: '50%',
-      transform: 'translateX(-50%)',
-      background: DARK, padding: '12px 16px',
-      zIndex: 9999, pointerEvents: 'none',
-      boxShadow: '0 12px 32px rgba(0,0,0,0.5)',
-      minWidth: 200, maxWidth: 280,
+      position:   'absolute',
+      bottom:     'calc(100% + 10px)',
+      left:       '50%',
+      transform:  'translateX(-50%)',
+      background: DARK,
+      padding:    '12px 16px',
+      zIndex:     9999,
+      pointerEvents: 'none',
+      boxShadow:  '0 12px 32px rgba(0,0,0,0.5)',
+      minWidth:   210,
+      maxWidth:   280,
       fontFamily: "'Plus Jakarta Sans','DM Sans',system-ui,sans-serif",
     }}>
       <div style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '3px 9px', background: sc.bg, marginBottom: 10 }}>
@@ -124,7 +126,7 @@ function Tooltip({ res, endTime }) {
           {sc.label}
         </span>
       </div>
-      <p style={{ margin: '0 0 10px', fontSize: 14, fontWeight: 900, color: '#fff', letterSpacing: '-0.3px' }}>
+      <p style={{ margin: '0 0 10px', fontSize: 14, fontWeight: 900, color: '#fff', letterSpacing: '-0.3px', whiteSpace: 'normal', wordBreak: 'break-word' }}>
         {res.customer_name}
       </p>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
@@ -150,9 +152,7 @@ function ResBlock({ res, laneCount, laneIndex, hS, hE, services }) {
 
   const durH    = getSvcDuration(services, res.service)
   const startD  = toDecimal(res.start_time) ?? 0
-  const endDec  = res.end_time
-    ? (toDecimal(res.end_time) ?? (startD + durH))
-    : (startD + durH)
+  const endDec  = res.end_time ? (toDecimal(res.end_time) ?? (startD + durH)) : (startD + durH)
   const endTime = res.end_time || decimalToTime(endDec)
   const p       = pct(res.start_time, decimalToTime(endDec), hS, hE)
   if (!p) return null
@@ -162,6 +162,12 @@ function ResBlock({ res, laneCount, laneIndex, hS, hE, services }) {
   const topPct  = laneCount === 1
     ? 50
     : laneIndex * (100 / laneCount) + (100 / laneCount - rowPctH) / 2
+
+  // Width categories for adaptive text
+  const isVeryNarrow = p.widthNum < 3   // just a sliver — no text
+  const isNarrow     = p.widthNum < 8   // show dot indicator only
+  const isMedium     = p.widthNum < 16  // show abbreviated name
+  const isWide       = p.widthNum >= 16 // show full name + time
 
   return (
     <div
@@ -180,42 +186,70 @@ function ResBlock({ res, laneCount, laneIndex, hS, hE, services }) {
         borderRadius:  '0 4px 4px 0',
         display:       'flex',
         alignItems:    'center',
-        padding:       p.widthNum < 3 ? '0 2px' : '0 8px',
+        justifyContent: isNarrow ? 'center' : 'flex-start',
+        padding:       isVeryNarrow ? '0' : isNarrow ? '0 3px' : '0 8px',
         overflow:      'hidden',
         cursor:        'default',
         zIndex:        hov ? 50 : laneIndex + 2,
         transition:    'box-shadow 0.1s, filter 0.1s',
         boxShadow:     hov ? '0 4px 16px rgba(0,0,0,0.4)' : '0 1px 3px rgba(0,0,0,0.2)',
         filter:        hov ? 'brightness(1.08)' : 'none',
-        whiteSpace:    'nowrap',
-        gap:           5,
+        gap:           4,
       }}
     >
+      {/* Tooltip always available on hover regardless of block size */}
       {hov && <Tooltip res={res} endTime={endTime} />}
 
-      {p.widthNum > 2 && (
+      {/* Very narrow — just colored block, tooltip on hover */}
+      {isVeryNarrow && null}
+
+      {/* Narrow — show a dot so user knows something is here */}
+      {!isVeryNarrow && isNarrow && (
+        <div style={{ width: 6, height: 6, borderRadius: '50%', background: 'rgba(255,255,255,0.7)', flexShrink: 0 }} />
+      )}
+
+      {/* Medium — first name only, truncated */}
+      {!isNarrow && isMedium && (
         <span style={{
-          fontSize:     laneCount > 2 ? 9 : 11,
+          fontSize:     10,
           fontWeight:   900,
           color:        sc.text,
           overflow:     'hidden',
           textOverflow: 'ellipsis',
-          flexShrink:   1,
+          whiteSpace:   'nowrap',
           minWidth:     0,
         }}>
-          {res.customer_name}
+          {res.customer_name.split(' ')[0]}
         </span>
       )}
 
-      {p.widthNum > 12 && laneCount <= 2 && (
-        <span style={{
-          fontSize:   9,
-          fontWeight: 600,
-          color:      'rgba(255,255,255,0.65)',
-          flexShrink: 0,
-        }}>
-          {res.start_time}–{endTime}
-        </span>
+      {/* Wide — full name + time range */}
+      {isWide && (
+        <>
+          <span style={{
+            fontSize:     laneCount > 2 ? 9 : 11,
+            fontWeight:   900,
+            color:        sc.text,
+            overflow:     'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace:   'nowrap',
+            flexShrink:   1,
+            minWidth:     0,
+          }}>
+            {res.customer_name}
+          </span>
+          {p.widthNum > 22 && laneCount <= 2 && (
+            <span style={{
+              fontSize:   9,
+              fontWeight: 600,
+              color:      'rgba(255,255,255,0.65)',
+              flexShrink: 0,
+              whiteSpace: 'nowrap',
+            }}>
+              {res.start_time}–{endTime}
+            </span>
+          )}
+        </>
       )}
     </div>
   )
@@ -231,31 +265,35 @@ function TableRow({ row, isLast, hS, hE, hours, totalH, services, isToday }) {
   return (
     <div style={{
       display:             'grid',
-      gridTemplateColumns: '140px 1fr',
+      gridTemplateColumns: '130px 1fr',
       borderBottom:        isLast ? 'none' : `1px solid ${BORDER}`,
       minHeight:           rowH,
     }}>
 
       {/* Info */}
       <div style={{
-        padding:     '0 14px',
+        padding:     '0 12px',
         borderRight: `2px solid rgba(43,33,24,0.10)`,
         display:     'flex',
         alignItems:  'center',
-        gap:         9,
+        gap:         8,
         background:  hasRes ? '#fdfaf7' : '#fff',
         flexShrink:  0,
       }}>
         <div style={{
-          width:      8, height: 8, borderRadius: '50%', flexShrink: 0,
+          width: 8, height: 8, borderRadius: '50%', flexShrink: 0,
           background: hasRes ? GREEN : 'rgba(43,33,24,0.15)',
           boxShadow:  hasRes ? `0 0 0 3px ${GREEN}22` : 'none',
         }} />
-        <span style={{ fontSize: 13, fontWeight: 900, color: DARK, letterSpacing: '-0.3px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+        <span style={{
+          fontSize: 12, fontWeight: 900, color: DARK,
+          letterSpacing: '-0.3px', overflow: 'hidden',
+          textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+        }}>
           {row.table_name}
         </span>
         {hasRes && (
-          <span style={{ fontSize: 9, fontWeight: 900, padding: '2px 5px', background: DARK, color: GOLD, flexShrink: 0 }}>
+          <span style={{ fontSize: 9, fontWeight: 900, padding: '1px 5px', background: DARK, color: GOLD, flexShrink: 0 }}>
             {row.reservations.length}
           </span>
         )}
@@ -267,11 +305,9 @@ function TableRow({ row, isLast, hS, hE, hours, totalH, services, isToday }) {
         {hours.map((h, i) => (
           <div key={`bg-${h}`} style={{ position: 'absolute', left: `${(i/totalH)*100}%`, width: `${(1/totalH)*100}%`, top: 0, bottom: 0, background: i%2===0 ? 'transparent' : 'rgba(43,33,24,0.015)', pointerEvents: 'none' }} />
         ))}
-
         {hours.map((h, i) => i > 0 && (
           <div key={`gl-${h}`} style={{ position: 'absolute', left: `${(i/totalH)*100}%`, top: 0, bottom: 0, width: 1, background: 'rgba(43,33,24,0.07)', pointerEvents: 'none' }} />
         ))}
-
         {hours.map((h, i) => (
           <div key={`ht-${h}`} style={{ position: 'absolute', left: `${((i+0.5)/totalH)*100}%`, top: '60%', bottom: 0, width: 1, background: 'rgba(43,33,24,0.04)', pointerEvents: 'none' }} />
         ))}
@@ -312,28 +348,28 @@ export default function TableTimeline({ controlledDate = null }) {
   }, [controlledDate]) // eslint-disable-line
 
   const { hStart, hEnd } = useMemo(() => getOpenHours(allOH, date), [allOH, date])
-  const totalH = Math.max(1, hEnd - hStart)
-  const hours  = Array.from({ length: hEnd - hStart }, (_, i) => hStart + i)
+  const totalH   = Math.max(1, hEnd - hStart)
+  const hours    = Array.from({ length: hEnd - hStart }, (_, i) => hStart + i)
   const totalRes = timeline.reduce((s, t) => s + t.reservations.length, 0)
 
   return (
     <div style={{ fontFamily: "'Plus Jakarta Sans','DM Sans',system-ui,sans-serif" }}>
       <style>{`@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}`}</style>
 
-      {/* ── Date nav ── */}
-      <div style={{ display: 'flex', alignItems: 'stretch', marginBottom: 14, border: `2px solid ${DARK}`, overflow: 'hidden' }}>
+      {/* ── Simple date selector ── */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 14 }}>
 
         <button
           onClick={() => setDate(offsetDate(date, -1))}
-          style={{ width: 42, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#fff', border: 'none', borderRight: `2px solid ${DARK}`, cursor: 'pointer', flexShrink: 0 }}
+          style={{ width: 34, height: 34, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#fff', border: `2px solid ${DARK}`, cursor: 'pointer', flexShrink: 0 }}
           onMouseEnter={e => e.currentTarget.style.background = CREAM}
           onMouseLeave={e => e.currentTarget.style.background = '#fff'}
         >
-          <ChevronLeft size={17} strokeWidth={2.5} color={DARK} />
+          <ChevronLeft size={16} strokeWidth={2.5} color={DARK} />
         </button>
 
-        <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 10, padding: '10px 16px', background: DARK, minWidth: 0 }}>
-          <CalendarDays size={13} color={GOLD} strokeWidth={2.5} style={{ flexShrink: 0 }} />
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '7px 14px', background: DARK, flex: 1, minWidth: 0 }}>
+          <CalendarDays size={12} color={GOLD} strokeWidth={2.5} style={{ flexShrink: 0 }} />
           <span style={{ fontSize: 13, fontWeight: 900, color: '#fff', textTransform: 'capitalize', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
             {formatDateLong(date)}
           </span>
@@ -341,23 +377,23 @@ export default function TableTimeline({ controlledDate = null }) {
 
         <button
           onClick={() => setDate(offsetDate(date, 1))}
-          style={{ width: 42, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#fff', border: 'none', borderLeft: `2px solid ${DARK}`, cursor: 'pointer', flexShrink: 0 }}
+          style={{ width: 34, height: 34, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#fff', border: `2px solid ${DARK}`, cursor: 'pointer', flexShrink: 0 }}
           onMouseEnter={e => e.currentTarget.style.background = CREAM}
           onMouseLeave={e => e.currentTarget.style.background = '#fff'}
         >
-          <ChevronRight size={17} strokeWidth={2.5} color={DARK} />
+          <ChevronRight size={16} strokeWidth={2.5} color={DARK} />
         </button>
 
         <input
           type="date" value={date}
           onChange={e => { if (e.target.value) setDate(e.target.value) }}
-          style={{ padding: '0 10px', border: 'none', borderLeft: `2px solid ${DARK}`, fontSize: 12, fontWeight: 700, color: DARK, fontFamily: 'inherit', background: CREAM, cursor: 'pointer', outline: 'none', width: 126, flexShrink: 0 }}
+          style={{ height: 34, padding: '0 10px', border: `2px solid ${DARK}`, fontSize: 12, fontWeight: 700, color: DARK, fontFamily: 'inherit', background: CREAM, cursor: 'pointer', outline: 'none', flexShrink: 0 }}
         />
 
         {!isToday && (
           <button
             onClick={() => setDate(today)}
-            style={{ padding: '0 14px', background: GOLD, border: 'none', borderLeft: `2px solid ${DARK}`, fontSize: 11, fontWeight: 900, color: DARK, cursor: 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap', flexShrink: 0 }}
+            style={{ height: 34, padding: '0 12px', background: GOLD, border: 'none', fontSize: 11, fontWeight: 900, color: DARK, cursor: 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap', flexShrink: 0 }}
             onMouseEnter={e => e.currentTarget.style.background = GOLD_DARK}
             onMouseLeave={e => e.currentTarget.style.background = GOLD}
           >
@@ -377,12 +413,12 @@ export default function TableTimeline({ controlledDate = null }) {
       <div style={{ border: `2px solid ${DARK}`, overflow: 'hidden' }}>
 
         {/* Hour header */}
-        <div style={{ display: 'grid', gridTemplateColumns: '140px 1fr', background: DARK }}>
-          <div style={{ padding: '10px 14px', borderRight: `2px solid rgba(200,169,126,0.15)`, display: 'flex', alignItems: 'center', gap: 8 }}>
-            <LayoutGrid size={11} color={GOLD} strokeWidth={2.5} />
+        <div style={{ display: 'grid', gridTemplateColumns: '130px 1fr', background: DARK }}>
+          <div style={{ padding: '9px 12px', borderRight: `2px solid rgba(200,169,126,0.15)`, display: 'flex', alignItems: 'center', gap: 7 }}>
+            <LayoutGrid size={10} color={GOLD} strokeWidth={2.5} />
             <span style={{ fontSize: 9, fontWeight: 900, color: GOLD, letterSpacing: '0.2em', textTransform: 'uppercase' }}>Table</span>
           </div>
-          <div style={{ position: 'relative', height: 36, overflowX: 'hidden' }}>
+          <div style={{ position: 'relative', height: 34, overflowX: 'hidden' }}>
             {hours.map((h, i) => {
               const isNow = isToday && new Date().getHours() === h
               return (
@@ -417,7 +453,7 @@ export default function TableTimeline({ controlledDate = null }) {
         {!loading && timeline.length > 0 && totalRes === 0 && (
           <>
             <div style={{ padding: '14px 20px', background: '#fdf6ec', borderBottom: `1px solid rgba(200,169,126,0.2)`, display: 'flex', alignItems: 'center', gap: 12 }}>
-              <CalendarDays size={18} color={GOLD_DARK} strokeWidth={2} style={{ flexShrink: 0 }} />
+              <CalendarDays size={16} color={GOLD_DARK} strokeWidth={2} style={{ flexShrink: 0 }} />
               <div>
                 <p style={{ margin: 0, fontSize: 13, fontWeight: 900, color: DARK }}>
                   Aucune réservation {isToday ? "aujourd'hui" : `le ${formatDateShort(date)}`}
@@ -433,7 +469,7 @@ export default function TableTimeline({ controlledDate = null }) {
           </>
         )}
 
-        {/* Rows with reservations */}
+        {/* Normal rows */}
         {!loading && timeline.length > 0 && totalRes > 0 && timeline.map((row, i) => (
           <TableRow key={row.table_id} row={row} isLast={i===timeline.length-1} hS={hStart} hE={hEnd} hours={hours} totalH={totalH} services={services} isToday={isToday} />
         ))}
