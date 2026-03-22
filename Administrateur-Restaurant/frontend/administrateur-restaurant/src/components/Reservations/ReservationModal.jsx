@@ -38,13 +38,13 @@ function generateSlotsFromOH(oh, durationMin = 30) {
   for (let t = start; t + dur <= end; t += dur) {
     const hh = Math.floor(t / 60)
     const mm = t % 60
-    slots.push(`${String(hh).padStart(2,'0')}:${String(mm).padStart(2,'0')}`)
+    slots.push(`${String(hh).padStart(2,'00')}:${String(mm).padStart(2,'00')}`)
   }
   return slots
 }
 
 // ── Mini Calendar ──────────────────────────────────────────────────
-// disabledDays uses JS convention: 0=Sun, 1=Mon...6=Sat
+// disabledDays: JS convention 0=Sun..6=Sat
 function Calendar({ value, onChange, blockedDates, disabledDays = [] }) {
   const today = new Date(); today.setHours(0,0,0,0)
   const init  = value ? new Date(value + 'T00:00:00') : today
@@ -68,7 +68,7 @@ function Calendar({ value, onChange, blockedDates, disabledDays = [] }) {
   function pick(day) {
     const iso   = toISO(cur.y, cur.m, day)
     const dt    = new Date(iso + 'T00:00:00')
-    const jsDay = dt.getDay() // 0=Sun..6=Sat — same convention as disabledDays
+    const jsDay = dt.getDay() // 0=Sun..6=Sat
     if (dt < today) return
     if (blockedDates.includes(iso)) return
     if (disabledDays.includes(jsDay)) return
@@ -100,10 +100,10 @@ function Calendar({ value, onChange, blockedDates, disabledDays = [] }) {
           if (!day) return <div key={`e${i}`} />
           const iso    = toISO(cur.y, cur.m, day)
           const dt     = new Date(iso + 'T00:00:00')
-          const jsDay  = dt.getDay() // 0=Sun..6=Sat
+          const jsDay  = dt.getDay()
           const isPast = dt < today
           const isBlk  = blockedDates.includes(iso)
-          const isOff  = disabledDays.includes(jsDay)   // ← FIX: jsDay, not appDay
+          const isOff  = disabledDays.includes(jsDay)
           const isSel  = iso === value
           const isTdy  = iso === todayISO
           const disabled = isPast || isBlk || isOff
@@ -141,7 +141,7 @@ function Calendar({ value, onChange, blockedDates, disabledDays = [] }) {
   )
 }
 
-// ── Time Slot picker ───────────────────────────────────────────────
+// ── Time slot picker ───────────────────────────────────────────────
 function TimeSlots({ value, onChange, slots }) {
   if (!slots.length) return (
     <div style={{ padding:'12px 14px', background:'#fdf6ec', borderLeft:`3px solid ${GOLD}`, fontSize:12, fontWeight:700, color:GOLD_DARK, display:'flex', alignItems:'center', gap:8 }}>
@@ -156,10 +156,13 @@ function TimeSlots({ value, onChange, slots }) {
         return (
           <button key={slot} onClick={() => onChange(slot)}
             style={{
-              padding:'7px 13px', background: active ? DARK : GOLD,
+              padding:'7px 13px',
+              background: active ? DARK : GOLD,
               border: 'none', borderRadius: 999,
-              fontSize:12, fontWeight:800, color: active ? GOLD : DARK,
-              cursor:'pointer', transition:'background 0.15s, color 0.15s',
+              fontSize:12, fontWeight:800,
+              color: active ? GOLD : DARK,
+              cursor:'pointer',
+              transition:'background 0.15s, color 0.15s',
             }}
           >
             {slot}
@@ -170,7 +173,7 @@ function TimeSlots({ value, onChange, slots }) {
   )
 }
 
-// ── Info row (view mode) ───────────────────────────────────────────
+// ── Info row ───────────────────────────────────────────────────────
 function InfoRow({ icon:Icon, label, value }) {
   if (!value) return null
   return (
@@ -187,7 +190,11 @@ function InfoRow({ icon:Icon, label, value }) {
 }
 
 function Label({ text }) {
-  return <p style={{ margin:'0 0 8px', fontSize:11, fontWeight:900, color:DARK, letterSpacing:'0.12em', textTransform:'uppercase' }}>{text}</p>
+  return (
+    <p style={{ margin:'0 0 8px', fontSize:11, fontWeight:900, color:DARK, letterSpacing:'0.12em', textTransform:'uppercase' }}>
+      {text}
+    </p>
+  )
 }
 
 function TextInput({ label, value, onChange, type='text', required }) {
@@ -218,7 +225,7 @@ export default function ReservationModal({
 
   const close = () => { setModalMode(null); setStep(1) }
 
-  // ── Fetch services + time-slots + blocked dates ────────────────
+  // ── Fetch data ─────────────────────────────────────────────────
   useEffect(() => {
     const h = { 'Authorization': `Bearer ${getToken()}`, 'Accept': 'application/json' }
     Promise.all([
@@ -233,37 +240,38 @@ export default function ReservationModal({
     }).catch(() => {})
   }, [])
 
-  // ── Disabled days — JS convention (0=Sun..6=Sat) ──────────────
-  // This is the convention used by available_days, working_dates, and openhours
-  const disabledDays = useMemo(() => {
-    const svc       = services.find(s => s.name === form.service)
-    const availDays = svc?.available_days ?? [0,1,2,3,4,5,6] // JS: 0=Sun..6=Sat
+  // ── Selected service ───────────────────────────────────────────
+  const selectedSvc = useMemo(
+    () => services.find(s => s.name === form.service) ?? null,
+    [form.service, services]
+  )
 
+  // ── Guest limit from service capacity ─────────────────────────
+  const maxGuests = selectedSvc?.capacity
+    ? parseInt(selectedSvc.capacity)
+    : 15
+
+  // ── Disabled days — JS convention 0=Sun..6=Sat ────────────────
+  const disabledDays = useMemo(() => {
+    const availDays = selectedSvc?.available_days ?? [0,1,2,3,4,5,6]
     return [0,1,2,3,4,5,6].filter(jsDay => {
-      const isWorking = workingDates[jsDay] ?? true // working_dates: JS convention ✓
-      const inService = availDays.includes(jsDay)   // available_days: JS convention ✓
+      const isWorking = workingDates[jsDay] ?? true
+      const inService = availDays.includes(jsDay)
       return !inService || !isWorking
     })
-  }, [form.service, services, workingDates])
+  }, [selectedSvc, workingDates])
 
-  // ── Time slots — use jsDay to index openhours ─────────────────
-  // openhours[0]=Sun, openhours[1]=Mon... (JS convention, same as PHP range(0,6))
+  // ── Time slots — jsDay indexes openhours directly ─────────────
   const timeSlots = useMemo(() => {
-    if (!form.date || !form.service) return []
-    const svc = services.find(s => s.name === form.service)
-    if (!svc) return []
-
-    const jsDay   = new Date(form.date + 'T00:00:00').getDay() // 0=Sun..6=Sat ← KEY FIX
-    const ohIndex = svc.ohindex ?? 0
+    if (!form.date || !selectedSvc) return []
+    const jsDay   = new Date(form.date + 'T00:00:00').getDay() // 0=Sun..6=Sat
+    const ohIndex = selectedSvc.ohindex ?? 0
     const oh      = allOH[ohIndex]
     if (!oh) return []
-
-    // ← FIX: use jsDay directly — openhours uses same JS convention
     const daySlot = oh.openhours?.[jsDay] ?? oh.openhours?.[0]
     if (!daySlot) return []
-
-    return generateSlotsFromOH(daySlot, svc.duration ?? 30)
-  }, [form.date, form.service, services, allOH])
+    return generateSlotsFromOH(daySlot, selectedSvc.duration ?? 30)
+  }, [form.date, selectedSvc, allOH])
 
   // Reset start_time when slot no longer valid
   useEffect(() => {
@@ -272,7 +280,24 @@ export default function ReservationModal({
     }
   }, [timeSlots]) // eslint-disable-line
 
+  // Reset guests if over new service cap
+  useEffect(() => {
+    if (form.guests && parseInt(form.guests) > maxGuests) {
+      setForm(f => ({ ...f, guests: '' }))
+    }
+  }, [maxGuests]) // eslint-disable-line
+
   const titles = { view:'Détail', edit:'Modifier le statut', create:'Nouvelle réservation' }
+
+  // ── Available days label ───────────────────────────────────────
+  const openDaysLabel = useMemo(() => {
+    if (!selectedSvc) return ''
+    const days = ['Dim','Lun','Mar','Mer','Jeu','Ven','Sam']
+    const avail = (selectedSvc.available_days ?? [0,1,2,3,4,5,6])
+      .filter(d => workingDates[d] !== false)
+      .map(d => days[d])
+    return avail.join(' · ')
+  }, [selectedSvc, workingDates])
 
   return createPortal(
     <div style={{
@@ -290,11 +315,11 @@ export default function ReservationModal({
         boxShadow:'0 24px 64px rgba(43,33,24,0.35)',
       }}>
 
-        {/* Header */}
+        {/* ── Header ── */}
         <div style={{ background:DARK, padding:'20px 26px', display:'flex', alignItems:'center', justifyContent:'space-between', flexShrink:0 }}>
           <div>
             <p style={{ margin:0, fontSize:10, fontWeight:700, color:GOLD, letterSpacing:'0.16em', textTransform:'uppercase' }}>
-              {titles[modalMode]}{modalMode === 'create' && ` — Étape ${step}/3`}
+              {titles[modalMode]}{modalMode==='create' && ` — Étape ${step}/3`}
             </p>
             <h2 style={{ margin:'3px 0 0', fontSize:18, fontWeight:900, color:'#fff', letterSpacing:'-0.5px' }}>
               {modalMode === 'create'
@@ -308,7 +333,7 @@ export default function ReservationModal({
           </button>
         </div>
 
-        {/* Progress bar */}
+        {/* ── Progress bar ── */}
         {modalMode === 'create' && (
           <div style={{ display:'flex', height:3 }}>
             {[1,2,3].map(s => (
@@ -333,7 +358,7 @@ export default function ReservationModal({
                 <InfoRow icon={FileText}     label="Notes"    value={editing.notes}      />
               </div>
               {editing.status && (() => {
-                const s = STATUS_CONFIG[editing.status] || { bg:'#f5f5f5', color:'#888', label: editing.status }
+                const s = STATUS_CONFIG[editing.status] || { bg:'#f5f5f5', color:'#888', label:editing.status }
                 return (
                   <div style={{ padding:'10px 16px', background:s.bg, display:'inline-flex' }}>
                     <span style={{ fontSize:12, fontWeight:900, color:s.color }}>{s.label}</span>
@@ -393,13 +418,15 @@ export default function ReservationModal({
             </>
           )}
 
-          {/* ── CREATE STEP 1 ── */}
+          {/* ── CREATE STEP 1: Service + Guests ── */}
           {modalMode === 'create' && step === 1 && (
             <>
+              {/* Service selector */}
               <div>
                 <Label text="Nos Formules" />
-                <select value={form.service ?? ''}
-                  onChange={e => setForm({...form, service:e.target.value, date:'', start_time:''})}
+                <select
+                  value={form.service ?? ''}
+                  onChange={e => setForm({...form, service:e.target.value, date:'', start_time:'', guests:''})}
                   style={{ ...inputStyle, appearance:'none', cursor:'pointer', fontSize:15 }}
                   onFocus={e => e.target.style.borderColor = GOLD}
                   onBlur={e => e.target.style.borderColor = '#e8e0d8'}
@@ -413,45 +440,59 @@ export default function ReservationModal({
                 </select>
               </div>
 
+              {/* Service info card */}
+              {selectedSvc && (
+                <div style={{ padding:'12px 14px', background:'#faf8f5', borderLeft:`3px solid ${GOLD}`, display:'flex', flexDirection:'column', gap:8 }}>
+                  <div style={{ display:'flex', alignItems:'center', gap:7 }}>
+                    <Clock size={12} color={GOLD_DARK} strokeWidth={2.5} />
+                    <span style={{ fontSize:12, fontWeight:700, color:DARK }}>
+                      Durée : <strong>{selectedSvc.duration} min</strong>
+                    </span>
+                  </div>
+                  <div style={{ display:'flex', alignItems:'center', gap:7 }}>
+                    <Users size={12} color={GOLD_DARK} strokeWidth={2.5} />
+                    <span style={{ fontSize:12, fontWeight:700, color:DARK }}>
+                      Capacité max : <strong>{selectedSvc.capacity} personne{selectedSvc.capacity>1?'s':''}</strong>
+                    </span>
+                  </div>
+                  {openDaysLabel && (
+                    <div style={{ display:'flex', alignItems:'center', gap:7 }}>
+                      <CalendarDays size={12} color={GOLD_DARK} strokeWidth={2.5} />
+                      <span style={{ fontSize:12, fontWeight:700, color:GOLD_DARK }}>
+                        {openDaysLabel}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Guests — limited by service capacity */}
               <div>
                 <Label text="Nombre de personnes" />
-                <select value={form.guests ?? ''}
+                <select
+                  value={form.guests ?? ''}
                   onChange={e => setForm({...form, guests:e.target.value})}
                   style={{ ...inputStyle, appearance:'none', cursor:'pointer', fontSize:15 }}
                   onFocus={e => e.target.style.borderColor = GOLD}
                   onBlur={e => e.target.style.borderColor = '#e8e0d8'}
                 >
                   <option value="">— Choisir —</option>
-                  {[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15].map(n => (
+                  {Array.from({ length: maxGuests }, (_, i) => i + 1).map(n => (
                     <option key={n} value={n}>{n} personne{n>1?'s':''}</option>
                   ))}
                 </select>
+                {selectedSvc?.capacity && (
+                  <p style={{ margin:'5px 0 0', fontSize:11, fontWeight:700, color:'rgba(43,33,24,0.4)', display:'flex', alignItems:'center', gap:5 }}>
+                    <Users size={10} strokeWidth={2.5} />
+                    Maximum {selectedSvc.capacity} personne{selectedSvc.capacity>1?'s':''} pour ce service
+                  </p>
+                )}
               </div>
-
-              {/* Show service hours info */}
-              {form.service && (() => {
-                const svc = services.find(s => s.name === form.service)
-                if (!svc) return null
-                const oh = allOH[svc.ohindex ?? 0]
-                if (!oh) return null
-                const days = ['Dim','Lun','Mar','Mer','Jeu','Ven','Sam']
-                // available days in JS convention
-                const availJsDays = svc.available_days ?? [0,1,2,3,4,5,6]
-                const openDays = availJsDays
-                  .filter(d => workingDates[d] !== false)
-                  .map(d => days[d])
-                  .join(', ')
-                return (
-                  <div style={{ padding:'10px 14px', background:'#faf8f5', borderLeft:`3px solid ${GOLD}`, fontSize:12, fontWeight:700, color:DARK }}>
-                    <div>⏱ Durée : {svc.duration} min</div>
-                    {openDays && <div style={{ marginTop:4, color:GOLD_DARK }}>📅 Disponible : {openDays}</div>}
-                  </div>
-                )
-              })()}
 
               <button
                 onClick={() => {
-                  if (!form.guests) { alert('Veuillez choisir le nombre de personnes.'); return }
+                  if (!form.service) { alert('Veuillez choisir une formule.'); return }
+                  if (!form.guests)  { alert('Veuillez choisir le nombre de personnes.'); return }
                   setStep(2)
                 }}
                 style={{ padding:'14px', background:GOLD, border:'none', fontSize:14, fontWeight:900, color:DARK, cursor:'pointer' }}
@@ -463,7 +504,7 @@ export default function ReservationModal({
             </>
           )}
 
-          {/* ── CREATE STEP 2 ── */}
+          {/* ── CREATE STEP 2: Date + Time ── */}
           {modalMode === 'create' && step === 2 && (
             <>
               {!form.service && (
@@ -490,8 +531,9 @@ export default function ReservationModal({
                         slots={timeSlots}
                       />
                       {timeSlots.length > 0 && (
-                        <p style={{ margin:'8px 0 0', fontSize:11, fontWeight:600, color:'rgba(43,33,24,0.4)' }}>
-                          {timeSlots.length} créneaux disponibles · intervalles de {services.find(s=>s.name===form.service)?.duration ?? 30} min
+                        <p style={{ margin:'8px 0 0', fontSize:11, fontWeight:600, color:'rgba(43,33,24,0.4)', display:'flex', alignItems:'center', gap:5 }}>
+                          <Clock size={10} strokeWidth={2.5} />
+                          {timeSlots.length} créneaux · intervalles de {selectedSvc?.duration ?? 30} min
                         </p>
                       )}
                     </>
@@ -523,9 +565,10 @@ export default function ReservationModal({
             </>
           )}
 
-          {/* ── CREATE STEP 3 ── */}
+          {/* ── CREATE STEP 3: Contact ── */}
           {modalMode === 'create' && step === 3 && (
             <>
+              {/* Summary */}
               <div style={{ background:'#faf8f5', padding:'14px 18px', display:'flex', flexDirection:'column', gap:8, borderLeft:`3px solid ${GOLD}` }}>
                 {[
                   ['Service',  form.service   || '—'],
@@ -548,7 +591,8 @@ export default function ReservationModal({
 
               <div>
                 <Label text="Demande spéciale (optionnel)" />
-                <textarea value={form.notes ?? ''} onChange={e => setForm({...form, notes:e.target.value})}
+                <textarea
+                  value={form.notes ?? ''} onChange={e => setForm({...form, notes:e.target.value})}
                   rows={2} style={{ ...inputStyle, resize:'vertical' }}
                   onFocus={e => e.target.style.borderColor = GOLD}
                   onBlur={e => e.target.style.borderColor = '#e8e0d8'}
