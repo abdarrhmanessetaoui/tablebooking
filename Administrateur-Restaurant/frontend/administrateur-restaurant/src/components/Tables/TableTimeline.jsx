@@ -317,9 +317,7 @@ export default function TableTimeline({ controlledDate = null }) {
     if (controlledDate && controlledDate !== date) setDate(controlledDate)
   }, [controlledDate]) // eslint-disable-line
 
-  const occupied = timeline.filter(t => t.reservations.length > 0).length
-  const free     = timeline.length - occupied
-  const totalRes = timeline.reduce((s, t) => s + t.reservations.length, 0)
+
 
   const { hStart, hEnd } = useMemo(() => getOpenHours(allOH, date), [allOH, date])
   const totalH = Math.max(1, hEnd - hStart)
@@ -346,23 +344,6 @@ export default function TableTimeline({ controlledDate = null }) {
           <span style={{ fontSize: 13, fontWeight: 900, color: '#fff', textTransform: 'capitalize', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
             {formatDateLong(date)}
           </span>
-          {!loading && timeline.length > 0 && (
-            <div style={{ display: 'flex', gap: 5, flexShrink: 0 }}>
-              {occupied > 0 && (
-                <span style={{ padding: '3px 8px', background: GREEN, fontSize: 10, fontWeight: 900, color: '#fff' }}>
-                  {occupied} occupée{occupied > 1 ? 's' : ''}
-                </span>
-              )}
-              <span style={{ padding: '3px 8px', background: 'rgba(255,255,255,0.1)', fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.6)' }}>
-                {free} libre{free > 1 ? 's' : ''}
-              </span>
-              {totalRes > 0 && (
-                <span style={{ padding: '3px 8px', background: 'rgba(200,169,126,0.25)', fontSize: 10, fontWeight: 900, color: GOLD }}>
-                  {totalRes} résa
-                </span>
-              )}
-            </div>
-          )}
         </div>
 
         <button
