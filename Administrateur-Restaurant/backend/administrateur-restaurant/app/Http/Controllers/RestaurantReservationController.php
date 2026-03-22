@@ -516,39 +516,39 @@ public function busyTables(Request $request)
     public function timeline(Request $request)
     {
         $date = $request->query('date', now()->toDateString());
-
+    
         if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)) {
             $date = now()->toDateString();
         }
-
-        // Load tables from form_structure JSON
+    
         $form = DB::table('wpjn_cpappbk_forms')->where('id', $this->formId())->first();
         if (!$form) return response()->json([]);
-
+    
         $structure = json_decode($form->form_structure, true);
         $tables    = [];
-
+    
         foreach ($structure[0] ?? [] as $field) {
             if (($field['ftype'] ?? '') === 'fapp') {
                 $tables = $field['tables'] ?? [];
                 break;
             }
         }
-
-        // Only active tables
+    
         $tables = collect($tables)->filter(fn($t) => $t['active'] ?? true)->values();
-
-        // Load reservations for this date that have a table assigned
+    
         $messages = WpMessage::where('formid', $this->formId())
             ->whereNotNull('table_idx')
             ->get()
             ->map(fn($m) => $m->toCleanArray())
-            ->filter(fn($r) => $r['date'] === $date && in_array($r['status'], ['Confirmed', 'Pending']))
+            ->filter(fn($r) =>
+                $r['date'] === $date &&
+                in_array($r['status'], ['Confirmed', 'Pending'])
+            )
             ->groupBy('table_idx');
-
+    
         $timeline = $tables->map(function ($table) use ($messages) {
             $tableReservations = $messages->get($table['idx'], collect());
-
+    
             return [
                 'table_id'     => $table['idx'],
                 'table_name'   => 'Table ' . $table['number'],
@@ -561,10 +561,12 @@ public function busyTables(Request $request)
                     'customer_name' => $r['name'],
                     'guests'        => (int) $r['guests'],
                     'status'        => $r['status'],
+                    'service'       => $r['service'] ?? '',  // ← ADD THIS
+                    'phone'         => $r['phone']   ?? '',  // ← ADD THIS
                 ])->values(),
             ];
         });
-
+    
         return response()->json($timeline->values());
     }
 }

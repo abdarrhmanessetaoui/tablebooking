@@ -1,7 +1,7 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useCallback } from 'react'
 import {
   ChevronLeft, ChevronRight, LayoutGrid,
-  Users, MapPin, Clock, CalendarDays,
+  Users, MapPin, Clock, CalendarDays, Utensils,
 } from 'lucide-react'
 import useTablesTimeline from '../../hooks/Tables/useTablesTimeline'
 import { GREEN, RED } from '../../styles/dashboard/tokens'
@@ -13,8 +13,8 @@ const CREAM     = '#faf8f5'
 const BORDER    = 'rgba(43,33,24,0.10)'
 
 const STATUS_BLOCK = {
-  Confirmed: { bg: '#16A34A', border: '#bbf7d0', text: '#fff' },
-  Pending:   { bg: '#b45309', border: '#fde68a', text: '#fff' },
+  Confirmed: { bg: '#16A34A', border: '#bbf7d0', text: '#fff', label: 'Confirmée'  },
+  Pending:   { bg: '#b45309', border: '#fde68a', text: '#fff', label: 'En attente' },
 }
 
 const LOC_COLORS = {
@@ -32,15 +32,22 @@ function toDecimal(time) {
 }
 
 function decimalToTime(dec) {
-  const h  = Math.floor(dec)
-  const m  = Math.round((dec - h) * 60)
-  return `${String(h % 24).padStart(2,'0')}:${String(m).padStart(2,'0')}`
+  const h = Math.floor(dec % 24)
+  const m = Math.round((dec - Math.floor(dec)) * 60)
+  return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`
 }
 
 function formatDate(iso) {
   if (!iso) return ''
   return new Date(iso + 'T00:00:00').toLocaleDateString('fr-FR', {
-    weekday: 'long', day: 'numeric', month: 'long',
+    weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
+  })
+}
+
+function formatDateShort(iso) {
+  if (!iso) return ''
+  return new Date(iso + 'T00:00:00').toLocaleDateString('fr-FR', {
+    weekday: 'short', day: 'numeric', month: 'short',
   })
 }
 
@@ -50,42 +57,34 @@ function offsetDate(iso, days) {
   return d.toISOString().slice(0, 10)
 }
 
-// ── Compute open hour range from allOH for given date ─────────────
 function getOpenHoursForDate(allOH, dateISO) {
   if (!allOH?.length || !dateISO) return { hStart: 11, hEnd: 23 }
-
   const dt     = new Date(dateISO + 'T00:00:00')
   const jsDay  = dt.getDay()
-  const appDay = jsDay === 0 ? 6 : jsDay - 1  // Mon=0..Sun=6
-
+  const appDay = jsDay === 0 ? 6 : jsDay - 1
   let minStart = Infinity
   let maxEnd   = -Infinity
-
   allOH.forEach(oh => {
-    const slot = oh.openhours?.[appDay] ?? oh.openhours?.[0]
+    const slot  = oh.openhours?.[appDay] ?? oh.openhours?.[0]
     if (!slot) return
     const start = parseInt(slot.h1 ?? 11) + parseInt(slot.m1 ?? 0) / 60
     const end   = parseInt(slot.h2 ?? 23) + parseInt(slot.m2 ?? 0) / 60
     if (start < minStart) minStart = start
     if (end   > maxEnd)   maxEnd   = end
   })
-
   if (!isFinite(minStart)) return { hStart: 11, hEnd: 23 }
-
   return {
     hStart: Math.max(0,  Math.floor(minStart)),
     hEnd:   Math.min(24, Math.ceil(maxEnd)),
   }
 }
 
-// ── Get service duration in decimal hours ─────────────────────────
 function getServiceDurationH(services, serviceName) {
   const svc = services.find(s => s.name === serviceName)
   if (!svc?.duration) return 1.5
   return Math.max(0.25, parseInt(svc.duration) / 60)
 }
 
-// ── Block position as % within timeline ───────────────────────────
 function blockPct(startTime, endTime, hStart, hEnd) {
   const start  = toDecimal(startTime)
   if (start === null) return null
@@ -93,25 +92,24 @@ function blockPct(startTime, endTime, hStart, hEnd) {
   const totalH = hEnd - hStart
   if (totalH <= 0) return null
   const left   = ((start - hStart) / totalH) * 100
-  const width  = ((end   - start)  / totalH) * 100
+  const width  = ((end - start)    / totalH) * 100
   return {
-    left:  `${Math.max(0, Math.min(left,  100)).toFixed(3)}%`,
-    width: `${Math.max(0.5, Math.min(width, 100 - Math.max(0, parseFloat(left)))).toFixed(3)}%`,
+    left:  `${Math.max(0, left).toFixed(3)}%`,
+    width: `${Math.max(0.5, Math.min(width, 100 - Math.max(0, left))).toFixed(3)}%`,
+    widthNum: width,
   }
 }
 
-// ── Lane assignment (greedy) ──────────────────────────────────────
 function assignLanes(reservations, services) {
   const sorted = [...reservations].sort(
     (a, b) => (toDecimal(a.start_time) ?? 0) - (toDecimal(b.start_time) ?? 0)
   )
   const laneEnds = []
-
   return sorted.map(res => {
-    const start  = toDecimal(res.start_time) ?? 0
-    const durH   = getServiceDurationH(services, res.service)
-    const end    = toDecimal(res.end_time) ?? (start + durH)
-    let   lane   = laneEnds.findIndex(e => e <= start + 0.01)
+    const start = toDecimal(res.start_time) ?? 0
+    const durH  = getServiceDurationH(services, res.service)
+    const end   = toDecimal(res.end_time) ?? (start + durH)
+    let   lane  = laneEnds.findIndex(e => e <= start + 0.01)
     if (lane === -1) lane = laneEnds.length
     laneEnds[lane] = end
     return { ...res, _end: end, lane }
@@ -120,44 +118,73 @@ function assignLanes(reservations, services) {
 
 // ── Tooltip ───────────────────────────────────────────────────────
 function Tooltip({ res, endTime }) {
+  const scheme = STATUS_BLOCK[res.status] ?? STATUS_BLOCK.Pending
   return (
     <div style={{
       position:      'absolute',
-      bottom:        'calc(100% + 6px)',
+      bottom:        'calc(100% + 8px)',
       left:          '50%',
       transform:     'translateX(-50%)',
       background:    DARK,
-      color:         '#fff',
-      padding:       '8px 12px',
-      fontSize:      11,
-      fontWeight:    700,
-      whiteSpace:    'nowrap',
-      zIndex:        100,
+      padding:       '10px 14px',
+      zIndex:        200,
       pointerEvents: 'none',
-      boxShadow:     '0 4px 16px rgba(0,0,0,0.4)',
-      lineHeight:    1.6,
+      boxShadow:     '0 8px 24px rgba(0,0,0,0.4)',
+      minWidth:      180,
+      maxWidth:      260,
     }}>
-      <div style={{ fontWeight: 900, fontSize: 12, color: GOLD, marginBottom: 3 }}>
+      {/* Status badge */}
+      <div style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '2px 8px', background: scheme.bg, marginBottom: 8 }}>
+        <span style={{ width: 5, height: 5, borderRadius: '50%', background: scheme.border }} />
+        <span style={{ fontSize: 9, fontWeight: 900, color: scheme.text, letterSpacing: '0.12em', textTransform: 'uppercase' }}>
+          {scheme.label}
+        </span>
+      </div>
+
+      {/* Name */}
+      <div style={{ fontSize: 13, fontWeight: 900, color: '#fff', letterSpacing: '-0.3px', marginBottom: 8 }}>
         {res.customer_name}
       </div>
-      <div style={{ opacity: 0.75 }}>
-        🕐 {res.start_time}{endTime ? ` – ${endTime}` : ''}
-      </div>
-      <div style={{ opacity: 0.75 }}>
-        👥 {res.guests} pers.
-      </div>
-      {res.service && (
-        <div style={{ opacity: 0.75 }}>
-          🍽 {res.service}
+
+      {/* Details */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
+          <Clock size={10} color={GOLD} strokeWidth={2.5} />
+          <span style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.8)' }}>
+            {res.start_time}{endTime ? ` – ${endTime}` : ''}
+          </span>
         </div>
-      )}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
+          <Users size={10} color={GOLD} strokeWidth={2.5} />
+          <span style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.8)' }}>
+            {res.guests} personne{res.guests > 1 ? 's' : ''}
+          </span>
+        </div>
+        {res.service && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
+            <Utensils size={10} color={GOLD} strokeWidth={2.5} />
+            <span style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.8)' }}>
+              {res.service}
+            </span>
+          </div>
+        )}
+        {res.phone && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
+            <span style={{ fontSize: 10, color: GOLD }}>📞</span>
+            <span style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.8)' }}>
+              {res.phone}
+            </span>
+          </div>
+        )}
+      </div>
+
+      {/* Arrow */}
       <div style={{
         position:    'absolute',
         bottom:      -5,
         left:        '50%',
         transform:   'translateX(-50%)',
-        width:       0,
-        height:      0,
+        width: 0, height: 0,
         borderLeft:  '5px solid transparent',
         borderRight: '5px solid transparent',
         borderTop:   `5px solid ${DARK}`,
@@ -170,16 +197,20 @@ function Tooltip({ res, endTime }) {
 function ResBlock({ res, laneCount, laneIndex, hStart, hEnd, services }) {
   const [hov, setHov] = useState(false)
 
-  const durH   = getServiceDurationH(services, res.service)
-  const endDec = toDecimal(res.end_time) ?? ((toDecimal(res.start_time) ?? 0) + durH)
+  const durH    = getServiceDurationH(services, res.service)
+  const startD  = toDecimal(res.start_time) ?? 0
+  const endDec  = toDecimal(res.end_time) ?? (startD + durH)
   const endTime = res.end_time ?? decimalToTime(endDec)
-
-  const pos    = blockPct(res.start_time, endTime, hStart, hEnd)
+  const pos     = blockPct(res.start_time, endTime, hStart, hEnd)
   if (!pos) return null
 
-  const scheme  = STATUS_BLOCK[res.status] ?? STATUS_BLOCK.Pending
-  const pctH    = Math.floor(90 / laneCount)
-  const topPct  = laneCount === 1 ? 50 : (laneIndex / laneCount) * 100 + (100 / laneCount - pctH) / 2
+  const scheme   = STATUS_BLOCK[res.status] ?? STATUS_BLOCK.Pending
+  const pctH     = Math.floor(88 / laneCount)
+  const topPct   = laneCount === 1
+    ? 50
+    : (laneIndex / laneCount) * 100 + (100 / laneCount - pctH) / 2
+  const isWide   = pos.widthNum > 6  // enough space for text
+  const isNarrow = pos.widthNum <= 3 // only show a sliver
 
   return (
     <div
@@ -191,47 +222,57 @@ function ResBlock({ res, laneCount, laneIndex, hStart, hEnd, services }) {
         width:        pos.width,
         top:          laneCount === 1 ? '50%' : `${topPct}%`,
         transform:    laneCount === 1 ? 'translateY(-50%)' : 'none',
-        height:       laneCount === 1 ? '70%' : `${pctH}%`,
-        minHeight:    18,
+        height:       laneCount === 1 ? '72%' : `${pctH}%`,
+        minHeight:    20,
         background:   scheme.bg,
         borderLeft:   `3px solid ${scheme.border}`,
         borderRadius: '0 3px 3px 0',
         display:      'flex',
-        alignItems:   'center',
-        padding:      '0 8px',
+        flexDirection:'column',
+        justifyContent:'center',
+        padding:      isNarrow ? '0 2px' : '0 8px',
         overflow:     'hidden',
         cursor:       'default',
         transition:   'box-shadow 0.12s, filter 0.12s',
         zIndex:       hov ? 50 : laneIndex + 2,
         boxShadow:    hov
           ? '0 6px 20px rgba(0,0,0,0.35)'
-          : '0 1px 4px rgba(0,0,0,0.2)',
+          : '0 1px 4px rgba(0,0,0,0.18)',
         filter:       hov ? 'brightness(1.1)' : 'none',
         whiteSpace:   'nowrap',
       }}
     >
-      {/* Tooltip on hover */}
       {hov && <Tooltip res={res} endTime={endTime} />}
 
-      <span style={{
-        fontSize:     laneCount > 2 ? 9 : 11,
-        fontWeight:   800,
-        color:        scheme.text,
-        overflow:     'hidden',
-        textOverflow: 'ellipsis',
-      }}>
-        {res.customer_name}
-      </span>
-      {laneCount <= 2 && parseFloat(pos.width) > 8 && (
-        <span style={{
-          fontSize:   9,
-          fontWeight: 600,
-          color:      'rgba(255,255,255,0.6)',
-          marginLeft: 5,
-          flexShrink: 0,
-        }}>
-          {res.start_time}–{endTime} · {res.guests}p
-        </span>
+      {isWide && (
+        <>
+          {/* Name */}
+          <span style={{
+            fontSize:     laneCount > 2 ? 9 : 11,
+            fontWeight:   900,
+            color:        scheme.text,
+            overflow:     'hidden',
+            textOverflow: 'ellipsis',
+            lineHeight:   1.2,
+          }}>
+            {res.customer_name}
+          </span>
+
+          {/* Time + guests + service in one line when space allows */}
+          {laneCount <= 3 && pos.widthNum > 10 && (
+            <span style={{
+              fontSize:   9,
+              fontWeight: 600,
+              color:      'rgba(255,255,255,0.65)',
+              overflow:   'hidden',
+              textOverflow:'ellipsis',
+              marginTop:  1,
+            }}>
+              {res.start_time}–{endTime} · {res.guests}p
+              {res.service && pos.widthNum > 18 ? ` · ${res.service}` : ''}
+            </span>
+          )}
+        </>
       )}
     </div>
   )
@@ -245,9 +286,7 @@ function TimelineRow({ row, isLast, hStart, hEnd, hours, totalH, services }) {
   const laneCount = lanedRes.length > 0
     ? Math.max(...lanedRes.map(r => r.lane)) + 1
     : 1
-
-  // Min 56px per lane, min 56px total
-  const rowH = Math.max(56, laneCount * 44)
+  const rowH      = Math.max(56, laneCount * 46)
 
   return (
     <div style={{
@@ -256,7 +295,8 @@ function TimelineRow({ row, isLast, hStart, hEnd, hours, totalH, services }) {
       borderBottom:        isLast ? 'none' : `1px solid ${BORDER}`,
       minHeight:           rowH,
     }}>
-      {/* ── Info cell ── */}
+
+      {/* Info cell */}
       <div style={{
         padding:        '10px 14px',
         borderRight:    `2px solid rgba(43,33,24,0.12)`,
@@ -267,21 +307,17 @@ function TimelineRow({ row, isLast, hStart, hEnd, hours, totalH, services }) {
         flexShrink:     0,
         gap:            6,
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
-          <div style={{
-            width: 28, height: 28, flexShrink: 0,
-            background: hasRes ? GOLD : '#f0ebe4',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-          }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <div style={{ width: 28, height: 28, flexShrink: 0, background: hasRes ? GOLD : '#f0ebe4', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <LayoutGrid size={13} color={hasRes ? DARK : 'rgba(43,33,24,0.3)'} strokeWidth={2.5} />
           </div>
-          <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          <div style={{ minWidth: 0 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
               <span style={{ fontSize: 13, fontWeight: 900, color: DARK, letterSpacing: '-0.3px' }}>
                 {row.table_name}
               </span>
               {hasRes && (
-                <span style={{ fontSize: 9, fontWeight: 900, padding: '1px 5px', background: DARK, color: GOLD }}>
+                <span style={{ fontSize: 9, fontWeight: 900, padding: '1px 5px', background: DARK, color: GOLD, flexShrink: 0 }}>
                   {row.reservations.length}
                 </span>
               )}
@@ -300,38 +336,37 @@ function TimelineRow({ row, isLast, hStart, hEnd, hours, totalH, services }) {
         </div>
       </div>
 
-      {/* ── Timeline track ── */}
+      {/* Timeline track */}
       <div style={{
         position:   'relative',
         overflow:   'visible',
         background: hasRes ? '#fff' : '#fafaf8',
         minHeight:  rowH,
       }}>
-
         {/* Alternating hour backgrounds */}
         {hours.map((h, i) => (
-          <div key={h} style={{
-            position:   'absolute',
-            left:       `${(i / totalH) * 100}%`,
-            width:      `${(1 / totalH) * 100}%`,
+          <div key={`bg-${h}`} style={{
+            position:      'absolute',
+            left:          `${(i / totalH) * 100}%`,
+            width:         `${(1 / totalH) * 100}%`,
             top: 0, bottom: 0,
-            background: i % 2 === 0 ? 'transparent' : 'rgba(43,33,24,0.015)',
+            background:    i % 2 === 0 ? 'transparent' : 'rgba(43,33,24,0.018)',
             pointerEvents: 'none',
           }} />
         ))}
 
         {/* Hour grid lines */}
-        {hours.map((h, i) => (
+        {hours.map((h, i) => i > 0 && (
           <div key={`line-${h}`} style={{
             position:      'absolute',
             left:          `${(i / totalH) * 100}%`,
             top: 0, bottom: 0, width: 1,
-            background:    i === 0 ? 'transparent' : 'rgba(43,33,24,0.08)',
+            background:    'rgba(43,33,24,0.08)',
             pointerEvents: 'none',
           }} />
         ))}
 
-        {/* Half-hour tick lines */}
+        {/* Half-hour ticks */}
         {hours.map((h, i) => (
           <div key={`half-${h}`} style={{
             position:      'absolute',
@@ -342,16 +377,15 @@ function TimelineRow({ row, isLast, hStart, hEnd, hours, totalH, services }) {
           }} />
         ))}
 
-        {/* Current time red line */}
+        {/* Current time line */}
         {(() => {
           const now = new Date()
           const dec = now.getHours() + now.getMinutes() / 60
           if (dec < hStart || dec > hEnd) return null
-          const left = ((dec - hStart) / totalH) * 100
           return (
             <div style={{
               position:      'absolute',
-              left:          `${left}%`,
+              left:          `${((dec - hStart) / totalH) * 100}%`,
               top: 0, bottom: 0, width: 2,
               background:    RED,
               zIndex:        40,
@@ -365,22 +399,18 @@ function TimelineRow({ row, isLast, hStart, hEnd, hours, totalH, services }) {
         {!hasRes && (
           <span style={{
             position:      'absolute',
-            top:           '50%',
-            left:          '50%',
+            top:           '50%', left: '50%',
             transform:     'translate(-50%,-50%)',
-            fontSize:      9,
-            fontWeight:    800,
+            fontSize:      9, fontWeight: 800,
             color:         'rgba(43,33,24,0.1)',
-            letterSpacing: '0.25em',
-            textTransform: 'uppercase',
-            pointerEvents: 'none',
-            userSelect:    'none',
+            letterSpacing: '0.25em', textTransform: 'uppercase',
+            pointerEvents: 'none', userSelect: 'none',
           }}>
             disponible
           </span>
         )}
 
-        {/* Reservation blocks */}
+        {/* Blocks */}
         {lanedRes.map(res => (
           <ResBlock
             key={res.id}
@@ -402,8 +432,11 @@ export default function TableTimeline({ controlledDate = null }) {
   const { timeline, loading, error, date, setDate, allOH, services } = useTablesTimeline()
   const isControlled = !!controlledDate
 
+  // ── Sync external date ─────────────────────────────────────────
   useEffect(() => {
-    if (controlledDate && controlledDate !== date) setDate(controlledDate)
+    if (controlledDate && controlledDate !== date) {
+      setDate(controlledDate)
+    }
   }, [controlledDate]) // eslint-disable-line
 
   const today    = new Date().toISOString().slice(0, 10)
@@ -411,36 +444,34 @@ export default function TableTimeline({ controlledDate = null }) {
   const free     = timeline.length - occupied
   const totalRes = timeline.reduce((s, t) => s + t.reservations.length, 0)
 
-  // ── Dynamic hour range based on real open hours ────────────────
+  // ── Dynamic hour range ─────────────────────────────────────────
   const { hStart, hEnd } = useMemo(
     () => getOpenHoursForDate(allOH, date),
     [allOH, date]
   )
-  const totalH = hEnd - hStart
+  const totalH = Math.max(1, hEnd - hStart)
   const hours  = Array.from({ length: hEnd - hStart }, (_, i) => hStart + i)
+
+  // ── Navigate date ──────────────────────────────────────────────
+  const goDate = useCallback((iso) => {
+    setDate(iso)
+  }, [setDate])
 
   return (
     <div style={{ fontFamily: "'Plus Jakarta Sans','DM Sans',system-ui,sans-serif", marginTop: 24 }}>
       <style>{`@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}`}</style>
 
       {/* ── Header ── */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, marginBottom: 14, flexWrap: 'wrap' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, marginBottom: 0, flexWrap: 'wrap' }}>
 
-          {/* Title pill */}
+        {/* Title + stats */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '8px 14px', background: DARK }}>
             <LayoutGrid size={13} color={GOLD} strokeWidth={2.5} />
             <span style={{ fontSize: 12, fontWeight: 900, color: '#fff', letterSpacing: '-0.2px', whiteSpace: 'nowrap' }}>
               Occupation des tables
             </span>
-            {isControlled && (
-              <span style={{ fontSize: 11, fontWeight: 700, color: 'rgba(200,169,126,0.6)', textTransform: 'capitalize', whiteSpace: 'nowrap' }}>
-                · {formatDate(date)}
-              </span>
-            )}
           </div>
-
-          {/* Stats pills */}
           {!loading && timeline.length > 0 && (
             <>
               <span style={{ padding: '5px 10px', background: occupied > 0 ? GREEN : CREAM, border: `1px solid ${occupied > 0 ? '#4ade8040' : BORDER}`, fontSize: 11, fontWeight: 900, color: occupied > 0 ? '#fff' : 'rgba(43,33,24,0.35)' }}>
@@ -457,40 +488,87 @@ export default function TableTimeline({ controlledDate = null }) {
             </>
           )}
         </div>
+      </div>
 
-        {/* Date nav — standalone only */}
-        {!isControlled && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-            <button onClick={() => setDate(offsetDate(date, -1))}
-              style={{ width: 34, height: 34, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#fff', border: `2px solid ${DARK}`, cursor: 'pointer' }}
-              onMouseEnter={e => e.currentTarget.style.background = CREAM}
-              onMouseLeave={e => e.currentTarget.style.background = '#fff'}
-            >
-              <ChevronLeft size={15} strokeWidth={2.5} color={DARK} />
-            </button>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 7, padding: '6px 12px', background: '#fff', border: `2px solid ${DARK}` }}>
-              <CalendarDays size={12} color={GOLD} strokeWidth={2.5} />
-              <span style={{ fontSize: 12, fontWeight: 900, color: DARK, whiteSpace: 'nowrap', textTransform: 'capitalize' }}>
-                {formatDate(date)}
-              </span>
-            </div>
-            <button onClick={() => setDate(offsetDate(date, 1))}
-              style={{ width: 34, height: 34, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#fff', border: `2px solid ${DARK}`, cursor: 'pointer' }}
-              onMouseEnter={e => e.currentTarget.style.background = CREAM}
-              onMouseLeave={e => e.currentTarget.style.background = '#fff'}
-            >
-              <ChevronRight size={15} strokeWidth={2.5} color={DARK} />
-            </button>
-            {date !== today && (
-              <button onClick={() => setDate(today)}
-                style={{ padding: '6px 12px', background: GOLD, border: 'none', fontSize: 11, fontWeight: 900, color: DARK, cursor: 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap' }}
-                onMouseEnter={e => e.currentTarget.style.background = GOLD_DARK}
-                onMouseLeave={e => e.currentTarget.style.background = GOLD}
-              >
-                Aujourd'hui
-              </button>
-            )}
-          </div>
+      {/* ── Date navigation bar — always visible ── */}
+      <div style={{
+        display:        'flex',
+        alignItems:     'center',
+        gap:            6,
+        margin:         '12px 0 14px',
+        flexWrap:       'wrap',
+      }}>
+        {/* Prev */}
+        <button
+          onClick={() => goDate(offsetDate(date, -1))}
+          style={{ width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#fff', border: `2px solid ${DARK}`, cursor: 'pointer', flexShrink: 0 }}
+          onMouseEnter={e => e.currentTarget.style.background = CREAM}
+          onMouseLeave={e => e.currentTarget.style.background = '#fff'}
+        >
+          <ChevronLeft size={16} strokeWidth={2.5} color={DARK} />
+        </button>
+
+        {/* Date display */}
+        <div style={{
+          flex:           1,
+          minWidth:       220,
+          display:        'flex',
+          alignItems:     'center',
+          gap:            8,
+          padding:        '8px 14px',
+          background:     DARK,
+          border:         `2px solid ${DARK}`,
+        }}>
+          <CalendarDays size={13} color={GOLD} strokeWidth={2.5} />
+          <span style={{ fontSize: 13, fontWeight: 900, color: '#fff', textTransform: 'capitalize', whiteSpace: 'nowrap' }}>
+            {formatDate(date)}
+          </span>
+          {date === today && (
+            <span style={{ marginLeft: 'auto', fontSize: 9, fontWeight: 900, color: GOLD, letterSpacing: '0.14em', textTransform: 'uppercase', flexShrink: 0 }}>
+              Aujourd'hui
+            </span>
+          )}
+        </div>
+
+        {/* Next */}
+        <button
+          onClick={() => goDate(offsetDate(date, 1))}
+          style={{ width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#fff', border: `2px solid ${DARK}`, cursor: 'pointer', flexShrink: 0 }}
+          onMouseEnter={e => e.currentTarget.style.background = CREAM}
+          onMouseLeave={e => e.currentTarget.style.background = '#fff'}
+        >
+          <ChevronRight size={16} strokeWidth={2.5} color={DARK} />
+        </button>
+
+        {/* Date picker input */}
+        <input
+          type="date"
+          value={date}
+          onChange={e => { if (e.target.value) goDate(e.target.value) }}
+          style={{
+            padding:     '7px 10px',
+            border:      `2px solid ${DARK}`,
+            fontSize:    12,
+            fontWeight:  700,
+            color:       DARK,
+            fontFamily:  'inherit',
+            background:  '#fff',
+            cursor:      'pointer',
+            outline:     'none',
+            height:      36,
+          }}
+        />
+
+        {/* Today button */}
+        {date !== today && (
+          <button
+            onClick={() => goDate(today)}
+            style={{ padding: '7px 14px', background: GOLD, border: 'none', fontSize: 11, fontWeight: 900, color: DARK, cursor: 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap', height: 36 }}
+            onMouseEnter={e => e.currentTarget.style.background = GOLD_DARK}
+            onMouseLeave={e => e.currentTarget.style.background = GOLD}
+          >
+            Aujourd'hui
+          </button>
         )}
       </div>
 
@@ -512,26 +590,20 @@ export default function TableTimeline({ controlledDate = null }) {
           </div>
           <div style={{ position: 'relative', height: 36, overflowX: 'hidden' }}>
             {hours.map((h, i) => {
-              const nowH  = new Date().getHours()
-              const isNow = nowH === h
+              const isNow = new Date().getHours() === h && date === today
               return (
                 <div key={h} style={{
-                  position:   'absolute',
-                  left:       `${(i / totalH) * 100}%`,
-                  width:      `${(1 / totalH) * 100}%`,
+                  position:    'absolute',
+                  left:        `${(i / totalH) * 100}%`,
+                  width:       `${(1 / totalH) * 100}%`,
                   top: 0, bottom: 0,
-                  display:    'flex',
-                  alignItems: 'center',
+                  display:     'flex',
+                  alignItems:  'center',
                   paddingLeft: 5,
-                  borderLeft: i > 0 ? '1px solid rgba(200,169,126,0.12)' : 'none',
-                  background: isNow ? 'rgba(239,68,68,0.08)' : 'transparent',
+                  borderLeft:  i > 0 ? '1px solid rgba(200,169,126,0.12)' : 'none',
+                  background:  isNow ? 'rgba(239,68,68,0.1)' : 'transparent',
                 }}>
-                  <span style={{
-                    fontSize:   9,
-                    fontWeight: isNow ? 900 : 600,
-                    color:      isNow ? RED : 'rgba(200,169,126,0.65)',
-                    whiteSpace: 'nowrap',
-                  }}>
+                  <span style={{ fontSize: 9, fontWeight: isNow ? 900 : 600, color: isNow ? RED : 'rgba(200,169,126,0.65)', whiteSpace: 'nowrap' }}>
                     {String(h % 24).padStart(2,'0')}h
                   </span>
                 </div>
@@ -548,13 +620,24 @@ export default function TableTimeline({ controlledDate = null }) {
           </div>
         )}
 
-        {/* Empty */}
+        {/* Empty tables */}
         {!loading && timeline.length === 0 && (
           <div style={{ padding: '52px 24px', textAlign: 'center', background: '#fff' }}>
             <LayoutGrid size={32} color={DARK} strokeWidth={1.5} style={{ display: 'block', margin: '0 auto 12px', opacity: 0.15 }} />
             <p style={{ margin: '0 0 4px', fontSize: 14, fontWeight: 900, color: DARK }}>Aucune table active</p>
-            <p style={{ margin: 0, fontSize: 12, fontWeight: 600, color: 'rgba(43,33,24,0.35)' }}>
-              Configurez vos tables dans la section Tables.
+            <p style={{ margin: 0, fontSize: 12, fontWeight: 600, color: 'rgba(43,33,24,0.35)' }}>Configurez vos tables dans la section Tables.</p>
+          </div>
+        )}
+
+        {/* No reservations for this date */}
+        {!loading && timeline.length > 0 && totalRes === 0 && (
+          <div style={{ padding: '28px 24px', textAlign: 'center', background: '#fafaf8', borderTop: `1px solid ${BORDER}` }}>
+            <CalendarDays size={28} color={DARK} strokeWidth={1.5} style={{ display: 'block', margin: '0 auto 10px', opacity: 0.15 }} />
+            <p style={{ margin: '0 0 3px', fontSize: 13, fontWeight: 900, color: 'rgba(43,33,24,0.3)' }}>
+              Aucune réservation le {formatDateShort(date)}
+            </p>
+            <p style={{ margin: 0, fontSize: 11, fontWeight: 600, color: 'rgba(43,33,24,0.2)' }}>
+              Toutes les tables sont libres ce jour-là
             </p>
           </div>
         )}
@@ -588,11 +671,11 @@ export default function TableTimeline({ controlledDate = null }) {
             </span>
           ))}
           <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 11, fontWeight: 700, color: DARK }}>
-            <span style={{ width: 2, height: 14, background: RED, flexShrink: 0, boxShadow: `0 0 4px ${RED}` }} />
+            <span style={{ width: 2, height: 14, background: RED, flexShrink: 0 }} />
             Maintenant
           </span>
           {allOH.length > 0 && (
-            <span style={{ marginLeft: 'auto', fontSize: 10, fontWeight: 700, color: GOLD_DARK, whiteSpace: 'nowrap' }}>
+            <span style={{ marginLeft: 'auto', fontSize: 10, fontWeight: 700, color: GOLD_DARK }}>
               {String(hStart).padStart(2,'0')}h – {String(hEnd % 24).padStart(2,'0')}h · Survolez pour les détails
             </span>
           )}
