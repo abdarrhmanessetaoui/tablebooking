@@ -4,13 +4,14 @@ import {
   Clock, CalendarDays, Utensils, Users,
 } from 'lucide-react'
 import useTablesTimeline from '../../hooks/Tables/useTablesTimeline'
-import { GREEN, RED } from '../../styles/dashboard/tokens'
+import { RED } from '../../styles/dashboard/tokens'
 
 const DARK      = '#2b2118'
 const GOLD      = '#c8a97e'
 const GOLD_DARK = '#a8834e'
 const CREAM     = '#faf8f5'
 const BORDER    = 'rgba(43,33,24,0.10)'
+const GREEN     = '#16A34A'
 
 const STATUS_BLOCK = {
   Confirmed: { bg: '#16A34A', border: '#86efac', text: '#fff', label: 'Confirmée'  },
@@ -192,7 +193,6 @@ function ResBlock({ res, laneCount, laneIndex, hS, hE, services }) {
     >
       {hov && <Tooltip res={res} endTime={endTime} />}
 
-      {/* Name — always show if any space */}
       {p.widthNum > 2 && (
         <span style={{
           fontSize:     laneCount > 2 ? 9 : 11,
@@ -207,7 +207,6 @@ function ResBlock({ res, laneCount, laneIndex, hS, hE, services }) {
         </span>
       )}
 
-      {/* Time + guests — only when wide enough */}
       {p.widthNum > 12 && laneCount <= 2 && (
         <span style={{
           fontSize:   9,
@@ -237,20 +236,20 @@ function TableRow({ row, isLast, hS, hE, hours, totalH, services, isToday }) {
       minHeight:           rowH,
     }}>
 
-      {/* ── Info — name + status dot only ── */}
+      {/* Info */}
       <div style={{
-        padding:        '0 14px',
-        borderRight:    `2px solid rgba(43,33,24,0.10)`,
-        display:        'flex',
-        alignItems:     'center',
-        gap:            9,
-        background:     hasRes ? '#fdfaf7' : '#fff',
-        flexShrink:     0,
+        padding:     '0 14px',
+        borderRight: `2px solid rgba(43,33,24,0.10)`,
+        display:     'flex',
+        alignItems:  'center',
+        gap:         9,
+        background:  hasRes ? '#fdfaf7' : '#fff',
+        flexShrink:  0,
       }}>
         <div style={{
-          width: 8, height: 8, borderRadius: '50%', flexShrink: 0,
-          background:  hasRes ? GREEN : 'rgba(43,33,24,0.15)',
-          boxShadow:   hasRes ? `0 0 0 3px ${GREEN}22` : 'none',
+          width:      8, height: 8, borderRadius: '50%', flexShrink: 0,
+          background: hasRes ? GREEN : 'rgba(43,33,24,0.15)',
+          boxShadow:  hasRes ? `0 0 0 3px ${GREEN}22` : 'none',
         }} />
         <span style={{ fontSize: 13, fontWeight: 900, color: DARK, letterSpacing: '-0.3px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
           {row.table_name}
@@ -262,25 +261,21 @@ function TableRow({ row, isLast, hS, hE, hours, totalH, services, isToday }) {
         )}
       </div>
 
-      {/* ── Track ── */}
+      {/* Track */}
       <div style={{ position: 'relative', overflow: 'visible', background: hasRes ? '#fff' : '#fafaf8', minHeight: rowH }}>
 
-        {/* Alternating hour backgrounds */}
         {hours.map((h, i) => (
           <div key={`bg-${h}`} style={{ position: 'absolute', left: `${(i/totalH)*100}%`, width: `${(1/totalH)*100}%`, top: 0, bottom: 0, background: i%2===0 ? 'transparent' : 'rgba(43,33,24,0.015)', pointerEvents: 'none' }} />
         ))}
 
-        {/* Hour lines */}
         {hours.map((h, i) => i > 0 && (
           <div key={`gl-${h}`} style={{ position: 'absolute', left: `${(i/totalH)*100}%`, top: 0, bottom: 0, width: 1, background: 'rgba(43,33,24,0.07)', pointerEvents: 'none' }} />
         ))}
 
-        {/* Half-hour ticks */}
         {hours.map((h, i) => (
           <div key={`ht-${h}`} style={{ position: 'absolute', left: `${((i+0.5)/totalH)*100}%`, top: '60%', bottom: 0, width: 1, background: 'rgba(43,33,24,0.04)', pointerEvents: 'none' }} />
         ))}
 
-        {/* Now line */}
         {isToday && (() => {
           const now = new Date()
           const dec = now.getHours() + now.getMinutes() / 60
@@ -292,7 +287,6 @@ function TableRow({ row, isLast, hS, hE, hours, totalH, services, isToday }) {
           )
         })()}
 
-        {/* Free label */}
         {!hasRes && (
           <span style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', fontSize: 9, fontWeight: 900, color: 'rgba(43,33,24,0.08)', letterSpacing: '0.3em', textTransform: 'uppercase', pointerEvents: 'none', userSelect: 'none' }}>
             libre
@@ -317,17 +311,16 @@ export default function TableTimeline({ controlledDate = null }) {
     if (controlledDate && controlledDate !== date) setDate(controlledDate)
   }, [controlledDate]) // eslint-disable-line
 
-
-
   const { hStart, hEnd } = useMemo(() => getOpenHours(allOH, date), [allOH, date])
   const totalH = Math.max(1, hEnd - hStart)
   const hours  = Array.from({ length: hEnd - hStart }, (_, i) => hStart + i)
+  const totalRes = timeline.reduce((s, t) => s + t.reservations.length, 0)
 
   return (
     <div style={{ fontFamily: "'Plus Jakarta Sans','DM Sans',system-ui,sans-serif" }}>
       <style>{`@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}`}</style>
 
-      {/* ── Date nav bar ── */}
+      {/* ── Date nav ── */}
       <div style={{ display: 'flex', alignItems: 'stretch', marginBottom: 14, border: `2px solid ${DARK}`, overflow: 'hidden' }}>
 
         <button
@@ -341,7 +334,7 @@ export default function TableTimeline({ controlledDate = null }) {
 
         <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 10, padding: '10px 16px', background: DARK, minWidth: 0 }}>
           <CalendarDays size={13} color={GOLD} strokeWidth={2.5} style={{ flexShrink: 0 }} />
-          <span style={{ fontSize: 13, fontWeight: 900, color: '#fff', textTransform: 'capitalize', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+          <span style={{ fontSize: 13, fontWeight: 900, color: '#fff', textTransform: 'capitalize', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
             {formatDateLong(date)}
           </span>
         </div>
@@ -393,12 +386,7 @@ export default function TableTimeline({ controlledDate = null }) {
             {hours.map((h, i) => {
               const isNow = isToday && new Date().getHours() === h
               return (
-                <div key={h} style={{
-                  position: 'absolute', left: `${(i/totalH)*100}%`, width: `${(1/totalH)*100}%`,
-                  top: 0, bottom: 0, display: 'flex', alignItems: 'center', paddingLeft: 5,
-                  borderLeft: i > 0 ? '1px solid rgba(200,169,126,0.1)' : 'none',
-                  background: isNow ? 'rgba(239,68,68,0.12)' : 'transparent',
-                }}>
+                <div key={h} style={{ position: 'absolute', left: `${(i/totalH)*100}%`, width: `${(1/totalH)*100}%`, top: 0, bottom: 0, display: 'flex', alignItems: 'center', paddingLeft: 5, borderLeft: i > 0 ? '1px solid rgba(200,169,126,0.1)' : 'none', background: isNow ? 'rgba(239,68,68,0.12)' : 'transparent' }}>
                   <span style={{ fontSize: 10, fontWeight: isNow ? 900 : 600, color: isNow ? RED : 'rgba(200,169,126,0.6)', whiteSpace: 'nowrap' }}>
                     {String(h % 24).padStart(2,'0')}h
                   </span>
@@ -445,7 +433,7 @@ export default function TableTimeline({ controlledDate = null }) {
           </>
         )}
 
-        {/* Normal rows */}
+        {/* Rows with reservations */}
         {!loading && timeline.length > 0 && totalRes > 0 && timeline.map((row, i) => (
           <TableRow key={row.table_id} row={row} isLast={i===timeline.length-1} hS={hStart} hE={hEnd} hours={hours} totalH={totalH} services={services} isToday={isToday} />
         ))}
