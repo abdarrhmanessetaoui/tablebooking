@@ -8,6 +8,8 @@ export default function useTablesTimeline(initialDate = null) {
 
   const [date,     setDate]     = useState(initialDate ?? today)
   const [timeline, setTimeline] = useState([])
+  const [allOH,    setAllOH]    = useState([])
+  const [services, setServices] = useState([])
   const [loading,  setLoading]  = useState(true)
   const [error,    setError]    = useState(null)
 
@@ -16,11 +18,22 @@ export default function useTablesTimeline(initialDate = null) {
     'Authorization': `Bearer ${getToken()}`,
   })
 
+  // ── Fetch open hours + services once ──────────────────────────
+  useEffect(() => {
+    Promise.all([
+      fetch(`${BASE}/time-slots`,          { headers: headers() }).then(r => r.json()),
+      fetch(`${BASE}/restaurant/services`, { headers: headers() }).then(r => r.json()),
+    ]).then(([slots, svcs]) => {
+      setAllOH(Array.isArray(slots?.allOH) ? slots.allOH : [])
+      setServices(Array.isArray(svcs) ? svcs : [])
+    }).catch(() => {})
+  }, []) // eslint-disable-line
+
   const fetchTimeline = useCallback(async (d) => {
     setLoading(true)
     setError(null)
     try {
-      const res = await fetch(`${BASE}/tables/timeline?date=${d}`, { headers: headers() })
+      const res  = await fetch(`${BASE}/tables/timeline?date=${d}`, { headers: headers() })
       if (!res.ok) throw new Error(`HTTP ${res.status}`)
       const data = await res.json()
       setTimeline(Array.isArray(data) ? data : [])
@@ -37,11 +50,9 @@ export default function useTablesTimeline(initialDate = null) {
   }, [date, fetchTimeline])
 
   return {
-    timeline,
-    loading,
-    error,
-    date,
-    setDate,
+    timeline, loading, error,
+    date, setDate,
+    allOH, services,
     refresh: () => fetchTimeline(date),
   }
 }
