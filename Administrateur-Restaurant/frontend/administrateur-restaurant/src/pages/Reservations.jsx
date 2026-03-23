@@ -233,6 +233,7 @@ export default function Reservations() {
     filterStatus,  setFilterStatus,
     filterService, setFilterService,
     filterDate,    setFilterDate,
+    filterTable,   setFilterTable,   // ← added
     clearFilters: _clearFilters,
     openView, openEdit, openCreate,
     handleSubmit, handleCreate, handleDelete,
@@ -336,7 +337,6 @@ export default function Reservations() {
     }
   }
 
-  // ── CHANGE 1: new handler ──────────────────────────────────────
   function handleTableAssigned(updatedReservation) {
     setReservations(prev =>
       prev.map(r => r.id === updatedReservation.id ? updatedReservation : r)
@@ -401,6 +401,7 @@ export default function Reservations() {
             filterStatus={filterStatus}   setFilterStatus={setFilterStatus}
             filterService={filterService} setFilterService={setFilterService}
             filterDate={filterDate}       setFilterDate={setFilterDate}
+            filterTable={filterTable}     setFilterTable={setFilterTable}
             clearFilters={clearFilters}
             services={services}
           />
