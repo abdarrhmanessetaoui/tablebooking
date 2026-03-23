@@ -1,14 +1,10 @@
 import { useState } from 'react'
-import { LayoutGrid, Link2 } from 'lucide-react'
+import { LayoutGrid, Link2, MapPin } from 'lucide-react'
 import { DARK, GOLD, GREEN, BORDER } from '../../../styles/reservations/tokens'
 
 export default function AssignTableCell({ r, onOpenAssign }) {
   const [hov, setHov] = useState(false)
   const hasTable = !!r.table_idx
-
-  // Prefer the real table number/name returned by the API.
-  // Fall back to the raw idx so it never shows blank.
-  const tableLabel = r.table_number ?? r.table_name ?? r.table_idx
 
   if (hasTable) {
     return (
@@ -28,7 +24,18 @@ export default function AssignTableCell({ r, onOpenAssign }) {
         }}
       >
         <LayoutGrid size={10} strokeWidth={2.5} />
-        Table {tableLabel}
+        Table {r.table_number ?? r.table_idx}
+        {r.table_location && (
+          <span style={{
+            display: 'inline-flex', alignItems: 'center', gap: 2,
+            marginLeft: 3,
+            opacity: hov ? 0.75 : 0.6,
+            fontSize: 10, fontWeight: 700,
+          }}>
+            <MapPin size={9} strokeWidth={2.5} />
+            {r.table_location}
+          </span>
+        )}
       </div>
     )
   }
