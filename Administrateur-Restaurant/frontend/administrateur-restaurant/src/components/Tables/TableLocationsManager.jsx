@@ -14,28 +14,56 @@ const PRESET_COLORS = [
 
 function ColorDot({ color, selected, onClick }) {
   return (
-    <button
-      onClick={onClick}
-      title={color}
-      style={{
-        width: 22, height: 22, borderRadius: '50%',
-        background: color, border: selected ? `3px solid ${DARK}` : '2px solid transparent',
-        cursor: 'pointer', flexShrink: 0,
-        boxShadow: selected ? `0 0 0 1px ${color}` : 'none',
-        transition: 'transform 0.1s',
-        transform: selected ? 'scale(1.15)' : 'scale(1)',
-      }}
-    />
+    <button onClick={onClick} title={color} style={{
+      width: 22, height: 22, borderRadius: '50%',
+      background: color,
+      border: selected ? `3px solid ${DARK}` : '2px solid transparent',
+      cursor: 'pointer', flexShrink: 0,
+      boxShadow: selected ? `0 0 0 1px ${color}` : 'none',
+      transition: 'transform 0.1s',
+      transform: selected ? 'scale(1.15)' : 'scale(1)',
+    }} />
   )
+}
+
+function ColorPicker({ value, onChange }) {
+  return (
+    <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap', alignItems: 'center' }}>
+      {PRESET_COLORS.map(c => (
+        <ColorDot key={c} color={c} selected={value === c} onClick={() => onChange(c)} />
+      ))}
+      {/* Custom color */}
+      <label title="Couleur personnalisée" style={{ position: 'relative', cursor: 'pointer' }}>
+        <div style={{
+          width: 22, height: 22, borderRadius: '50%',
+          background: PRESET_COLORS.includes(value) ? '#e5e7eb' : value,
+          border: `2px solid ${DARK}`,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          fontSize: 13, fontWeight: 900, color: DARK,
+        }}>+</div>
+        <input type="color" value={value} onChange={e => onChange(e.target.value)}
+          style={{ position: 'absolute', opacity: 0, width: 0, height: 0 }} />
+      </label>
+    </div>
+  )
+}
+
+const inp = {
+  padding: '9px 12px', border: `2px solid ${BORDER}`,
+  fontSize: 13, fontWeight: 700, color: DARK,
+  fontFamily: 'inherit', outline: 'none',
+  background: '#fff', borderRadius: 0,
+  width: '100%', boxSizing: 'border-box',
 }
 
 export default function TableLocationsManager() {
   const { locations, loading, saving, handleAdd, handleUpdate, handleDelete } = useTableLocations()
-  const [newName,    setNewName]    = useState('')
-  const [newColor,   setNewColor]   = useState(PRESET_COLORS[0])
-  const [editingId,  setEditingId]  = useState(null)
-  const [editName,   setEditName]   = useState('')
-  const [editColor,  setEditColor]  = useState('')
+
+  const [newName,   setNewName]   = useState('')
+  const [newColor,  setNewColor]  = useState(PRESET_COLORS[0])
+  const [editingId, setEditingId] = useState(null)
+  const [editName,  setEditName]  = useState('')
+  const [editColor, setEditColor] = useState('')
 
   function startEdit(loc) {
     setEditingId(loc.id)
@@ -55,14 +83,6 @@ export default function TableLocationsManager() {
     cancelEdit()
   }
 
-  const inp = {
-    padding: '9px 12px', border: `2px solid ${BORDER}`,
-    fontSize: 13, fontWeight: 700, color: DARK,
-    fontFamily: 'inherit', outline: 'none',
-    background: '#fff', borderRadius: 0,
-    width: '100%', boxSizing: 'border-box',
-  }
-
   return (
     <div style={{
       background: '#fff', border: `1.5px solid ${BORDER}`,
@@ -76,49 +96,35 @@ export default function TableLocationsManager() {
         </span>
       </div>
 
-      <div style={{ padding: '16px' }}>
+      <div style={{ padding: 16 }}>
 
         {/* Add new */}
-        <div style={{ marginBottom: 16, padding: '14px', background: '#faf8f5', border: `1px solid rgba(43,33,24,0.1)` }}>
+        <div style={{ marginBottom: 16, padding: 14, background: '#faf8f5', border: `1px solid rgba(43,33,24,0.1)` }}>
           <p style={{ margin: '0 0 10px', fontSize: 9, fontWeight: 900, color: DARK, letterSpacing: '0.16em', textTransform: 'uppercase' }}>
             Nouvel emplacement
           </p>
-          <div style={{ display: 'flex', gap: 8, alignItems: 'flex-end', flexWrap: 'wrap' }}>
-            <div style={{ flex: 1, minWidth: 140 }}>
-              <input
-                type="text" placeholder="Ex: Rooftop, Jardin…"
-                value={newName} onChange={e => setNewName(e.target.value)}
-                onKeyDown={e => e.key === 'Enter' && handleAdd(newName, newColor, () => setNewName(''))}
-                style={inp}
-              />
-            </div>
-            <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap', alignItems: 'center' }}>
-              {PRESET_COLORS.map(c => (
-                <ColorDot key={c} color={c} selected={newColor === c} onClick={() => setNewColor(c)} />
-              ))}
-              {/* Custom color picker */}
-              <label title="Couleur personnalisée" style={{ position: 'relative', cursor: 'pointer' }}>
-                <div style={{ width: 22, height: 22, borderRadius: '50%', background: PRESET_COLORS.includes(newColor) ? '#e5e7eb' : newColor, border: `2px solid ${DARK}`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 900, color: DARK }}>
-                  +
-                </div>
-                <input type="color" value={newColor} onChange={e => setNewColor(e.target.value)}
-                  style={{ position: 'absolute', opacity: 0, width: 0, height: 0 }} />
-              </label>
-            </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            <input
+              type="text" placeholder="Ex: Rooftop, Jardin, VIP…"
+              value={newName} onChange={e => setNewName(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && handleAdd(newName, newColor, () => setNewName(''))}
+              style={inp}
+            />
+            <ColorPicker value={newColor} onChange={setNewColor} />
             <button
               onClick={() => handleAdd(newName, newColor, () => setNewName(''))}
               disabled={!newName.trim() || saving}
               style={{
-                display: 'flex', alignItems: 'center', gap: 6,
-                padding: '9px 14px', background: DARK, border: 'none',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+                padding: '10px', background: DARK, border: 'none',
                 fontSize: 12, fontWeight: 800, color: GOLD,
                 cursor: !newName.trim() || saving ? 'not-allowed' : 'pointer',
                 opacity: !newName.trim() || saving ? 0.45 : 1,
-                fontFamily: 'inherit', whiteSpace: 'nowrap',
+                fontFamily: 'inherit',
               }}
             >
               <Plus size={13} strokeWidth={2.5} />
-              Ajouter
+              Ajouter l'emplacement
             </button>
           </div>
         </div>
@@ -137,34 +143,27 @@ export default function TableLocationsManager() {
             {locations.map(loc => (
               <div key={loc.id} style={{
                 display: 'flex', alignItems: 'center', gap: 10,
-                padding: '10px 12px', border: `1.5px solid rgba(43,33,24,0.1)`,
+                padding: '10px 12px',
+                border: `1.5px solid rgba(43,33,24,0.1)`,
                 background: editingId === loc.id ? '#faf8f5' : '#fff',
               }}>
                 {editingId === loc.id ? (
                   <>
-                    <input
-                      type="text" value={editName}
-                      onChange={e => setEditName(e.target.value)}
-                      onKeyDown={e => { if (e.key === 'Enter') saveEdit(); if (e.key === 'Escape') cancelEdit() }}
-                      style={{ ...inp, flex: 1 }}
-                      autoFocus
-                    />
-                    <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
-                      {PRESET_COLORS.map(c => (
-                        <ColorDot key={c} color={c} selected={editColor === c} onClick={() => setEditColor(c)} />
-                      ))}
-                      <label title="Couleur personnalisée" style={{ position: 'relative', cursor: 'pointer' }}>
-                        <div style={{ width: 22, height: 22, borderRadius: '50%', background: PRESET_COLORS.includes(editColor) ? '#e5e7eb' : editColor, border: `2px solid ${DARK}`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 900, color: DARK }}>+</div>
-                        <input type="color" value={editColor} onChange={e => setEditColor(e.target.value)}
-                          style={{ position: 'absolute', opacity: 0, width: 0, height: 0 }} />
-                      </label>
+                    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 8 }}>
+                      <input
+                        type="text" value={editName}
+                        onChange={e => setEditName(e.target.value)}
+                        onKeyDown={e => { if (e.key === 'Enter') saveEdit(); if (e.key === 'Escape') cancelEdit() }}
+                        style={inp} autoFocus
+                      />
+                      <ColorPicker value={editColor} onChange={setEditColor} />
                     </div>
                     <button onClick={saveEdit} disabled={!editName.trim() || saving}
-                      style={{ padding: '6px 10px', background: DARK, border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
+                      style={{ padding: '8px 10px', background: DARK, border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', flexShrink: 0 }}>
                       <Check size={13} color={GOLD} strokeWidth={2.5} />
                     </button>
                     <button onClick={cancelEdit}
-                      style={{ padding: '6px 10px', background: 'none', border: `1.5px solid rgba(43,33,24,0.2)`, cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
+                      style={{ padding: '8px 10px', background: 'none', border: `1.5px solid rgba(43,33,24,0.2)`, cursor: 'pointer', display: 'flex', alignItems: 'center', flexShrink: 0 }}>
                       <X size={13} color={DARK} strokeWidth={2.5} />
                     </button>
                   </>

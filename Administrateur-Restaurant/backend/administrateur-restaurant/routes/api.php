@@ -65,5 +65,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put   ('/tables/{idx}',        [TableController::class, 'update']);
     Route::delete('/tables/{idx}',        [TableController::class, 'destroy']);
     Route::patch ('/tables/{idx}/toggle', [TableController::class, 'toggleActive']);
+    Route::get   ('/table-locations',       [TableController::class, 'indexLocations']);
+    Route::post  ('/table-locations',       [TableController::class, 'storeLocation']);
+    Route::put   ('/table-locations/{id}',  [TableController::class, 'updateLocation']);
+    Route::delete('/table-locations/{id}',  [TableController::class, 'destroyLocation']);
 
 });

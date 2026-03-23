@@ -38,12 +38,15 @@ function Field({ label, children }) {
   )
 }
 
+// locations = [{ id, name, color }, ...]  — passed from parent via useTableLocations
 export default function TableForm({ initial = EMPTY, onSave, saving, editingNumber, onCancel, locations = [] }) {
   const defaultLocation = initial.location || locations[0]?.name || ''
   const [form, setForm] = useState({ ...EMPTY, ...initial, location: initial.location || defaultLocation })
-  const set  = k => v => setForm(f => ({ ...f, [k]: v }))
-  const fo   = e => e.target.style.borderColor = GOLD
-  const bl   = e => e.target.style.borderColor = BORDER
+
+  const set = k => v => setForm(f => ({ ...f, [k]: v }))
+  const fo  = e => e.target.style.borderColor = GOLD
+  const bl  = e => e.target.style.borderColor = BORDER
+
   const valid = form.number.trim() && form.capacity !== '' && form.location
 
   async function handleSubmit() {
@@ -54,7 +57,7 @@ export default function TableForm({ initial = EMPTY, onSave, saving, editingNumb
   return (
     <div style={{ background: '#fff', border: `1.5px solid ${BORDER}`, overflow: 'hidden' }}>
 
-      {/* Header bar */}
+      {/* Header */}
       <div style={{ padding: '12px 16px', background: DARK, display: 'flex', alignItems: 'center', gap: 8 }}>
         <LayoutGrid size={14} strokeWidth={2.5} color={GOLD} />
         <span style={{ fontSize: 11, fontWeight: 900, color: GOLD, letterSpacing: '0.12em', textTransform: 'uppercase' }}>
@@ -83,8 +86,8 @@ export default function TableForm({ initial = EMPTY, onSave, saving, editingNumb
 
         <Field label="Emplacement">
           {locations.length === 0 ? (
-            <div style={{ ...inp, color: 'rgba(43,33,24,0.4)', fontSize: 12, display: 'flex', alignItems: 'center' }}>
-              Aucun emplacement — ajoutez-en d'abord
+            <div style={{ ...inp, color: 'rgba(43,33,24,0.4)', fontSize: 12, display: 'flex', alignItems: 'center', pointerEvents: 'none' }}>
+              Aucun emplacement — créez-en d'abord
             </div>
           ) : (
             <select
@@ -93,7 +96,7 @@ export default function TableForm({ initial = EMPTY, onSave, saving, editingNumb
               style={{ ...inp, cursor: 'pointer' }}
               onFocus={fo} onBlur={bl}
             >
-              <option value="">Choisir un emplacement</option>
+              <option value="">Choisir un emplacement…</option>
               {locations.map(l => (
                 <option key={l.id} value={l.name}>{l.name}</option>
               ))}

@@ -35,10 +35,15 @@ export default function useTableLocations() {
     if (!name.trim()) return
     setSaving(true)
     try {
-      const res  = await fetch(API, {
+      const res = await fetch(API, {
         method: 'POST', headers: hdrs(),
         body: JSON.stringify({ name: name.trim(), color }),
       })
+      if (!res.ok) {
+        const err = await res.json()
+        toast(err.message ?? "Impossible d'ajouter", 'error')
+        return
+      }
       const data = await res.json()
       setLocations(prev => [...prev, data])
       toast(`Emplacement "${data.name}" ajouté`, 'success')
@@ -59,7 +64,7 @@ export default function useTableLocations() {
       })
       const data = await res.json()
       setLocations(prev => prev.map(l => l.id === id ? data : l))
-      toast(`Emplacement mis à jour`, 'success')
+      toast('Emplacement mis à jour', 'success')
     } catch {
       toast("Impossible de modifier l'emplacement", 'error')
     } finally {
