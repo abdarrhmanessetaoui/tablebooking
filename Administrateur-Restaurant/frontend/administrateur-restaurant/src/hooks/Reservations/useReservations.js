@@ -28,6 +28,7 @@ export default function useReservations(initialFilters = {}) {
   const [search,        setSearch]        = useState('')
   const [filterStatus,  setFilterStatus]  = useState(initialFilters?.filterStatus || 'all')
   const [filterService, setFilterService] = useState('all')
+  const [filterTable, setFilterTable] = useState('all')
   const [filterDate,    setFilterDate]    = useState(initialFilters?.filterDate || '')
 
   const fetchReservations = async (silent = false) => {
