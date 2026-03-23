@@ -1,8 +1,8 @@
 import { useState, useRef } from 'react'
 import { Search, X, Calendar } from 'lucide-react'
-import CalendarPopup from './CalendarPopup.jsx'
-import { DARK, GOLD, GOLD_DARK } from '../../../styles/reservations/tokens.js'
-import { filterInputBase, dateBtnStyle } from '../../../styles/reservations/filters.styles.js'
+import CalendarPopup from './CalendarPopup'
+import { DARK, GOLD, GOLD_DARK } from '../../../styles/reservations/tokens'
+import { filterInputBase, dateBtnStyle } from '../../../styles/reservations/filters.styles'
 
 const MONTHS_FR = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre']
 const MUTED     = 'rgba(43,33,24,0.35)'
