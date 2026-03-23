@@ -16,6 +16,11 @@ const EMPTY_FORM = {
   guests: '', service: '', status: 'Pending', notes: ''
 }
 
+// A reservation is considered unassigned when table_idx is absent, null, 0, or empty string
+function isUnassigned(r) {
+  return r.table_idx === null || r.table_idx === undefined || r.table_idx === 0 || r.table_idx === ''
+}
+
 export default function useReservations(initialFilters = {}) {
   const [reservations, setReservations] = useState([])
   const [loading, setLoading]           = useState(true)
@@ -59,9 +64,15 @@ export default function useReservations(initialFilters = {}) {
         const matchSearch  = search === '' ||
           (r.name  && r.name.toLowerCase().includes(search.toLowerCase())) ||
           (r.phone && r.phone.includes(search))
-        const matchStatus  = filterStatus  === 'all' || r.status    === filterStatus
-        const matchService = filterService === 'all' || r.service   === filterService
-        const matchTable   = filterTable   === 'all' || String(r.table_idx) === String(filterTable)
+
+        const matchStatus  = filterStatus  === 'all' || r.status  === filterStatus
+        const matchService = filterService === 'all' || r.service === filterService
+
+        const matchTable =
+          filterTable === 'all'        ? true :
+          filterTable === 'unassigned' ? isUnassigned(r) :
+          String(r.table_idx) === String(filterTable)
+
         return matchSearch && matchStatus && matchService && matchTable
       })
       .sort((a, b) => {
