@@ -1,9 +1,9 @@
 import { useState, useEffect, useRef } from 'react'
-import DesktopTable    from './DesktopTable'
-import MobileCards     from './MobileCards'
-import Pagination      from './Pagination'
-import AssignTableModal from '../AssignTableModal'
-import { DARK, GOLD, GOLD_DARK, CREAM, BORDER, GREEN } from '../../../styles/reservations/tokens'
+import DesktopTable    from './DesktopTable.jsx'
+import MobileCards     from './MobileCards.jsx'
+import Pagination      from './Pagination.jsx'
+import AssignTableModal from '../AssignTableModal.jsx'
+import { DARK, GOLD, GOLD_DARK, CREAM, BORDER, GREEN } from '../../../styles/reservations/tokens.js'
 
 export default function ReservationsTable({
   reservations, openView, openEdit, handleDelete,

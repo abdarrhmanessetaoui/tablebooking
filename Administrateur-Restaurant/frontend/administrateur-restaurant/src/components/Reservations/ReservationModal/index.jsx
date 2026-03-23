@@ -1,14 +1,14 @@
 import { useState } from 'react'
 import { createPortal } from 'react-dom'
-import useModalData   from '../../../hooks/Reservations/useModalData'
-import useTimeSlots   from '../../../hooks/Reservations/useTimeSlots'
-import ModalHeader    from './ModalHeader'
-import ViewMode       from './modes/ViewMode'
-import EditMode       from './modes/EditMode'
-import StepService    from './steps/StepService'
-import StepDateTime   from './steps/StepDateTime'
-import StepContact    from './steps/StepContact'
-import { overlayStyle, panelStyle } from '../../../styles/reservations/modal.styles'
+import useModalData   from '../../../hooks/Reservations/useModalData.js'
+import useTimeSlots   from '../../../hooks/Reservations/useTimeSlots.js'
+import ModalHeader    from './ModalHeader.jsx'
+import ViewMode       from './modes/ViewMode.jsx'
+import EditMode       from './modes/EditMode.jsx'
+import StepService    from './steps/StepService.jsx'
+import StepDateTime   from './steps/StepDateTime.jsx'
+import StepContact    from './steps/StepContact.jsx'
+import { overlayStyle, panelStyle } from '../../../styles/reservations/modal.styles.js'
 
 export default function ReservationModal({ modalMode, editing, form, setForm, handleSubmit, handleCreate, handleDelete, setModalMode }) {
   const [step, setStep] = useState(1)
