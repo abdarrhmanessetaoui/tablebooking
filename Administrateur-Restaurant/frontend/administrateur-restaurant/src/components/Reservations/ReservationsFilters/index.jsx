@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
-import { Search, X, Calendar, LayoutGrid } from 'lucide-react'
+import { Search, X, Calendar } from 'lucide-react'
 import CalendarPopup from './CalendarPopup.jsx'
 import { DARK, GOLD, GOLD_DARK } from '../../../styles/reservations/tokens.js'
 import { filterInputBase, dateBtnStyle } from '../../../styles/reservations/filters.styles.js'
@@ -21,6 +21,20 @@ function dateLabel(filterDate) {
   return filterDate
 }
 
+// Mirrors dateBtnStyle logic but for <select> elements
+function selectActiveStyle(isActive) {
+  return {
+    ...filterInputBase,
+    cursor: 'pointer',
+    ...(isActive ? {
+      background: DARK,
+      color: GOLD,
+      border: 'none',
+      fontWeight: 800,
+    } : {}),
+  }
+}
+
 export default function ReservationsFilters({
   search,        setSearch,
   filterStatus,  setFilterStatus,
@@ -34,7 +48,6 @@ export default function ReservationsFilters({
   const [tables,  setTables]  = useState([])
   const anchorRef = useRef(null)
 
-  // Fetch tables for filter dropdown
   useEffect(() => {
     fetch('http://localhost:8000/api/tables', {
       headers: { 'Authorization': `Bearer ${getToken()}`, 'Accept': 'application/json' }
@@ -44,9 +57,11 @@ export default function ReservationsFilters({
       .catch(() => {})
   }, [])
 
-  const hasFilters = search || filterStatus !== 'all' || filterDate ||
-    (filterService && filterService !== 'all') ||
-    (filterTable && filterTable !== 'all')
+  const statusActive  = filterStatus  && filterStatus  !== 'all'
+  const serviceActive = filterService && filterService !== 'all'
+  const tableActive   = filterTable   && filterTable   !== 'all'
+
+  const hasFilters = search || statusActive || filterDate || serviceActive || tableActive
 
   return (
     <>
@@ -69,17 +84,27 @@ export default function ReservationsFilters({
           .filters-date,
           .filters-clear { grid-column: auto; }
         }
+
+        /* Unified active select: gold options stay readable in dropdown */
+        .filter-select option {
+          background: #fff;
+          color: #2b2118;
+          font-weight: 600;
+        }
       `}</style>
 
       <div className="filters-wrap">
 
-        {/* Search */}
-        <div className="filters-search" style={{ position:'relative' }}>
-          <Search size={14} color={MUTED} strokeWidth={2.5} style={{ position:'absolute', left:12, top:'50%', transform:'translateY(-50%)', pointerEvents:'none' }} />
+        {/* ── Search ── */}
+        <div className="filters-search" style={{ position: 'relative' }}>
+          <Search
+            size={14} color={MUTED} strokeWidth={2.5}
+            style={{ position:'absolute', left:12, top:'50%', transform:'translateY(-50%)', pointerEvents:'none' }}
+          />
           <input
             type="text" placeholder="Rechercher…"
             value={search} onChange={e => setSearch(e.target.value)}
-            style={{ ...filterInputBase, paddingLeft:34 }}
+            style={{ ...filterInputBase, paddingLeft: 34 }}
           />
           {search && (
             <button onClick={() => setSearch('')}
@@ -89,33 +114,36 @@ export default function ReservationsFilters({
           )}
         </div>
 
-        {/* Status */}
-        <select value={filterStatus} onChange={e => setFilterStatus(e.target.value)}
-          style={{ ...filterInputBase, cursor:'pointer' }}>
+        {/* ── Status ── */}
+        <select
+          className="filter-select"
+          value={filterStatus}
+          onChange={e => setFilterStatus(e.target.value)}
+          style={selectActiveStyle(statusActive)}
+        >
           <option value="all">Tous les statuts</option>
           <option value="Pending">En attente</option>
           <option value="Confirmed">Confirmées</option>
           <option value="Cancelled">Annulées</option>
         </select>
 
-        {/* Service */}
-        <select value={filterService ?? 'all'} onChange={e => setFilterService(e.target.value)}
-          style={{ ...filterInputBase, cursor:'pointer' }}>
+        {/* ── Service ── */}
+        <select
+          className="filter-select"
+          value={filterService ?? 'all'}
+          onChange={e => setFilterService(e.target.value)}
+          style={selectActiveStyle(serviceActive)}
+        >
           <option value="all">Tous les services</option>
           {services.map(s => <option key={s} value={s}>{s}</option>)}
         </select>
 
-        {/* Table */}
+        {/* ── Table ── */}
         <select
+          className="filter-select"
           value={filterTable ?? 'all'}
           onChange={e => setFilterTable(e.target.value)}
-          style={{
-            ...filterInputBase,
-            cursor: 'pointer',
-            background: filterTable && filterTable !== 'all' ? DARK : '#fff',
-            color:      filterTable && filterTable !== 'all' ? GOLD  : DARK,
-            border:     filterTable && filterTable !== 'all' ? 'none' : `2px solid ${DARK}`,
-          }}
+          style={selectActiveStyle(tableActive)}
         >
           <option value="all">Toutes les tables</option>
           {tables.map(t => (
@@ -126,13 +154,13 @@ export default function ReservationsFilters({
           <option value="unassigned">Non assignées</option>
         </select>
 
-        {/* Date */}
+        {/* ── Date ── */}
         <div className="filters-date" ref={anchorRef}>
           <button onClick={() => setCalOpen(o => !o)} style={dateBtnStyle(!!filterDate)}>
             <span style={{ overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
               {dateLabel(filterDate)}
             </span>
-            <Calendar size={14} strokeWidth={2.2} style={{ flexShrink:0 }} />
+            <Calendar size={14} strokeWidth={2.2} style={{ flexShrink: 0 }} />
           </button>
           {filterDate && (
             <button
@@ -144,7 +172,7 @@ export default function ReservationsFilters({
           )}
         </div>
 
-        {/* Clear all */}
+        {/* ── Clear all ── */}
         {hasFilters && (
           <div className="filters-clear">
             <button onClick={clearFilters}
