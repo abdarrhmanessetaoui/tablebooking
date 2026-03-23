@@ -6,6 +6,10 @@ export default function AssignTableCell({ r, onOpenAssign }) {
   const [hov, setHov] = useState(false)
   const hasTable = !!r.table_idx
 
+  // Prefer the real table number/name returned by the API.
+  // Fall back to the raw idx so it never shows blank.
+  const tableLabel = r.table_number ?? r.table_name ?? r.table_idx
+
   if (hasTable) {
     return (
       <div
@@ -24,7 +28,7 @@ export default function AssignTableCell({ r, onOpenAssign }) {
         }}
       >
         <LayoutGrid size={10} strokeWidth={2.5} />
-        T-{r.table_idx}
+        Table {tableLabel}
       </div>
     )
   }
