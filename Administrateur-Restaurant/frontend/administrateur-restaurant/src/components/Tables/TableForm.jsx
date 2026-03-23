@@ -5,8 +5,7 @@ const DARK   = '#2b2118'
 const GOLD   = '#c8a97e'
 const BORDER = '#2b2118'
 
-const LOCATIONS = ['Intérieur', 'Terrasse', 'Bar', 'Salon privé']
-const EMPTY     = { number: '', capacity: '', location: 'Intérieur' }
+const EMPTY = { number: '', capacity: '', location: '' }
 
 const inp = {
   padding: '12px 14px',
@@ -39,8 +38,9 @@ function Field({ label, children }) {
   )
 }
 
-export default function TableForm({ initial = EMPTY, onSave, saving, editingNumber, onCancel }) {
-  const [form, setForm] = useState({ ...EMPTY, ...initial })
+export default function TableForm({ initial = EMPTY, onSave, saving, editingNumber, onCancel, locations = [] }) {
+  const defaultLocation = initial.location || locations[0]?.name || ''
+  const [form, setForm] = useState({ ...EMPTY, ...initial, location: initial.location || defaultLocation })
   const set  = k => v => setForm(f => ({ ...f, [k]: v }))
   const fo   = e => e.target.style.borderColor = GOLD
   const bl   = e => e.target.style.borderColor = BORDER
@@ -48,7 +48,7 @@ export default function TableForm({ initial = EMPTY, onSave, saving, editingNumb
 
   async function handleSubmit() {
     if (!valid || saving) return
-    await onSave(form, () => setForm(EMPTY))
+    await onSave(form, () => setForm({ ...EMPTY, location: locations[0]?.name || '' }))
   }
 
   return (
@@ -82,14 +82,23 @@ export default function TableForm({ initial = EMPTY, onSave, saving, editingNumb
         </div>
 
         <Field label="Emplacement">
-          <select
-            value={form.location}
-            onChange={e => set('location')(e.target.value)}
-            style={{ ...inp, cursor: 'pointer' }}
-            onFocus={fo} onBlur={bl}
-          >
-            {LOCATIONS.map(l => <option key={l} value={l}>{l}</option>)}
-          </select>
+          {locations.length === 0 ? (
+            <div style={{ ...inp, color: 'rgba(43,33,24,0.4)', fontSize: 12, display: 'flex', alignItems: 'center' }}>
+              Aucun emplacement — ajoutez-en d'abord
+            </div>
+          ) : (
+            <select
+              value={form.location}
+              onChange={e => set('location')(e.target.value)}
+              style={{ ...inp, cursor: 'pointer' }}
+              onFocus={fo} onBlur={bl}
+            >
+              <option value="">Choisir un emplacement</option>
+              {locations.map(l => (
+                <option key={l.id} value={l.name}>{l.name}</option>
+              ))}
+            </select>
+          )}
         </Field>
 
         <button
