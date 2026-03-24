@@ -1,15 +1,16 @@
 import { useState } from 'react'
 import { FileDown, Trash2, ToggleRight, ToggleLeft } from 'lucide-react'
-import FadeUp        from '../components/Dashboard/FadeUp'
-import Spinner       from '../components/Dashboard/Spinner'
-import TableForm     from '../components/Tables/TableForm'
-import TableList     from '../components/Tables/TableList'
-import TableTimeline from '../components/Tables/TableTimeline'
-import useTables     from '../hooks/Tables/useTables'
-import { confirm }   from '../components/ui/ConfirmDialog'
-import { toast }     from '../components/ui/Toast'
-import { getToken }  from '../utils/auth'
-
+import FadeUp                from '../components/Dashboard/FadeUp'
+import Spinner               from '../components/Dashboard/Spinner'
+import TableForm             from '../components/Tables/TableForm'
+import TableList             from '../components/Tables/TableList'
+import TableTimeline         from '../components/Tables/TableTimeline'
+import TableLocationsManager from '../components/Tables/TableLocationsManager'
+import useTables             from '../hooks/Tables/useTables'
+import useTableLocations     from '../hooks/Tables/useTableLocations'
+import { confirm }           from '../components/ui/ConfirmDialog'
+import { toast }             from '../components/ui/Toast'
+import { getToken }          from '../utils/auth'
 
 const DARK    = '#2b2118'
 const GOLD    = '#c8a97e'
@@ -18,7 +19,7 @@ const RED     = '#b94040'
 const RED_BG  = '#fdf0f0'
 const CREAM   = '#faf8f5'
 
-const API = 'http://localhost:8000/api/tables'
+const API  = 'http://localhost:8000/api/tables'
 const hdrs = () => ({
   'Content-Type': 'application/json', 'Accept': 'application/json',
   'Authorization': `Bearer ${getToken()}`,
@@ -114,7 +115,7 @@ function BulkBar({ count, onDelete, onActivate, onDeactivate, onClear }) {
 
       <button onClick={onClear} style={{
         marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 5,
-        padding: '7px 10px', background: 'none', border: `1px solid #3d2d1e`,
+        padding: '7px 10px', background: 'none', border: '1px solid #3d2d1e',
         color: '#fff', fontSize: 12, fontWeight: 700,
         cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.15s', flexShrink: 0, minHeight: 34,
       }}
@@ -136,8 +137,11 @@ export default function Tables() {
     setTables,
   } = useTables()
 
+  // ── Locations — fetched once, shared between TableForm & TableLocationsManager
+  const { locations, loading: locLoading, saving: locSaving, handleAdd, handleUpdate, handleDelete: handleDeleteLoc } = useTableLocations()
+
   const [selectedTables, setSelectedTables] = useState([])
-  const [exporting, setExporting] = useState(false)
+  const [exporting,      setExporting]      = useState(false)
 
   async function handleBulkDelete() {
     const ok = await confirm({
@@ -160,35 +164,29 @@ export default function Tables() {
   }
 
   async function handleBulkActivate() {
-    const toActivate = selectedTables.filter(idx => !tables.find(t => t.idx === idx)?.active)
     try {
       await Promise.all(
-        toActivate.map(idx =>
-          fetch(`${API}/${idx}/toggle`, { method: 'PATCH', headers: hdrs() })
-        )
+        selectedTables
+          .filter(idx => !tables.find(t => t.idx === idx)?.active)
+          .map(idx => fetch(`${API}/${idx}/toggle`, { method: 'PATCH', headers: hdrs() }))
       )
-      setTables(prev => prev.map(t =>
-        selectedTables.includes(t.idx) ? { ...t, active: true } : t
-      ))
+      setTables(prev => prev.map(t => selectedTables.includes(t.idx) ? { ...t, active: true } : t))
       toast(`${selectedTables.length} table${selectedTables.length > 1 ? 's activées' : ' activée'}`, 'success')
       setSelectedTables([])
     } catch {
-      toast('Erreur lors de l\'activation', 'error')
+      toast("Erreur lors de l'activation", 'error')
       setSelectedTables([])
     }
   }
 
   async function handleBulkDeactivate() {
-    const toDeactivate = selectedTables.filter(idx => tables.find(t => t.idx === idx)?.active)
     try {
       await Promise.all(
-        toDeactivate.map(idx =>
-          fetch(`${API}/${idx}/toggle`, { method: 'PATCH', headers: hdrs() })
-        )
+        selectedTables
+          .filter(idx => tables.find(t => t.idx === idx)?.active)
+          .map(idx => fetch(`${API}/${idx}/toggle`, { method: 'PATCH', headers: hdrs() }))
       )
-      setTables(prev => prev.map(t =>
-        selectedTables.includes(t.idx) ? { ...t, active: false } : t
-      ))
+      setTables(prev => prev.map(t => selectedTables.includes(t.idx) ? { ...t, active: false } : t))
       toast(`${selectedTables.length} table${selectedTables.length > 1 ? 's désactivées' : ' désactivée'}`, 'warning')
       setSelectedTables([])
     } catch {
@@ -272,9 +270,6 @@ export default function Tables() {
               <h1 style={{ margin: 0, fontSize: 'clamp(20px,5vw,36px)', fontWeight: 900, color: DARK, letterSpacing: '-1.5px', lineHeight: 1 }}>
                 Tables
               </h1>
-              <p className="page-subtitle" style={{ margin: '6px 0 0', fontSize: 12, fontWeight: 700, color: GOLD_DK }}>
-                
-              </p>
             </div>
             <div style={{ display: 'flex', gap: 3, flexShrink: 0 }}>
               <Btn icon={FileDown} primary onClick={handleExport} disabled={exporting}>
@@ -309,26 +304,44 @@ export default function Tables() {
         <FadeUp delay={20}>
           <div className="tbl-layout">
 
-            <div className="tbl-form-sticky" style={{ minWidth: 0 }}>
-              <h2 style={{ margin: '0 0 5px', fontSize: 'clamp(15px,2.5vw,22px)', fontWeight: 900, color: DARK, letterSpacing: '-0.8px' }}>
-                {editingTbl ? 'Modifier la table' : 'Ajouter une table'}
-              </h2>
-              <p className="page-subtitle" style={{ margin: '0 0 16px', fontSize: 12, fontWeight: 700, color: GOLD_DK }}>
-               
-              </p>
-              <TableForm
-                key={editingTbl?.idx ?? 'new'}
-                initial={editingTbl
-                  ? { number: editingTbl.number, capacity: editingTbl.capacity, location: editingTbl.location }
-                  : undefined
-                }
-                onSave={handleSave}
-                saving={saving}
-                editingNumber={editingTbl?.number ?? null}
-                onCancel={() => setEditingTbl(null)}
+            {/* ── Left column: form + locations manager ── */}
+            <div className="tbl-form-sticky" style={{ minWidth: 0, display: 'flex', flexDirection: 'column', gap: 24 }}>
+
+              {/* Table form */}
+              <div>
+                <h2 style={{ margin: '0 0 5px', fontSize: 'clamp(15px,2.5vw,22px)', fontWeight: 900, color: DARK, letterSpacing: '-0.8px' }}>
+                  {editingTbl ? 'Modifier la table' : 'Ajouter une table'}
+                </h2>
+                <p className="page-subtitle" style={{ margin: '0 0 16px', fontSize: 12, fontWeight: 700, color: GOLD_DK }}>
+                  Les emplacements ci-dessous sont disponibles dans le formulaire
+                </p>
+                <TableForm
+                  key={editingTbl?.idx ?? 'new'}
+                  initial={editingTbl
+                    ? { number: editingTbl.number, capacity: editingTbl.capacity, location: editingTbl.location }
+                    : undefined
+                  }
+                  onSave={handleSave}
+                  saving={saving}
+                  editingNumber={editingTbl?.number ?? null}
+                  onCancel={() => setEditingTbl(null)}
+                  locations={locations}
+                />
+              </div>
+
+              {/* Locations manager */}
+              <TableLocationsManager
+                locations={locations}
+                loading={locLoading}
+                saving={locSaving}
+                onAdd={handleAdd}
+                onUpdate={handleUpdate}
+                onDelete={handleDeleteLoc}
               />
+
             </div>
 
+            {/* ── Right column: table list ── */}
             <div>
               <div className="tbl-mob-divider" style={{ height: 2, background: DARK, margin: '32px 0 28px' }} />
               <div style={{ marginBottom: 16, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
@@ -353,23 +366,17 @@ export default function Tables() {
           </div>
         </FadeUp>
 
-
-        {/* ── Timeline — always shown, synced to correct date ── */}
+        {/* ── Timeline ── */}
         <FadeUp delay={50}>
           <div style={{ margin: '40px 0 0', display: 'flex', alignItems: 'center', gap: 14 }}>
             <div style={{ height: 2, background: DARK, flex: 1 }} />
-            <span style={{
-              fontSize: 9, fontWeight: 900, color: DARK,
-              letterSpacing: '0.2em', textTransform: 'uppercase', whiteSpace: 'nowrap',
-            }}>
+            <span style={{ fontSize: 9, fontWeight: 900, color: DARK, letterSpacing: '0.2em', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>
               Occupation des tables
             </span>
             <div style={{ height: 2, background: DARK, flex: 1 }} />
           </div>
           <TableTimeline />
         </FadeUp>
-
-
 
       </div>
     </>
