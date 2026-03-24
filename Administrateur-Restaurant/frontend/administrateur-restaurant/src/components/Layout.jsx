@@ -1,32 +1,37 @@
+// src/components/Layout.jsx
 import { useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import useDashboard from '../hooks/Dashboard/useDashboard'
 import Sidebar from './Sidebar'
 import { HamburgerIcon, CloseIcon } from '../data/sidebarItems'
+import { useTranslation } from 'react-i18next' // 🔹 import
 
 const DARK = '#2b2118'
 const GOLD = '#c8a97e'
 const SW_OPEN      = 220
 const SW_COLLAPSED = 64
 
+// 🔹 keys for translation
 const PAGE_TITLES = {
-  '/dashboard':     'Dashboard',
-  '/reservations':  'Réservations',
-  '/blocked-dates': 'Dates bloquées',
-  '/calendar':      'Planning',
-  '/services':      'Services',
-  '/reports':       'Rapports',
-  '/settings':      'Paramètres',
-  '/tables': 'Tables',
+  '/dashboard':     'dashboard',
+  '/reservations':  'reservations',
+  '/blocked-dates': 'blocked_dates',
+  '/calendar':      'calendar',
+  '/services':      'services',
+  '/reports':       'reports',
+  '/settings':      'settings',
+  '/tables':        'tables',
 }
 
 export default function Layout({ children }) {
+  const { t } = useTranslation()           // 🔹 hook
   const { handleLogout }          = useDashboard()
   const [open, setOpen]           = useState(false)
   const [collapsed, setCollapsed] = useState(false)
   const location                  = useLocation()
-  const title                     = PAGE_TITLES[location.pathname] || 'Dashboard'
-  const SW                        = collapsed ? SW_COLLAPSED : SW_OPEN
+  const titleKey                   = PAGE_TITLES[location.pathname] || 'dashboard'
+  const title                      = t(titleKey) // 🔹 translated
+  const SW                         = collapsed ? SW_COLLAPSED : SW_OPEN
 
   return (
     <>
@@ -113,7 +118,7 @@ export default function Layout({ children }) {
               onError={e => { e.target.style.display = 'none' }} />
 
             <span style={{ fontSize: 11, fontWeight: 700, color: 'rgba(200,169,126,0.6)', minWidth: 72, textAlign: 'right', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-              {title}
+              {title} {/* 🔹 translated page title */}
             </span>
           </header>
 

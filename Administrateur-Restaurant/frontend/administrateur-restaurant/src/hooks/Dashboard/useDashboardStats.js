@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { getToken } from '../../utils/auth'
+import { useTranslation } from "react-i18next"
 
 const DEFAULTS = {
   today: 0, today_confirmed: 0, today_pending: 0, today_cancelled: 0,
@@ -17,6 +18,8 @@ function sanitize(data) {
 }
 
 export default function useDashboardStats() {
+  const { t } = useTranslation()
+
   const [stats,   setStats]   = useState(DEFAULTS)
   const [loading, setLoading] = useState(true)
   const [error,   setError]   = useState(null)
@@ -24,19 +27,25 @@ export default function useDashboardStats() {
   const fetchStats = useCallback(async () => {
     setLoading(true)
     setError(null)
+
     try {
       const res = await fetch('http://localhost:8000/api/stats', {
         headers: { Authorization: `Bearer ${getToken()}` },
       })
-      if (!res.ok) throw new Error(`Erreur ${res.status}`)
+
+      if (!res.ok) {
+        throw new Error(t("errors.fetch_stats"))
+      }
+
       const data = await res.json()
       setStats(sanitize(data))
+
     } catch (e) {
-      setError(e.message)
+      setError(e.message || t("errors.fetch_stats"))
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, [t])
 
   useEffect(() => { fetchStats() }, [fetchStats])
 

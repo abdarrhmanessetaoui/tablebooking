@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react'
 import { getToken }  from '../../utils/auth'
-import { toast }     from '../../components/ui/Toast'
-import { confirm }   from '../../components/ui/ConfirmDialog'
-
+import { toast } from '../../components/ui/Toast.jsx'
+import { confirm } from '../../components/ui/ConfirmDialog.jsx'
+import i18n from '../../i18next'
 const API = 'http://localhost:8000/api/tables'
 
 const hdrs = () => ({
@@ -27,7 +27,7 @@ export default function useTables() {
       const data = await res.json()
       setTables(Array.isArray(data) ? data : [])
     } catch {
-      setError('Impossible de charger les tables.')
+      setError(i18n.t('errors.load_tables'))
     } finally {
       setLoading(false)
     }
@@ -51,7 +51,7 @@ export default function useTables() {
             ? { ...t, number: form.number, capacity: parseInt(form.capacity), location: form.location }
             : t
         ))
-        toast(`Table ${form.number} modifiée`, 'success')
+        toast(i18n.t('toast.table_updated', { number: form.number }), 'success')
         setEditingTbl(null)
       } else {
         const res  = await fetch(API, {
@@ -65,11 +65,11 @@ export default function useTables() {
         })
         const data = await res.json()
         setTables(prev => [...prev, data])
-        toast(`Table ${form.number} ajoutée`, 'success')
+        toast(i18n.t('toast.table_created', { number: form.number }), 'success')
         if (resetForm) resetForm()
       }
     } catch {
-      toast(editingTbl ? 'Impossible de modifier' : "Impossible d'ajouter", 'error')
+      toast(i18n.t(editingTbl ? 'toast.table_update_failed' : 'toast.table_create_failed'), 'error')
     } finally {
       setSaving(false)
     }
@@ -77,10 +77,10 @@ export default function useTables() {
 
   async function handleDelete(tbl) {
     const ok = await confirm({
-      title:        'Supprimer la table',
-      message:      `Voulez-vous supprimer la table ${tbl.number} ?`,
-      sub:          'Cette action est irréversible.',
-      confirmLabel: 'Supprimer',
+      title:        i18n.t('confirm.delete_table_title'),
+      message:      i18n.t('confirm.delete_table_message', { number: tbl.number }),
+      sub:          i18n.t('confirm.delete_table_sub'),
+      confirmLabel: i18n.t('confirm.delete_table_button'),
       type:         'danger',
     })
     if (!ok) return
@@ -88,9 +88,9 @@ export default function useTables() {
       await fetch(`${API}/${tbl.idx}`, { method: 'DELETE', headers: hdrs() })
       setTables(prev => prev.filter(t => t.idx !== tbl.idx))
       if (editingTbl?.idx === tbl.idx) setEditingTbl(null)
-      toast(`Table ${tbl.number} supprimée`, 'warning')
+      toast(i18n.t('toast.table_deleted', { number: tbl.number }), 'warning')
     } catch {
-      toast('Impossible de supprimer', 'error')
+      toast(i18n.t('toast.table_delete_failed'), 'error')
     }
   }
 
@@ -100,9 +100,12 @@ export default function useTables() {
       setTables(prev => prev.map(t =>
         t.idx === tbl.idx ? { ...t, active: !t.active } : t
       ))
-      toast(`Table ${tbl.number} ${tbl.active ? 'désactivée' : 'activée'}`, 'success')
+      toast(
+        i18n.t(tbl.active ? 'toast.table_deactivated' : 'toast.table_activated', { number: tbl.number }),
+        'success'
+      )
     } catch {
-      toast('Impossible de modifier le statut', 'error')
+      toast(i18n.t('toast.table_toggle_failed'), 'error')
     }
   }
 
@@ -110,7 +113,6 @@ export default function useTables() {
     tables, loading, error,
     editingTbl, setEditingTbl,
     saving, handleSave, handleDelete, handleToggle,
-    // ✅ FIX 1: export setTables — required by Tables.jsx bulk handlers
     setTables,
   }
 }

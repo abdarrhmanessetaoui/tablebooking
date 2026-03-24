@@ -8,9 +8,15 @@ use App\Http\Controllers\BlockedDateController;
 use App\Http\Controllers\TimeSlotController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\TableController;
-
+use App\Http\Controllers\Auth\PasswordResetLinkController;
+use App\Http\Controllers\Auth\NewPasswordController;
 
 // ── Auth ──────────────────────────────────────────────────────────────────────
+
+
+Route::post('/forgot-password', [PasswordResetLinkController::class, 'store']);
+Route::post('/reset-password', [NewPasswordController::class, 'store']);
+
 Route::post('/login',  [AuthenticatedSessionController::class, 'store']);
 Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->middleware('auth:sanctum');
 

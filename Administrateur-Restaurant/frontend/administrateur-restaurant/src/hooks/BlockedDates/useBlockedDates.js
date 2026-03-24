@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { getToken } from '../../utils/auth'
 import { toast }   from '../../components/ui/Toast'
 import { confirm } from '../../components/ui/ConfirmDialog'
+import { useTranslation } from "react-i18next"
 
 const API_GET   = 'http://localhost:8000/api/admin/blocked-dates'
 const API_WRITE = 'http://localhost:8000/api/blocked-dates'
@@ -23,6 +24,8 @@ const EMPTY_FORM = {
 }
 
 export default function useBlockedDates() {
+  const { t } = useTranslation()
+
   const [blockedDates, setBlockedDates] = useState([])
   const [loading,      setLoading]      = useState(true)
   const [error,        setError]        = useState('')
@@ -38,7 +41,7 @@ export default function useBlockedDates() {
       const data = await res.json()
       setBlockedDates(Array.isArray(data) ? data : [])
     } catch {
-      setError('Impossible de charger les dates bloquées.')
+      setError(t("errors.load_blocked_dates"))
       setBlockedDates([])
     } finally {
       setLoading(false)
@@ -47,7 +50,6 @@ export default function useBlockedDates() {
 
   function getDatesToBlock() {
     const dates = []
-
     if (form.mode === 'single') {
       if (form.date) dates.push(form.date)
 
@@ -84,10 +86,10 @@ export default function useBlockedDates() {
 
     if (dates.length > 10) {
       const ok = await confirm({
-        title:        'Bloquer plusieurs dates',
-        message:      `Vous allez bloquer ${dates.length} dates.`,
-        sub:          'Cette action peut prendre un moment.',
-        confirmLabel: 'Confirmer',
+        title:        t("block.multiple_title"),
+        message:      t("block.multiple_message", { count: dates.length }),
+        sub:          t("block.multiple_sub"),
+        confirmLabel: t("block.confirm"),
         type:         'warning',
       })
       if (!ok) return
@@ -103,7 +105,6 @@ export default function useBlockedDates() {
       })
 
       if (!res.ok) {
-        // fallback: one by one
         const added = []
         for (const date of dates) {
           const r = await fetch(API_WRITE, {
@@ -130,35 +131,38 @@ export default function useBlockedDates() {
 
       toast(
         dates.length === 1
-          ? 'Date bloquée avec succès'
-          : `${dates.length} dates bloquées avec succès`,
+          ? t("block.success_one")
+          : t("block.success_many", { count: dates.length }),
         'success'
       )
+
       setForm(EMPTY_FORM)
+
     } catch {
-      toast('Impossible de bloquer les dates', 'error')
+      toast(t("errors.block_failed"), 'error')
     } finally {
       setSubmitting(false)
     }
   }
 
   const handleUnblock = async (date) => {
-    const label = new Date(date).toLocaleDateString('fr-FR', {
-      weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
-    })
+    const label = new Date(date).toLocaleDateString()
+
     const ok = await confirm({
-      title:        'Débloquer la date',
-      message:      `Voulez-vous débloquer le ${label} ?`,
-      confirmLabel: 'Débloquer',
+      title:        t("unblock.title"),
+      message:      t("unblock.message", { date: label }),
+      confirmLabel: t("unblock.confirm"),
       type:         'danger',
     })
+
     if (!ok) return
+
     try {
       await fetch(`${API_WRITE}/${date}`, { method: 'DELETE', headers: headers() })
       setBlockedDates(prev => prev.filter(d => d.date !== date))
-      toast('Date débloquée', 'warning')
+      toast(t("unblock.success"), 'warning')
     } catch {
-      toast('Impossible de débloquer la date', 'error')
+      toast(t("errors.unblock_failed"), 'error')
     }
   }
 

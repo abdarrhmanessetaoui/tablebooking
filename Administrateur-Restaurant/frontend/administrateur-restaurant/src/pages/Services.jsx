@@ -1,21 +1,25 @@
+// src/pages/Services.jsx
 import { useState } from 'react'
-import { FileDown }  from 'lucide-react'
-import FadeUp   from '../components/Dashboard/FadeUp'
-import Spinner  from '../components/Dashboard/Spinner'
+import { FileDown } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
+
+import FadeUp from '../components/Dashboard/FadeUp'
+import Spinner from '../components/Dashboard/Spinner'
 import ServiceForm from '../components/Services/ServiceForm'
 import ServiceList from '../components/Services/ServiceList'
-import useServices  from '../hooks/Services/useServices'
+import useServices from '../hooks/Services/useServices'
 
-const DARK    = '#2b2118'
-const GOLD    = '#c8a97e'
+const DARK = '#2b2118'
+const GOLD = '#c8a97e'
 const GOLD_DK = '#a8834e'
-const RED     = '#b94040'
-const RED_BG  = '#fdf0f0'
-const CREAM   = '#faf8f5'
+const RED = '#b94040'
+const RED_BG = '#fdf0f0'
+const CREAM = '#faf8f5'
 
+// Btn component with translation support
 function Btn({ children, onClick, primary, disabled, icon: Icon }) {
   const [hov, setHov] = useState(false)
-  const bg    = primary ? (hov ? DARK : GOLD) : (hov ? GOLD : DARK)
+  const bg = primary ? (hov ? DARK : GOLD) : (hov ? GOLD : DARK)
   const color = primary ? (hov ? GOLD : DARK) : '#fff'
   return (
     <button onClick={onClick} disabled={disabled}
@@ -36,6 +40,7 @@ function Btn({ children, onClick, primary, disabled, icon: Icon }) {
 }
 
 export default function Services() {
+  const { t } = useTranslation()
   const {
     services, loading, error,
     editingSvc, setEditingSvc,
@@ -55,34 +60,50 @@ export default function Services() {
       const { jsPDF } = window.jspdf
       const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' })
       const dateStr = new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
+
+      // Header
       doc.setFillColor(43,33,24); doc.rect(0,0,210,32,'F')
       doc.setFont('helvetica','bold'); doc.setFontSize(18); doc.setTextColor(200,169,126)
       doc.text('TableBooking.ma',20,14)
-      doc.setFontSize(9); doc.setTextColor(255,255,255); doc.text('Services',20,22)
-      doc.setTextColor(200,169,126); doc.setFontSize(8); doc.text(dateStr,190,22,{align:'right'})
-      doc.setTextColor(43,33,24); doc.setFontSize(20); doc.text('Services',20,48)
+      doc.setFontSize(9); doc.setTextColor(255,255,255)
+      doc.text(t('services') || 'Services',20,22)
+      doc.setTextColor(200,169,126); doc.setFontSize(8)
+      doc.text(dateStr,190,22,{align:'right'})
+
+      // Body title
+      doc.setTextColor(43,33,24); doc.setFontSize(20)
+      doc.text(t('services') || 'Services',20,48)
       doc.setFontSize(10); doc.setTextColor(200,169,126)
-      doc.text(`${services.length} service${services.length!==1?'s':''}`,20,56)
+      doc.text(`${services.length} ${t('service') || 'service'}${services.length!==1?'s':''}`,20,56)
       doc.setDrawColor(43,33,24); doc.setLineWidth(0.5); doc.line(20,61,190,61)
+
+      // Table
       let y = 70
       doc.setFillColor(43,33,24); doc.rect(20,y,170,9,'F')
       doc.setTextColor(200,169,126); doc.setFontSize(8); doc.setFont('helvetica','bold')
-      doc.text('NOM',24,y+6); doc.text('PRIX',90,y+6); doc.text('CAPACITÉ',130,y+6); doc.text('DURÉE',165,y+6)
+      doc.text(t('name') || 'NOM',24,y+6)
+      doc.text(t('price') || 'PRIX',90,y+6)
+      doc.text(t('capacity') || 'CAPACITÉ',130,y+6)
+      doc.text(t('duration') || 'DURÉE',165,y+6)
       y += 9
+
       services.forEach((svc,i) => {
         if (y>270) { doc.addPage(); y=20 }
         doc.setFillColor(i%2===0?255:250,i%2===0?255:248,i%2===0?255:245); doc.rect(20,y,170,9,'F')
         doc.setTextColor(43,33,24); doc.setFontSize(9); doc.setFont('helvetica','normal')
         doc.text(svc.name||'—',24,y+6)
-        doc.text(Number(svc.price)>0?`${svc.price} dh`:'Gratuit',90,y+6)
-        doc.text(`${svc.capacity} pers.`,130,y+6)
+        doc.text(Number(svc.price)>0?`${svc.price} dh`:t('free') || 'Gratuit',90,y+6)
+        doc.text(`${svc.capacity} ${t('guests') || 'pers.'}`,130,y+6)
         doc.text(`${svc.duration} min`,165,y+6)
         y+=9
       })
+
       const pH = doc.internal.pageSize.height
       doc.setFillColor(200,169,126); doc.rect(0,pH-10,210,10,'F')
       doc.setTextColor(43,33,24); doc.setFontSize(7); doc.setFont('helvetica','bold')
-      doc.text('TableBooking.ma',20,pH-4); doc.text(dateStr,190,pH-4,{align:'right'})
+      doc.text('TableBooking.ma',20,pH-4)
+      doc.text(dateStr,190,pH-4,{align:'right'})
+
       doc.save(`services_${new Date().toISOString().slice(0,10)}.pdf`)
     } catch(e) { console.error(e) } finally { setExporting(false) }
   }
@@ -117,22 +138,18 @@ export default function Services() {
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, marginBottom: 8, flexWrap: 'wrap' }}>
             <div style={{ minWidth: 0, flex: 1 }}>
               <h1 style={{ margin: 0, fontSize: 'clamp(20px,5vw,36px)', fontWeight: 900, color: DARK, letterSpacing: '-1.5px', lineHeight: 1 }}>
-                Services
+                {t('services')}
               </h1>
               <p className="page-subtitle" style={{ margin: '6px 0 0', fontSize: 12, fontWeight: 700, color: GOLD_DK }}>
-                Gérez les formules proposées aux clients lors de la réservation.
+                {t('services_subtitle')}
               </p>
             </div>
             <div style={{ display: 'flex', gap: 3, flexShrink: 0 }}>
               <Btn icon={FileDown} primary onClick={handleExport} disabled={exporting}>
-                {exporting ? 'Génération…' : 'Exporter PDF'}
+                {exporting ? t('in_progress') : t('export_pdf')}
               </Btn>
             </div>
           </div>
-        </FadeUp>
-
-        <FadeUp delay={10}>
-          <div style={{ height: 2, background: DARK, margin: '16px 0 28px' }} />
         </FadeUp>
 
         {error && (
@@ -145,42 +162,33 @@ export default function Services() {
 
         <FadeUp delay={20}>
           <div className="svc-layout">
-
             {/* LEFT — form */}
             <div className="svc-form-sticky" style={{ minWidth: 0 }}>
               <h2 style={{ margin: '0 0 5px', fontSize: 'clamp(15px,2.5vw,22px)', fontWeight: 900, color: DARK, letterSpacing: '-0.8px' }}>
-                {editingSvc ? 'Modifier le service' : 'Ajouter un service'}
+                {editingSvc ? t('edit_service') : t('add_service')}
               </h2>
-              <p className="page-subtitle" style={{ margin: '0 0 16px', fontSize: 12, fontWeight: 700, color: GOLD_DK }}>
-            
-              </p>
-
               <ServiceForm
-  key={editingSvc?.idx ?? 'new'}
-  initial={editingSvc
-    ? {
-        name:           editingSvc.name,
-        price:          editingSvc.price,
-        capacity:       editingSvc.capacity,
-        duration:       editingSvc.duration,
-        available_days: editingSvc.available_days ?? [0,1,2,3,4,5,6],  // ← ADD THIS
-      }
-    : undefined
-  }
-  onSave={handleSave}
-  saving={saving}
-  editingName={editingSvc?.name ?? null}
-  onCancel={() => setEditingSvc(null)}
-/>
+                key={editingSvc?.idx ?? 'new'}
+                initial={editingSvc ? {
+                  name: editingSvc.name,
+                  price: editingSvc.price,
+                  capacity: editingSvc.capacity,
+                  duration: editingSvc.duration,
+                  available_days: editingSvc.available_days ?? [0,1,2,3,4,5,6],
+                } : undefined}
+                onSave={handleSave}
+                saving={saving}
+                editingName={editingSvc?.name ?? null}
+                onCancel={() => setEditingSvc(null)}
+              />
             </div>
 
             {/* RIGHT — list */}
             <div>
               <div className="svc-mob-divider" style={{ height: 2, background: DARK, margin: '32px 0 28px' }} />
-
               <div style={{ marginBottom: 16, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
                 <h2 style={{ margin: 0, fontSize: 'clamp(15px,2.5vw,22px)', fontWeight: 900, color: DARK, letterSpacing: '-0.8px' }}>
-                  Services configurés
+                  {t('configured_services')}
                 </h2>
                 <span style={{ padding: '4px 10px', background: DARK, fontSize: 11, fontWeight: 900, color: GOLD, letterSpacing: '0.05em', flexShrink: 0 }}>
                   {services.length}
@@ -194,7 +202,6 @@ export default function Services() {
                 onDelete={handleDelete}
               />
             </div>
-
           </div>
         </FadeUp>
       </div>

@@ -16,6 +16,7 @@ export default function useDashboard() {
       })
     } catch (e) {
       // fail silently, still log out client side
+      console.log(e);
     }
 
     removeToken()

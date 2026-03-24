@@ -1,17 +1,27 @@
-import {
-  Home, CalendarDays, BookOpen,
-  BarChart2, Settings, CalendarOff, LogOut, Utensils, LayoutGrid
+// src/data/sidebarItems.js
+import { 
+  Home, CalendarDays, BookOpen, BarChart2, Settings, CalendarOff, LogOut, Utensils, LayoutGrid 
 } from 'lucide-react'
 
+// 🌟 Define icons
+const DashboardIcon    = () => <Home size={20} strokeWidth={2.2} />
+const ReservationsIcon = () => <BookOpen size={20} strokeWidth={2.2} />
+const BlockedDatesIcon = () => <CalendarOff size={20} strokeWidth={2.2} />
+const CalendarIcon     = () => <CalendarDays size={20} strokeWidth={2.2} />
+const ServicesIcon     = () => <Utensils size={20} strokeWidth={2.2} />
+const ReportsIcon      = () => <BarChart2 size={20} strokeWidth={2.2} />
+const SettingsIcon     = () => <Settings size={20} strokeWidth={2.2} />
+const TablesIcon       = () => <LayoutGrid size={20} strokeWidth={2.2} />
+
 export const navItems = [
-  { to: '/dashboard', label: 'Tableau de bord', icon: <Home size={22} strokeWidth={2} /> },
-  { to: '/reservations',  label: 'Réservations',    icon: <BookOpen        size={22} strokeWidth={2} /> },
-  { to: '/calendar',      label: 'Planning',        icon: <CalendarDays    size={22} strokeWidth={2} /> },
-  { to: '/blocked-dates', label: 'Dates bloquées',  icon: <CalendarOff     size={22} strokeWidth={2} /> },
-  { to: '/services',      label: 'Services',        icon: <Utensils        size={22} strokeWidth={2} /> },
-  { to: '/tables',       label: 'Tables',         icon: <LayoutGrid     size={22} strokeWidth={2} /> },
-  { to: '/reports',       label: 'Rapports',        icon: <BarChart2       size={22} strokeWidth={2} /> },
-  { to: '/settings',      label: 'Paramètres',      icon: <Settings        size={22} strokeWidth={2} /> },
+  { to: "/dashboard", icon: <DashboardIcon />, label: "dashboard" },
+  { to: "/reservations", icon: <ReservationsIcon />, label: "reservations" },
+  { to: "/blocked-dates", icon: <BlockedDatesIcon />, label: "blocked_dates" },
+  { to: "/calendar", icon: <CalendarIcon />, label: "calendar" },
+  { to: "/services", icon: <ServicesIcon />, label: "services" },
+  { to: "/reports", icon: <ReportsIcon />, label: "reports" },
+  { to: "/settings", icon: <SettingsIcon />, label: "settings" },
+  { to: "/tables", icon: <TablesIcon />, label: "tables" },
 ]
 
 export function LogoutIcon() {
