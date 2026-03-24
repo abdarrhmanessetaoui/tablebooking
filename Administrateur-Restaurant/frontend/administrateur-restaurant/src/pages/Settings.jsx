@@ -406,7 +406,7 @@ export default function Settings() {
                     <TextInput value={notifications.fp_from_name} onChange={v => setNotifField('fp_from_name', v)} placeholder="TableBooking.ma" />
                   </Field>
                   <Field label="Email expéditeur">
-                    <TextInput icon={Mail} value={notifications.fp_from_email} onChange={v => setNotifField('fp_from_email', v)} placeholder="reservation@tablebooking.ma" type="email" />
+                    <TextInput disabled icon={Mail} value={notifications.fp_from_email} onChange={v => setNotifField('fp_from_email', v)} placeholder="reservation@tablebooking.ma" type="email" />
                   </Field>
                 </Grid>
                 <Field label="Emails destinataires (séparés par des virgules)">
