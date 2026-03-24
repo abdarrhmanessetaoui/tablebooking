@@ -313,7 +313,7 @@ export default function Tables() {
                   {editingTbl ? 'Modifier la table' : 'Ajouter une table'}
                 </h2>
                 <p className="page-subtitle" style={{ margin: '0 0 16px', fontSize: 12, fontWeight: 700, color: GOLD_DK }}>
-                  Les emplacements ci-dessous sont disponibles dans le formulaire
+                  
                 </p>
                 <TableForm
                   key={editingTbl?.idx ?? 'new'}
