@@ -17,15 +17,14 @@ class DatabaseSeeder extends Seeder
         // ══════════════════════════════════════════════════════════════
         // 1. USER
         // ══════════════════════════════════════════════════════════════
-        $userId = DB::table('users')->insertGetId([
-            'name'                => 'Dal Corso Admin',
-            'email'               => 'admin@tablebooking.ma',
-            'password'            => 'password',
-            'restaurant_form_id'  => 13,
-            'email_verified_at'   => now(),
-            'created_at'          => now(),
-            'updated_at'          => now(),
+        $user = \App\Models\User::create([
+            'name'               => 'Dal Corso Admin',
+            'email'              => 'admin@tablebooking.ma',
+            'password'           => 'password', // auto-hashed by model cast
+            'restaurant_form_id' => 13,
+            'email_verified_at'  => now(),
         ]);
+        $userId = $user->id;
 
         $this->command->info("✅ User created — admin@tablebooking.ma / password");
 
