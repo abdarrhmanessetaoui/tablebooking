@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Plus, Check, X, Utensils } from 'lucide-react'
+
 
 const DARK    = '#2b2118'
 const GOLD    = '#c8a97e'
@@ -23,7 +23,7 @@ const inp = {
   border: `2px solid ${BORDER}`,
   fontSize: 14, fontWeight: 700, color: DARK,
   fontFamily: 'inherit', outline: 'none', background: '#fff',
-  transition: 'border-color 0.15s',
+  transition: 'none',
   width: '100%', boxSizing: 'border-box',
   minWidth: 0, WebkitAppearance: 'none', borderRadius: 0,
 }
@@ -71,23 +71,16 @@ function DayPicker({ value = [0,1,2,3,4,5,6], onChange }) {
               title={d.full}
               style={{
                 display: 'flex', flexDirection: 'column', alignItems: 'center',
-                padding: '8px 10px', minWidth: 42, gap: 2,
-                background: active ? DARK : '#f5f0eb',
-                border: `2px solid ${active ? DARK : '#e8e0d8'}`,
-                color: active ? GOLD : '#bbb',
-                cursor: 'pointer', transition: 'all 0.15s', fontFamily: 'inherit',
-              }}
-              onMouseEnter={e => {
-                if (!active) { e.currentTarget.style.background = '#e8e0d8'; e.currentTarget.style.color = DARK }
-              }}
-              onMouseLeave={e => {
-                if (!active) { e.currentTarget.style.background = '#f5f0eb'; e.currentTarget.style.color = '#bbb' }
+                padding: '10px 10px', minWidth: 44, gap: 2,
+                background: active ? DARK : '#FFFFFF',
+                border: `2px solid ${DARK}`,
+                color: active ? GOLD : DARK,
+                cursor: 'pointer', fontFamily: 'inherit',
               }}
             >
               <span style={{ fontSize: 10, fontWeight: 900, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
                 {d.short}
               </span>
-              {active && <div style={{ width: 4, height: 4, background: GOLD, borderRadius: '50%' }} />}
             </button>
           )
         })}
@@ -132,7 +125,6 @@ export default function ServiceForm({ initial = EMPTY, onSave, saving, editingNa
 
       {/* Header */}
       <div style={{ padding: '12px 16px', background: DARK, display: 'flex', alignItems: 'center', gap: 8 }}>
-        <Utensils size={14} strokeWidth={2.5} color={GOLD} />
         <span style={{ fontSize: 11, fontWeight: 900, color: GOLD, letterSpacing: '0.12em', textTransform: 'uppercase' }}>
           {editingName ? `Modifier — ${editingName}` : 'Nouveau service'}
         </span>
@@ -164,7 +156,7 @@ export default function ServiceForm({ initial = EMPTY, onSave, saving, editingNa
         </Field>
 
         {/* Days picker */}
-        <div style={{ padding: '14px', background: '#faf8f5', border: `1.5px solid #e8e0d8` }}>
+        <div style={{ padding: '14px', background: '#FFFFFF', border: `2px solid ${DARK}` }}>
           <DayPicker
             value={form.available_days ?? [0,1,2,3,4,5,6]}
             onChange={v => set('available_days')(v)}
@@ -175,34 +167,29 @@ export default function ServiceForm({ initial = EMPTY, onSave, saving, editingNa
           style={{
             display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
             padding: '15px', background: DARK, border: 'none',
-            color: valid && !saving ? GOLD : '#fff',
-            fontSize: 14, fontWeight: 800,
+            color: GOLD,
+            fontSize: 14, fontWeight: 900,
             cursor: valid && !saving ? 'pointer' : 'not-allowed',
-            opacity: !valid || saving ? 0.45 : 1,
-            transition: 'background 0.15s, opacity 0.15s',
             fontFamily: 'inherit', width: '100%', minHeight: 50,
+            textTransform: 'uppercase'
           }}
-          onMouseEnter={e => { if (valid && !saving) e.currentTarget.style.background = '#3d2d1e' }}
-          onMouseLeave={e => { e.currentTarget.style.background = DARK }}
         >
           {saving ? 'Enregistrement…'
             : editingName
-              ? <><Check size={15} strokeWidth={2.5} /> Enregistrer les modifications</>
-              : <><Plus size={15} strokeWidth={2.5} /> Ajouter le service</>
+              ? 'Enregistrer'
+              : 'Ajouter le service'
           }
         </button>
 
         {editingName && (
           <button onClick={onCancel} style={{
             display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-            padding: '11px', background: 'none', border: `1.5px solid ${BORDER}`,
-            fontSize: 12, fontWeight: 800, color: DARK,
-            cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.15s', width: '100%',
-          }}
-            onMouseEnter={e => { e.currentTarget.style.background = '#fdf6ec'; e.currentTarget.style.color = GOLD_DK; e.currentTarget.style.borderColor = GOLD }}
-            onMouseLeave={e => { e.currentTarget.style.background = 'none'; e.currentTarget.style.color = DARK; e.currentTarget.style.borderColor = BORDER }}
-          >
-            <X size={13} strokeWidth={2.5} /> Annuler la modification
+            padding: '12px', background: GOLD, border: `none`,
+            fontSize: 12, fontWeight: 900, color: DARK,
+            cursor: 'pointer', fontFamily: 'inherit', width: '100%',
+            textTransform: 'uppercase'
+          }}>
+            Annuler
           </button>
         )}
 

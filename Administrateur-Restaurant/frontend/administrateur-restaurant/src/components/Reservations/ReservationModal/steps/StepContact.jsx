@@ -1,11 +1,11 @@
 import { useState } from 'react'
+
 import Label      from '../../shared/Label'
 import TextInput  from '../../shared/TextInput'
 import { DARK, GOLD, GOLD_DARK, STATUS_CONFIG } from '../../../../styles/reservations/tokens'
 import { inputStyle, footerBtnPrimary, footerBtnSecondary, summaryBoxStyle } from '../../../../styles/reservations/modal.styles'
 
 export default function StepContact({ form, setForm, onBack, onSubmit }) {
-  const [hov, setHov] = useState(false)
   return (
     <>
       <div style={summaryBoxStyle}>
@@ -24,8 +24,7 @@ export default function StepContact({ form, setForm, onBack, onSubmit }) {
       <div>
         <Label text="Demande spéciale (optionnel)" />
         <textarea value={form.notes??''} onChange={e=>setForm({...form,notes:e.target.value})} rows={2}
-          style={{ ...inputStyle, resize:'vertical' }}
-          onFocus={e=>e.target.style.borderColor=GOLD} onBlur={e=>e.target.style.borderColor='#e8e0d8'} />
+          style={{ ...inputStyle, resize:'vertical' }} />
       </div>
       <div>
         <Label text="Statut" />
@@ -40,8 +39,8 @@ export default function StepContact({ form, setForm, onBack, onSubmit }) {
       </div>
       <div style={{ display:'flex', gap:8 }}>
         <button onClick={onBack} style={footerBtnSecondary}>← Retour</button>
-        <button onClick={onSubmit} onMouseEnter={()=>setHov(true)} onMouseLeave={()=>setHov(false)} style={footerBtnPrimary(hov)}>
-          Créer la réservation
+        <button onClick={onSubmit} style={{ ...footerBtnPrimary, display:'flex', alignItems:'center', justifyContent:'center', gap:8, textTransform: 'uppercase' }}>
+          Terminer la réservation
         </button>
       </div>
     </>

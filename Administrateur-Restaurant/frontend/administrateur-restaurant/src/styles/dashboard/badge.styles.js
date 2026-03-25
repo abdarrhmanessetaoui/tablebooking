@@ -1,4 +1,4 @@
-import { GREEN, RED, AMBER } from './tokens'
+import { GREEN, RED, AMBER, DARK } from './tokens'
 
 // ── Status color map ──────────────────────────────────────────────
 export const STATUS_MAP = {
@@ -11,20 +11,12 @@ export const STATUS_MAP = {
 export const badge = (color) => ({
   display:       'inline-flex',
   alignItems:    'center',
-  gap:           5,
+  padding:       '4px 12px',
+  background:    color,
   fontSize:      10,
   fontWeight:    900,
-  color:         color,
+  color:         DARK,
   letterSpacing: '0.04em',
   whiteSpace:    'nowrap',
 })
-
-// ── Dot ───────────────────────────────────────────────────────────
-export const dot = (color) => ({
-  width:        6,
-  height:       6,
-  borderRadius: '50%',
-  background:   color,
-  flexShrink:   0,
-  boxShadow:    `0 0 0 2px ${color}22`,
-})
+

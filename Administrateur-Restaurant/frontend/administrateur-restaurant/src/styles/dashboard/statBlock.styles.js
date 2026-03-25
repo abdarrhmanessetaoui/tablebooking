@@ -64,7 +64,6 @@ export const progressFill = (w, accent) => ({
   height:     '100%',
   width:      `${w}%`,
   background: accent,
-  transition: 'width 0.9s ease',
 })
 
 export const progressPct = (accent) => ({

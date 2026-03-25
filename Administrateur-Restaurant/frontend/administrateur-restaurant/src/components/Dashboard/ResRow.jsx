@@ -1,6 +1,4 @@
-import { useState } from 'react'
-import { Clock, Users, Utensils, ChevronRight, User2 } from 'lucide-react'
-import Badge from './Badge'
+import { Badge } from './Badge'
 import {
   row, nameWrapper, nameInner, nameTxt, phoneTxt,
   dateTxt, timeChip, guestsTxt,
@@ -18,14 +16,10 @@ function fmtDate(iso) {
 }
 
 export default function ResRow({ r, i, tpl, showDate, onRowClick }) {
-  const [hov, setHov] = useState(false)
-
   return (
     <div
       onClick={() => onRowClick(r)}
-      onMouseEnter={() => setHov(true)}
-      onMouseLeave={() => setHov(false)}
-      style={{ ...row(hov, i), gridTemplateColumns: tpl }}
+      style={{ ...row(false, i), gridTemplateColumns: tpl, cursor: 'pointer' }}
     >
       {/* Date — only in month tab */}
       {showDate && (
@@ -37,7 +31,6 @@ export default function ResRow({ r, i, tpl, showDate, onRowClick }) {
       {/* Name + phone */}
       <div style={nameWrapper}>
         <div style={nameInner}>
-          <User2 size={11} strokeWidth={2.5} color={DARK} style={{ flexShrink: 0 }} />
           <p style={nameTxt}>{r.name}</p>
         </div>
         {r.phone && <p style={phoneTxt}>{r.phone}</p>}
@@ -45,27 +38,21 @@ export default function ResRow({ r, i, tpl, showDate, onRowClick }) {
 
       {/* Time chip */}
       <span style={timeChip}>
-        <Clock size={11} strokeWidth={2.5} color={GOLD_DK} />
         {r.start_time}
       </span>
 
       {/* Guests */}
       <span style={guestsTxt}>
-        <Users size={11} strokeWidth={2.5} color={DARK} />
-        {r.guests}
+        {r.guests} pers.
       </span>
 
       {/* Service chip */}
       <span style={serviceChip}>
-        <Utensils size={11} strokeWidth={2.5} color={GOLD_DK} style={{ flexShrink: 0 }} />
         <span style={serviceText}>{r.service || '—'}</span>
       </span>
 
       {/* Status badge */}
       <Badge status={r.status} />
-
-      {/* Chevron */}
-      <ChevronRight size={14} strokeWidth={2.5} style={chevron(hov)} />
     </div>
   )
 }

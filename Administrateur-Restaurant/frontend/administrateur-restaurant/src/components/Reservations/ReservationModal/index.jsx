@@ -25,7 +25,7 @@ export default function ReservationModal({ modalMode, editing, form, setForm, ha
         {/* Progress bar */}
         {modalMode === 'create' && (
           <div style={{ display:'flex', height:3 }}>
-            {[1,2,3].map(s => <div key={s} style={{ flex:1, background:s<=step?'#c8a97e':'#e8e0d8', transition:'background 0.3s' }} />)}
+            {[1,2,3].map(s => <div key={s} style={{ flex:1, background:s<=step?GOLD:'#e8e0d8' }} />)}
           </div>
         )}
 

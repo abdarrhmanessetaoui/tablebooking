@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Plus, Trash2, Pencil, Check, X, MapPin } from 'lucide-react'
+
 
 const DARK   = '#2b2118'
 const GOLD   = '#c8a97e'
@@ -14,12 +14,11 @@ const PRESET_COLORS = [
 function ColorDot({ color, selected, onClick }) {
   return (
     <button onClick={onClick} title={color} style={{
-      width: 22, height: 22, borderRadius: '50%',
+      width: 22, height: 22,
       background: color,
       border: selected ? `3px solid ${DARK}` : '2px solid transparent',
       cursor: 'pointer', flexShrink: 0,
       boxShadow: selected ? `0 0 0 1px ${color}` : 'none',
-      transition: 'transform 0.1s',
       transform: selected ? 'scale(1.15)' : 'scale(1)',
     }} />
   )
@@ -33,7 +32,7 @@ function ColorPicker({ value, onChange }) {
       ))}
       <label title="Couleur personnalisée" style={{ position: 'relative', cursor: 'pointer' }}>
         <div style={{
-          width: 22, height: 22, borderRadius: '50%',
+          width: 22, height: 22,
           background: PRESET_COLORS.includes(value) ? '#e5e7eb' : value,
           border: `2px solid ${DARK}`,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -77,7 +76,6 @@ export default function TableLocationsManager({ locations = [], loading, saving,
 
       {/* Header */}
       <div style={{ padding: '12px 16px', background: DARK, display: 'flex', alignItems: 'center', gap: 8 }}>
-        <MapPin size={14} strokeWidth={2.5} color={GOLD} />
         <span style={{ fontSize: 11, fontWeight: 900, color: GOLD, letterSpacing: '0.12em', textTransform: 'uppercase' }}>
           Emplacements
         </span>
@@ -107,14 +105,13 @@ export default function TableLocationsManager({ locations = [], loading, saving,
               style={{
                 display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
                 padding: '10px', background: DARK, border: 'none',
-                fontSize: 12, fontWeight: 800, color: GOLD,
+                fontSize: 12, fontWeight: 900, color: GOLD,
                 cursor: !newName.trim() || saving ? 'not-allowed' : 'pointer',
                 opacity: !newName.trim() || saving ? 0.45 : 1,
-                fontFamily: 'inherit',
+                fontFamily: 'inherit', textTransform: 'uppercase'
               }}
             >
-              <Plus size={13} strokeWidth={2.5} />
-              {saving ? 'Enregistrement…' : "Ajouter l'emplacement"}
+              {saving ? 'Enregistrement…' : "Ajouter"}
             </button>
           </div>
         </div>
@@ -144,32 +141,26 @@ export default function TableLocationsManager({ locations = [], loading, saving,
                       />
                       <ColorPicker value={editColor} onChange={setEditColor} />
                     </div>
-                    <button onClick={saveEdit} disabled={!editName.trim() || saving} title="Enregistrer"
-                      style={{ padding: '8px 10px', background: DARK, border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', flexShrink: 0 }}>
-                      <Check size={13} color={GOLD} strokeWidth={2.5} />
+                    <button onClick={saveEdit} disabled={!editName.trim() || saving}
+                      style={{ padding: '8px 12px', background: DARK, border: 'none', cursor: 'pointer', color: GOLD, fontSize: 10, fontWeight: 900, textTransform: 'uppercase' }}>
+                      Enregistrer
                     </button>
-                    <button onClick={cancelEdit} title="Annuler"
-                      style={{ padding: '8px 10px', background: 'none', border: `1.5px solid rgba(43,33,24,0.2)`, cursor: 'pointer', display: 'flex', alignItems: 'center', flexShrink: 0 }}>
-                      <X size={13} color={DARK} strokeWidth={2.5} />
+                    <button onClick={cancelEdit}
+                      style={{ padding: '8px 12px', background: 'none', border: `2px solid ${DARK}`, cursor: 'pointer', color: DARK, fontSize: 10, fontWeight: 900, textTransform: 'uppercase' }}>
+                      Annuler
                     </button>
                   </>
                 ) : (
                   <>
-                    <span style={{ width: 12, height: 12, borderRadius: '50%', background: loc.color, flexShrink: 0 }} />
+                    <span style={{ width: 12, height: 12, borderRadius: 0, background: loc.color, flexShrink: 0 }} />
                     <span style={{ flex: 1, fontSize: 13, fontWeight: 700, color: DARK }}>{loc.name}</span>
-                    <button onClick={() => startEdit(loc)} title="Modifier"
-                      style={{ padding: '5px 9px', background: 'none', border: `1.5px solid rgba(43,33,24,0.15)`, cursor: 'pointer', display: 'flex', alignItems: 'center' }}
-                      onMouseEnter={e => e.currentTarget.style.borderColor = DARK}
-                      onMouseLeave={e => e.currentTarget.style.borderColor = 'rgba(43,33,24,0.15)'}
-                    >
-                      <Pencil size={12} color={DARK} strokeWidth={2.5} />
+                    <button onClick={() => startEdit(loc)}
+                      style={{ padding: '6px 10px', background: DARK, border: 'none', cursor: 'pointer', color: GOLD, fontSize: 10, fontWeight: 900, textTransform: 'uppercase' }}>
+                      Modifier
                     </button>
-                    <button onClick={() => onDelete(loc)} title="Supprimer"
-                      style={{ padding: '5px 9px', background: 'none', border: `1.5px solid rgba(185,64,64,0.2)`, cursor: 'pointer', display: 'flex', alignItems: 'center' }}
-                      onMouseEnter={e => { e.currentTarget.style.background = '#fef2f2'; e.currentTarget.style.borderColor = '#b94040' }}
-                      onMouseLeave={e => { e.currentTarget.style.background = 'none'; e.currentTarget.style.borderColor = 'rgba(185,64,64,0.2)' }}
-                    >
-                      <Trash2 size={12} color="#b94040" strokeWidth={2.5} />
+                    <button onClick={() => onDelete(loc)}
+                      style={{ padding: '6px 10px', background: '#FF0000', border: 'none', cursor: 'pointer', color: '#fff', fontSize: 10, fontWeight: 900, textTransform: 'uppercase' }}>
+                      Supprimer
                     </button>
                   </>
                 )}

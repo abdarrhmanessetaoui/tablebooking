@@ -8,9 +8,8 @@ export default function FadeUp({ children, delay = 0, style = {} }) {
   }, [delay])
   return (
     <div style={{
-      opacity: on ? 1 : 0,
-      transform: on ? 'translateY(0px)' : 'translateY(14px)',
-      transition: 'opacity 0.45s ease, transform 0.45s ease',
+      opacity: 1,
+      transform: 'translateY(0px)',
       ...style,
     }}>
       {children}

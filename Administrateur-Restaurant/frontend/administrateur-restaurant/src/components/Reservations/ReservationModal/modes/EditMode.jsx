@@ -1,9 +1,8 @@
-import { useState } from 'react'
+
 import Label from '../../shared/Label'
-import { DARK, GOLD, GOLD_DARK, STATUS_CONFIG } from '../../../../styles/reservations/tokens'
+import { DARK, GOLD, STATUS_CONFIG } from '../../../../styles/reservations/tokens'
 
 export default function EditMode({ editing, form, setForm, handleSubmit, onClose }) {
-  const [hov, setHov] = useState(false)
   return (
     <>
       <div style={{ background:'#faf8f5', padding:'14px 18px', display:'flex', flexDirection:'column', gap:8 }}>
@@ -26,10 +25,16 @@ export default function EditMode({ editing, form, setForm, handleSubmit, onClose
         </div>
       </div>
       <div style={{ display:'flex', gap:8 }}>
-        <button onClick={onClose} style={{ flex:1, padding:'12px', background:'#f5f0eb', border:'none', fontSize:13, fontWeight:800, color:DARK, cursor:'pointer' }}>Annuler</button>
-        <button onClick={handleSubmit} onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
-          style={{ flex:2, padding:'12px', background:hov?GOLD_DARK:GOLD, border:'none', fontSize:14, fontWeight:900, color:DARK, cursor:'pointer' }}>
-          Enregistrer
+        <button onClick={onClose} style={{ flex:1, padding:'12px', background:GOLD, border:'none', fontSize:13, fontWeight:900, color:DARK, cursor:'pointer' }}>
+          Annuler
+        </button>
+        <button onClick={handleSubmit}
+          style={{
+            flex:2, display:'flex', alignItems:'center', justifyContent:'center', gap:8,
+            padding:'12px', background:DARK, border:'none', fontSize:14, fontWeight:900, color:GOLD, cursor:'pointer',
+            textTransform: 'uppercase'
+          }}>
+          Enregistrer le statut
         </button>
       </div>
     </>

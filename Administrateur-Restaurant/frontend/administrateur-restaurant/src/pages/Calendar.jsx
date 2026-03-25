@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { FileDown } from 'lucide-react'
+
 import useCalendar   from '../hooks/Calendar/useCalendar'
 import CalendarNav   from '../components/Calendar/CalendarNav'
 import CalendarWeek  from '../components/Calendar/CalendarWeek'
@@ -12,23 +12,18 @@ const GOLD_DK = '#a8834e'
 const RED_BG  = '#fdf0f0'
 const RED     = '#b94040'
 
-function Btn({ children, onClick, primary, disabled, icon: Icon }) {
-  const [hov, setHov] = useState(false)
-  const bg    = primary ? (hov ? DARK : GOLD) : (hov ? GOLD : DARK)
-  const color = primary ? (hov ? GOLD : DARK) : '#fff'
+function Btn({ children, onClick, primary, disabled }) {
   return (
     <button onClick={onClick} disabled={disabled}
-      onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
       style={{
         display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-        padding: '11px 20px', background: bg, border: 'none', color,
-        fontSize: 13, fontWeight: 800,
+        padding: '11px 20px', background: DARK, border: 'none', color: GOLD,
+        fontSize: 13, fontWeight: 900,
         cursor: disabled ? 'not-allowed' : 'pointer',
         opacity: disabled ? 0.5 : 1,
-        transition: 'background 0.15s, color 0.15s',
         fontFamily: 'inherit', whiteSpace: 'nowrap',
+        textTransform: 'uppercase'
       }}>
-      {Icon && <Icon size={15} strokeWidth={2.2} />}
       <span className="btn-label">{children}</span>
     </button>
   )
@@ -161,7 +156,7 @@ export default function Calendar() {
       `}</style>
 
       <div style={{
-        minHeight: '100vh', background: '#faf8f5',
+        minHeight: '100vh', background: '#FFFFFF',
         fontFamily: "'Plus Jakarta Sans','DM Sans',system-ui,sans-serif",
         padding: 'clamp(16px,3vw,40px) clamp(12px,3vw,36px)',
       }}>
@@ -179,7 +174,7 @@ export default function Calendar() {
               </p>
             </div>
             <div style={{ display: 'flex', gap: 3, flexShrink: 0 }}>
-              <Btn icon={FileDown} primary onClick={handleExport} disabled={exporting}>
+              <Btn primary onClick={handleExport} disabled={exporting}>
                 {exporting ? 'Génération…' : 'Exporter PDF'}
               </Btn>
             </div>

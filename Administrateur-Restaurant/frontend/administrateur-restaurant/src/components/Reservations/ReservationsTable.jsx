@@ -1,10 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
-import {
-  Eye, Pencil, Trash2,
-  ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight,
-  CalendarDays, Clock3, Users, Utensils, User2, Phone,
-  LayoutGrid, Link2,
-} from 'lucide-react'
+
 import AssignTableModal from './AssignTableModal'
 import { GREEN, RED } from '../../styles/dashboard/tokens'
 
@@ -12,12 +6,12 @@ const DARK      = '#2b2118'
 const GOLD      = '#c8a97e'
 const GOLD_DARK = '#a8834e'
 const CREAM     = '#faf8f5'
-const BORDER    = 'rgba(43,33,24,0.12)'
+const BORDER    = '#e8e0d8'
 
 const STATUS = {
-  Confirmed: { bg: '#f0fdf4', color: '#16a34a', label: 'Confirmée',  dot: GREEN },
-  Pending:   { bg: '#fdf6ec', color: '#a8834e', label: 'En attente', dot: '#c8a97e' },
-  Cancelled: { bg: '#fef2f2', color: '#dc2626', label: 'Annulée',    dot: RED   },
+  Confirmed: { bg: '#00A651', color: '#fff', label: 'Confirmée' },
+  Pending:   { bg: '#c8a97e', color: '#fff', label: 'En attente' },
+  Cancelled: { bg: '#FF0000', color: '#fff', label: 'Annulée'   },
 }
 
 const PAGE_SIZES = [10, 25, 50, 100]
@@ -32,9 +26,9 @@ function Checkbox({ checked, indeterminate, onChange }) {
     <div onClick={e => { e.stopPropagation(); onChange() }} style={{
       width: 17, height: 17, flexShrink: 0,
       background: checked || indeterminate ? DARK : '#fff',
-      border: `2px solid ${checked || indeterminate ? DARK : 'rgba(43,33,24,0.2)'}`,
+      border: `2px solid ${DARK}`,
       display: 'flex', alignItems: 'center', justifyContent: 'center',
-      cursor: 'pointer', transition: 'all 0.15s',
+      cursor: 'pointer',
     }}>
       {checked && (
         <svg width="9" height="7" viewBox="0 0 10 8" fill="none">
@@ -46,36 +40,34 @@ function Checkbox({ checked, indeterminate, onChange }) {
   )
 }
 
-function ActionBtn({ onClick, icon: Icon, danger, title }) {
-  const [hov, setHov] = useState(false)
+function ActionBtn({ onClick, label, danger, title }) {
   return (
     <button title={title} onClick={e => { e.stopPropagation(); onClick() }}
-      onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
       style={{
-        width: 28, height: 28, display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-        background: danger ? (hov ? RED : '#fef2f2') : (hov ? DARK : '#f5f0eb'),
-        border: 'none', cursor: 'pointer', transition: 'all 0.15s', flexShrink: 0,
+        padding: '6px 10px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+        background: danger ? '#FF0000' : DARK,
+        border: 'none', cursor: 'pointer', flexShrink: 0,
+        color: danger ? '#fff' : GOLD, fontSize: 10, fontWeight: 900, textTransform: 'uppercase'
       }}
     >
-      <Icon size={12} strokeWidth={2.5} color={danger ? (hov ? '#fff' : RED) : (hov ? GOLD : DARK)} />
+      {label}
     </button>
   )
 }
 
 function PageBtn({ onClick, disabled, active, children }) {
-  const [hov, setHov] = useState(false)
   return (
     <button onClick={onClick} disabled={disabled}
-      onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
       style={{
         minWidth: 32, height: 32, padding: '0 6px',
         display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-        background: active ? DARK : hov && !disabled ? '#f0ebe4' : '#fff',
-        border: `1.5px solid ${active ? DARK : BORDER}`,
-        color: active ? GOLD : disabled ? 'rgba(43,33,24,0.25)' : DARK,
+        background: active ? DARK : '#fff',
+        border: `1.5px solid ${DARK}`,
+        color: active ? GOLD : DARK,
         fontSize: 12, fontWeight: active ? 900 : 700,
         cursor: disabled ? 'not-allowed' : 'pointer',
-        transition: 'all 0.15s', flexShrink: 0,
+        opacity: disabled ? 0.35 : 1,
+        flexShrink: 0,
       }}
     >
       {children}
@@ -85,49 +77,23 @@ function PageBtn({ onClick, disabled, active, children }) {
 
 // ── Assign table cell — inline compact button ──────────────────────
 function AssignTableCell({ r, onOpenAssign }) {
-  const [hov, setHov] = useState(false)
   const hasTable = !!r.table_idx
-
-  if (hasTable) {
-    return (
-      <div
-        onClick={e => { e.stopPropagation(); onOpenAssign(r) }}
-        onMouseEnter={() => setHov(true)}
-        onMouseLeave={() => setHov(false)}
-        title="Changer la table"
-        style={{
-          display: 'inline-flex', alignItems: 'center', gap: 4,
-          padding: '3px 8px',
-          background: hov ? DARK : '#f0fdf4',
-          border: `1px solid ${hov ? DARK : GREEN}`,
-          fontSize: 11, fontWeight: 800,
-          color: hov ? GOLD : '#16a34a',
-          cursor: 'pointer', transition: 'all 0.12s', whiteSpace: 'nowrap',
-        }}
-      >
-        <LayoutGrid size={10} strokeWidth={2.5} />
-        T-{r.table_idx}
-      </div>
-    )
-  }
 
   return (
     <button
       onClick={e => { e.stopPropagation(); onOpenAssign(r) }}
-      onMouseEnter={() => setHov(true)}
-      onMouseLeave={() => setHov(false)}
       style={{
         display: 'inline-flex', alignItems: 'center', gap: 4,
-        padding: '3px 8px', background: 'none',
-        border: `1.5px dashed ${hov ? DARK : BORDER}`,
-        fontSize: 11, fontWeight: 800,
-        color: hov ? DARK : 'rgba(43,33,24,0.4)',
+        padding: '5px 10px',
+        background: hasTable ? '#00A651' : GOLD,
+        border: `none`,
+        fontSize: 11, fontWeight: 900,
+        color: hasTable ? '#fff' : DARK,
         cursor: 'pointer', fontFamily: 'inherit',
-        transition: 'all 0.12s', whiteSpace: 'nowrap',
+        whiteSpace: 'nowrap',
       }}
     >
-      <Link2 size={10} strokeWidth={2.5} />
-      Assigner
+      {hasTable ? `Table ${r.table_idx}` : 'Assigner table'}
     </button>
   )
 }
@@ -140,7 +106,7 @@ function MobileCard({ r, selected, highlighted, onToggle, openView, openEdit, ha
       background: highlighted ? '#fff8ec' : selected ? '#fdf6ec' : '#fff',
       borderLeft: `3px solid ${highlighted ? GOLD : selected ? GOLD : 'transparent'}`,
       borderBottom: `1px solid ${BORDER}`,
-      padding: '14px 16px', transition: 'all 0.15s', position: 'relative',
+      padding: '14px 16px', position: 'relative',
     }}>
       {highlighted && (
         <div style={{ position: 'absolute', top: 10, right: 14, fontSize: 9, fontWeight: 900, color: GOLD_DARK, letterSpacing: '0.12em', textTransform: 'uppercase', background: '#fdf6ec', padding: '2px 7px', border: `1px solid ${GOLD}55` }}>
@@ -160,27 +126,26 @@ function MobileCard({ r, selected, highlighted, onToggle, openView, openEdit, ha
       </div>
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 10 }}>
         {[
-          { Icon: CalendarDays, value: r.date,       gold: false },
-          { Icon: Clock3,       value: r.start_time, gold: false },
-          { Icon: Users,        value: r.guests ? `${r.guests}p` : null, gold: false },
-          { Icon: Utensils,     value: r.service ? trunc(r.service, 16) : null, gold: true },
+          { value: r.date },
+          { value: r.start_time },
+          { value: r.guests ? `${r.guests}p` : null },
+          { value: r.service ? trunc(r.service, 16) : null, gold: true },
         ].filter(item => item.value).map((item, i) => (
-          <span key={i} style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '4px 9px', background: item.gold ? '#f5f0eb' : CREAM, fontSize: 11, fontWeight: 700, color: item.gold ? GOLD_DARK : DARK }}>
-            <item.Icon size={11} strokeWidth={2.5} color={item.gold ? GOLD_DARK : DARK} />
+          <span key={i} style={{ display: 'inline-flex', alignItems: 'center', padding: '4px 9px', background: item.gold ? GOLD : CREAM, fontSize: 11, fontWeight: 800, color: DARK }}>
             {item.value}
           </span>
         ))}
         <AssignTableCell r={r} onOpenAssign={onOpenAssign} />
       </div>
       <div style={{ display: 'flex', gap: 4 }}>
-        <button onClick={() => openView(r)} style={{ flex: 1, padding: '8px', background: highlighted ? GOLD : '#f5f0eb', border: 'none', fontSize: 11, fontWeight: 700, color: DARK, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5, fontFamily: 'inherit' }}>
-          <Eye size={12} strokeWidth={2.5} /> Voir
+        <button onClick={() => openView(r)} style={{ flex: 1, padding: '10px', background: GOLD, border: 'none', fontSize: 11, fontWeight: 900, color: DARK, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5, fontFamily: 'inherit' }}>
+          VOIR
         </button>
-        <button onClick={() => openEdit(r)} style={{ flex: 1, padding: '8px', background: DARK, border: 'none', fontSize: 11, fontWeight: 700, color: GOLD, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5, fontFamily: 'inherit' }}>
-          <Pencil size={12} strokeWidth={2.5} /> Modifier
+        <button onClick={() => openEdit(r)} style={{ flex: 1, padding: '10px', background: DARK, border: 'none', fontSize: 11, fontWeight: 900, color: GOLD, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5, fontFamily: 'inherit' }}>
+          MODIFIER
         </button>
-        <button onClick={() => handleDelete(r.id)} style={{ width: 36, padding: '8px', background: '#fef2f2', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <Trash2 size={12} strokeWidth={2.5} color={RED} />
+        <button onClick={() => handleDelete(r.id)} style={{ width: 64, padding: '10px', background: '#FF0000', border: 'none', color: '#fff', fontSize: 10, fontWeight: 900, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          SUPPR
         </button>
       </div>
     </div>
@@ -203,52 +168,42 @@ function TableRow({ r, i, selected, highlighted, highlightRef, toggleOne, openVi
       ref={highlighted ? highlightRef : null}
       className={highlighted ? 'row-highlighted' : ''}
       onClick={() => toggleOne(r.id)}
-      onMouseEnter={() => setHov(true)}
-      onMouseLeave={() => setHov(false)}
       style={{
         background: bg, borderBottom: `1px solid ${BORDER}`,
-        borderLeft: highlighted ? `4px solid ${GOLD}` : selected ? `4px solid ${GOLD}88` : hov ? `4px solid ${GOLD}44` : '4px solid transparent',
-        transition: 'background 0.12s, border-color 0.12s', cursor: 'pointer',
+        borderLeft: highlighted ? `4px solid ${GOLD}` : selected ? `4px solid ${GOLD}` : '4px solid transparent',
+        cursor: 'pointer',
       }}
     >
       <td style={{ ...cell, width: 36, padding: '9px 10px' }} onClick={e => e.stopPropagation()}>
         <Checkbox checked={selected} onChange={() => toggleOne(r.id)} />
       </td>
       <td style={cell}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-          <User2 size={11} strokeWidth={2.5} color={highlighted ? GOLD_DARK : DARK} style={{ flexShrink: 0 }} />
-          <span style={{ fontSize: 12, fontWeight: highlighted ? 900 : 800, color: highlighted ? GOLD_DARK : DARK, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 100 }}>
-            {r.name || '—'}
-          </span>
-        </div>
+        <span style={{ fontSize: 12, fontWeight: highlighted ? 900 : 800, color: highlighted ? GOLD_DARK : DARK, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 100 }}>
+          {r.name || '—'}
+        </span>
       </td>
       <td style={cell}>
-        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: 11, fontWeight: 700, color: DARK, whiteSpace: 'nowrap' }}>
-          <Phone size={10} strokeWidth={2.5} color={DARK} style={{ flexShrink: 0 }} />
+        <span style={{ fontSize: 11, fontWeight: 700, color: DARK, whiteSpace: 'nowrap' }}>
           {r.phone || '—'}
         </span>
       </td>
       <td style={cell}>
-        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: 11, fontWeight: 700, color: DARK, whiteSpace: 'nowrap' }}>
-          <CalendarDays size={10} strokeWidth={2.5} color={DARK} style={{ flexShrink: 0 }} />
+        <span style={{ fontSize: 11, fontWeight: 700, color: DARK, whiteSpace: 'nowrap' }}>
           {r.date || '—'}
         </span>
       </td>
       <td style={cell}>
-        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, padding: '3px 7px', background: highlighted ? `${GOLD}22` : '#f5f0eb', fontSize: 11, fontWeight: 700, color: GOLD_DARK, whiteSpace: 'nowrap' }}>
-          <Clock3 size={10} strokeWidth={2.5} color={GOLD_DARK} />
+        <span style={{ display: 'inline-flex', padding: '3px 7px', background: highlighted ? GOLD : '#f5f0eb', fontSize: 11, fontWeight: 800, color: DARK, whiteSpace: 'nowrap' }}>
           {r.start_time || '—'}
         </span>
       </td>
       <td style={cell}>
-        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: 11, fontWeight: 700, color: DARK, whiteSpace: 'nowrap' }}>
-          <Users size={10} strokeWidth={2.5} color={DARK} style={{ flexShrink: 0 }} />
+        <span style={{ fontSize: 11, fontWeight: 700, color: DARK, whiteSpace: 'nowrap' }}>
           {r.guests || '—'}
         </span>
       </td>
       <td style={cell}>
-        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, padding: '3px 7px', background: '#f5f0eb', fontSize: 11, fontWeight: 700, color: GOLD_DARK, maxWidth: 110, overflow: 'hidden' }}>
-          <Utensils size={10} strokeWidth={2.5} color={GOLD_DARK} style={{ flexShrink: 0 }} />
+        <span style={{ display: 'inline-flex', padding: '3px 7px', background: '#f5f0eb', fontSize: 11, fontWeight: 800, color: DARK, maxWidth: 110, overflow: 'hidden' }}>
           <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.service || '—'}</span>
         </span>
       </td>
@@ -257,16 +212,15 @@ function TableRow({ r, i, selected, highlighted, highlightRef, toggleOne, openVi
         <AssignTableCell r={r} onOpenAssign={onOpenAssign} />
       </td>
       <td style={cell}>
-        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, padding: '3px 8px', background: s.bg, fontSize: 10, fontWeight: 800, color: s.color, whiteSpace: 'nowrap' }}>
-          <span style={{ width: 5, height: 5, borderRadius: '50%', background: s.dot, flexShrink: 0 }} />
+        <span style={{ display: 'inline-flex', alignItems: 'center', padding: '4px 10px', background: s.bg, fontSize: 10, fontWeight: 900, color: s.color, whiteSpace: 'nowrap' }}>
           {s.label}
         </span>
       </td>
       <td style={{ ...cell, padding: '9px 10px' }}>
         <div style={{ display: 'flex', gap: 3 }}>
-          <ActionBtn icon={Eye}    title="Voir"      onClick={() => openView(r)} />
-          <ActionBtn icon={Pencil} title="Modifier"  onClick={() => openEdit(r)} />
-          <ActionBtn icon={Trash2} title="Supprimer" onClick={() => handleDelete(r.id)} danger />
+          <ActionBtn label="VOIR"    title="Voir"      onClick={() => openView(r)} />
+          <ActionBtn label="EDIT"    title="Modifier"  onClick={() => openEdit(r)} />
+          <ActionBtn label="SUPPR"   title="Supprimer" onClick={() => handleDelete(r.id)} danger />
         </div>
       </td>
     </tr>
@@ -457,15 +411,15 @@ export default function ReservationsTable({
               </select>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
-              <PageBtn onClick={() => setPage(1)} disabled={safePage === 1}><ChevronsLeft size={12} strokeWidth={2.5} /></PageBtn>
-              <PageBtn onClick={() => setPage(p => Math.max(1, p - 1))} disabled={safePage === 1}><ChevronLeft size={12} strokeWidth={2.5} /></PageBtn>
+              <PageBtn onClick={() => setPage(1)} disabled={safePage === 1}>«</PageBtn>
+              <PageBtn onClick={() => setPage(p => Math.max(1, p - 1))} disabled={safePage === 1}>‹</PageBtn>
               {getPages().map((p, i) =>
                 p === '...'
                   ? <span key={`d${i}`} style={{ padding: '0 4px', fontSize: 12, color: DARK, userSelect: 'none' }}>…</span>
                   : <PageBtn key={p} active={p === safePage} onClick={() => setPage(p)}>{p}</PageBtn>
               )}
-              <PageBtn onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={safePage === totalPages}><ChevronRight size={12} strokeWidth={2.5} /></PageBtn>
-              <PageBtn onClick={() => setPage(totalPages)} disabled={safePage === totalPages}><ChevronsRight size={12} strokeWidth={2.5} /></PageBtn>
+              <PageBtn onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={safePage === totalPages}>›</PageBtn>
+              <PageBtn onClick={() => setPage(totalPages)} disabled={safePage === totalPages}>»</PageBtn>
             </div>
           </div>
         )}

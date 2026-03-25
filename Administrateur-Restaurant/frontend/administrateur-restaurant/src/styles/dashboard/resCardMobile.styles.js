@@ -1,12 +1,11 @@
 import { DARK, GOLD_DK, WHITE, CREAM, BORDER } from './tokens'
 
 // ── Card wrapper ──────────────────────────────────────────────────
-export const card = (hov, i) => ({
+export const card = (i) => ({
   padding:      '13px 14px',
   borderBottom: `1px solid ${BORDER}`,
-  background:   hov ? '#f5ede0' : i % 2 === 0 ? WHITE : CREAM,
+  background:   WHITE,
   cursor:       'pointer',
-  transition:   'background 0.12s',
 })
 
 // ── Top row: name + badge + chevron ──────────────────────────────

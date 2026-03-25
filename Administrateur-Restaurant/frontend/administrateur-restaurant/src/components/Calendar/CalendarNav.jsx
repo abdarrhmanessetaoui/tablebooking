@@ -1,5 +1,4 @@
-import { useState } from 'react'
-import { ChevronLeft, ChevronRight, CalendarDays } from 'lucide-react'
+
 
 const DARK = '#2b2118'
 const GOLD = '#c8a97e'
@@ -7,16 +6,12 @@ const VIEWS       = ['day', 'week', 'month', 'year']
 const VIEW_LABELS = { day: 'Jour', week: 'Semaine', month: 'Mois', year: 'Année' }
 
 function ArrowBtn({ onClick, children }) {
-  const [h, setH] = useState(false)
   return (
     <button onClick={onClick}
-      onMouseEnter={() => setH(true)} onMouseLeave={() => setH(false)}
       style={{
         width: 40, height: 40, display: 'flex', alignItems: 'center', justifyContent: 'center',
-        background: h ? DARK : '#fff',
-        border: `2px solid ${h ? DARK : 'rgba(43,33,24,0.18)'}`,
-        color: h ? '#fff' : DARK,
-        cursor: 'pointer', transition: 'all 0.13s', flexShrink: 0,
+        background: DARK, border: 'none', color: GOLD,
+        cursor: 'pointer', flexShrink: 0, fontSize: 18, fontWeight: 900
       }}>
       {children}
     </button>
@@ -24,8 +19,7 @@ function ArrowBtn({ onClick, children }) {
 }
 
 export default function CalendarNav({ view, setView, navLabel, navigate, goToday, currentDate }) {
-  const isToday   = new Date().toDateString() === currentDate.toDateString()
-  const [hToday, setHToday] = useState(false)
+  const isToday = new Date().toDateString() === currentDate.toDateString()
 
   return (
     <>
@@ -34,7 +28,7 @@ export default function CalendarNav({ view, setView, navLabel, navigate, goToday
         .cnav-left  { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
         .cnav-label { display: flex; align-items: center; gap: 9px; padding: 10px 16px; border: 2px solid ${DARK}; background: #fff; min-width: 0; }
         .cnav-views { display: flex; border: 2px solid ${DARK}; overflow: hidden; }
-        .cnav-views button { padding: 10px 14px; border: none; background: #fff; color: ${DARK}; font-size: 11px; font-weight: 900; cursor: pointer; transition: all 0.13s; font-family: inherit; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; }
+        .cnav-views button { padding: 10px 14px; border: none; background: #fff; color: ${DARK}; font-size: 11px; font-weight: 900; cursor: pointer; font-family: inherit; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; transition: none !important; }
         @media(max-width:600px){
           .cnav { flex-direction: column; align-items: flex-start; }
           .cnav-label { min-width: 140px; }
@@ -48,21 +42,19 @@ export default function CalendarNav({ view, setView, navLabel, navigate, goToday
 
       <div className="cnav">
         <div className="cnav-left">
-          <ArrowBtn onClick={() => navigate('prev')}><ChevronLeft size={16} strokeWidth={2.5} /></ArrowBtn>
+          <ArrowBtn onClick={() => navigate('prev')}>‹</ArrowBtn>
 
           <div className="cnav-label">
-            <CalendarDays size={13} strokeWidth={2.5} color={GOLD} style={{ flexShrink: 0 }} />
-            <span style={{ fontSize: 13, fontWeight: 900, color: DARK, letterSpacing: '-0.4px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: 220 }}>
+            <span style={{ fontSize: 13, fontWeight: 900, color: DARK, letterSpacing: '-0.4px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: 220, textTransform: 'uppercase' }}>
               {navLabel()}
             </span>
           </div>
 
-          <ArrowBtn onClick={() => navigate('next')}><ChevronRight size={16} strokeWidth={2.5} /></ArrowBtn>
+          <ArrowBtn onClick={() => navigate('next')}>›</ArrowBtn>
 
           {!isToday && (
             <button onClick={goToday}
-              onMouseEnter={() => setHToday(true)} onMouseLeave={() => setHToday(false)}
-              style={{ padding: '10px 16px', background: hToday ? GOLD : '#fff', border: `2px solid ${hToday ? GOLD : 'rgba(43,33,24,0.18)'}`, color: DARK, fontSize: 11, fontWeight: 900, cursor: 'pointer', transition: 'all 0.13s', fontFamily: 'inherit', letterSpacing: '0.04em', whiteSpace: 'nowrap' }}>
+              style={{ padding: '10px 16px', background: GOLD, border: `2px solid ${GOLD}`, color: DARK, fontSize: 11, fontWeight: 900, cursor: 'pointer', fontFamily: 'inherit', letterSpacing: '0.04em', whiteSpace: 'nowrap' }}>
               Aujourd'hui
             </button>
           )}

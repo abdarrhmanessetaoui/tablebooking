@@ -1,19 +1,18 @@
 import { NavLink } from 'react-router-dom'
 import { navItems, LogoutIcon } from '../data/sidebarItems'
 import { useState } from 'react'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
+
 
 const DARK = '#2b2118'
 const GOLD = '#c8a97e'
 
 export default function Sidebar({ handleLogout, onNavClick, collapsed, onToggle }) {
-  const [hov,    setHov]    = useState(null)
-  const [hovOut, setHovOut] = useState(false)
 
   return (
     <div style={{
       width: '100%', height: '100%',
-      background: DARK,
+      background: '#FFFFFF',
+      borderRight: `2px solid ${DARK}`,
       display: 'flex', flexDirection: 'column',
       fontFamily: "'Plus Jakarta Sans','DM Sans',system-ui,sans-serif",
       overflow: 'hidden',
@@ -22,12 +21,11 @@ export default function Sidebar({ handleLogout, onNavClick, collapsed, onToggle 
       {/* LOGO */}
       <div style={{
         padding: collapsed ? '28px 0 24px' : '28px 24px 24px',
-        borderBottom: `1px solid rgba(200,169,126,0.18)`,
+        borderBottom: `2px solid ${DARK}`,
         flexShrink: 0,
         display: 'flex', alignItems: 'center',
         justifyContent: collapsed ? 'center' : 'space-between',
         gap: 8,
-        transition: 'padding 0.22s',
       }}>
         {!collapsed && (
           <>
@@ -51,18 +49,14 @@ export default function Sidebar({ handleLogout, onNavClick, collapsed, onToggle 
             style={{
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               width: 28, height: 28, flexShrink: 0,
-              background: 'rgba(200,169,126,0.1)',
-              border: '1px solid rgba(200,169,126,0.2)',
-              color: 'rgba(200,169,126,0.6)',
-              cursor: 'pointer', transition: 'all 0.15s',
+              background: DARK,
+              border: `1px solid ${GOLD}`,
+              color: GOLD,
+              cursor: 'pointer',
+              fontSize: 10, fontWeight: 900
             }}
-            onMouseEnter={e => { e.currentTarget.style.background = 'rgba(200,169,126,0.2)'; e.currentTarget.style.color = GOLD }}
-            onMouseLeave={e => { e.currentTarget.style.background = 'rgba(200,169,126,0.1)'; e.currentTarget.style.color = 'rgba(200,169,126,0.6)' }}
           >
-            {collapsed
-              ? <ChevronRight size={14} strokeWidth={2.5} />
-              : <ChevronLeft  size={14} strokeWidth={2.5} />
-            }
+            {collapsed ? '›' : '‹'}
           </button>
         )}
       </div>
@@ -78,8 +72,6 @@ export default function Sidebar({ handleLogout, onNavClick, collapsed, onToggle 
             key={item.to}
             to={item.to}
             onClick={onNavClick}
-            onMouseEnter={() => setHov(i)}
-            onMouseLeave={() => setHov(null)}
             title={collapsed ? item.label : undefined}
             style={({ isActive }) => ({
               display: 'flex', alignItems: 'center',
@@ -88,34 +80,27 @@ export default function Sidebar({ handleLogout, onNavClick, collapsed, onToggle 
               justifyContent: collapsed ? 'center' : 'flex-start',
               textDecoration: 'none',
               position: 'relative',
-              transition: 'background 0.15s, color 0.15s',
-              background: isActive ? GOLD : hov === i ? 'rgba(200,169,126,0.15)' : 'transparent',
-              color: isActive ? DARK : hov === i ? GOLD : 'rgba(255,255,255,0.5)',
+              background: isActive ? DARK : 'transparent',
+              color: isActive ? GOLD : DARK,
               overflow: 'hidden',
+              fontWeight: 900,
+              textTransform: 'uppercase',
+              letterSpacing: '0.05em'
             })}
           >
-            {({ isActive }) => (
-              <>
-                <span style={{ display:'flex', alignItems:'center', flexShrink:0, color:'inherit' }}>
-                  {item.icon}
-                </span>
                 {!collapsed && (
-                  <span style={{ fontSize:14, fontWeight: isActive ? 900 : 600, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>
+                  <span style={{ fontSize:14, fontWeight: isActive ? 900 : 700, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>
                     {item.label}
                   </span>
                 )}
-              </>
-            )}
           </NavLink>
         ))}
       </nav>
 
       {/* LOGOUT */}
-      <div style={{ padding: collapsed ? '10px 8px 28px' : '10px 8px 28px', borderTop:`1px solid rgba(200,169,126,0.18)`, flexShrink:0 }}>
+      <div style={{ padding: collapsed ? '10px 8px 28px' : '10px 8px 28px', borderTop:`2px solid ${DARK}`, flexShrink:0 }}>
         <button
           onClick={handleLogout}
-          onMouseEnter={() => setHovOut(true)}
-          onMouseLeave={() => setHovOut(false)}
           title={collapsed ? 'Déconnexion' : undefined}
           style={{
             width:'100%', display:'flex', alignItems:'center',
@@ -123,18 +108,16 @@ export default function Sidebar({ handleLogout, onNavClick, collapsed, onToggle 
             justifyContent: collapsed ? 'center' : 'flex-start',
             padding: collapsed ? '13px 0' : '13px 16px',
             marginTop: 8,
-            background: hovOut ? 'rgba(255,80,80,0.18)' : 'transparent',
+            background: '#FF0000',
             border: 'none',
-            color: hovOut ? '#ff6b6b' : 'rgba(255,255,255,0.4)',
+            color: '#FFFFFF',
             cursor:'pointer',
-            transition: 'background 0.15s, color 0.15s',
-            fontFamily:'inherit', fontSize:14, fontWeight:600, textAlign:'left',
+            fontFamily:'inherit', fontSize:13, fontWeight:900, textAlign:'left',
+            textTransform: 'uppercase'
           }}
         >
-          <span style={{ display:'flex', alignItems:'center', flexShrink:0, color:'inherit' }}>
-            <LogoutIcon />
-          </span>
           {!collapsed && <span>Déconnexion</span>}
+          {collapsed && <span>OFF</span>}
         </button>
       </div>
     </div>

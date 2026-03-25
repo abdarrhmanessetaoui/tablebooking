@@ -1,5 +1,4 @@
-import { useState } from 'react'
-import { FileDown, Trash2, ToggleRight, ToggleLeft } from 'lucide-react'
+
 import FadeUp                from '../components/Dashboard/FadeUp'
 import Spinner               from '../components/Dashboard/Spinner'
 import TableForm             from '../components/Tables/TableForm'
@@ -25,40 +24,31 @@ const hdrs = () => ({
   'Authorization': `Bearer ${getToken()}`,
 })
 
-function Btn({ children, onClick, primary, disabled, icon: Icon }) {
-  const [hov, setHov] = useState(false)
-  const bg    = primary ? (hov ? DARK : GOLD) : (hov ? GOLD : DARK)
-  const color = primary ? (hov ? GOLD : DARK) : '#fff'
+function Btn({ children, onClick, primary, disabled }) {
   return (
     <button onClick={onClick} disabled={disabled}
-      onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
       style={{
         display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-        padding: '10px 16px', background: bg, border: 'none', color,
-        fontSize: 13, fontWeight: 800,
+        padding: '10px 16px', background: DARK, border: 'none', color: GOLD,
+        fontSize: 13, fontWeight: 900,
         cursor: disabled ? 'not-allowed' : 'pointer',
         opacity: disabled ? 0.5 : 1,
-        transition: 'background 0.15s, color 0.15s',
         fontFamily: 'inherit', whiteSpace: 'nowrap', minHeight: 40,
       }}>
-      {Icon && <Icon size={15} strokeWidth={2.2} />}
       <span className="btn-label">{children}</span>
     </button>
   )
 }
 
 function BulkBar({ count, onDelete, onActivate, onDeactivate, onClear }) {
-  const [hovDel, setHovDel] = useState(false)
   return (
     <div style={{
       position: 'sticky', top: 8, zIndex: 30,
       display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap',
       padding: '10px 12px', background: DARK,
-      boxShadow: '0 4px 24px rgba(43,33,24,0.28)',
-      marginBottom: 12, animation: 'slideDown 0.18s ease',
+      marginBottom: 12, border: `2px solid ${GOLD}`,
     }}>
       <style>{`
-        @keyframes slideDown { from{opacity:0;transform:translateY(-8px)} to{opacity:1;transform:translateY(0)} }
         @media (max-width: 480px) { .bulk-label { display: none !important; } }
       `}</style>
 
@@ -74,53 +64,43 @@ function BulkBar({ count, onDelete, onActivate, onDeactivate, onClear }) {
       <div style={{ width: 1, height: 20, background: '#3d2d1e', margin: '0 4px', flexShrink: 0 }} />
 
       <button onClick={onActivate} style={{
-        display: 'flex', alignItems: 'center', gap: 5, padding: '7px 12px',
-        background: 'rgba(22,163,74,0.12)', border: '1px solid rgba(22,163,74,0.25)',
-        color: '#4ade80', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit',
-        transition: 'all 0.15s', flexShrink: 0, minHeight: 34,
+        padding: '7px 12px',
+        background: '#00A651', border: 'none',
+        color: '#fff', fontSize: 11, fontWeight: 900, cursor: 'pointer', fontFamily: 'inherit',
+        flexShrink: 0, minHeight: 34, textTransform: 'uppercase'
       }}
-        onMouseEnter={e => { e.currentTarget.style.background = '#16a34a'; e.currentTarget.style.color = '#fff' }}
-        onMouseLeave={e => { e.currentTarget.style.background = 'rgba(22,163,74,0.12)'; e.currentTarget.style.color = '#4ade80' }}
       >
-        <ToggleRight size={13} strokeWidth={2.5} />
-        <span className="bulk-label">Activer</span>
+        ACTIVER
       </button>
 
       <button onClick={onDeactivate} style={{
-        display: 'flex', alignItems: 'center', gap: 5, padding: '7px 12px',
-        background: 'rgba(200,169,126,0.12)', border: '1px solid rgba(200,169,126,0.25)',
-        color: GOLD, fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit',
-        transition: 'all 0.15s', flexShrink: 0, minHeight: 34,
+        padding: '7px 12px',
+        background: GOLD, border: 'none',
+        color: DARK, fontSize: 11, fontWeight: 900, cursor: 'pointer', fontFamily: 'inherit',
+        flexShrink: 0, minHeight: 34, textTransform: 'uppercase'
       }}
-        onMouseEnter={e => { e.currentTarget.style.background = GOLD; e.currentTarget.style.color = DARK }}
-        onMouseLeave={e => { e.currentTarget.style.background = 'rgba(200,169,126,0.12)'; e.currentTarget.style.color = GOLD }}
       >
-        <ToggleLeft size={13} strokeWidth={2.5} />
-        <span className="bulk-label">Désactiver</span>
+        DÉSACTIVER
       </button>
 
       <button onClick={onDelete}
-        onMouseEnter={() => setHovDel(true)} onMouseLeave={() => setHovDel(false)}
         style={{
-          display: 'flex', alignItems: 'center', gap: 5, padding: '7px 12px',
-          background: hovDel ? '#ef4444' : 'rgba(239,68,68,0.12)',
-          border: '1px solid rgba(239,68,68,0.25)',
-          color: hovDel ? '#fff' : '#f87171',
-          fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit',
-          transition: 'all 0.15s', flexShrink: 0, minHeight: 34,
+          padding: '7px 12px',
+          background: '#FF0000',
+          border: 'none',
+          color: '#fff',
+          fontSize: 11, fontWeight: 900, cursor: 'pointer', fontFamily: 'inherit',
+          flexShrink: 0, minHeight: 34, textTransform: 'uppercase'
         }}>
-        <Trash2 size={13} strokeWidth={2.5} />
-        <span className="bulk-label">Supprimer</span>
+        SUPPRIMER
       </button>
 
       <button onClick={onClear} style={{
         marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 5,
         padding: '7px 10px', background: 'none', border: '1px solid #3d2d1e',
-        color: '#fff', fontSize: 12, fontWeight: 700,
-        cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.15s', flexShrink: 0, minHeight: 34,
+        color: GOLD, fontSize: 12, fontWeight: 700,
+        cursor: 'pointer', fontFamily: 'inherit', flexShrink: 0, minHeight: 34,
       }}
-        onMouseEnter={e => e.currentTarget.style.color = GOLD}
-        onMouseLeave={e => e.currentTarget.style.color = '#fff'}
       >
         <span style={{ fontSize: 16, lineHeight: 1 }}>✕</span>
         <span className="bulk-label">Désélectionner</span>
@@ -257,7 +237,7 @@ export default function Tables() {
       `}</style>
 
       <div style={{
-        background: CREAM,
+        background: '#FFFFFF',
         fontFamily: "'Plus Jakarta Sans','DM Sans',system-ui,sans-serif",
         padding: 'clamp(14px,3vw,40px) clamp(12px,4vw,36px)',
         boxSizing: 'border-box', width: '100%', overflowX: 'hidden',
@@ -272,7 +252,7 @@ export default function Tables() {
               </h1>
             </div>
             <div style={{ display: 'flex', gap: 3, flexShrink: 0 }}>
-              <Btn icon={FileDown} primary onClick={handleExport} disabled={exporting}>
+              <Btn primary onClick={handleExport} disabled={exporting}>
                 {exporting ? 'Génération…' : 'Exporter PDF'}
               </Btn>
             </div>

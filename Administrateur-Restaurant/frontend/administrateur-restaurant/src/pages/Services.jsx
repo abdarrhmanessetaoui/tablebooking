@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { FileDown }  from 'lucide-react'
+
 import FadeUp   from '../components/Dashboard/FadeUp'
 import Spinner  from '../components/Dashboard/Spinner'
 import ServiceForm from '../components/Services/ServiceForm'
@@ -13,23 +13,18 @@ const RED     = '#b94040'
 const RED_BG  = '#fdf0f0'
 const CREAM   = '#faf8f5'
 
-function Btn({ children, onClick, primary, disabled, icon: Icon }) {
-  const [hov, setHov] = useState(false)
-  const bg    = primary ? (hov ? DARK : GOLD) : (hov ? GOLD : DARK)
-  const color = primary ? (hov ? GOLD : DARK) : '#fff'
+function Btn({ children, onClick, primary, disabled }) {
   return (
     <button onClick={onClick} disabled={disabled}
-      onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
       style={{
         display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-        padding: '10px 16px', background: bg, border: 'none', color,
-        fontSize: 13, fontWeight: 800,
+        padding: '10px 16px', background: DARK, border: 'none', color: GOLD,
+        fontSize: 13, fontWeight: 900,
         cursor: disabled ? 'not-allowed' : 'pointer',
         opacity: disabled ? 0.5 : 1,
-        transition: 'background 0.15s, color 0.15s',
         fontFamily: 'inherit', whiteSpace: 'nowrap', minHeight: 40,
+        textTransform: 'uppercase'
       }}>
-      {Icon && <Icon size={15} strokeWidth={2.2} />}
       <span className="btn-label">{children}</span>
     </button>
   )
@@ -105,7 +100,7 @@ export default function Services() {
       `}</style>
 
       <div style={{
-        background: CREAM,
+        background: '#FFFFFF',
         fontFamily: "'Plus Jakarta Sans','DM Sans',system-ui,sans-serif",
         padding: 'clamp(14px,3vw,40px) clamp(12px,4vw,36px)',
         boxSizing: 'border-box', width: '100%', overflowX: 'hidden',
@@ -124,7 +119,7 @@ export default function Services() {
               </p>
             </div>
             <div style={{ display: 'flex', gap: 3, flexShrink: 0 }}>
-              <Btn icon={FileDown} primary onClick={handleExport} disabled={exporting}>
+              <Btn primary onClick={handleExport} disabled={exporting}>
                 {exporting ? 'Génération…' : 'Exporter PDF'}
               </Btn>
             </div>

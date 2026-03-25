@@ -1,4 +1,4 @@
-import { CheckCircle, Clock, XCircle, CalendarDays, ArrowRight } from 'lucide-react'
+
 import Ring                       from './Ring'
 import StatBlock                  from './StatBlock'
 import DashboardReservationsTable from './DashboardReservationsTable'
@@ -66,7 +66,6 @@ export default function TabPanel({ tab, stats, reservations, onViewAll, tabLabel
 {/* Stat blocks — stretch to fill remaining height */}
 <div className="db-stat-blocks">
   <StatBlock
-    icon={CheckCircle}
     value={c}
     label="Confirmées"
     accent={GREEN}
@@ -75,7 +74,6 @@ export default function TabPanel({ tab, stats, reservations, onViewAll, tabLabel
     total={total}
   />
   <StatBlock
-    icon={Clock}
     value={p}
     label="En attente"
     accent={AMBER}
@@ -84,7 +82,6 @@ export default function TabPanel({ tab, stats, reservations, onViewAll, tabLabel
     total={total}
   />
   <StatBlock
-    icon={XCircle}
     value={a}
     label="Annulées"
     accent={RED}
@@ -123,11 +120,6 @@ export default function TabPanel({ tab, stats, reservations, onViewAll, tabLabel
                 ))
               ) : (
                 <div style={mobileEmpty}>
-                  <CalendarDays
-                    size={32}
-                    color="rgba(43,33,24,0.1)"
-                    style={{ display: 'block', margin: '0 auto 12px' }}
-                  />
                   <p style={mobileEmptyTitle}>Aucune réservation</p>
                   <p style={mobileEmptySubtitle}>{periodLabel}</p>
                 </div>
@@ -136,10 +128,9 @@ export default function TabPanel({ tab, stats, reservations, onViewAll, tabLabel
               {/* Mobile view all */}
               <button
                 onClick={onViewAll}
-                style={mobileViewAllBtn}
+                style={{ ...mobileViewAllBtn, background: DARK, color: GOLD, border: 'none', padding: '14px', fontSize: 11, fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.05em' }}
               >
                 <span>Toutes les réservations — {periodLabel}</span>
-                <ArrowRight size={13} strokeWidth={2.5} />
               </button>
             </div>
 

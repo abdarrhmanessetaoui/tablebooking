@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Eye, Pencil, Trash2, CalendarDays, Clock3, Users, Utensils, User2, Phone } from 'lucide-react'
+
 import Checkbox        from './Checkbox'
 import ActionBtn       from './ActionBtn'
 import AssignTableCell from './AssignTableCell'
@@ -12,26 +12,20 @@ function trunc(str, max=14) {
 }
 
 export default function TableRow({ r, i, selected, highlighted, highlightRef, toggleOne, openView, openEdit, handleDelete, onOpenAssign }) {
-  const [hov, setHov] = useState(false)
-  const s = STATUS_CONFIG[r.status] || { bg:'#fdf6ec', color:DARK, label:r.status||'—', dot:'#c8a97e' }
-
   let rowBg = i % 2 === 0 ? '#fff' : CREAM
   if (selected)    rowBg = '#fdf6ec'
   if (highlighted) rowBg = '#fff8ec'
-  const bg = (!selected && !highlighted && hov) ? '#f5ede0' : rowBg
+  const bg = rowBg
 
   return (
     <tr
       ref={highlighted ? highlightRef : null}
       className={highlighted ? 'row-highlighted' : ''}
       onClick={() => toggleOne(r.id)}
-      onMouseEnter={() => setHov(true)}
-      onMouseLeave={() => setHov(false)}
       style={{
         background: bg,
-        borderBottom: `1px solid ${BORDER}`,
-        borderLeft: highlighted ? `4px solid ${GOLD}` : selected ? `4px solid ${GOLD}88` : hov ? `4px solid ${GOLD}44` : '4px solid transparent',
-        transition: 'background 0.12s, border-color 0.12s',
+        borderBottom: `2px solid ${DARK}`,
+        borderLeft: highlighted ? `6px solid ${GOLD}` : selected ? `6px solid ${GOLD}` : '6px solid transparent',
         cursor: 'pointer',
       }}
     >
@@ -40,39 +34,37 @@ export default function TableRow({ r, i, selected, highlighted, highlightRef, to
       </td>
       <td style={cellStyle}>
         <div style={{ display:'flex', alignItems:'center', gap:5 }}>
-          <User2 size={11} strokeWidth={2.5} color={highlighted?GOLD_DARK:DARK} style={{ flexShrink:0 }} />
-          <span style={{ fontSize:12, fontWeight:highlighted?900:800, color:highlighted?GOLD_DARK:DARK, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap', maxWidth:100 }}>
+          <span style={{ fontSize: 8, fontWeight: 900, color: GOLD, marginRight: 2 }}>NOM:</span>
+          <span style={{ fontSize:12, fontWeight:900, color:DARK, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap', maxWidth:100 }}>
             {r.name||'—'}
           </span>
         </div>
       </td>
       <td style={cellStyle}>
         <span style={{ display:'inline-flex', alignItems:'center', gap:4, fontSize:11, fontWeight:700, color:DARK, whiteSpace:'nowrap' }}>
-          <Phone size={10} strokeWidth={2.5} color={DARK} style={{ flexShrink:0 }} />
+          <span style={{ fontSize: 8, fontWeight: 900, color: GOLD, marginRight: 2 }}>TÉL:</span>
           {r.phone||'—'}
         </span>
       </td>
       <td style={cellStyle}>
         <span style={{ display:'inline-flex', alignItems:'center', gap:4, fontSize:11, fontWeight:700, color:DARK, whiteSpace:'nowrap' }}>
-          <CalendarDays size={10} strokeWidth={2.5} color={DARK} style={{ flexShrink:0 }} />
+          <span style={{ fontSize: 8, fontWeight: 900, color: GOLD, marginRight: 2 }}>DATE:</span>
           {r.date||'—'}
         </span>
       </td>
       <td style={cellStyle}>
-        <span style={{ display:'inline-flex', alignItems:'center', gap:4, padding:'3px 7px', background:highlighted?`${GOLD}22`:'#f5f0eb', fontSize:11, fontWeight:700, color:GOLD_DARK, whiteSpace:'nowrap' }}>
-          <Clock3 size={10} strokeWidth={2.5} color={GOLD_DARK} />
+        <span style={{ display:'inline-flex', alignItems:'center', gap:4, padding:'3px 7px', background:DARK, fontSize:11, fontWeight:900, color:GOLD, whiteSpace:'nowrap' }}>
           {r.start_time||'—'}
         </span>
       </td>
       <td style={cellStyle}>
         <span style={{ display:'inline-flex', alignItems:'center', gap:4, fontSize:11, fontWeight:700, color:DARK, whiteSpace:'nowrap' }}>
-          <Users size={10} strokeWidth={2.5} color={DARK} style={{ flexShrink:0 }} />
+          <span style={{ fontSize: 8, fontWeight: 900, color: GOLD, marginRight: 2 }}>PERS:</span>
           {r.guests||'—'}
         </span>
       </td>
       <td style={cellStyle}>
-        <span style={{ display:'inline-flex', alignItems:'center', gap:4, padding:'3px 7px', background:'#f5f0eb', fontSize:11, fontWeight:700, color:GOLD_DARK, maxWidth:110, overflow:'hidden' }}>
-          <Utensils size={10} strokeWidth={2.5} color={GOLD_DARK} style={{ flexShrink:0 }} />
+        <span style={{ display:'inline-flex', alignItems:'center', gap:4, padding:'3px 7px', background:DARK, fontSize:11, fontWeight:900, color:GOLD, maxWidth:110, overflow:'hidden' }}>
           <span style={{ overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{r.service||'—'}</span>
         </span>
       </td>

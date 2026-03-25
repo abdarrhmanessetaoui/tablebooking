@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useNavigate }   from 'react-router-dom'
-import { FileDown }      from 'lucide-react'
+
 
 import useDashboardStats from '../hooks/Dashboard/useDashboardStats'
 import useRestaurantInfo from '../hooks/useRestaurantInfo'
@@ -122,7 +122,7 @@ export default function Dashboard() {
               </p>
             </div>
             <div style={{ display: 'flex', gap: 3, flexShrink: 0 }}>
-              <Btn icon={FileDown} primary onClick={handleExport} disabled={exporting}>
+              <Btn primary onClick={handleExport} disabled={exporting}>
                 {exporting ? 'Export…' : 'Exporter PDF'}
               </Btn>
             </div>

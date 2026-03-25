@@ -41,13 +41,13 @@ export default function Layout({ children }) {
           flex-shrink: 0; position: sticky; top: 0; height: 100vh;
           overflow: hidden; z-index: 20;
           width: ${SW}px;
-          transition: width 0.22s cubic-bezier(0.4,0,0.2,1);
-          border-right: 1px solid rgba(200,169,126,0.12);
+          border-right: 2px solid ${DARK};
         }
         .l-main    { flex: 1; min-width: 0; background: #fff; overflow-x: hidden; }
         .l-topbar  {
           display: none; align-items: center; justify-content: space-between;
-          padding: 0 16px; height: 52px; background: ${DARK};
+          padding: 0 16px; height: 52px; background: #fff;
+          border-bottom: 2px solid ${DARK};
           position: sticky; top: 0; z-index: 30; flex-shrink: 0;
         }
         .l-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.55); z-index: 40; }
@@ -55,7 +55,6 @@ export default function Layout({ children }) {
           display: none; position: fixed; top: 0; left: 0;
           width: ${SW_OPEN}px; height: 100%; z-index: 50;
           transform: translateX(-100%);
-          transition: transform 0.26s cubic-bezier(0.22,1,0.36,1);
         }
         .l-drawer.open { transform: translateX(0); }
 
@@ -83,7 +82,7 @@ export default function Layout({ children }) {
         <div
           className={`l-overlay${open ? '' : ' hidden'}`}
           onClick={() => setOpen(false)}
-          style={{ opacity: open ? 1 : 0, pointerEvents: open ? 'all' : 'none', transition: 'opacity 0.22s' }}
+          style={{ opacity: open ? 1 : 0, pointerEvents: open ? 'all' : 'none' }}
         />
 
         {/* Mobile drawer */}
@@ -104,7 +103,7 @@ export default function Layout({ children }) {
             <button
               onClick={() => setOpen(o => !o)}
               aria-label="Menu"
-              style={{ width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(200,169,126,0.15)', border: 'none', color: GOLD, cursor: 'pointer', flexShrink: 0 }}>
+              style={{ width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center', background: DARK, border: 'none', color: GOLD, cursor: 'pointer', flexShrink: 0 }}>
               {open ? <CloseIcon /> : <HamburgerIcon />}
             </button>
 
@@ -112,7 +111,7 @@ export default function Layout({ children }) {
               style={{ height: 24, objectFit: 'contain' }}
               onError={e => { e.target.style.display = 'none' }} />
 
-            <span style={{ fontSize: 11, fontWeight: 700, color: 'rgba(200,169,126,0.6)', minWidth: 72, textAlign: 'right', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+            <span style={{ fontSize: 11, fontWeight: 700, color: DARK, minWidth: 72, textAlign: 'right', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
               {title}
             </span>
           </header>

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Pencil, Trash2, Utensils, Users, Clock, DollarSign } from 'lucide-react'
+
 
 const DARK    = '#2b2118'
 const GOLD    = '#c8a97e'
@@ -12,17 +12,15 @@ const RED_BG  = '#fdf0f0'
 const DAYS_SHORT = ['Dim','Lun','Mar','Mer','Jeu','Ven','Sam']
 
 function ServiceRow({ svc, isEditing, onEdit, onDelete, idx }) {
-  const bg          = isEditing ? '#fdf6ec' : idx % 2 === 0 ? '#fff' : CREAM
-  const availDays   = svc.available_days ?? [0,1,2,3,4,5,6]
-  const allDays     = availDays.length === 7
+  const availDays = svc.available_days ?? [0,1,2,3,4,5,6]
+  const allDays   = availDays.length === 7
 
   return (
     <div className="svc-row" style={{
       display: 'grid', gridTemplateColumns: '1fr auto',
-      background: bg,
-      borderBottom: `1px solid #e8e0d8`,
-      borderLeft: `3px solid ${isEditing ? GOLD : 'transparent'}`,
-      transition: 'background 0.12s',
+      background: '#FFFFFF',
+      borderBottom: `2px solid ${DARK}`,
+      borderLeft: `6px solid ${isEditing ? GOLD : DARK}`,
     }}>
       {/* Content */}
       <div style={{ padding: '14px 16px', minWidth: 0 }}>
@@ -32,24 +30,21 @@ function ServiceRow({ svc, isEditing, onEdit, onDelete, idx }) {
 
         {/* Info badges */}
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 8 }}>
-          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '3px 9px', background: '#fdf6ec', fontSize: 11, fontWeight: 800, color: GOLD_DK }}>
-            <DollarSign size={10} strokeWidth={2.5} color={GOLD} />
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '4px 10px', background: DARK, fontSize: 11, fontWeight: 900, color: GOLD, textTransform: 'uppercase' }}>
             {Number(svc.price) > 0 ? `${svc.price} dh` : 'Gratuit'}
           </span>
-          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '3px 9px', background: '#fdf6ec', fontSize: 11, fontWeight: 700, color: GOLD_DK }}>
-            <Users size={10} strokeWidth={2.5} color={GOLD} />
-            {svc.capacity} personnes max
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '4px 10px', background: DARK, fontSize: 11, fontWeight: 900, color: GOLD, textTransform: 'uppercase' }}>
+            {svc.capacity} PERS.
           </span>
-          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '3px 9px', background: '#fdf6ec', fontSize: 11, fontWeight: 700, color: GOLD_DK }}>
-            <Clock size={10} strokeWidth={2.5} color={GOLD} />
-            {svc.duration} min
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '4px 10px', background: DARK, fontSize: 11, fontWeight: 900, color: GOLD, textTransform: 'uppercase' }}>
+            {svc.duration} MIN
           </span>
         </div>
 
         {/* Days row */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 4, flexWrap: 'wrap' }}>
           {allDays ? (
-            <span style={{ fontSize: 10, fontWeight: 800, color: GOLD_DK, padding: '2px 8px', background: '#fdf6ec' }}>
+            <span style={{ fontSize: 10, fontWeight: 900, color: DARK, padding: '4px 10px', background: GOLD, textTransform: 'uppercase' }}>
               Tous les jours
             </span>
           ) : (
@@ -72,32 +67,30 @@ function ServiceRow({ svc, isEditing, onEdit, onDelete, idx }) {
       </div>
 
       {/* Actions */}
-      <div style={{ display: 'flex', flexDirection: 'column', borderLeft: `1px solid #e8e0d8` }}>
+      <div style={{ display: 'flex', flexDirection: 'column', borderLeft: `2px solid ${DARK}` }}>
         <button onClick={() => onEdit(svc)} title="Modifier"
           style={{
             flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center',
             padding: '0 18px',
-            background: isEditing ? '#fdf6ec' : 'none',
-            border: 'none', borderBottom: '1px solid #e8e0d8',
-            color: isEditing ? GOLD : DARK,
-            cursor: 'pointer', transition: 'all 0.15s', minHeight: 44,
+            background: DARK,
+            border: 'none',
+            color: GOLD,
+            cursor: 'pointer', minHeight: 44,
+            fontSize: 10, fontWeight: 900, textTransform: 'uppercase'
           }}
-          onMouseEnter={e => { e.currentTarget.style.background = DARK; e.currentTarget.style.color = GOLD }}
-          onMouseLeave={e => { e.currentTarget.style.background = isEditing ? '#fdf6ec' : 'none'; e.currentTarget.style.color = isEditing ? GOLD : DARK }}
         >
-          <Pencil size={13} strokeWidth={2.5} />
+          MODIFIER
         </button>
         <button onClick={() => onDelete(svc)} title="Supprimer"
           style={{
             flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center',
-            padding: '0 18px', background: 'none',
-            border: 'none', color: DARK,
-            cursor: 'pointer', transition: 'all 0.15s', minHeight: 44,
+            padding: '0 18px', background: '#FF0000',
+            border: 'none', color: '#fff',
+            cursor: 'pointer', minHeight: 44,
+            fontSize: 10, fontWeight: 900, textTransform: 'uppercase'
           }}
-          onMouseEnter={e => { e.currentTarget.style.background = RED_BG; e.currentTarget.style.color = RED }}
-          onMouseLeave={e => { e.currentTarget.style.background = 'none'; e.currentTarget.style.color = DARK }}
         >
-          <Trash2 size={13} strokeWidth={2.5} />
+          SUPPRIMER
         </button>
       </div>
     </div>
@@ -108,7 +101,6 @@ export default function ServiceList({ services, editingSvc, onEdit, onDelete }) 
   if (services.length === 0) {
     return (
       <div style={{ padding: '56px 16px', textAlign: 'center', background: '#fff', border: `1.5px solid ${BORDER}` }}>
-        <Utensils size={40} color={DARK} strokeWidth={1.5} style={{ display: 'block', margin: '0 auto 14px' }} />
         <p style={{ margin: 0, fontSize: 15, fontWeight: 900, color: DARK }}>Aucun service configuré</p>
         <p style={{ margin: '6px 0 0', fontSize: 12, fontWeight: 600, color: DARK }}>
           Utilisez le formulaire pour ajouter un service.
@@ -119,10 +111,10 @@ export default function ServiceList({ services, editingSvc, onEdit, onDelete }) 
 
   return (
     <>
-      <style>{`@media (hover: hover) { .svc-row:hover { background: #fdf6ec !important; } }`}</style>
+
       <div style={{ border: `1px solid ${BORDER}`, overflow: 'hidden' }}>
         {/* Header */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', padding: '10px 16px', background: DARK }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', padding: '12px 16px', background: DARK }}>
           <span style={{ fontSize: 9, fontWeight: 900, color: GOLD, letterSpacing: '0.2em', textTransform: 'uppercase' }}>Nom du service</span>
           <span style={{ fontSize: 9, fontWeight: 900, color: GOLD, letterSpacing: '0.2em', textTransform: 'uppercase' }}>Actions</span>
         </div>

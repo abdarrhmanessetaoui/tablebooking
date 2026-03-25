@@ -16,7 +16,7 @@ export const selectStyle = {
 
 export const overlayStyle = {
   position: 'fixed', inset: 0, zIndex: 9999,
-  background: 'rgba(43,33,24,0.6)',
+  background: '#fff',
   display: 'flex', alignItems: 'center',
   justifyContent: 'center', padding: 16,
   fontFamily: "'Plus Jakarta Sans','DM Sans',system-ui,sans-serif",
@@ -26,7 +26,7 @@ export const panelStyle = {
   background: '#fff', width: '100%', maxWidth: 480,
   maxHeight: '92vh', overflow: 'auto',
   display: 'flex', flexDirection: 'column',
-  boxShadow: '0 24px 64px rgba(43,33,24,0.35)',
+  border: `2px solid ${DARK}`,
 }
 
 export const headerStyle = {
@@ -41,14 +41,13 @@ export const summaryBoxStyle = {
   borderLeft: `3px solid ${GOLD}`,
 }
 
-export const footerBtnPrimary = (hov) => ({
-  flex: 2, padding: '12px', background: hov ? '#a8834e' : GOLD,
-  border: 'none', fontSize: 14, fontWeight: 900, color: DARK,
-  cursor: 'pointer', transition: 'background 0.15s',
-})
-
+export const footerBtnPrimary = {
+  flex: 2, padding: '12px', background: DARK,
+  border: 'none', fontSize: 13, fontWeight: 900, color: GOLD,
+  cursor: 'pointer', fontFamily: 'inherit',
+}
 export const footerBtnSecondary = {
-  flex: 1, padding: '12px', background: '#f5f0eb',
-  border: 'none', fontSize: 13, fontWeight: 800,
-  color: DARK, cursor: 'pointer',
+  flex: 1, padding: '12px', background: GOLD,
+  border: 'none', fontSize: 13, fontWeight: 900,
+  color: DARK, cursor: 'pointer', fontFamily: 'inherit',
 }

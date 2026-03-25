@@ -1,23 +1,26 @@
-import { ArrowRight, CalendarDays } from 'lucide-react'
 import ResRow from './ResRow'
 import {
   tableWrapper, tableHeader, headerCell,
   rowsContainer, viewAllBtn,
   emptyWrapper, emptyInner, emptyTitle, emptySubtitle,
 } from '../../styles/dashboard/reservationsTable.styles'
-import { DARK } from '../../styles/dashboard/tokens'
+import { DARK, GOLD } from '../../styles/dashboard/tokens'
 
 // ── View all button ───────────────────────────────────────────────
 function ViewAllBtn({ onViewAll, tabLabel }) {
   return (
     <button
       onClick={onViewAll}
-      style={viewAllBtn}
-      onMouseEnter={e => e.currentTarget.style.background = '#3d2d1e'}
-      onMouseLeave={e => e.currentTarget.style.background = DARK}
+      style={{
+        width: '100%', padding: '12px 16px',
+        background: DARK, border: `2px solid ${DARK}`,
+        color: GOLD, fontSize: 13, fontWeight: 900,
+        cursor: 'pointer', fontFamily: 'inherit',
+        textTransform: 'uppercase', letterSpacing: '0.05em',
+        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10
+      }}
     >
       <span>Toutes les réservations — {tabLabel}</span>
-      <ArrowRight size={13} strokeWidth={2.5} />
     </button>
   )
 }
@@ -27,13 +30,8 @@ function EmptyState({ onViewAll, tabLabel }) {
   return (
     <div style={emptyWrapper}>
       <div style={emptyInner}>
-        <CalendarDays
-          size={36}
-          color="rgba(200,169,126,0.9)"
-          style={{ marginBottom: 14 }}
-        />
-        <p style={emptyTitle}>Aucune réservation</p>
-        <p style={emptySubtitle}>Les réservations apparaîtront ici</p>
+        <p style={{ ...emptyTitle, fontSize: 16, fontWeight: 900, marginBottom: 4 }}>AUCUNE RÉSERVATION</p>
+        <p style={emptySubtitle}>LES RÉSERVATIONS APPARAÎTRONT ICI</p>
       </div>
       <ViewAllBtn onViewAll={onViewAll} tabLabel={tabLabel} />
     </div>
@@ -69,7 +67,7 @@ export default function DashboardReservationsTable({
       {/* Header */}
       <div style={tableHeader(tpl)}>
         {COLS.map(c => (
-          <span key={c.key} style={headerCell}>{c.label}</span>
+          <span key={c.key} style={{ ...headerCell, fontSize: 10, fontWeight: 900, textTransform: 'uppercase' }}>{c.label}</span>
         ))}
       </div>
 

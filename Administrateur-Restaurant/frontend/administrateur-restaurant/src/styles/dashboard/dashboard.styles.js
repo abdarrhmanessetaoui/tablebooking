@@ -7,7 +7,7 @@ import {
   // ── Page wrapper ──────────────────────────────────────────────────
   export const page = {
     minHeight:   '100vh',
-    background:  CREAM,
+    background:  '#FFFFFF',
     fontFamily:  FONT_FAMILY,
     padding:     'clamp(14px,3vw,40px) clamp(12px,4vw,36px)',
     width:       '100%',
@@ -65,23 +65,20 @@ import {
   }
   
   // ── Button ────────────────────────────────────────────────────────
-  export function btnStyle(hov, primary, disabled) {
-    const bg    = primary ? (hov ? DARK : GOLD) : (hov ? GOLD : DARK)
-    const color = primary ? (hov ? GOLD : DARK) : WHITE
+  export function btnStyle(primary, disabled) {
     return {
       display:        'flex',
       alignItems:     'center',
       justifyContent: 'center',
       gap:            8,
       padding:        '10px 16px',
-      background:     bg,
+      background:     DARK,
       border:         'none',
-      color,
+      color:          GOLD,
       fontSize:       13,
-      fontWeight:     800,
+      fontWeight:     900,
       cursor:         disabled ? 'not-allowed' : 'pointer',
       opacity:        disabled ? 0.5 : 1,
-      transition:     'background 0.15s, color 0.15s',
       fontFamily:     'inherit',
       whiteSpace:     'nowrap',
       minHeight:      40,
@@ -123,12 +120,8 @@ import {
       font-family: inherit;
       letter-spacing: .14em;
       text-transform: uppercase;
-      transition: color .14s, background .14s, border-color .14s;
       white-space: nowrap;
       flex-shrink: 0;
-    }
-    .db-tab:hover:not(.active) {
-      background: #fdf0d5;
     }
     .db-tab.active {
       background: ${DARK};
@@ -146,6 +139,6 @@ import {
       font-size: 9px;
       font-weight: 900;
     }
-    .db-tab.active .tab-pill       { background: ${GOLD}22;   color: ${GOLD};  }
-    .db-tab:not(.active) .tab-pill { background: ${AMBER_BG}; color: ${AMBER}; }
+    .db-tab.active .tab-pill       { background: ${GOLD}; color: ${DARK}; }
+    .db-tab:not(.active) .tab-pill { background: ${GOLD}; color: ${DARK}; }
   `

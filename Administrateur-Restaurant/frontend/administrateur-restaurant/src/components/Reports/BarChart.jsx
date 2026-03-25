@@ -6,8 +6,6 @@ const GOLD_BG = '#fdf6ec'
 const CREAM   = '#faf8f5'
 
 export default function BarChart({ data = {}, title, subtitle, highlight = false }) {
-  const [mounted, setMounted] = useState(false)
-  useEffect(() => { const id = setTimeout(() => setMounted(true), 80); return () => clearTimeout(id) }, [])
 
   const entries = Object.entries(data)
   const max     = Math.max(...entries.map(([, v]) => v), 1)
@@ -56,10 +54,9 @@ export default function BarChart({ data = {}, title, subtitle, highlight = false
                 </span>
                 <div style={{
                   width: '100%',
-                  height: mounted ? `${Math.max(pct, 2)}%` : '2%',
+                  height: `${Math.max(pct, 2)}%`,
                   background: isTop ? DARK : GOLD,
-                  opacity: isTop ? 1 : 0.55 + (value / max) * 0.45,
-                  transition: 'height 0.65s cubic-bezier(0.22,1,0.36,1)',
+                  opacity: isTop ? 1 : 0.6,
                 }} />
               </div>
             )

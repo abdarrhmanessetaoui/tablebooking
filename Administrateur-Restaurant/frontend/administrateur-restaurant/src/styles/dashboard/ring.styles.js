@@ -1,59 +1,65 @@
-import { DARK, GOLD_DK, BORDER } from './tokens'
+import { DARK, GOLD } from './tokens'
 
-// ── SVG ring wrapper ──────────────────────────────────────────────
+// ── Wrapper (size-based flex container) ───────────────────────────
 export const ringWrapper = (size) => ({
-  position:  'relative',
-  width:     size,
-  height:    size,
-  flexShrink: 0,
+  position: 'relative',
+  width:    size,
+  height:   size,
+  display:  'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
 })
 
+// ── SVG props ─────────────────────────────────────────────────────
 export const svg = (size) => ({
   transform: 'rotate(-90deg)',
-  width:     size,
-  height:    size,
+  display:   'block',
 })
 
 // ── Background track circle ───────────────────────────────────────
 export const trackCircle = {
-  fill:        'none',
-  stroke:      BORDER,
-  strokeWidth: '8',
+  fill:         'none',
+  stroke:       '#f5f0eb',
+  strokeWidth:  '8',
 }
 
-// ── Animated segment ──────────────────────────────────────────────
+// ── Progress segment circle style ─────────────────────────────────
 export const segment = (arc, circ, offset, color, index) => ({
   fill:              'none',
   stroke:            color,
   strokeWidth:       '8',
   strokeDasharray:   `${arc} ${circ}`,
   strokeDashoffset:  -offset,
-  transition:        `stroke-dasharray 0.9s ease ${index * 0.12}s`,
+  // NO TRANSITION — strictly static
 })
 
-// ── Center label overlay ──────────────────────────────────────────
+// ── Center label overlay (absolute centered) ──────────────────────
 export const centerOverlay = {
-  position:       'absolute',
-  inset:          0,
-  display:        'flex',
-  flexDirection:  'column',
-  alignItems:     'center',
-  justifyContent: 'center',
+  position: 'absolute',
+  top:      '50%',
+  left:     '50%',
+  transform: 'translate(-50%, -50%)',
+  textAlign: 'center',
+  display:   'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  pointerEvents: 'none',
 }
 
 export const centerPct = {
-  fontSize:           16,
-  fontWeight:         900,
-  color:              DARK,
-  lineHeight:         1,
-  fontVariantNumeric: 'tabular-nums',
+  display:       'block',
+  fontSize:      '26px',
+  fontWeight:    '900',
+  color:         DARK,
+  lineHeight:    '1',
+  letterSpacing: '-1.5px',
 }
 
 export const centerLabel = {
-  fontSize:      7,
-  fontWeight:    900,
-  color:         GOLD_DK,
+  fontSize:      '10px',
+  fontWeight:    '900',
+  color:         DARK,
   textTransform: 'uppercase',
-  letterSpacing: '0.1em',
-  marginTop:     2,
+  marginTop:     '4px',
+  opacity:       '0.6',
 }

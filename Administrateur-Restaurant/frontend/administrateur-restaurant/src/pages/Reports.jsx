@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { FileDown, BarChart2, Users, CheckCircle, Clock, XCircle } from 'lucide-react'
+
 import useReports    from '../hooks/Reports/useReports'
 import useServices   from '../hooks/Reservations/useServices'
 import FadeUp        from '../components/Dashboard/FadeUp'
@@ -55,33 +55,28 @@ async function doPDF(summary, pLabel, sLabel) {
 }
 
 /* ════ BUTTON ════ */
-function Btn({ children, onClick, primary, disabled, icon: Icon }) {
-  const [hov,setHov]=useState(false)
-  const bg    = primary ? (hov?DARK:GOLD) : (hov?GOLD:DARK)
-  const color = primary ? (hov?GOLD:DARK) : '#fff'
+function Btn({ children, onClick, primary, disabled }) {
   return (
     <button onClick={onClick} disabled={disabled}
-      onMouseEnter={()=>setHov(true)} onMouseLeave={()=>setHov(false)}
       style={{
         display:'flex',alignItems:'center',justifyContent:'center',gap:8,
-        padding:'11px 20px',background:bg,border:'none',color,
-        fontSize:13,fontWeight:800,cursor:disabled?'not-allowed':'pointer',
-        opacity:disabled?0.5:1,transition:'background 0.15s,color 0.15s',
+        padding:'11px 20px',background:DARK,border:'none',color:GOLD,
+        fontSize:13,fontWeight:900,cursor:disabled?'not-allowed':'pointer',
+        opacity:disabled?0.5:1,
         fontFamily:'inherit',whiteSpace:'nowrap',
+        textTransform:'uppercase'
       }}>
-      {Icon&&<Icon size={15} strokeWidth={2.2}/>}
       <span className="btn-label">{children}</span>
     </button>
   )
 }
 
 /* ════ SUMMARY CARD ════ */
-function SumCard({ icon:Icon, value, label, accent, bg, delay=0 }) {
+function SumCard({ value, label, accent, bg, delay=0 }) {
   const n = useCountUp(typeof value==='number' ? value : 0, 700, delay)
   return (
-    <div style={{background:bg, borderTop:`3px solid ${accent}`, padding:'18px 20px'}}>
+    <div style={{background:bg, borderTop:`4px solid ${accent}`, padding:'18px 20px'}}>
       <div style={{display:'flex',alignItems:'center',gap:6,marginBottom:10}}>
-        <Icon size={12} strokeWidth={2.5} color={accent}/>
         <span style={{fontSize:9,fontWeight:900,color:accent,textTransform:'uppercase',letterSpacing:'0.16em'}}>{label}</span>
       </div>
       <p style={{margin:0,fontSize:'clamp(26px,4vw,42px)',fontWeight:900,color:DARK,letterSpacing:'-2px',fontVariantNumeric:'tabular-nums',lineHeight:1}}>
@@ -162,7 +157,6 @@ function BarChart({ data={}, title, subtitle, highlight=false, barColor=GOLD }) 
                   height:`${Math.max(pct,3)}%`,
                   background: isTop ? DARK : barColor,
                   opacity: isTop ? 1 : 0.5+(value/max)*0.5,
-                  transition:'height 0.65s cubic-bezier(0.22,1,0.36,1)',
                 }}/>
               </div>
             )
@@ -225,7 +219,6 @@ function ServiceChart({ data={} }) {
                 flex: mounted ? val : 0,
                 background: COLORS[i%COLORS.length],
                 minWidth: mounted ? 2 : 0,
-                transition:'flex 0.75s cubic-bezier(0.22,1,0.36,1)',
               }}/>
           ))}
         </div>
@@ -243,10 +236,9 @@ function ServiceChart({ data={} }) {
               </div>
               <div style={{height:3,background: BORDER,overflow:'hidden'}}>
                 <div style={{
-                  height:'100%',
-                  width: mounted ? `${pct}%` : '0%',
-                  background: COLORS[i%COLORS.length],
-                  transition:`width 0.75s cubic-bezier(0.22,1,0.36,1) ${i*60}ms`,
+                   height:'100%',
+                   width: mounted ? `${pct}%` : '0%',
+                   background: COLORS[i%COLORS.length],
                 }}/>
               </div>
             </div>
@@ -313,7 +305,7 @@ export default function Reports() {
       `}</style>
 
       <div style={{
-        minHeight:'100vh', background:CREAM,
+        minHeight:'100vh', background:'#FFFFFF',
         fontFamily:"'Plus Jakarta Sans','DM Sans',system-ui,sans-serif",
         padding:'clamp(16px,3vw,40px) clamp(12px,3vw,36px)',
         boxSizing:'border-box',
@@ -332,7 +324,7 @@ export default function Reports() {
               </p>
             </div>
             <div style={{display:'flex',gap:3,flexShrink:0}}>
-              <Btn icon={FileDown} primary onClick={handleExport} disabled={exporting}>
+              <Btn primary onClick={handleExport} disabled={exporting}>
                 {exporting ? 'Génération…' : 'Exporter PDF'}
               </Btn>
             </div>
@@ -368,11 +360,11 @@ export default function Reports() {
         <FadeUp delay={20}>
           <SectionTitle title="Résumé général" sub="" count={s.total??0}/>
           <div className="rp-sum" style={{marginBottom:32}}>
-            <SumCard icon={BarChart2}   value={s.total??0}     label="Total"       accent={DARK}    bg={WHITE}    delay={40} />
-            <SumCard icon={CheckCircle} value={s.confirmed??0} label="Confirmées"  accent={GREEN}   bg={GREEN_BG} delay={70} />
-            <SumCard icon={Clock}       value={s.pending??0}   label="En attente"  accent={AMBER}   bg={AMBER_BG} delay={100}/>
-            <SumCard icon={XCircle}     value={s.cancelled??0} label="Annulées"    accent={RED}     bg={RED_BG}   delay={130}/>
-            <SumCard icon={Users}       value={s.avg_guests ? `${Number(s.avg_guests).toFixed(1)}` : '0'} label="Moyenne de personnes" accent={GOLD_DK} bg={CREAM} delay={160}/>
+            <SumCard value={s.total??0}     label="Total"       accent={DARK}    bg={WHITE}    delay={40} />
+            <SumCard value={s.confirmed??0} label="Confirmées"  accent={GREEN}   bg={'#f0fdf4'} delay={70} />
+            <SumCard value={s.pending??0}   label="En attente"  accent={AMBER}   bg={'#fffbeb'} delay={100}/>
+            <SumCard value={s.cancelled??0} label="Annulées"    accent={'#FF0000'} bg={'#fef2f2'} delay={130}/>
+            <SumCard value={s.avg_guests ? `${Number(s.avg_guests).toFixed(1)}` : '0'} label="Moyenne" accent={GOLD_DK} bg={'#f8f9fa'} delay={160}/>
           </div>
         </FadeUp>
 

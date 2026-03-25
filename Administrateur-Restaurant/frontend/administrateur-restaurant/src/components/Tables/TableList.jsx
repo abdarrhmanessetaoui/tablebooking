@@ -1,9 +1,5 @@
 import { useState, useEffect } from 'react'
-import {
-  Pencil, Trash2, LayoutGrid, Users, MapPin,
-  ToggleLeft, ToggleRight,
-  ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight,
-} from 'lucide-react'
+
 
 const DARK     = '#2b2118'
 const GOLD     = '#c8a97e'
@@ -43,7 +39,7 @@ function Checkbox({ checked, indeterminate, onChange }) {
         background: checked || indeterminate ? DARK : '#fff',
         border: `2px solid ${DARK}`,
         display: 'flex', alignItems: 'center', justifyContent: 'center',
-        cursor: 'pointer', transition: 'all 0.15s',
+        cursor: 'pointer',
       }}
     >
       {checked && (
@@ -57,21 +53,19 @@ function Checkbox({ checked, indeterminate, onChange }) {
 }
 
 function PageBtn({ onClick, disabled, active, children }) {
-  const [hov, setHov] = useState(false)
   return (
     <button
       onClick={onClick} disabled={disabled}
-      onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
       style={{
         minWidth: 36, height: 36, padding: '0 6px',
         display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-        background: active ? DARK : hov && !disabled ? '#FBF5EA' : '#fff',
+        background: active ? DARK : '#fff',
         border: `1.5px solid ${DARK}`,
         color: active ? GOLD : DARK,
         fontSize: 12, fontWeight: active ? 900 : 700,
         cursor: disabled ? 'not-allowed' : 'pointer',
         opacity: disabled ? 0.35 : 1,
-        transition: 'all 0.15s', flexShrink: 0,
+        flexShrink: 0,
       }}
     >
       {children}
@@ -91,10 +85,7 @@ function TableRow({ tbl, isEditing, isSelected, onEdit, onDelete, onToggle, onSe
         display: 'grid',
         gridTemplateColumns: '40px minmax(auto, 1fr) auto',
         background: bg,
-        borderBottom: `1px solid #e8e0d8`,
-        borderLeft: `3px solid ${isSelected || isEditing ? GOLD : 'transparent'}`,
-        transition: 'background 0.12s',
-        opacity: tbl.active ? 1 : 0.6,
+        borderLeft: `6px solid ${isSelected || isEditing ? GOLD : DARK}`,
       }}
     >
       {/* Checkbox cell */}
@@ -134,7 +125,6 @@ function TableRow({ tbl, isEditing, isSelected, onEdit, onDelete, onToggle, onSe
             fontSize: 11, fontWeight: 800, color: GOLD_DK,
             whiteSpace: 'nowrap',
           }}>
-            <Users size={10} strokeWidth={2.5} color={GOLD} />
             {tbl.capacity} Personnes max
           </span>
           <span style={{
@@ -143,7 +133,6 @@ function TableRow({ tbl, isEditing, isSelected, onEdit, onDelete, onToggle, onSe
             fontSize: 11, fontWeight: 700, color: locStyle.color,
             whiteSpace: 'nowrap',
           }}>
-            <MapPin size={10} strokeWidth={2.5} color={locStyle.color} />
             {tbl.location}
           </span>
         </div>
@@ -156,41 +145,32 @@ function TableRow({ tbl, isEditing, isSelected, onEdit, onDelete, onToggle, onSe
         <ToggleActionBtn tbl={tbl} onToggle={onToggle} />
 
         {/* Edit */}
-        <button
-          onClick={() => onEdit(tbl)}
-          title="Modifier"
-          style={{
-            flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center',
-            padding: '0 18px', minHeight: 36,
-            background: isEditing ? '#fdf6ec' : 'none',
-            border: 'none', borderBottom: `1px solid #e8e0d8`,
-            color: isEditing ? GOLD : DARK,
-            cursor: 'pointer', transition: 'all 0.15s',
-          }}
-          onMouseEnter={e => { e.currentTarget.style.background = DARK; e.currentTarget.style.color = GOLD }}
-          onMouseLeave={e => {
-            e.currentTarget.style.background = isEditing ? '#fdf6ec' : 'none'
-            e.currentTarget.style.color = isEditing ? GOLD : DARK
-          }}
-        >
-          <Pencil size={13} strokeWidth={2.5} />
-        </button>
-
+          <button
+            onClick={() => onEdit(tbl)}
+            style={{
+              flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center',
+              padding: '0 18px', minHeight: 40,
+              background: DARK,
+              border: 'none', borderBottom: `2px solid rgba(200,169,126,0.2)`,
+              color: GOLD,
+              fontSize: 11, fontWeight: 900, cursor: 'pointer', textTransform: 'uppercase'
+            }}
+          >
+            Modifier
+          </button>
+        
         {/* Delete */}
-        <button
-          onClick={() => onDelete(tbl)}
-          title="Supprimer"
-          style={{
-            flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center',
-            padding: '0 18px', minHeight: 36,
-            background: 'none', border: 'none',
-            color: DARK, cursor: 'pointer', transition: 'all 0.15s',
-          }}
-          onMouseEnter={e => { e.currentTarget.style.background = RED_BG; e.currentTarget.style.color = RED }}
-          onMouseLeave={e => { e.currentTarget.style.background = 'none'; e.currentTarget.style.color = DARK }}
-        >
-          <Trash2 size={13} strokeWidth={2.5} />
-        </button>
+          <button
+            onClick={() => onDelete(tbl)}
+            style={{
+              flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center',
+              padding: '0 18px', minHeight: 40,
+              background: '#FF0000', border: 'none',
+              color: '#fff', fontSize: 11, fontWeight: 900, cursor: 'pointer', textTransform: 'uppercase'
+            }}
+          >
+            Supprimer
+          </button>
 
       </div>
     </div>
@@ -203,29 +183,16 @@ function ToggleActionBtn({ tbl, onToggle }) {
   return (
     <button
       onClick={() => onToggle(tbl)}
-      title={isActive ? 'Désactiver' : 'Activer'}
       style={{
         flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-        padding: '0 14px', minHeight: 36,
-        background: isActive ? GREEN_BG : 'none',
-        border: 'none', borderBottom: `1px solid #e8e0d8`,
-        color: isActive ? GREEN : '#bbb',
-        cursor: 'pointer', transition: 'all 0.15s',
+        padding: '0 14px', minHeight: 40,
+        background: isActive ? '#00A651' : DARK,
+        border: 'none', borderBottom: `2px solid rgba(255,255,255,0.2)`,
+        color: isActive ? '#fff' : GOLD,
+        cursor: 'pointer',
         whiteSpace: 'nowrap',
       }}
-      onMouseEnter={e => {
-        e.currentTarget.style.background = isActive ? RED_BG : GREEN_BG
-        e.currentTarget.style.color      = isActive ? RED    : GREEN
-      }}
-      onMouseLeave={e => {
-        e.currentTarget.style.background = isActive ? GREEN_BG : 'none'
-        e.currentTarget.style.color      = isActive ? GREEN   : '#bbb'
-      }}
     >
-      {isActive
-        ? <ToggleRight size={14} strokeWidth={2.5} />
-        : <ToggleLeft  size={14} strokeWidth={2.5} />
-      }
       <span style={{ fontSize: 10, fontWeight: 900, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
         {isActive ? 'Actif' : 'Inactif'}
       </span>
@@ -242,7 +209,6 @@ export default function TableList({ tables, editingTbl, onEdit, onDelete, onTogg
   if (!tables || tables.length === 0) {
     return (
       <div style={{ padding: '56px 16px', textAlign: 'center', background: '#fff', border: `1.5px solid ${BORDER}` }}>
-        <LayoutGrid size={40} color={DARK} strokeWidth={1.5} style={{ display: 'block', margin: '0 auto 14px' }} />
         <p style={{ margin: 0, fontSize: 15, fontWeight: 900, color: DARK }}>Aucune table configurée</p>
         <p style={{ margin: '6px 0 0', fontSize: 12, fontWeight: 600, color: DARK }}>
           Utilisez le formulaire pour ajouter une table.
@@ -284,7 +250,7 @@ export default function TableList({ tables, editingTbl, onEdit, onDelete, onTogg
 
   return (
     <>
-      <style>{`@media (hover: hover) { .tbl-row:hover { background: #fdf6ec !important; } }`}</style>
+
 
       {/* Stats bar */}
       <div style={{ display: 'flex', gap: 0, marginBottom: 12 }}>
@@ -378,15 +344,15 @@ export default function TableList({ tables, editingTbl, onEdit, onDelete, onTogg
               {(safe - 1) * PAGE_SIZE + 1}–{Math.min(safe * PAGE_SIZE, tables.length)} / {tables.length}
             </span>
             <div style={{ display: 'flex', gap: 3, flexWrap: 'wrap' }}>
-              {!isXs && <PageBtn onClick={() => setPage(1)} disabled={safe === 1}><ChevronsLeft size={12} strokeWidth={2.5} /></PageBtn>}
-              <PageBtn onClick={() => setPage(p => Math.max(1, p - 1))} disabled={safe === 1}><ChevronLeft size={12} strokeWidth={2.5} /></PageBtn>
+              {!isXs && <PageBtn onClick={() => setPage(1)} disabled={safe === 1}>«</PageBtn>}
+              <PageBtn onClick={() => setPage(p => Math.max(1, p - 1))} disabled={safe === 1}>‹</PageBtn>
               {getPages().map((p, i) =>
                 p === '…'
                   ? <span key={`d${i}`} style={{ padding: '0 2px', fontSize: 12, color: DARK, lineHeight: '36px' }}>…</span>
                   : <PageBtn key={p} active={p === safe} onClick={() => setPage(p)}>{p}</PageBtn>
               )}
-              <PageBtn onClick={() => setPage(p => Math.min(total, p + 1))} disabled={safe === total}><ChevronRight size={12} strokeWidth={2.5} /></PageBtn>
-              {!isXs && <PageBtn onClick={() => setPage(total)} disabled={safe === total}><ChevronsRight size={12} strokeWidth={2.5} /></PageBtn>}
+              <PageBtn onClick={() => setPage(p => Math.min(total, p + 1))} disabled={safe === total}>›</PageBtn>
+              {!isXs && <PageBtn onClick={() => setPage(total)} disabled={safe === total}>»</PageBtn>}
             </div>
           </div>
         )}

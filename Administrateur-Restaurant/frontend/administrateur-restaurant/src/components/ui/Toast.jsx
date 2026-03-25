@@ -1,11 +1,11 @@
 import { useState, useEffect, useCallback } from 'react'
-import { CheckCircle, XCircle, AlertCircle, X } from 'lucide-react'
+
 
 const TYPES = {
-  success: { bg: '#f0fdf4', border: '#bbf7d0', color: '#166534', icon: CheckCircle, dot: '#16a34a' },
-  error:   { bg: '#fef2f2', border: '#fecaca', color: '#991b1b', icon: XCircle,     dot: '#dc2626' },
-  warning: { bg: '#fffbeb', border: '#fde68a', color: '#92400e', icon: AlertCircle, dot: '#c8a97e' },
-  info:    { bg: '#fdf6ec', border: '#e8d8b0', color: '#a8834e', icon: AlertCircle, dot: '#c8a97e' },
+  success: { bg: '#00A651', border: '#00A651', color: '#fff' },
+  error:   { bg: '#FF0000', border: '#FF0000', color: '#fff' },
+  warning: { bg: '#c8a97e', border: '#c8a97e', color: '#fff' },
+  info:    { bg: '#2b2118', border: '#2b2118', color: '#fff' },
 }
 
 let _addToast = null
@@ -34,38 +34,33 @@ export default function ToastContainer() {
       pointerEvents: 'none',
     }}>
       <style>{`
-        @keyframes toastIn { from { opacity:0; transform:translateX(24px) } to { opacity:1; transform:translateX(0) } }
         @media (max-width: 600px) { .toast-item { width: calc(100vw - 48px) !important; } }
       `}</style>
       {toasts.map(t => {
         const cfg  = TYPES[t.type] || TYPES.info
-        const Icon = cfg.icon
         return (
           <div key={t.id} className="toast-item" style={{
             pointerEvents: 'all',
             display: 'flex', alignItems: 'center', gap: 10,
             padding: '12px 16px',
             background: cfg.bg,
-            border: `1.5px solid ${cfg.border}`,
-            borderLeft: `4px solid ${cfg.dot}`,
-            boxShadow: '0 4px 20px rgba(43,33,24,0.12)',
+            border: `1px solid ${cfg.border}`,
             minWidth: 280, maxWidth: 380,
-            animation: 'toastIn 0.22s ease',
             fontFamily: "'Plus Jakarta Sans','DM Sans',system-ui,sans-serif",
           }}>
-            <Icon size={15} color={cfg.dot} strokeWidth={2.5} style={{ flexShrink: 0 }} />
-            <span style={{ flex: 1, fontSize: 13, fontWeight: 700, color: cfg.color, lineHeight: 1.4 }}>
+            <span style={{ flex: 1, fontSize: 13, fontWeight: 900, color: cfg.color, lineHeight: 1.4 }}>
               {t.message}
             </span>
             <button
               onClick={() => setToasts(prev => prev.filter(x => x.id !== t.id))}
               style={{
-                background: 'none', border: 'none', cursor: 'pointer',
-                padding: 2, display: 'flex', flexShrink: 0,
-                color: cfg.color, opacity: 0.5,
+                background: 'none', border: `1px solid ${cfg.color}`, cursor: 'pointer',
+                padding: '4px 8px', display: 'flex', flexShrink: 0,
+                color: cfg.color, fontSize: 10, fontWeight: 900, textTransform: 'uppercase',
+                fontFamily: 'inherit',
               }}
             >
-              <X size={13} strokeWidth={2.5} />
+              OK
             </button>
           </div>
         )

@@ -1,9 +1,6 @@
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useState, useEffect, useMemo } from 'react'
-import {
-  Plus, FileDown, Trash2, CheckCircle,
-  Clock, XCircle, X
-} from 'lucide-react'
+
 import useReservations from '../hooks/Reservations/useReservations'
 import useServices     from '../hooks/Reservations/useServices'
 import ReservationsFilters from '../components/Reservations/ReservationsFilters/index'
@@ -19,44 +16,36 @@ const DARK      = '#2b2118'
 const GOLD      = '#c8a97e'
 const GOLD_DARK = '#a8834e'
 
-function Btn({ children, onClick, primary, disabled, icon: Icon }) {
-  const [hov, setHov] = useState(false)
-  const bg    = primary ? (hov ? DARK : GOLD) : (hov ? GOLD : DARK)
-  const color = primary ? (hov ? GOLD : DARK) : '#fff'
+function Btn({ children, onClick, primary, disabled }) {
   return (
     <button onClick={onClick} disabled={disabled}
-      onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
       style={{
         display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
         padding: '11px 20px',
-        background: bg, border: 'none', color,
-        fontSize: 13, fontWeight: 800,
+        background: DARK, border: 'none', color: GOLD,
+        fontSize: 13, fontWeight: 900,
         cursor: disabled ? 'not-allowed' : 'pointer',
         opacity: disabled ? 0.5 : 1,
-        transition: 'background 0.15s, color 0.15s',
         fontFamily: 'inherit', whiteSpace: 'nowrap',
+        textTransform: 'uppercase'
       }}
     >
-      {Icon && <Icon size={15} strokeWidth={2.2} />}
       <span className="btn-label">{children}</span>
     </button>
   )
 }
 
 function BulkBar({ count, onDelete, onStatus, onClear }) {
-  const [hovDel, setHovDel] = useState(false)
   return (
     <div style={{
       position: 'sticky', top: 8, zIndex: 30,
       display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap',
       padding: '10px 16px',
       background: DARK,
-      boxShadow: '0 4px 24px rgba(43,33,24,0.28)',
+      border: `2px solid ${GOLD}`,
       marginBottom: 12,
-      animation: 'slideDown 0.18s ease',
     }}>
       <style>{`
-        @keyframes slideDown { from{opacity:0;transform:translateY(-8px)} to{opacity:1;transform:translateY(0)} }
         @media (max-width: 600px) {
           .btn-label  { display: none !important; }
           .bulk-label { display: none !important; }
@@ -76,62 +65,53 @@ function BulkBar({ count, onDelete, onStatus, onClear }) {
       <div style={{ width: 1, height: 20, background: 'rgba(255,255,255,0.12)', margin: '0 2px', flexShrink: 0 }} />
 
       {[
-        { status: 'Confirmed', label: 'Confirmer',  Icon: CheckCircle, color: '#4ade80' },
-        { status: 'Pending',   label: 'En attente', Icon: Clock,       color: GOLD      },
-        { status: 'Cancelled', label: 'Annuler',    Icon: XCircle,     color: '#f87171' },
-      ].map(({ status, label, Icon, color }) => (
+        { status: 'Confirmed', label: 'Confirmer',  color: '#00A651' },
+        { status: 'Pending',   label: 'En attente', color: GOLD      },
+        { status: 'Cancelled', label: 'Annuler',    color: '#FF0000' },
+      ].map(({ status, label, color }) => (
         <button key={status} onClick={() => onStatus(status)}
           style={{
-            display: 'flex', alignItems: 'center', gap: 5,
-            padding: '6px 12px',
-            background: 'rgba(255,255,255,0.07)',
-            border: '1px solid rgba(255,255,255,0.1)',
-            color, fontSize: 12, fontWeight: 700,
+            padding: '7px 12px',
+            background: color,
+            border: 'none',
+            color: color === GOLD ? DARK : '#fff',
+            fontSize: 11, fontWeight: 900,
             cursor: 'pointer', fontFamily: 'inherit',
-            transition: 'background 0.15s', flexShrink: 0,
+            flexShrink: 0, textTransform: 'uppercase'
           }}
-          onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.15)'}
-          onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,255,255,0.07)'}
         >
-          <Icon size={13} strokeWidth={2.5} />
-          <span className="btn-label">{label}</span>
+          {label}
         </button>
       ))}
 
       <div style={{ width: 1, height: 20, background: 'rgba(255,255,255,0.12)', margin: '0 2px', flexShrink: 0 }} />
 
       <button onClick={onDelete}
-        onMouseEnter={() => setHovDel(true)} onMouseLeave={() => setHovDel(false)}
         style={{
-          display: 'flex', alignItems: 'center', gap: 5,
-          padding: '6px 12px',
-          background: hovDel ? '#ef4444' : 'rgba(239,68,68,0.12)',
-          border: '1px solid rgba(239,68,68,0.25)',
-          color: hovDel ? '#fff' : '#f87171',
-          fontSize: 12, fontWeight: 700,
+          padding: '7px 12px',
+          background: '#FF0000',
+          border: 'none',
+          color: '#fff',
+          fontSize: 11, fontWeight: 900,
           cursor: 'pointer', fontFamily: 'inherit',
-          transition: 'all 0.15s', flexShrink: 0,
+          flexShrink: 0, textTransform: 'uppercase'
         }}
       >
-        <Trash2 size={13} strokeWidth={2.5} />
-        <span className="btn-label">Supprimer</span>
+        Supprimer
       </button>
 
       <button onClick={onClear}
         style={{
-          marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 5,
-          padding: '6px 10px',
-          background: 'none', border: '1px solid rgba(255,255,255,0.12)',
-          color: 'rgba(255,255,255,0.45)',
-          fontSize: 12, fontWeight: 700,
+          marginLeft: 'auto',
+          padding: '7px 12px',
+          background: GOLD, border: 'none',
+          color: DARK,
+          fontSize: 11, fontWeight: 900,
           cursor: 'pointer', fontFamily: 'inherit',
-          transition: 'all 0.15s', flexShrink: 0,
+          flexShrink: 0, textTransform: 'uppercase'
         }}
-        onMouseEnter={e => e.currentTarget.style.color = '#fff'}
-        onMouseLeave={e => e.currentTarget.style.color = 'rgba(255,255,255,0.45)'}
       >
-        <X size={13} strokeWidth={2.5} />
-        <span className="btn-label">Désélectionner</span>
+        Désélectionner
       </button>
     </div>
   )
@@ -355,7 +335,7 @@ export default function Reservations() {
       `}</style>
 
       <div style={{
-        minHeight: '100vh', background: '#faf8f5',
+        minHeight: '100vh', background: '#FFFFFF',
         fontFamily: "'Plus Jakarta Sans','DM Sans',system-ui,sans-serif",
         padding: 'clamp(16px,3vw,40px) clamp(12px,3vw,36px)',
       }}>
@@ -372,10 +352,10 @@ export default function Reservations() {
               </p>
             </div>
             <div style={{ display: 'flex', gap: 3, flexShrink: 0 }}>
-              <Btn icon={FileDown} primary onClick={handleExportPDF} disabled={exporting}>
+              <Btn primary onClick={handleExportPDF} disabled={exporting}>
                 {exporting ? 'Export…' : 'Exporter PDF'}
               </Btn>
-              <Btn icon={Plus} onClick={openCreate}>
+               <Btn onClick={openCreate}>
                 Nouvelle réservation
               </Btn>
             </div>
@@ -388,8 +368,7 @@ export default function Reservations() {
 
         {error && (
           <FadeUp delay={20}>
-            <div style={{ marginBottom: 16, padding: '11px 16px', background: '#fdf0f0', borderLeft: '3px solid #b94040', fontSize: 12, fontWeight: 700, color: '#b94040', display: 'flex', alignItems: 'center', gap: 8 }}>
-              <XCircle size={14} strokeWidth={2.5} />
+            <div style={{ marginBottom: 16, padding: '11px 16px', background: '#FF0000', fontSize: 12, fontWeight: 900, color: '#FFFFFF', display: 'flex', alignItems: 'center', gap: 8 }}>
               {error}
             </div>
           </FadeUp>

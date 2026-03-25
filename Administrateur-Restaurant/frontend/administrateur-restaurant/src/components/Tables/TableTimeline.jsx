@@ -1,5 +1,4 @@
-import { useState, useEffect, useMemo } from 'react'
-import { LayoutGrid, Clock, CalendarDays, Utensils, Users, ChevronLeft, ChevronRight } from 'lucide-react'
+
 import useTablesTimeline from '../../hooks/Tables/useTablesTimeline'
 import { RED } from '../../styles/dashboard/tokens'
 
@@ -109,31 +108,31 @@ function MiniCal({ value, onChange }) {
   for (let d=1; d<=dim(cur.y,cur.m); d++) cells.push(d)
 
   return (
-    <div style={{ background: '#fff', border: `2px solid ${DARK}`, userSelect: 'none' }}>
+    <div style={{ background: '#fff', border: `3px solid ${DARK}`, userSelect: 'none' }}>
       {/* Header */}
       <div style={{ background: DARK, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '7px 8px' }}>
         <button onClick={() => setCur(c => c.m===0?{y:c.y-1,m:11}:{y:c.y,m:c.m-1})}
-          style={{ background:'none', border:'none', cursor:'pointer', padding:3, display:'flex' }}>
-          <ChevronLeft size={13} color={GOLD} strokeWidth={2.5} />
+          style={{ background:DARK, border:`2px solid ${GOLD}`, cursor:'pointer', padding:'4px 10px', display:'flex', fontSize:10, fontWeight:900, color:GOLD }}>
+          PRÉC
         </button>
-        <span style={{ fontSize:11, fontWeight:900, color:'#fff', textTransform:'capitalize' }}>
+        <span style={{ fontSize:12, fontWeight:900, color:'#fff', textTransform:'capitalize' }}>
           {formatMonthYear(cur.y, cur.m)}
         </span>
         <button onClick={() => setCur(c => c.m===11?{y:c.y+1,m:0}:{y:c.y,m:c.m+1})}
-          style={{ background:'none', border:'none', cursor:'pointer', padding:3, display:'flex' }}>
-          <ChevronRight size={13} color={GOLD} strokeWidth={2.5} />
+          style={{ background:DARK, border:`2px solid ${GOLD}`, cursor:'pointer', padding:'4px 10px', display:'flex', fontSize:10, fontWeight:900, color:GOLD }}>
+          SUIV
         </button>
       </div>
 
       {/* Day headers */}
-      <div style={{ display:'grid', gridTemplateColumns:'repeat(7,1fr)', background:CREAM, borderBottom:`1px solid ${BORDER}` }}>
+      <div style={{ display:'grid', gridTemplateColumns:'repeat(7,1fr)', background:'#eee', borderBottom:`2px solid ${DARK}` }}>
         {DAYS.map((d,i) => (
-          <div key={i} style={{ padding:'4px 0', textAlign:'center', fontSize:8, fontWeight:900, color:GOLD_DARK }}>{d}</div>
+          <div key={i} style={{ padding:'6px 0', textAlign:'center', fontSize:9, fontWeight:900, color:DARK }}>{d}</div>
         ))}
       </div>
 
       {/* Days grid */}
-      <div style={{ display:'grid', gridTemplateColumns:'repeat(7,1fr)', padding:'3px' }}>
+      <div style={{ display:'grid', gridTemplateColumns:'repeat(7,1fr)', padding:'2px' }}>
         {cells.map((day, i) => {
           if (!day) return <div key={`e${i}`} />
           const iso  = toISO(cur.y, cur.m, day)
@@ -142,87 +141,40 @@ function MiniCal({ value, onChange }) {
           return (
             <button key={day} onClick={() => onChange(iso)}
               style={{
-                padding:'4px 0', border:'none', borderRadius:2,
-                background: isSel ? DARK : 'transparent',
-                color: isSel ? GOLD : isTdy ? GOLD_DARK : DARK,
-                fontSize:10, fontWeight: isSel||isTdy ? 900 : 600,
-                cursor:'pointer', textAlign:'center', position:'relative',
-                transition:'background 0.1s',
+                padding:'6px 0', border:'none',
+                background: isSel ? DARK : isTdy ? GOLD : '#fff',
+                color: isSel ? GOLD : DARK,
+                fontSize:11, fontWeight: 900,
+                cursor:'pointer', textAlign:'center',
               }}
-              onMouseEnter={e => { if(!isSel) e.currentTarget.style.background = CREAM }}
-              onMouseLeave={e => { if(!isSel) e.currentTarget.style.background = 'transparent' }}
             >
               {day}
-              {isTdy && !isSel && (
-                <span style={{ position:'absolute', bottom:1, left:'50%', transform:'translateX(-50%)', width:3, height:3, borderRadius:'50%', background:GOLD_DARK, display:'block' }} />
-              )}
             </button>
           )
         })}
       </div>
 
       {/* Today shortcut */}
-      <div style={{ padding:'5px 8px', borderTop:`1px solid ${BORDER}` }}>
+      <div style={{ padding:'8px', borderTop:`2px solid ${DARK}` }}>
         <button
           onClick={() => { onChange(todayISO); setCur({ y:today.getFullYear(), m:today.getMonth() }) }}
-          style={{ width:'100%', padding:'5px', background: value===todayISO ? DARK : CREAM, border:`1px solid ${BORDER}`, fontSize:10, fontWeight:800, color: value===todayISO ? GOLD : DARK, cursor:'pointer', fontFamily:'inherit', transition:'all 0.15s' }}
-          onMouseEnter={e => { if(value!==todayISO) e.currentTarget.style.background='#e8e0d8' }}
-          onMouseLeave={e => { if(value!==todayISO) e.currentTarget.style.background=CREAM }}
+          style={{ width:'100%', padding:'8px', background: DARK, border:`none`, fontSize:11, fontWeight:900, color: GOLD, cursor:'pointer', fontFamily:'inherit' }}
         >
-          Aujourd'hui
+          AUJOURD'HUI
         </button>
       </div>
     </div>
   )
 }
 
-// ── Tooltip ───────────────────────────────────────────────────────
-function Tip({ res, endTime }) {
-  const sc = STATUS[res.status] ?? STATUS.Pending
-  return (
-    <div style={{
-      position:'absolute', bottom:'calc(100% + 8px)', left:'50%',
-      transform:'translateX(-50%)',
-      background:DARK, padding:'10px 14px', zIndex:9999,
-      pointerEvents:'none', boxShadow:'0 8px 28px rgba(0,0,0,0.55)',
-      minWidth:190, maxWidth:250,
-      fontFamily:"'Plus Jakarta Sans','DM Sans',system-ui,sans-serif",
-    }}>
-      <div style={{ display:'inline-flex', alignItems:'center', gap:5, padding:'2px 8px', background:sc.bg, marginBottom:8 }}>
-        <span style={{ width:4, height:4, borderRadius:'50%', background:sc.border }} />
-        <span style={{ fontSize:9, fontWeight:900, color:sc.text, letterSpacing:'0.12em', textTransform:'uppercase' }}>
-          {sc.label}
-        </span>
-      </div>
-      <p style={{ margin:'0 0 8px', fontSize:13, fontWeight:900, color:'#fff', whiteSpace:'normal', wordBreak:'break-word' }}>
-        {res.customer_name}
-      </p>
-      <div style={{ display:'flex', flexDirection:'column', gap:5 }}>
-        {[
-          { Icon:Clock,    v:`${res.start_time}${endTime?` – ${endTime}`:''}` },
-          { Icon:Users,    v:`${res.guests} pers.` },
-          { Icon:Utensils, v:res.service||null },
-        ].filter(x=>x.v).map(({Icon,v}) => (
-          <div key={v} style={{ display:'flex', alignItems:'center', gap:7 }}>
-            <Icon size={10} color={GOLD} strokeWidth={2.5} style={{ flexShrink:0 }} />
-            <span style={{ fontSize:11, fontWeight:600, color:'rgba(255,255,255,0.8)' }}>{v}</span>
-          </div>
-        ))}
-      </div>
-      <div style={{ position:'absolute', bottom:-5, left:'50%', transform:'translateX(-50%)', width:0, height:0, borderLeft:'5px solid transparent', borderRight:'5px solid transparent', borderTop:`5px solid ${DARK}` }} />
-    </div>
-  )
-}
+
 
 // ── Reservation block ──────────────────────────────────────────────
 // KEY FIX: uses minWidth in px so even 15-min slots are always readable
-function Block({ res, laneCount, laneIdx, hS, hE, services, trackPx }) {
-  const [hov, setHov] = useState(false)
-
+function Block({ res, laneCount, laneIdx, hS, hE, services }) {
   const dur     = getDur(services, res.service)
   const sD      = toDecimal(res.start_time) ?? 0
   const eD      = res.end_time ? (toDecimal(res.end_time) ?? (sD + dur)) : (sD + dur)
-  const endTime = res.end_time || decimalToTime(eD)
   const pos     = getPos(res.start_time, decimalToTime(eD), hS, hE)
   if (!pos) return null
 
@@ -230,77 +182,32 @@ function Block({ res, laneCount, laneIdx, hS, hE, services, trackPx }) {
   const rowPctH  = 84 / laneCount
   const topPct   = laneCount === 1 ? 50 : laneIdx * (100 / laneCount) + (100 / laneCount - rowPctH) / 2
 
-  // Real pixel width based on track container width
-  const realPx   = trackPx > 0 ? (pos.wPct / 100) * trackPx : 0
-  // Minimum 52px so name is always readable — block overflows visually if needed
-  const minPx    = 52
-  const displayW = Math.max(realPx, minPx)
-
-  // Content tiers based on pixel width
-  const showInit  = displayW >= 20 && displayW < 40
-  const showFirst = displayW >= 40 && displayW < 70
-  const showName  = displayW >= 70 && displayW < 130
-  const isFull    = displayW >= 130
-
   return (
     <div
-      onMouseEnter={() => setHov(true)}
-      onMouseLeave={() => setHov(false)}
       style={{
         position:       'absolute',
         left:           `${pos.l.toFixed(4)}%`,
-        // Use percentage width but enforce minWidth in px
         width:          `${pos.w.toFixed(4)}%`,
-        minWidth:       `${minPx}px`,
         top:            laneCount === 1 ? '50%' : `${topPct}%`,
         transform:      laneCount === 1 ? 'translateY(-50%)' : 'none',
         height:         laneCount === 1 ? '72%' : `${rowPctH}%`,
         minHeight:      22,
         background:     sc.bg,
         borderLeft:     `3px solid ${sc.border}`,
-        borderRadius:   '0 3px 3px 0',
         display:        'flex',
         alignItems:     'center',
-        padding:        displayW < 40 ? '0 4px' : '0 8px',
+        padding:        '0 8px',
         overflow:       'hidden',
         cursor:         'default',
-        zIndex:         hov ? 50 : laneIdx + 2,
-        transition:     'box-shadow 0.1s, filter 0.1s',
-        boxShadow:      hov ? '0 4px 14px rgba(0,0,0,0.4)' : '0 1px 3px rgba(0,0,0,0.18)',
-        filter:         hov ? 'brightness(1.1)' : 'none',
+        zIndex:         laneIdx + 2,
         gap:            4,
         whiteSpace:     'nowrap',
       }}
     >
-      {hov && <Tip res={res} endTime={endTime} />}
 
-      {showInit && (
-        <span style={{ fontSize:10, fontWeight:900, color:'rgba(255,255,255,0.95)' }}>
-          {res.customer_name.charAt(0)}
-        </span>
-      )}
-      {showFirst && (
-        <span style={{ fontSize:10, fontWeight:900, color:sc.text, overflow:'hidden', textOverflow:'ellipsis', minWidth:0 }}>
-          {res.customer_name.split(' ')[0]}
-        </span>
-      )}
-      {showName && (
-        <span style={{ fontSize:laneCount>2?9:10, fontWeight:900, color:sc.text, overflow:'hidden', textOverflow:'ellipsis', minWidth:0, flexShrink:1 }}>
-          {res.customer_name}
-        </span>
-      )}
-      {isFull && (
-        <>
-          <span style={{ fontSize:laneCount>2?9:11, fontWeight:900, color:sc.text, overflow:'hidden', textOverflow:'ellipsis', flexShrink:1, minWidth:0 }}>
-            {res.customer_name}
-          </span>
-          {displayW > 200 && laneCount <= 2 && (
-            <span style={{ fontSize:9, fontWeight:600, color:'rgba(255,255,255,0.6)', flexShrink:0 }}>
-              {res.start_time}–{endTime}
-            </span>
-          )}
-        </>
-      )}
+      <span style={{ fontSize:10, fontWeight:900, color:sc.text }}>
+        {res.customer_name}
+      </span>
     </div>
   )
 }
@@ -320,8 +227,7 @@ function Row({ row, isLast, hS, hE, hours, totalH, services, isToday }) {
     <div style={{ display:'grid', gridTemplateColumns:'90px 1fr', borderBottom:isLast?'none':`1px solid ${BORDER}`, minHeight:rowH }}>
 
       {/* Table label */}
-      <div style={{ padding:'0 10px', borderRight:`1px solid rgba(43,33,24,0.09)`, display:'flex', alignItems:'center', gap:7, background:hasRes?'#fdfaf7':'#fff', flexShrink:0 }}>
-        <div style={{ width:7, height:7, borderRadius:'50%', flexShrink:0, background:hasRes?GREEN:'rgba(43,33,24,0.13)', boxShadow:hasRes?`0 0 0 3px ${GREEN}22`:'none' }} />
+      <div style={{ padding:'0 10px', borderRight:`1px solid rgba(43,33,24,0.09)`, display:'flex', alignItems:'center', gap:7, background:'#fff', flexShrink:0 }}>
         <span style={{ fontSize:11, fontWeight:900, color:DARK, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap', flex:1, minWidth:0 }}>
           {row.table_name}
         </span>
@@ -349,9 +255,7 @@ function Row({ row, isLast, hS, hE, hours, totalH, services, isToday }) {
           const dec = new Date().getHours() + new Date().getMinutes() / 60
           if (dec < hS || dec > hE) return null
           return (
-            <div style={{ position:'absolute', left:`${((dec-hS)/totalH)*100}%`, top:0, bottom:0, width:2, background:RED, zIndex:40, pointerEvents:'none', boxShadow:`0 0 6px ${RED}88` }}>
-              <div style={{ position:'absolute', top:-3, left:'50%', transform:'translateX(-50%)', width:7, height:7, borderRadius:'50%', background:RED }} />
-            </div>
+            <div style={{ position:'absolute', left:`${((dec-hS)/totalH)*100}%`, top:0, bottom:0, width:1, background:RED, zIndex:40, pointerEvents:'none' }} />
           )
         })()}
 
@@ -411,8 +315,7 @@ export default function TableTimeline({ controlledDate = null }) {
         <div className="tl-side">
           <MiniCal value={date} onChange={setDate} />
           <div style={{ marginTop:8, padding:'7px 10px', background:DARK, display:'flex', alignItems:'center', gap:7 }}>
-            <CalendarDays size={11} color={GOLD} strokeWidth={2.5} />
-            <span style={{ fontSize:11, fontWeight:800, color:'#fff', textTransform:'capitalize', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
+            <span style={{ fontSize:11, fontWeight:900, color:'#fff', textTransform:'capitalize', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
               {formatShort(date)}
             </span>
           </div>
@@ -425,7 +328,6 @@ export default function TableTimeline({ controlledDate = null }) {
             {/* Hour header */}
             <div style={{ display:'grid', gridTemplateColumns:'90px 1fr', background:DARK }}>
               <div style={{ padding:'7px 10px', borderRight:`1px solid rgba(200,169,126,0.15)`, display:'flex', alignItems:'center', gap:6 }}>
-                <LayoutGrid size={10} color={GOLD} strokeWidth={2.5} />
                 <span style={{ fontSize:9, fontWeight:900, color:GOLD, letterSpacing:'0.18em', textTransform:'uppercase' }}>Table</span>
               </div>
               <div style={{ position:'relative', height:30, overflowX:'hidden' }}>
@@ -451,7 +353,6 @@ export default function TableTimeline({ controlledDate = null }) {
 
             {!loading && timeline.length===0 && (
               <div style={{ padding:'40px 24px', textAlign:'center', background:'#fff' }}>
-                <LayoutGrid size={28} color={DARK} strokeWidth={1.2} style={{ display:'block', margin:'0 auto 10px', opacity:0.1 }} />
                 <p style={{ margin:'0 0 4px', fontSize:13, fontWeight:900, color:DARK }}>Aucune table configurée</p>
                 <p style={{ margin:0, fontSize:11, fontWeight:600, color:'rgba(43,33,24,0.3)' }}>Ajoutez des tables dans la section Tables.</p>
               </div>
@@ -459,8 +360,7 @@ export default function TableTimeline({ controlledDate = null }) {
 
             {!loading && timeline.length>0 && totalRes===0 && (
               <div style={{ padding:'10px 14px', background:'#fdf6ec', borderBottom:`1px solid rgba(200,169,126,0.18)`, display:'flex', alignItems:'center', gap:9 }}>
-                <CalendarDays size={13} color={GOLD_DARK} strokeWidth={2} style={{ flexShrink:0 }} />
-                <p style={{ margin:0, fontSize:12, fontWeight:800, color:DARK }}>
+                <p style={{ margin:0, fontSize:12, fontWeight:900, color:DARK }}>
                   Aucune réservation {isToday?"aujourd'hui":`le ${formatShort(date)}`}
                   <span style={{ fontWeight:600, color:GOLD_DARK, marginLeft:8 }}>
                     · {timeline.length} table{timeline.length>1?'s':''} libre{timeline.length>1?'s':''}

@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { createPortal } from 'react-dom'
-import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react'
+
 import { DARK, GOLD, GOLD_DARK } from '../../../styles/reservations/tokens'
 import { calNavBtnStyle } from '../../../styles/reservations/filters.styles'
 
@@ -89,13 +89,13 @@ export default function CalendarPopup({ filterDate, setFilterDate, onClose, anch
     }}>
       {/* Header */}
       <div style={{ display:'flex', alignItems:'center', background:DARK, padding:'8px 6px', gap:2 }}>
-        <button onClick={() => setViewYear(y=>y-1)} style={calNavBtnStyle}><ChevronsLeft  size={13} strokeWidth={2.5} /></button>
-        <button onClick={() => navMonth(-1)}         style={calNavBtnStyle}><ChevronLeft   size={13} strokeWidth={2.5} /></button>
-        <span style={{ flex:1, textAlign:'center', fontSize:13, fontWeight:800, color:GOLD, textTransform:'capitalize' }}>
+        <button onClick={() => setViewYear(y=>y-1)} style={{ ...calNavBtnStyle, fontWeight:900, color:GOLD }}>«</button>
+        <button onClick={() => navMonth(-1)}         style={{ ...calNavBtnStyle, fontWeight:900, color:GOLD }}>‹</button>
+        <span style={{ flex:1, textAlign:'center', fontSize:11, fontWeight:900, color:GOLD, textTransform:'uppercase', letterSpacing:'0.05em' }}>
           {MONTHS_FR[viewMonth]} {viewYear}
         </span>
-        <button onClick={() => navMonth(1)}          style={calNavBtnStyle}><ChevronRight  size={13} strokeWidth={2.5} /></button>
-        <button onClick={() => setViewYear(y=>y+1)}  style={calNavBtnStyle}><ChevronsRight size={13} strokeWidth={2.5} /></button>
+        <button onClick={() => navMonth(1)}          style={{ ...calNavBtnStyle, fontWeight:900, color:GOLD }}>›</button>
+        <button onClick={() => setViewYear(y=>y+1)}  style={{ ...calNavBtnStyle, fontWeight:900, color:GOLD }}>»</button>
       </div>
 
       {/* Mode tabs */}
@@ -122,16 +122,14 @@ export default function CalendarPopup({ filterDate, setFilterDate, onClose, anch
           ))}
           {cells.map((c,i) => (
             <div key={i} onClick={c.onClick}
-              onMouseEnter={e => { if(!c.isOther && !c.isSelected) e.currentTarget.style.background='#f5f0eb' }}
-              onMouseLeave={e => { if(!c.isSelected) e.currentTarget.style.background='transparent' }}
               style={{
-                textAlign:'center', fontSize:12, borderRadius:2,
-                fontWeight: c.isSelected?800 : c.isToday?900 : 600,
-                color: c.isSelected?GOLD : c.isToday?GOLD_DARK : c.isOther?'rgba(43,33,24,0.2)' : DARK,
-                background: c.isSelected?DARK : 'transparent',
-                padding:'5px 2px',
+                textAlign:'center', fontSize:11, borderRadius:0,
+                fontWeight: c.isSelected?900 : c.isToday?900 : 800,
+                color: c.isSelected?GOLD : c.isToday?GOLD : c.isOther?'#ddd' : DARK,
+                background: c.isSelected?DARK : c.isToday?GOLD_DARK : 'transparent',
+                border: c.isToday ? `1px solid ${GOLD}` : 'none',
+                padding:'6px 2px',
                 cursor: c.isOther?'default':'pointer',
-                transition:'background 0.1s',
               }}
             >{c.content}</div>
           ))}
@@ -146,10 +144,8 @@ export default function CalendarPopup({ filterDate, setFilterDate, onClose, anch
             const isSelected = selMonth && selMon===i && selYear===viewYear
             return (
               <div key={m} onClick={() => pickMonth(i)}
-                onMouseEnter={e => { if(!isSelected) e.currentTarget.style.background='#f5f0eb' }}
-                onMouseLeave={e => { e.currentTarget.style.background = isSelected?DARK:'transparent' }}
-                style={{ padding:'8px 4px', textAlign:'center', fontSize:12, cursor:'pointer', fontWeight:isSelected?800:isCurrent?900:700, color:isSelected?GOLD:isCurrent?GOLD_DARK:DARK, background:isSelected?DARK:'transparent', transition:'background 0.1s' }}
-              >{m.slice(0,4)}</div>
+                style={{ padding:'10px 4px', textAlign:'center', fontSize:11, cursor:'pointer', fontWeight:900, color:isSelected?GOLD:isCurrent?GOLD:DARK, background:isSelected?DARK:isCurrent?GOLD_DARK:'transparent', textTransform:'uppercase' }}
+              >{m.slice(0,3)}</div>
             )
           })}
         </div>

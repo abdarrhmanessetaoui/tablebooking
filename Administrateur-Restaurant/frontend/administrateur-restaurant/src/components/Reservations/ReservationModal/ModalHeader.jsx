@@ -1,4 +1,4 @@
-import { X } from 'lucide-react'
+
 import { DARK, GOLD } from '../../../styles/reservations/tokens'
 export default function ModalHeader({ modalMode, step, editing, onClose }) {
   const titles = { view:'Détail', edit:'Modifier le statut', create:'Nouvelle réservation' }
@@ -13,8 +13,8 @@ export default function ModalHeader({ modalMode, step, editing, onClose }) {
           {modalMode==='create' ? stepTitles[step] : (editing?.name||'—')}
         </h2>
       </div>
-      <button onClick={onClose} style={{ background:'rgba(255,255,255,0.1)', border:'none', width:34, height:34, display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer' }}>
-        <X size={17} color="#fff" strokeWidth={2.5} />
+      <button onClick={onClose} style={{ background: GOLD, border: 'none', padding: '8px 14px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', fontSize: 10, fontWeight: 900, color: DARK, textTransform: 'uppercase' }}>
+        Fermer
       </button>
     </div>
   )

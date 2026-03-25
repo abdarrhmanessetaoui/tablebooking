@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Clock, Users, Utensils, CalendarDays, ChevronRight } from 'lucide-react'
+
 import Badge from './Badge'
 import {
   card, topRow, nameBlock, nameTxt, phoneTxt,
@@ -17,27 +17,23 @@ function fmtDate(iso) {
 }
 
 export default function ResCardMobile({ r, i, onRowClick }) {
-  const [hov, setHov] = useState(false)
-
   const chips = [
     {
-      Icon:  CalendarDays,
+      label: 'DATE',
       value: r.date && r.date !== TODAY_DATE && r.date !== TOMORROW_DATE
                ? fmtDate(r.date)
                : null,
       gold: false,
     },
-    { Icon: Clock,    value: r.start_time,                         gold: false },
-    { Icon: Users,    value: r.guests ? `${r.guests} personnes` : null, gold: false },
-    { Icon: Utensils, value: r.service || null,                    gold: true  },
+    { label: 'HEURE', value: r.start_time, gold: false },
+    { label: 'PERS',  value: r.guests ? `${r.guests}` : null, gold: false },
+    { label: 'SERVICE', value: r.service || null, gold: true  },
   ].filter(item => item.value)
 
   return (
     <div
       onClick={() => onRowClick(r)}
-      onMouseEnter={() => setHov(true)}
-      onMouseLeave={() => setHov(false)}
-      style={card(hov, i)}
+      style={{ ...card(false, i), background: '#FFFFFF', border: `2px solid ${DARK}` }}
     >
       {/* Top row: name + badge + chevron */}
       <div style={topRow}>
@@ -47,19 +43,14 @@ export default function ResCardMobile({ r, i, onRowClick }) {
         </div>
         <div style={badgeRow}>
           <Badge status={r.status} />
-          <ChevronRight size={13} strokeWidth={2.5} color={DARK} />
         </div>
       </div>
 
       {/* Chips row */}
       <div style={chipsRow}>
         {chips.map((item, idx) => (
-          <span key={idx} style={chip(item.gold)}>
-            <item.Icon
-              size={11}
-              strokeWidth={2.5}
-              color={item.gold ? GOLD_DK : DARK}
-            />
+          <span key={idx} style={{ ...chip(item.gold), background: item.gold ? GOLD : DARK, color: item.gold ? DARK : GOLD, padding: '4px 8px', fontSize: 10, fontWeight: 900 }}>
+            <span style={{ fontSize: 8, opacity: 0.8, marginRight: 4 }}>{item.label}</span>
             {item.value}
           </span>
         ))}

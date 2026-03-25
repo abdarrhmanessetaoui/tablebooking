@@ -3,10 +3,9 @@ import Label from '../../shared/Label'
 import ServiceInfoCard from '../ServiceInfoCard'
 import { DARK, GOLD, GOLD_DARK } from '../../../../styles/reservations/tokens'
 import { selectStyle } from '../../../../styles/reservations/modal.styles'
-import { Users } from 'lucide-react'
+
 
 export default function StepService({ form, setForm, services, selectedSvc, maxGuests, openDaysLabel, onNext }) {
-  const [hov, setHov] = useState(false)
   return (
     <>
       <div>
@@ -27,12 +26,12 @@ export default function StepService({ form, setForm, services, selectedSvc, maxG
         </select>
         {selectedSvc?.capacity && (
           <p style={{ margin:'5px 0 0', fontSize:11, fontWeight:700, color:'rgba(43,33,24,0.4)', display:'flex', alignItems:'center', gap:5 }}>
-            <Users size={10} strokeWidth={2.5} />Maximum {selectedSvc.capacity} personne{selectedSvc.capacity>1?'s':''} pour ce service
+            Maximum {selectedSvc.capacity} personne{selectedSvc.capacity>1?'s':''} pour ce service
           </p>
         )}
       </div>
-      <button onClick={onNext} onMouseEnter={()=>setHov(true)} onMouseLeave={()=>setHov(false)}
-        style={{ padding:'14px', background:hov?GOLD_DARK:GOLD, border:'none', fontSize:14, fontWeight:900, color:DARK, cursor:'pointer' }}>
+      <button onClick={onNext}
+        style={{ padding:'14px', background:DARK, border:'none', fontSize:14, fontWeight:900, color:GOLD, cursor:'pointer' }}>
         Suivant →
       </button>
     </>

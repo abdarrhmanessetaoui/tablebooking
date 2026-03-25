@@ -9,18 +9,18 @@ export const GOLD_DK  = '#a8834e'
 export const WHITE    = '#ffffff'
 
 // ── Brown replaces all grays ──────────────────────────────────────
-export const CREAM    = '#fdf6ec'   // was #faf8f5 — brown tint background
-export const BORDER   = '#e8d5b7'   // was #e8e0d6 — brown border
+export const CREAM    = '#FFFFFF'
+export const BORDER   = '#2b2118'
 
 // ── Semantic colors ───────────────────────────────────────────────
 export const GREEN    = '#16A34A'
-export const GREEN_BG = '#edfaf4'
+export const GREEN_BG = '#16A34A'
 
 export const RED      = '#DC2626'
-export const RED_BG   = '#fdf0f0'
+export const RED_BG   = '#DC2626'
 
 export const AMBER    = '#c2410c'
-export const AMBER_BG = '#fff7ed'
+export const AMBER_BG = '#c2410c'
 
 // ── Typography ────────────────────────────────────────────────────
 export const FONT_FAMILY = "'Plus Jakarta Sans','DM Sans',system-ui,sans-serif"

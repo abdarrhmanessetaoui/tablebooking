@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { CalendarOff, Calendar, RefreshCw } from 'lucide-react'
+
 
 const DARK   = '#2b2118'
 const GOLD   = '#c8a97e'
@@ -20,7 +20,7 @@ const inp = {
   border: `2px solid ${BORDER}`,
   fontSize: 14, fontWeight: 700, color: DARK,
   fontFamily: 'inherit', outline: 'none', background: '#fff',
-  transition: 'border-color 0.15s',
+  transition: 'none',
   width: '100%', boxSizing: 'border-box',
   minWidth: 0, WebkitAppearance: 'none', borderRadius: 0,
 }
@@ -44,21 +44,21 @@ function Field({ label, children, style }) {
   )
 }
 
-function ModeTab({ active, onClick, icon: Icon, label }) {
+function ModeTab({ active, onClick, label }) {
   return (
     <button onClick={onClick} title={label} style={{
       flex: '1 1 0', minWidth: 0,
       display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5,
       padding: '13px 4px',
-      background: active ? DARK : '#f5f0eb',
-      border: 'none',
+      background: active ? DARK : '#FFFFFF',
+      border: `2px solid ${DARK}`,
       color: active ? GOLD : DARK,
-      fontSize: 11, fontWeight: 800,
+      fontSize: 11, fontWeight: 900,
       cursor: 'pointer', fontFamily: 'inherit',
-      transition: 'all 0.15s', minHeight: 48,
+      minHeight: 48,
       overflow: 'hidden', WebkitTapHighlightColor: 'transparent',
+      textTransform: 'uppercase'
     }}>
-      <Icon size={15} strokeWidth={2.5} style={{ flexShrink: 0 }} />
       <span className="mode-label" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0 }}>
         {label}
       </span>
@@ -92,9 +92,9 @@ export default function BlockedDateForm({ form, setForm, handleBlock, submitting
 
       <div style={{ background: '#fff', border: `1.5px solid ${BORDER}`, overflow: 'hidden', width: '100%', boxSizing: 'border-box' }}>
         <div style={{ display: 'flex', borderBottom: `2px solid ${DARK}`, width: '100%', overflow: 'hidden' }}>
-          <ModeTab active={form.mode === 'single'}    onClick={() => set('mode','single')}    icon={CalendarOff} label="Unique" />
-          <ModeTab active={form.mode === 'interval'}  onClick={() => set('mode','interval')}  icon={Calendar}    label="Intervalle" />
-          <ModeTab active={form.mode === 'recurring'} onClick={() => set('mode','recurring')} icon={RefreshCw}   label="Récurrent" />
+          <ModeTab active={form.mode === 'single'}    onClick={() => set('mode','single')}    label="Unique" />
+          <ModeTab active={form.mode === 'interval'}  onClick={() => set('mode','interval')}  label="Intervalle" />
+          <ModeTab active={form.mode === 'recurring'} onClick={() => set('mode','recurring')} label="Récurrent" />
         </div>
 
         <div style={{ padding: 'clamp(14px,4vw,24px)', display: 'flex', flexDirection: 'column', gap: 14 }}>
@@ -137,10 +137,10 @@ export default function BlockedDateForm({ form, setForm, handleBlock, submitting
           </Field>
 
           {preview.length > 0 && (
-            <div style={{ padding: '10px 13px', background: '#fdf6ec', borderLeft: `3px solid ${GOLD}`, fontSize: 13, fontWeight: 700, color: '#a8834e', lineHeight: 1.6 }}>
+            <div style={{ padding: '10px 13px', background: GOLD, border: `2px solid ${DARK}`, fontSize: 13, fontWeight: 900, color: DARK, lineHeight: 1.6, textTransform: 'uppercase' }}>
               {preview.length === 1
-                ? `1 date : ${new Date(preview[0]).toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'long', year:'numeric' })}`
-                : `${preview.length} dates — du ${new Date(preview[0]).toLocaleDateString('fr-FR', { day:'numeric', month:'short' })} au ${new Date(preview[preview.length-1]).toLocaleDateString('fr-FR', { day:'numeric', month:'short', year:'numeric' })}`
+                ? `1 DATE : ${new Date(preview[0]).toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'long', year:'numeric' })}`
+                : `${preview.length} DATES — DU ${new Date(preview[0]).toLocaleDateString('fr-FR', { day:'numeric', month:'short' })} AU ${new Date(preview[preview.length-1]).toLocaleDateString('fr-FR', { day:'numeric', month:'short', year:'numeric' })}`
               }
             </div>
           )}
@@ -149,20 +149,16 @@ export default function BlockedDateForm({ form, setForm, handleBlock, submitting
             style={{
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
               padding: '15px',
-              background: valid() && !submitting ? DARK : DARK,
-              border: 'none', color: valid() && !submitting ? GOLD : '#fff',
-              fontSize: 14, fontWeight: 800,
+              background: valid() && !submitting ? '#3d2d1e' : DARK,
+              border: 'none', color: valid() && !submitting ? GOLD : '#666',
+              fontSize: 14, fontWeight: 900,
               cursor: submitting || !valid() ? 'not-allowed' : 'pointer',
               opacity: submitting || !valid() ? 0.45 : 1,
-              transition: 'background 0.15s, opacity 0.15s',
               fontFamily: 'inherit', width: '100%',
               WebkitTapHighlightColor: 'transparent', minHeight: 50,
             }}
-            onMouseEnter={e => { if (!submitting && valid()) e.currentTarget.style.background = '#3d2d1e' }}
-            onMouseLeave={e => { e.currentTarget.style.background = DARK }}
           >
-            <CalendarOff size={15} strokeWidth={2.5} />
-            {submitting ? 'Enregistrement…' : preview.length > 1 ? `Bloquer ${preview.length} dates` : 'Bloquer la date'}
+            {submitting ? 'Enregistrement…' : preview.length > 1 ? `Bloquer ${preview.length} dates` : 'Bloquer'}
           </button>
 
         </div>

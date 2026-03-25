@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Plus, Check, X, LayoutGrid } from 'lucide-react'
+
 
 const DARK   = '#2b2118'
 const GOLD   = '#c8a97e'
@@ -12,7 +12,7 @@ const inp = {
   border: `2px solid ${BORDER}`,
   fontSize: 14, fontWeight: 700, color: DARK,
   fontFamily: 'inherit', outline: 'none', background: '#fff',
-  transition: 'border-color 0.15s',
+
   width: '100%', boxSizing: 'border-box',
   minWidth: 0, WebkitAppearance: 'none', borderRadius: 0,
 }
@@ -59,7 +59,6 @@ export default function TableForm({ initial = EMPTY, onSave, saving, editingNumb
 
       {/* Header */}
       <div style={{ padding: '12px 16px', background: DARK, display: 'flex', alignItems: 'center', gap: 8 }}>
-        <LayoutGrid size={14} strokeWidth={2.5} color={GOLD} />
         <span style={{ fontSize: 11, fontWeight: 900, color: GOLD, letterSpacing: '0.12em', textTransform: 'uppercase' }}>
           {editingNumber ? `Modifier — Table ${editingNumber}` : 'Nouvelle table'}
         </span>
@@ -109,36 +108,31 @@ export default function TableForm({ initial = EMPTY, onSave, saving, editingNumb
           disabled={!valid || saving}
           style={{
             display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-            padding: '15px', background: DARK, border: 'none',
-            color: valid && !saving ? GOLD : '#fff',
+            padding: '15px', background: valid && !saving ? '#3d2d1e' : DARK, border: 'none',
+            color: valid && !saving ? GOLD : '#666',
             fontSize: 14, fontWeight: 800,
             cursor: valid && !saving ? 'pointer' : 'not-allowed',
             opacity: !valid || saving ? 0.45 : 1,
-            transition: 'background 0.15s, opacity 0.15s',
             fontFamily: 'inherit', width: '100%', minHeight: 50,
           }}
-          onMouseEnter={e => { if (valid && !saving) e.currentTarget.style.background = '#3d2d1e' }}
-          onMouseLeave={e => { e.currentTarget.style.background = DARK }}
         >
           {saving
             ? 'Enregistrement…'
             : editingNumber
-              ? <><Check size={15} strokeWidth={2.5} /> Enregistrer les modifications</>
-              : <><Plus size={15} strokeWidth={2.5} /> Ajouter la table</>
+              ? 'ENREGISTRER'
+              : 'AJOUTER LA TABLE'
           }
         </button>
 
         {editingNumber && (
           <button onClick={onCancel} style={{
             display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-            padding: '11px', background: 'none', border: `1.5px solid ${BORDER}`,
-            fontSize: 12, fontWeight: 800, color: DARK,
-            cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.15s', width: '100%',
-          }}
-            onMouseEnter={e => { e.currentTarget.style.background = '#fdf6ec'; e.currentTarget.style.color = '#a8834e'; e.currentTarget.style.borderColor = GOLD }}
-            onMouseLeave={e => { e.currentTarget.style.background = 'none'; e.currentTarget.style.color = DARK; e.currentTarget.style.borderColor = BORDER }}
-          >
-            <X size={13} strokeWidth={2.5} /> Annuler la modification
+            padding: '12px', background: GOLD, border: `none`,
+            fontSize: 12, fontWeight: 900, color: DARK,
+            cursor: 'pointer', fontFamily: 'inherit', width: '100%',
+            textTransform: 'uppercase'
+          }}>
+            Annuler
           </button>
         )}
       </div>

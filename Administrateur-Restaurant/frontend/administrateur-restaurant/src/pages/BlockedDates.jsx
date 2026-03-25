@@ -1,5 +1,4 @@
-import { useState } from 'react'
-import { FileDown, Trash2 } from 'lucide-react'
+
 import useBlockedDates from '../hooks/BlockedDates/useBlockedDates'
 import BlockedDateForm from '../components/BlockedDates/BlockedDateForm'
 import BlockedDateList from '../components/BlockedDates/BlockedDateList'
@@ -15,40 +14,33 @@ const GOLD_DK = '#a8834e'
 const RED     = '#b94040'
 const RED_BG  = '#fdf0f0'
 
-function Btn({ children, onClick, primary, disabled, icon: Icon }) {
-  const [hov, setHov] = useState(false)
-  const bg    = primary ? (hov ? DARK : GOLD) : (hov ? GOLD : DARK)
-  const color = primary ? (hov ? GOLD : DARK) : '#fff'
+function Btn({ children, onClick, primary, disabled }) {
   return (
     <button onClick={onClick} disabled={disabled}
-      onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
       style={{
         display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-        padding: '10px 16px', background: bg, border: 'none', color,
-        fontSize: 13, fontWeight: 800,
+        padding: '10px 16px', background: DARK, border: 'none', color: GOLD,
+        fontSize: 13, fontWeight: 900,
         cursor: disabled ? 'not-allowed' : 'pointer',
         opacity: disabled ? 0.5 : 1,
-        transition: 'background 0.15s, color 0.15s',
         fontFamily: 'inherit', whiteSpace: 'nowrap', minHeight: 40,
+        textTransform: 'uppercase'
       }}>
-      {Icon && <Icon size={15} strokeWidth={2.2} />}
       <span className="btn-label">{children}</span>
     </button>
   )
 }
 
 function BulkBar({ count, onUnblock, onClear }) {
-  const [hovDel, setHovDel] = useState(false)
   return (
     <div style={{
       position: 'sticky', top: 8, zIndex: 30,
       display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap',
       padding: '10px 12px', background: DARK,
-      boxShadow: '0 4px 24px rgba(43,33,24,0.28)',
-      marginBottom: 12, animation: 'slideDown 0.18s ease',
+      border: `2px solid ${GOLD}`,
+      marginBottom: 12,
     }}>
       <style>{`
-        @keyframes slideDown { from{opacity:0;transform:translateY(-8px)} to{opacity:1;transform:translateY(0)} }
         @media (max-width: 480px) { .bulk-label { display: none !important; } }
       `}</style>
 
@@ -64,31 +56,28 @@ function BulkBar({ count, onUnblock, onClear }) {
       <div style={{ width: 1, height: 20, background: DARK, margin: '0 4px', flexShrink: 0 }} />
 
       <button onClick={onUnblock}
-        onMouseEnter={() => setHovDel(true)} onMouseLeave={() => setHovDel(false)}
         style={{
-          display: 'flex', alignItems: 'center', gap: 5, padding: '7px 12px',
-          background: hovDel ? '#ef4444' : 'rgba(239,68,68,0.12)',
-          border: '1px solid rgba(239,68,68,0.25)',
-          color: hovDel ? '#fff' : '#f87171',
-          fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit',
-          transition: 'all 0.15s', flexShrink: 0, minHeight: 34,
+          padding: '7px 12px',
+          background: '#FF0000',
+          border: 'none',
+          color: '#fff',
+          fontSize: 11, fontWeight: 900, cursor: 'pointer', fontFamily: 'inherit',
+          flexShrink: 0, minHeight: 34,
+          textTransform: 'uppercase'
         }}>
-        <Trash2 size={13} strokeWidth={2.5} />
-        <span className="bulk-label">Débloquer</span>
+        DÉBLOQUER
       </button>
 
       <button onClick={onClear}
         style={{
-          marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 5,
-          padding: '7px 10px', background: 'none', border: `1px solid ${DARK}`,
-          color: '#fff', fontSize: 12, fontWeight: 700,
-          cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.15s', flexShrink: 0, minHeight: 34,
+          marginLeft: 'auto',
+          padding: '7px 12px', background: GOLD, border: 'none',
+          color: DARK, fontSize: 11, fontWeight: 900,
+          cursor: 'pointer', fontFamily: 'inherit', flexShrink: 0, minHeight: 34,
+          textTransform: 'uppercase'
         }}
-        onMouseEnter={e => e.currentTarget.style.color = GOLD}
-        onMouseLeave={e => e.currentTarget.style.color = '#fff'}
       >
-        <span style={{ fontSize: 16, lineHeight: 1 }}>✕</span>
-        <span className="bulk-label">Désélectionner</span>
+        DÉSÉLECTIONNER
       </button>
     </div>
   )
@@ -184,7 +173,7 @@ export default function BlockedDates() {
       `}</style>
 
       <div style={{
-        minHeight: '100vh', background: '#faf8f5',
+        minHeight: '100vh', background: '#FFFFFF',
         fontFamily: "'Plus Jakarta Sans','DM Sans',system-ui,sans-serif",
         padding: 'clamp(14px,3vw,40px) clamp(12px,4vw,36px)',
         boxSizing: 'border-box', width: '100%', overflowX: 'hidden',
@@ -202,7 +191,7 @@ export default function BlockedDates() {
               </p>
             </div>
             <div style={{ display: 'flex', gap: 3, flexShrink: 0 }}>
-              <Btn icon={FileDown} primary onClick={handleExport} disabled={exporting}>
+              <Btn primary onClick={handleExport} disabled={exporting}>
                 {exporting ? 'Génération…' : 'Exporter PDF'}
               </Btn>
             </div>

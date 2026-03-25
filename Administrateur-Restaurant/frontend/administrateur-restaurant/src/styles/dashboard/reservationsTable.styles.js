@@ -42,7 +42,6 @@ export const viewAllBtn = {
   alignItems:     'center',
   justifyContent: 'space-between',
   fontFamily:     'inherit',
-  transition:     'background 0.15s',
   flexShrink:     0,
   marginTop:      'auto',
 }

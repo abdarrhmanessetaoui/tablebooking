@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { createPortal } from 'react-dom'
-import { X, Calendar, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react'
+
 
 const DARK = '#2b2118'
 const GOLD = '#c8a97e'
@@ -10,7 +10,7 @@ const DAYS_FR   = ['Lu','Ma','Me','Je','Ve','Sa','Di']
 
 const navBtnStyle = {
   background: 'none', border: 'none', cursor: 'pointer',
-  color: 'rgba(200,169,126,0.7)', padding: '4px 6px',
+  color: GOLD, padding: '4px 6px',
   fontFamily: 'inherit', display: 'flex', alignItems: 'center',
 }
 
@@ -122,21 +122,13 @@ function CalendarPopup({ filterDate, setFilterDate, onClose, anchorRef }) {
     >
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', background: DARK, padding: '8px 6px', gap: 2 }}>
-        <button onClick={() => setViewYear(y => y - 1)} style={navBtnStyle} title="Année précédente">
-          <ChevronsLeft size={13} strokeWidth={2.5} />
-        </button>
-        <button onClick={() => navMonth(-1)} style={navBtnStyle} title="Mois précédent">
-          <ChevronLeft size={13} strokeWidth={2.5} />
-        </button>
-        <span style={{ flex: 1, textAlign: 'center', fontSize: 13, fontWeight: 800, color: GOLD, letterSpacing: '0.02em' }}>
+        <button onClick={() => setViewYear(y => y - 1)} style={{ ...navBtnStyle, fontWeight:900, color:GOLD }}>«</button>
+        <button onClick={() => navMonth(-1)}         style={{ ...navBtnStyle, fontWeight:900, color:GOLD }}>‹</button>
+        <span style={{ flex: 1, textAlign: 'center', fontSize: 11, fontWeight: 900, color: GOLD, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
           {MONTHS_FR[viewMonth]} {viewYear}
         </span>
-        <button onClick={() => navMonth(1)} style={navBtnStyle} title="Mois suivant">
-          <ChevronRight size={13} strokeWidth={2.5} />
-        </button>
-        <button onClick={() => setViewYear(y => y + 1)} style={navBtnStyle} title="Année suivante">
-          <ChevronsRight size={13} strokeWidth={2.5} />
-        </button>
+        <button onClick={() => navMonth(1)}          style={{ ...navBtnStyle, fontWeight:900, color:GOLD }}>›</button>
+        <button onClick={() => setViewYear(y => y + 1)}  style={{ ...navBtnStyle, fontWeight:900, color:GOLD }}>»</button>
       </div>
 
       {/* Mode toggle */}
@@ -150,7 +142,6 @@ function CalendarPopup({ filterDate, setFilterDate, onClose, anchorRef }) {
             color: mode === m ? DARK : '#2b2118',
             borderBottom: mode === m ? `2px solid ${DARK}` : 'none',
             marginBottom: mode === m ? -2 : 0,
-            transition: 'all 0.12s',
           }}>
             {m === 'day' ? 'Jour' : 'Mois'}
           </button>
@@ -172,16 +163,14 @@ function CalendarPopup({ filterDate, setFilterDate, onClose, anchorRef }) {
             <div
               key={i}
               onClick={c.onClick}
-              onMouseEnter={e => { if (!c.isOther && !c.isSelected) e.currentTarget.style.background = '#f5f0eb' }}
-              onMouseLeave={e => { if (!c.isSelected) e.currentTarget.style.background = 'transparent' }}
               style={{
-                textAlign: 'center', fontSize: 12, borderRadius: 2,
-                fontWeight: c.isSelected ? 800 : c.isToday ? 900 : c.isOther ? 400 : 700,
-                color: c.isSelected ? GOLD : c.isToday ? GOLD : c.isOther ? '#2b2118' : DARK,
-                background: c.isSelected ? DARK : 'transparent',
-                padding: '5px 2px',
+                textAlign: 'center', fontSize: 11, borderRadius: 0,
+                fontWeight: c.isSelected ? 900 : c.isToday ? 900 : 800,
+                color: c.isSelected ? GOLD : c.isToday ? GOLD : c.isOther ? '#ddd' : DARK,
+                background: c.isSelected ? DARK : c.isToday ? DARK : 'transparent',
+                border: c.isToday ? `1px solid ${GOLD}` : 'none',
+                padding: '6px 2px',
                 cursor: c.isOther ? 'default' : 'pointer',
-                transition: 'background 0.1s',
               }}
             >
               {c.content}
@@ -200,17 +189,15 @@ function CalendarPopup({ filterDate, setFilterDate, onClose, anchorRef }) {
               <div
                 key={m}
                 onClick={() => pickMonth(i)}
-                onMouseEnter={e => { if (!isSelected) e.currentTarget.style.background = '#f5f0eb' }}
-                onMouseLeave={e => { e.currentTarget.style.background = isSelected ? DARK : 'transparent' }}
                 style={{
-                  padding: '8px 4px', textAlign: 'center', fontSize: 12, cursor: 'pointer',
-                  fontWeight: isSelected ? 800 : isCurrent ? 900 : 700,
+                  padding: '10px 4px', textAlign: 'center', fontSize: 11, cursor: 'pointer',
+                  fontWeight: 900,
                   color: isSelected ? GOLD : isCurrent ? GOLD : DARK,
-                  background: isSelected ? DARK : 'transparent',
-                  transition: 'background 0.1s',
+                  background: isSelected ? DARK : isCurrent ? DARK : 'transparent',
+                  textTransform: 'uppercase'
                 }}
               >
-                {m.slice(0, 4)}
+                {m.slice(0, 3)}
               </div>
             )
           })}
@@ -260,11 +247,12 @@ export default function ReportsFilters({
   }
 
   const base = {
-    background: '#fff', border: '2px solid #2b2118',
-    padding: '10px 14px', fontSize: 13, fontWeight: 600,
+    background: '#FFFFFF', border: '2px solid #2b2118',
+    padding: '10px 14px', fontSize: 13, fontWeight: 900,
     color: DARK, fontFamily: 'inherit',
     outline: 'none', boxSizing: 'border-box',
     width: '100%', borderRadius: 0,
+    textTransform: 'uppercase'
   }
 
   return (
@@ -310,32 +298,31 @@ export default function ReportsFilters({
             style={{
               display: 'flex', alignItems: 'center', justifyContent: 'space-between',
               gap: 8, width: '100%', padding: '10px 14px',
-              background: filterDate ? DARK : '#fff',
-              border: filterDate ? 'none' : '2px solid #e8e0d8',
-              fontSize: 13, fontWeight: 800,
-              color: filterDate ? GOLD : '#2b2118',
+              background: filterDate ? DARK : '#FFFFFF',
+              border: `2px solid ${DARK}`,
+              fontSize: 13, fontWeight: 900,
+              color: filterDate ? GOLD : DARK,
               cursor: 'pointer', fontFamily: 'inherit',
-              transition: 'all 0.15s',
+              textTransform: 'uppercase'
             }}
           >
             <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
               {dateLabel()}
             </span>
-            <Calendar size={14} strokeWidth={2.2} style={{ flexShrink: 0 }} />
+            {!filterDate && <span style={{ fontSize: 9, fontWeight: 900, opacity: 0.7 }}>DATES</span>}
           </button>
 
           {filterDate && (
             <button
               onClick={e => { e.stopPropagation(); setFilterDate(''); setCalOpen(false) }}
-              title="Effacer la date"
               style={{
-                position: 'absolute', right: 36, top: '50%', transform: 'translateY(-50%)',
-                background: 'none', border: 'none', cursor: 'pointer', padding: '4px 6px',
-                display: 'flex', alignItems: 'center', color: 'rgba(200,169,126,0.6)',
-                zIndex: 1,
+                position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)',
+                background: GOLD, border: 'none', cursor: 'pointer', padding: '4px 8px',
+                display: 'flex', alignItems: 'center', color: DARK,
+                zIndex: 1, fontSize: 9, fontWeight: 900
               }}
             >
-              <X size={11} strokeWidth={2.5} />
+              EFFACER
             </button>
           )}
         </div>
@@ -346,12 +333,12 @@ export default function ReportsFilters({
             <button onClick={clearFilters} style={{
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
               padding: '10px 14px', width: '100%',
-              background: DARK, border: 'none',
-              fontSize: 12, fontWeight: 800, color: GOLD,
+              background: '#FF0000', border: 'none',
+              fontSize: 11, fontWeight: 900, color: '#FFFFFF',
               cursor: 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap',
+              textTransform: 'uppercase'
             }}>
-              <X size={13} strokeWidth={2.5} />
-              Effacer les filtres
+              EFFACER TOUT
             </button>
           </div>
         )}

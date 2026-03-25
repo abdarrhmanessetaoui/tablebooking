@@ -1,15 +1,14 @@
 import { DARK, GOLD_DK, WHITE, CREAM, BORDER } from './tokens'
 
 // ── Row wrapper ───────────────────────────────────────────────────
-export const row = (hov, i) => ({
+export const row = (i) => ({
   display:         'grid',
   gap:             10,
   padding:         '13px 16px',
-  background:      hov ? '#f5ede0' : i % 2 === 0 ? WHITE : CREAM,
-  borderBottom:    `1px solid ${BORDER}`,
+  background:      WHITE,
+  borderBottom:    `2px solid ${DARK}`,
   alignItems:      'center',
   cursor:          'pointer',
-  transition:      'background 0.12s',
 })
 
 // ── Name cell ─────────────────────────────────────────────────────
@@ -57,13 +56,14 @@ export const timeChip = {
   display:            'inline-flex',
   alignItems:         'center',
   gap:                5,
-  padding:            '4px 9px',
-  background:         '#fdf0d5',
+  padding:            '4px 10px',
+  background:         GOLD,
   fontSize:           11,
-  fontWeight:         700,
-  color:              GOLD_DK,
+  fontWeight:         900,
+  color:              DARK,
   whiteSpace:         'nowrap',
   fontVariantNumeric: 'tabular-nums',
+  textTransform:      'uppercase'
 }
 
 // ── Guests cell ───────────────────────────────────────────────────
@@ -81,13 +81,14 @@ export const serviceChip = {
   display:    'inline-flex',
   alignItems: 'center',
   gap:        5,
-  padding:    '4px 9px',
-  background: '#fdf0d5',
+  padding:    '4px 10px',
+  background: DARK,
   fontSize:   11,
-  fontWeight: 700,
-  color:      GOLD_DK,
+  fontWeight: 900,
+  color:      GOLD,
   whiteSpace: 'nowrap',
   overflow:   'hidden',
+  textTransform: 'uppercase'
 }
 
 export const serviceText = {
@@ -96,8 +97,7 @@ export const serviceText = {
 }
 
 // ── Chevron ───────────────────────────────────────────────────────
-export const chevron = (hov) => ({
-  transition:  'color 0.12s',
+export const chevron = () => ({
   justifySelf: 'end',
-  color:       hov ? GOLD_DK : 'transparent',
+  color:       GOLD_DK,
 })

@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
-import { Search, X, Calendar } from 'lucide-react'
+
 import CalendarPopup from './CalendarPopup.jsx'
 import { DARK, GOLD, GOLD_DARK } from '../../../styles/reservations/tokens.js'
 import { filterInputBase, dateBtnStyle } from '../../../styles/reservations/filters.styles.js'
@@ -97,19 +97,15 @@ export default function ReservationsFilters({
 
         {/* ── Search ── */}
         <div className="filters-search" style={{ position: 'relative' }}>
-          <Search
-            size={14} color={MUTED} strokeWidth={2.5}
-            style={{ position:'absolute', left:12, top:'50%', transform:'translateY(-50%)', pointerEvents:'none' }}
-          />
           <input
-            type="text" placeholder="Rechercher…"
+            type="text" placeholder="RECHERCHER…"
             value={search} onChange={e => setSearch(e.target.value)}
-            style={{ ...filterInputBase, paddingLeft: 34 }}
+            style={{ ...filterInputBase, paddingLeft: 14, fontWeight: 900, textTransform: 'uppercase' }}
           />
           {search && (
             <button onClick={() => setSearch('')}
-              style={{ position:'absolute', right:10, top:'50%', transform:'translateY(-50%)', background:'none', border:'none', cursor:'pointer', padding:4, display:'flex', alignItems:'center' }}>
-              <X size={12} color={MUTED} strokeWidth={2.5} />
+              style={{ position:'absolute', right:10, top:'50%', transform:'translateY(-50%)', background:DARK, border:'none', cursor:'pointer', padding:'4px 8px', display:'flex', alignItems:'center', fontSize: 9, fontWeight: 900, color: GOLD }}>
+              VIDER
             </button>
           )}
         </div>
@@ -157,17 +153,17 @@ export default function ReservationsFilters({
         {/* ── Date ── */}
         <div className="filters-date" ref={anchorRef}>
           <button onClick={() => setCalOpen(o => !o)} style={dateBtnStyle(!!filterDate)}>
-            <span style={{ overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
+            <span style={{ overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap', textTransform: 'uppercase' }}>
               {dateLabel(filterDate)}
             </span>
-            <Calendar size={14} strokeWidth={2.2} style={{ flexShrink: 0 }} />
+            {!filterDate && <span style={{ fontSize: 9, fontWeight: 900, opacity: 0.7, marginLeft: 6 }}>DATES</span>}
           </button>
           {filterDate && (
             <button
               onClick={e => { e.stopPropagation(); setFilterDate(''); setCalOpen(false) }}
-              style={{ position:'absolute', right:36, top:'50%', transform:'translateY(-50%)', background:'none', border:'none', cursor:'pointer', padding:'4px 6px', display:'flex', alignItems:'center', color:'rgba(200,169,126,0.7)', zIndex:1 }}
+              style={{ position:'absolute', right:10, top:'50%', transform:'translateY(-50%)', background:GOLD, border:'none', cursor:'pointer', padding:'4px 8px', display:'flex', alignItems:'center', color:DARK, zIndex:1, fontSize: 9, fontWeight: 900 }}
             >
-              <X size={11} strokeWidth={2.5} />
+              EFFACER
             </button>
           )}
         </div>
@@ -176,9 +172,8 @@ export default function ReservationsFilters({
         {hasFilters && (
           <div className="filters-clear">
             <button onClick={clearFilters}
-              style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:6, padding:'10px 14px', width:'100%', background:DARK, border:'none', fontSize:12, fontWeight:800, color:GOLD, cursor:'pointer', fontFamily:'inherit', whiteSpace:'nowrap' }}>
-              <X size={13} strokeWidth={2.5} />
-              Effacer les filtres
+              style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:6, padding:'10px 14px', width:'100%', background:'#FF0000', border:'none', fontSize:11, fontWeight:900, color:'#FFF', cursor:'pointer', fontFamily:'inherit', whiteSpace:'nowrap', textTransform: 'uppercase' }}>
+              EFFACER TOUT
             </button>
           </div>
         )}

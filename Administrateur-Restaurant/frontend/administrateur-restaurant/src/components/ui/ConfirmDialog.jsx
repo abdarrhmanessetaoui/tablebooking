@@ -1,5 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
-import { AlertCircle, Trash2, X } from 'lucide-react'
+
 
 const DARK = '#2b2118'
 const GOLD = '#c8a97e'
@@ -29,41 +28,32 @@ export default function ConfirmDialog() {
   return (
     <div style={{
       position: 'fixed', inset: 0, zIndex: 9998,
-      background: 'rgba(43,33,24,0.55)',
+      background: '#1a120b',
       display: 'flex', alignItems: 'center', justifyContent: 'center',
       padding: 16,
-      animation: 'fadeIn 0.15s ease',
       fontFamily: "'Plus Jakarta Sans','DM Sans',system-ui,sans-serif",
     }}>
-      <style>{`
-        @keyframes fadeIn { from{opacity:0} to{opacity:1} }
-        @keyframes popIn  { from{opacity:0;transform:scale(0.95)} to{opacity:1;transform:scale(1)} }
-      `}</style>
+
 
       <div style={{
         background: '#fff', width: '100%', maxWidth: 400,
-        boxShadow: '0 20px 60px rgba(43,33,24,0.2)',
-        animation: 'popIn 0.18s ease',
+        border: `3px solid ${DARK}`,
         overflow: 'hidden',
       }}>
         {/* Header */}
         <div style={{ background: DARK, padding: '18px 22px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            {isDanger
-              ? <Trash2 size={16} color="#f87171" strokeWidth={2.5} />
-              : <AlertCircle size={16} color={GOLD} strokeWidth={2.5} />
-            }
-            <span style={{ fontSize: 14, fontWeight: 900, color: '#fff', letterSpacing: '-0.3px' }}>
-              {dialog.title || 'Confirmation'}
-            </span>
-          </div>
+          <span style={{ fontSize: 14, fontWeight: 900, color: '#fff', letterSpacing: '-0.3px', textTransform: 'uppercase' }}>
+            {dialog.title || 'Confirmation'}
+          </span>
           <button onClick={() => handle(false)} style={{
-            background: 'rgba(255,255,255,0.08)', border: 'none',
-            width: 28, height: 28,
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            cursor: 'pointer', color: '#fff',
+            background: 'none', border: `1px solid ${GOLD}`,
+            padding: '4px 10px',
+            fontSize: 10, fontWeight: 900,
+            cursor: 'pointer', color: GOLD,
+            textTransform: 'uppercase', letterSpacing: '0.05em',
+            fontFamily: 'inherit'
           }}>
-            <X size={14} strokeWidth={2.5} />
+            Fermer
           </button>
         </div>
 
@@ -80,28 +70,24 @@ export default function ConfirmDialog() {
         </div>
 
         {/* Actions */}
-        <div style={{ padding: '0 22px 20px', display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
+        <div style={{ padding: '0 22px 20px', display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
           <button onClick={() => handle(false)} style={{
-            padding: '10px 20px', background: '#f5f0eb', border: 'none',
-            fontSize: 13, fontWeight: 800, color: DARK,
+            padding: '12px 24px', background: '#F5F5F5', border: 'none',
+            fontSize: 12, fontWeight: 900, color: DARK,
             cursor: 'pointer', fontFamily: 'inherit',
-          }}
-            onMouseEnter={e => e.currentTarget.style.background = '#ede5d8'}
-            onMouseLeave={e => e.currentTarget.style.background = '#f5f0eb'}
-          >
+            textTransform: 'uppercase', letterSpacing: '0.05em'
+          }}>
             Annuler
           </button>
           <button onClick={() => handle(true)} style={{
-            padding: '10px 20px',
-            background: isDanger ? '#b94040' : DARK,
+            padding: '12px 24px',
+            background: isDanger ? '#FF0000' : DARK,
             border: 'none',
-            fontSize: 13, fontWeight: 800,
+            fontSize: 12, fontWeight: 900,
             color: isDanger ? '#fff' : GOLD,
             cursor: 'pointer', fontFamily: 'inherit',
-          }}
-            onMouseEnter={e => e.currentTarget.style.background = isDanger ? '#991b1b' : '#3d2d1e'}
-            onMouseLeave={e => e.currentTarget.style.background = isDanger ? '#b94040' : DARK}
-          >
+            textTransform: 'uppercase', letterSpacing: '0.05em'
+          }}>
             {dialog.confirmLabel || 'Confirmer'}
           </button>
         </div>

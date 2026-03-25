@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Clock } from 'lucide-react'
+
 import Label          from '../../shared/Label'
 import MiniCalendar   from '../MiniCalendar'
 import TimeSlotPicker from '../TimeSlotPicker'
@@ -7,7 +7,6 @@ import { DARK, GOLD, GOLD_DARK } from '../../../../styles/reservations/tokens'
 import { footerBtnPrimary, footerBtnSecondary } from '../../../../styles/reservations/modal.styles'
 
 export default function StepDateTime({ form, setForm, blockedDates, disabledDays, timeSlots, selectedSvc, onBack, onNext }) {
-  const [hov, setHov] = useState(false)
   return (
     <>
       {!form.service && (
@@ -24,7 +23,7 @@ export default function StepDateTime({ form, setForm, blockedDates, disabledDays
               <TimeSlotPicker value={form.start_time} onChange={v=>setForm({...form,start_time:v})} slots={timeSlots} />
               {timeSlots.length>0 && (
                 <p style={{ margin:'8px 0 0', fontSize:11, fontWeight:600, color:'rgba(43,33,24,0.4)', display:'flex', alignItems:'center', gap:5 }}>
-                  <Clock size={10} strokeWidth={2.5} />{timeSlots.length} créneaux · intervalles de {selectedSvc?.duration??30} min
+                  {timeSlots.length} créneaux · intervalles de {selectedSvc?.duration??30} min
                 </p>
               )}
             </>
@@ -37,7 +36,7 @@ export default function StepDateTime({ form, setForm, blockedDates, disabledDays
       )}
       <div style={{ display:'flex', gap:8 }}>
         <button onClick={onBack} style={footerBtnSecondary}>← Retour</button>
-        <button onClick={onNext} onMouseEnter={()=>setHov(true)} onMouseLeave={()=>setHov(false)} style={footerBtnPrimary(hov)}>Suivant →</button>
+        <button onClick={onNext} style={footerBtnPrimary}>Suivant →</button>
       </div>
     </>
   )

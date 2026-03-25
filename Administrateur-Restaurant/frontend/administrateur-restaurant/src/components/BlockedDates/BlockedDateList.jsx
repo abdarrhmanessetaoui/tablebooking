@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Trash2, CalendarOff, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react'
+
 
 const DARK      = '#2b2118'
 const GOLD      = '#c8a97e'
@@ -46,10 +46,10 @@ function Checkbox({ checked, indeterminate, onChange }) {
   return (
     <div onClick={e => { e.stopPropagation(); onChange() }} style={{
       width: 18, height: 18, flexShrink: 0,
-      background: checked || indeterminate ? DARK : '#fff',
+      background: checked || indeterminate ? DARK : '#FFFFFF',
       border: `2px solid ${DARK}`,
       display: 'flex', alignItems: 'center', justifyContent: 'center',
-      cursor: 'pointer', transition: 'all 0.15s', padding: 2, margin: -2,
+      cursor: 'pointer', padding: 2, margin: -2,
     }}>
       {checked && (
         <svg width="9" height="7" viewBox="0 0 10 8" fill="none">
@@ -64,20 +64,18 @@ function Checkbox({ checked, indeterminate, onChange }) {
 }
 
 function PageBtn({ onClick, disabled, active, children }) {
-  const [hov, setHov] = useState(false)
   return (
     <button onClick={onClick} disabled={disabled}
-      onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
       style={{
         minWidth: 36, height: 36, padding: '0 6px',
         display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-        background: active ? DARK : hov && !disabled ? '#FBF5EA' : '#fff',
-        border: `1.5px solid ${DARK}`,
+        background: active ? DARK : '#FFFFFF',
+        border: `2px solid ${DARK}`,
         color: active ? GOLD : DARK,
         fontSize: 12, fontWeight: active ? 900 : 700,
         cursor: disabled ? 'not-allowed' : 'pointer',
         opacity: disabled ? 0.35 : 1,
-        transition: 'all 0.15s', flexShrink: 0,
+        flexShrink: 0,
         WebkitTapHighlightColor: 'transparent',
       }}>
       {children}
@@ -95,7 +93,6 @@ export default function BlockedDateList({ blockedDates, handleUnblock, selectedD
   if (!blockedDates || blockedDates.length === 0) {
     return (
       <div style={{ padding: '56px 16px', textAlign: 'center', background: '#fff', border: `1.5px solid ${BORDER}` }}>
-        <CalendarOff size={40} color={DARK} strokeWidth={1.5} style={{ display: 'block', margin: '0 auto 14px' }} />
         <p style={{ margin: 0, fontSize: 15, fontWeight: 900, color: DARK }}>Aucune date bloquée</p>
         <p style={{ margin: '6px 0 0', fontSize: 12, fontWeight: 600, color: DARK }}>
           Utilisez le formulaire pour bloquer des dates.
@@ -157,18 +154,17 @@ export default function BlockedDateList({ blockedDates, handleUnblock, selectedD
       <style>{`
         .unblock-label { display: inline; }
         @media (max-width: 599px) { .unblock-label { display: none !important; } }
-        @media (hover: hover) { .bd-row:hover { background: #faf5ee !important; } }
       `}</style>
 
       <div style={{ background: '#fff', border: `1px solid ${BORDER}`, overflow: 'hidden' }}>
 
         {/* Partial selection banner */}
         {selectedDates.length > 0 && !allSelected && (
-          <div style={{ padding: '9px 14px', background: '#fdf6ec', borderBottom: `1px solid #e8d8b0`, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, flexWrap: 'wrap' }}>
-            <span style={{ fontSize: 12, fontWeight: 700, color: GOLD_DARK }}>
+          <div style={{ padding: '10px 14px', background: GOLD, borderBottom: `2px solid ${DARK}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, flexWrap: 'wrap' }}>
+            <span style={{ fontSize: 12, fontWeight: 900, color: DARK, textTransform: 'uppercase' }}>
               {selectedDates.length} sélectionné{selectedDates.length > 1 ? 's' : ''}
             </span>
-            <button onClick={() => setSelectedDates(blockedDates.map(d => d.date))} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 800, color: DARK, textDecoration: 'underline', fontFamily: 'inherit', padding: 0 }}>
+            <button onClick={() => setSelectedDates(blockedDates.map(d => d.date))} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 900, color: DARK, textDecoration: 'underline', fontFamily: 'inherit', padding: 0, textTransform: 'uppercase' }}>
               Tout sélectionner ({blockedDates.length})
             </button>
           </div>
@@ -203,7 +199,6 @@ export default function BlockedDateList({ blockedDates, handleUnblock, selectedD
           const past     = isPast(d.date)
           const selected = selectedDates.includes(d.date)
           const idx      = (safe - 1) * PAGE_SIZE + i
-          const bg       = selected ? '#fdf6ec' : idx % 2 === 0 ? '#fff' : CREAM
           const reason   = d.reason || d.notes || d.label || ''   // fallback field names
 
           return (
@@ -212,10 +207,10 @@ export default function BlockedDateList({ blockedDates, handleUnblock, selectedD
                 display: 'grid',
                 gridTemplateColumns: isMobile ? `44px 1fr 44px` : `44px 1fr 1fr 120px`,
                 padding: isMobile ? '13px 12px' : '14px 16px',
-                background: bg,
-                borderBottom: `1px solid ${BORDER}`,
-                borderLeft: `3px solid ${selected ? GOLD : 'transparent'}`,
-                alignItems: 'center', gap: 8, cursor: 'pointer', transition: 'background 0.12s',
+                background: '#FFFFFF',
+                borderBottom: `2px solid ${DARK}`,
+                borderLeft: `6px solid ${selected ? GOLD : DARK}`,
+                alignItems: 'center', gap: 8, cursor: 'pointer',
                 opacity: past ? 0.6 : 1, userSelect: 'none',
               }}>
 
@@ -280,17 +275,13 @@ export default function BlockedDateList({ blockedDates, handleUnblock, selectedD
                   display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
                   width: '100%',
                   padding: isMobile ? '10px 0' : '10px 18px',
-                  background: DARK, border: 'none', color: '#fff',
+                  background: '#FF0000', border: 'none', color: '#fff',
                   fontSize: 13, fontWeight: 800, cursor: 'pointer',
-                  transition: 'background 0.15s',
                   fontFamily: 'inherit', whiteSpace: 'nowrap', minHeight: 40,
                   WebkitTapHighlightColor: 'transparent',
                 }}
-                onMouseEnter={e => e.currentTarget.style.background = '#b94040'}
-                onMouseLeave={e => e.currentTarget.style.background = DARK}
                 title="Débloquer">
-                <Trash2 size={14} strokeWidth={2.2} />
-                <span className="unblock-label">Débloquer</span>
+                <span className="unblock-label">DÉBLOQUER</span>
               </button>
             </div>
           )
@@ -307,15 +298,15 @@ export default function BlockedDateList({ blockedDates, handleUnblock, selectedD
               {(safe - 1) * PAGE_SIZE + 1}–{Math.min(safe * PAGE_SIZE, sorted.length)} / {sorted.length}
             </span>
             <div style={{ display: 'flex', gap: 3, flexWrap: 'wrap' }}>
-              {!isXs && <PageBtn onClick={() => setPage(1)} disabled={safe === 1}><ChevronsLeft size={12} strokeWidth={2.5} /></PageBtn>}
-              <PageBtn onClick={() => setPage(p => Math.max(1, p - 1))} disabled={safe === 1}><ChevronLeft size={12} strokeWidth={2.5} /></PageBtn>
+              {!isXs && <PageBtn onClick={() => setPage(1)} disabled={safe === 1}>«</PageBtn>}
+              <PageBtn onClick={() => setPage(p => Math.max(1, p - 1))} disabled={safe === 1}>‹</PageBtn>
               {getPages().map((p, i) =>
                 p === '…'
-                  ? <span key={`d${i}`} style={{ padding: '0 2px', fontSize: 12, color: DARK, lineHeight: '36px' }}>…</span>
+                   ? <span key={`d${i}`} style={{ padding: '0 6px', fontSize: 12, fontWeight: 900, color: DARK, lineHeight: '36px' }}>…</span>
                   : <PageBtn key={p} active={p === safe} onClick={() => setPage(p)}>{p}</PageBtn>
               )}
-              <PageBtn onClick={() => setPage(p => Math.min(total, p + 1))} disabled={safe === total}><ChevronRight size={12} strokeWidth={2.5} /></PageBtn>
-              {!isXs && <PageBtn onClick={() => setPage(total)} disabled={safe === total}><ChevronsRight size={12} strokeWidth={2.5} /></PageBtn>}
+              <PageBtn onClick={() => setPage(p => Math.min(total, p + 1))} disabled={safe === total}>›</PageBtn>
+              {!isXs && <PageBtn onClick={() => setPage(total)} disabled={safe === total}>»</PageBtn>}
             </div>
           </div>
         )}
