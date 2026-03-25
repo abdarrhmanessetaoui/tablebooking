@@ -333,12 +333,12 @@ class RestaurantReservationController extends Controller
         $form = DB::table('wpjn_cpappbk_forms')
             ->where('id', $this->formId())
             ->first();
-    
+
         if (!$form) return response()->json([]);
-    
+
         $structure = json_decode($form->form_structure, true);
         $services  = [];
-    
+
         foreach ($structure[0] ?? [] as $field) {
             if (($field['ftype'] ?? '') === 'fapp') {
                 foreach ($field['services'] ?? [] as $svc) {
@@ -355,7 +355,218 @@ class RestaurantReservationController extends Controller
                 break;
             }
         }
-    
+
         return response()->json($services);
+    }
+
+    // =========================================================================
+    // NEW METHOD #1 — Assign a table to a reservation
+    // PATCH /api/restaurant/reservations/{id}/assign-table
+    // Body: { "table_idx": 3 }  — send null to unassign
+    // =========================================================================
+    public function assignTable(Request $request, int $id)
+    {
+        $request->validate([
+            'table_idx' => 'nullable|integer',
+        ]);
+    
+        $message  = WpMessage::where('formid', $this->formId())->findOrFail($id);
+        $tableIdx = $request->input('table_idx');
+    
+        if (!is_null($tableIdx)) {
+    
+            // ── Validate table exists and is active ───────────────────
+            $form      = DB::table('wpjn_cpappbk_forms')->where('id', $this->formId())->first();;
+            $structure = json_decode($form->form_structure, true);
+            $tables    = [];
+    
+            foreach ($structure[0] ?? [] as $field) {
+                if (($field['ftype'] ?? '') === 'fapp') {
+                    $tables = $field['tables'] ?? [];
+                    break;
+                }
+            }
+    
+            $table = collect($tables)->firstWhere('idx', (int) $tableIdx);
+    
+            if (!$table) {
+                return response()->json(['message' => 'Table introuvable.'], 404);
+            }
+    
+            if (!($table['active'] ?? true)) {
+                return response()->json(['message' => 'Cette table est inactive.'], 422);
+            }
+    
+            // ── Get current reservation details ───────────────────────
+            $current     = $message->toCleanArray();
+            $currentDate = $current['date']       ?? null;
+            $startTime   = $current['start_time'] ?? null;
+            $endTime     = $current['end_time']   ?? null;
+    
+            // ── Check for time conflicts on the same table ────────────
+            if ($currentDate && $startTime) {
+    
+                // Load all reservations for same date with same table
+                $conflicts = WpMessage::where('formid', $this->formId())
+                    ->where('id', '!=', $id)           // exclude self
+                    ->where('table_idx', $tableIdx)
+                    ->get()
+                    ->map(fn($m) => $m->toCleanArray())
+                    ->filter(function ($r) use ($currentDate, $startTime, $endTime) {
+    
+                        // Must be same date
+                        if (($r['date'] ?? '') !== $currentDate) return false;
+    
+                        // Skip cancelled reservations
+                        if ($r['status'] === 'Cancelled') return false;
+    
+                        $rStart = $r['start_time'] ?? null;
+                        $rEnd   = $r['end_time']   ?? null;
+    
+                        if (!$rStart) return false;
+    
+                        // Convert to comparable decimal hours
+                        $toDecimal = function (string $t): float {
+                            [$h, $m] = explode(':', $t);
+                            return (int)$h + (int)$m / 60;
+                        };
+    
+                        $aStart = $toDecimal($startTime);
+                        // Default slot = 2h if no end_time
+                        $aEnd   = $endTime ? $toDecimal($endTime) : $aStart + 2;
+    
+                        $bStart = $toDecimal($rStart);
+                        $bEnd   = $rEnd ? $toDecimal($rEnd) : $bStart + 2;
+    
+                        // Overlap: A starts before B ends AND A ends after B starts
+                        return $aStart < $bEnd && $aEnd > $bStart;
+                    });
+    
+                if ($conflicts->isNotEmpty()) {
+                    $conflict    = $conflicts->first();
+                    $conflictTime = $conflict['start_time'] ?? '?';
+                    $conflictName = $conflict['name']       ?? 'un client';
+    
+                    return response()->json([
+                        'message' => "Conflit : cette table est déjà assignée à {$conflictName} à {$conflictTime} le {$currentDate}.",
+                    ], 422);
+                }
+            }
+        }
+
+        
+    
+        // ── All good — assign ─────────────────────────────────────────
+        $message->table_idx = $tableIdx;
+        $message->save();
+    
+        return response()->json($message->toCleanArray());
+    }
+
+    /**
+ * GET /api/tables/busy?date=YYYY-MM-DD&start_time=HH:MM&end_time=HH:MM&exclude_id=123
+ * Returns array of table_idx values that are already taken at that time.
+ */
+public function busyTables(Request $request)
+{
+    $date      = $request->query('date');
+    $startTime = $request->query('start_time');
+    $endTime   = $request->query('end_time');
+    $excludeId = (int) $request->query('exclude_id', 0);
+
+    if (!$date || !$startTime) {
+        return response()->json([]);
+    }
+
+    $toDecimal = function (string $t): float {
+        [$h, $m] = explode(':', $t);
+        return (int)$h + (int)$m / 60;
+    };
+
+    $aStart = $toDecimal($startTime);
+    $aEnd   = $endTime ? $toDecimal($endTime) : $aStart + 2;
+
+    $busy = WpMessage::where('formid', $this->formId())
+        ->whereNotNull('table_idx')
+        ->where('id', '!=', $excludeId)
+        ->get()
+        ->map(fn($m) => $m->toCleanArray())
+        ->filter(function ($r) use ($date, $aStart, $aEnd, $toDecimal) {
+            if (($r['date'] ?? '') !== $date) return false;
+            if ($r['status'] === 'Cancelled') return false;
+            $rStart = $r['start_time'] ?? null;
+            if (!$rStart) return false;
+            $bStart = $toDecimal($rStart);
+            $bEnd   = isset($r['end_time']) && $r['end_time']
+                ? $toDecimal($r['end_time'])
+                : $bStart + 2;
+            return $aStart < $bEnd && $aEnd > $bStart;
+        })
+        ->pluck('table_idx')
+        ->unique()
+        ->values();
+
+    return response()->json($busy);
+}
+
+    // =========================================================================
+    // NEW METHOD #2 — Table occupancy timeline for a given date
+    // GET /api/tables/timeline?date=YYYY-MM-DD
+    // =========================================================================
+    public function timeline(Request $request)
+    {
+        $date = $request->query('date', now()->toDateString());
+    
+        if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)) {
+            $date = now()->toDateString();
+        }
+    
+        $form = DB::table('wpjn_cpappbk_forms')->where('id', $this->formId())->first();
+        if (!$form) return response()->json([]);
+    
+        $structure = json_decode($form->form_structure, true);
+        $tables    = [];
+    
+        foreach ($structure[0] ?? [] as $field) {
+            if (($field['ftype'] ?? '') === 'fapp') {
+                $tables = $field['tables'] ?? [];
+                break;
+            }
+        }
+    
+        $tables = collect($tables)->filter(fn($t) => $t['active'] ?? true)->values();
+    
+        $messages = WpMessage::where('formid', $this->formId())
+            ->whereNotNull('table_idx')
+            ->get()
+            ->map(fn($m) => $m->toCleanArray())
+            ->filter(fn($r) =>
+                $r['date'] === $date &&
+                in_array($r['status'], ['Confirmed', 'Pending'])
+            )
+            ->groupBy('table_idx');
+    
+        $timeline = $tables->map(function ($table) use ($messages) {
+            $tableReservations = $messages->get($table['idx'], collect());
+    
+            return [
+                'table_id'     => $table['idx'],
+                'table_name'   => 'Table ' . $table['number'],
+                'capacity'     => (int) $table['capacity'],
+                'location'     => $table['location'],
+                'reservations' => collect($tableReservations)->map(fn($r) => [
+                    'id'            => $r['id'],
+                    'start_time'    => $r['start_time'],
+                    'end_time'      => $r['end_time'],
+                    'customer_name' => $r['name'],
+                    'guests'        => (int) $r['guests'],
+                    'status'        => $r['status'],
+                    'service'       => $r['service'] ?? '',  // ← ADD THIS
+                    'phone'         => $r['phone']   ?? '',  // ← ADD THIS
+                ])->values(),
+            ];
+        });
+    
+        return response()->json($timeline->values());
     }
 }

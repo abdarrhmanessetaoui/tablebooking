@@ -5,8 +5,7 @@ const DARK   = '#2b2118'
 const GOLD   = '#c8a97e'
 const BORDER = '#2b2118'
 
-const LOCATIONS = ['Intérieur', 'Terrasse', 'Bar', 'Salon privé']
-const EMPTY     = { number: '', capacity: '', location: 'Intérieur' }
+const EMPTY = { number: '', capacity: '', location: '' }
 
 const inp = {
   padding: '12px 14px',
@@ -39,22 +38,26 @@ function Field({ label, children }) {
   )
 }
 
-export default function TableForm({ initial = EMPTY, onSave, saving, editingNumber, onCancel }) {
-  const [form, setForm] = useState({ ...EMPTY, ...initial })
-  const set  = k => v => setForm(f => ({ ...f, [k]: v }))
-  const fo   = e => e.target.style.borderColor = GOLD
-  const bl   = e => e.target.style.borderColor = BORDER
+// locations = [{ id, name, color }, ...]  — passed from parent via useTableLocations
+export default function TableForm({ initial = EMPTY, onSave, saving, editingNumber, onCancel, locations = [] }) {
+  const defaultLocation = initial.location || locations[0]?.name || ''
+  const [form, setForm] = useState({ ...EMPTY, ...initial, location: initial.location || defaultLocation })
+
+  const set = k => v => setForm(f => ({ ...f, [k]: v }))
+  const fo  = e => e.target.style.borderColor = GOLD
+  const bl  = e => e.target.style.borderColor = BORDER
+
   const valid = form.number.trim() && form.capacity !== '' && form.location
 
   async function handleSubmit() {
     if (!valid || saving) return
-    await onSave(form, () => setForm(EMPTY))
+    await onSave(form, () => setForm({ ...EMPTY, location: locations[0]?.name || '' }))
   }
 
   return (
     <div style={{ background: '#fff', border: `1.5px solid ${BORDER}`, overflow: 'hidden' }}>
 
-      {/* Header bar */}
+      {/* Header */}
       <div style={{ padding: '12px 16px', background: DARK, display: 'flex', alignItems: 'center', gap: 8 }}>
         <LayoutGrid size={14} strokeWidth={2.5} color={GOLD} />
         <span style={{ fontSize: 11, fontWeight: 900, color: GOLD, letterSpacing: '0.12em', textTransform: 'uppercase' }}>
@@ -82,14 +85,23 @@ export default function TableForm({ initial = EMPTY, onSave, saving, editingNumb
         </div>
 
         <Field label="Emplacement">
-          <select
-            value={form.location}
-            onChange={e => set('location')(e.target.value)}
-            style={{ ...inp, cursor: 'pointer' }}
-            onFocus={fo} onBlur={bl}
-          >
-            {LOCATIONS.map(l => <option key={l} value={l}>{l}</option>)}
-          </select>
+          {locations.length === 0 ? (
+            <div style={{ ...inp, color: 'rgba(43,33,24,0.4)', fontSize: 12, display: 'flex', alignItems: 'center', pointerEvents: 'none' }}>
+              Aucun emplacement — créez-en d'abord
+            </div>
+          ) : (
+            <select
+              value={form.location}
+              onChange={e => set('location')(e.target.value)}
+              style={{ ...inp, cursor: 'pointer' }}
+              onFocus={fo} onBlur={bl}
+            >
+              <option value="">Choisir un emplacement…</option>
+              {locations.map(l => (
+                <option key={l.id} value={l.name}>{l.name}</option>
+              ))}
+            </select>
+          )}
         </Field>
 
         <button

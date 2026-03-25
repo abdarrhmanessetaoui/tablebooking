@@ -198,7 +198,7 @@ export default function BlockedDates() {
                 Dates bloquées
               </h1>
               <p className="page-subtitle" style={{ margin: '6px 0 0', fontSize: 12, fontWeight: 700, color: GOLD_DK }}>
-                Les dates bloquées ne peuvent pas être réservées par les clients.
+               
               </p>
             </div>
             <div style={{ display: 'flex', gap: 3, flexShrink: 0 }}>

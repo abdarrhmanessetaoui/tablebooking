@@ -56,7 +56,7 @@ function aggregate(rows) {
     if (r.guests) { guests_sum += parseInt(r.guests); guests_n++ }
     if (r.start_time) inc(by_hour, r.start_time.slice(0, 5))
     if (r.service)    inc(by_service, r.service)
-    if (r.guests)     inc(by_guests, parseInt(r.guests) + ' pers.')
+    if (r.guests)     inc(by_guests, parseInt(r.guests) + ' personnes')
     if (r.date) {
       const d  = new Date(r.date)
       const yr = d.getFullYear(), mo = d.getMonth()

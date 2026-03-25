@@ -203,7 +203,6 @@ export default function Settings() {
             Paramètres
           </h1>
           <p style={{ margin: '6px 0 0', fontSize: 12, fontWeight: 700, color: GOLD_DK }}>
-            Restaurant · Horaires · Notifications
           </p>
         </FadeUp>
 

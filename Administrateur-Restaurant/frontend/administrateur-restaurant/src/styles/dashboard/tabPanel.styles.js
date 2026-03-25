@@ -1,0 +1,119 @@
+export const tabPanelCSS = `
+  .db-card {
+    background: #fff;
+    border: 2px solid #2b2118;
+    overflow: hidden;
+  }
+  .db-body {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    align-items: stretch;
+    min-height: 400px;
+  }
+  .db-left {
+    border-right: 2px solid #2b2118;
+    display: flex;
+    flex-direction: column;
+  }
+  .db-stats-sticky {
+    position: sticky;
+    top: 24px;
+  }
+  .db-right {
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
+  }
+  .db-stat-blocks {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+  .db-stat-blocks > div {
+    flex: 1;
+  }
+  @media (max-width: 860px) {
+    .db-body         { grid-template-columns: 1fr; min-height: auto; }
+    .db-left         { border-right: none; border-bottom: 2px solid #2b2118; }
+    .db-stats-sticky { position: static; }
+    .db-stat-blocks  { flex-direction: row; }
+  }
+  @media (max-width: 540px) {
+    .db-stat-blocks  { flex-direction: column; }
+  }
+  .res-desktop { display: block; height: 100%; }
+  .res-mobile  { display: none;  }
+  @media (max-width: 640px) {
+    .res-desktop { display: none;  }
+    .res-mobile  { display: block; }
+  }
+`
+
+export const heroSection = {
+  padding:      '20px 20px 18px',
+  display:      'flex',
+  alignItems:   'center',
+  gap:          20,
+  borderBottom: `2px solid #2b2118`,
+  background:   '#fff',
+  flexShrink:   0,
+}
+
+export const heroNumber = {
+  margin:             0,
+  fontSize:           'clamp(52px,8vw,80px)',
+  fontWeight:         900,
+  color:              '#2b2118',
+  lineHeight:         0.9,
+  letterSpacing:      '-4px',
+  fontVariantNumeric: 'tabular-nums',
+}
+
+export const heroLabel = {
+  margin:     '10px 0 0',
+  fontSize:   11,
+  fontWeight: 700,
+  color:      '#2b2118',
+}
+
+export const statsList = {
+  display:       'flex',
+  flexDirection: 'column',
+  flex:          1,
+}
+
+export const mobileEmpty = {
+  padding:   '40px 16px',
+  textAlign: 'center',
+}
+
+export const mobileEmptyTitle = {
+  margin:     0,
+  fontSize:   13,
+  fontWeight: 900,
+  color:      'rgba(43,33,24,0.25)',
+}
+
+export const mobileEmptySubtitle = {
+  margin:     '5px 0 0',
+  fontSize:   11,
+  fontWeight: 700,
+  color:      'rgba(200,169,126,0.6)',
+}
+
+export const mobileViewAllBtn = {
+  width:          '100%',
+  padding:        '13px 16px',
+  background:     '#2b2118',
+  border:         'none',
+  color:          '#fff',
+  fontSize:       11,
+  fontWeight:     900,
+  letterSpacing:  '0.1em',
+  textTransform:  'uppercase',
+  cursor:         'pointer',
+  display:        'flex',
+  alignItems:     'center',
+  justifyContent: 'space-between',
+  fontFamily:     'inherit',
+}

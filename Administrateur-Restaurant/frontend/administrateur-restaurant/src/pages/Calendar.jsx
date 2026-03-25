@@ -1,10 +1,10 @@
 import { useState } from 'react'
 import { FileDown } from 'lucide-react'
-import useCalendar  from '../hooks/Calendar/useCalendar'
-import CalendarNav  from '../components/Calendar/CalendarNav'
-import CalendarWeek from '../components/Calendar/CalendarWeek'
-import FadeUp  from '../components/Dashboard/FadeUp'
-import Spinner from '../components/Dashboard/Spinner'
+import useCalendar   from '../hooks/Calendar/useCalendar'
+import CalendarNav   from '../components/Calendar/CalendarNav'
+import CalendarWeek  from '../components/Calendar/CalendarWeek'
+import FadeUp        from '../components/Dashboard/FadeUp'
+import Spinner       from '../components/Dashboard/Spinner'
 
 const DARK    = '#2b2118'
 const GOLD    = '#c8a97e'
@@ -39,10 +39,64 @@ export default function Calendar() {
     view, setView, currentDate, setCurrentDate,
     weekDays, monthDays, loading, error,
     navigate, goToday, getByDate, getByMonth,
-    navLabel, reservations, refetch,
+    navLabel, reservations,
   } = useCalendar()
 
   const [exporting, setExporting] = useState(false)
+
+  // ── NEW: track which day is selected inside week view
+  const [weekSelectedDay, setWeekSelectedDay] = useState(null)
+
+  // Reset selected day when view or week changes
+  // so it always defaults to today or Monday
+  function handleNavigate(dir) {
+    setWeekSelectedDay(null)
+    navigate(dir)
+  }
+  function handleGoToday() {
+    setWeekSelectedDay(null)
+    goToday()
+  }
+  function handleSetView(v) {
+    setWeekSelectedDay(null)
+    setView(v)
+  }
+
+  // ── Compute the correct ISO date for the timeline ──────────────
+  function getTimelineDate() {
+    if (view === 'day') {
+      return currentDate.toISOString().slice(0, 10)
+    }
+    if (view === 'week') {
+      // Use the day the user clicked in week view
+      // Fall back to today if in current week, else Monday
+      if (weekSelectedDay) return weekSelectedDay.toISOString().slice(0, 10)
+      const today     = new Date()
+      const todayInWeek = weekDays.find(d => d.toDateString() === today.toDateString())
+      if (todayInWeek) return todayInWeek.toISOString().slice(0, 10)
+      return weekDays[0]?.toISOString().slice(0, 10)
+    }
+    if (view === 'month') {
+      // Use today if in this month, else first day of month
+      const today = new Date()
+      const sameMonth = today.getMonth() === currentDate.getMonth() &&
+                        today.getFullYear() === currentDate.getFullYear()
+      if (sameMonth) return today.toISOString().slice(0, 10)
+      return new Date(currentDate.getFullYear(), currentDate.getMonth(), 1)
+        .toISOString().slice(0, 10)
+    }
+    if (view === 'year') {
+      // Use today if in this year, else Jan 1
+      const today = new Date()
+      if (today.getFullYear() === currentDate.getFullYear()) {
+        return today.toISOString().slice(0, 10)
+      }
+      return `${currentDate.getFullYear()}-01-01`
+    }
+    return currentDate.toISOString().slice(0, 10)
+  }
+
+  const timelineDate = getTimelineDate()
 
   async function handleExport() {
     setExporting(true)
@@ -70,7 +124,10 @@ export default function Calendar() {
       doc.text('NOM',24,y+6); doc.text('DATE',80,y+6); doc.text('HEURE',120,y+6); doc.text('STATUT',155,y+6)
       y += 9
 
-      const allRes = view==='day' ? getByDate(currentDate) : view==='week' ? weekDays.flatMap(d => getByDate(d)) : reservations||[]
+      const allRes = view==='day' ? getByDate(currentDate)
+        : view==='week' ? weekDays.flatMap(d => getByDate(d))
+        : reservations || []
+
       allRes.forEach((r,i) => {
         if (y>270) { doc.addPage(); y=20 }
         doc.setFillColor(i%2===0?255:250, i%2===0?255:248, i%2===0?255:245)
@@ -118,7 +175,7 @@ export default function Calendar() {
                 Planning
               </h1>
               <p className="page-subtitle" style={{ margin: '6px 0 0', fontSize: 12, fontWeight: 700, color: GOLD_DK }}>
-                Gérez vos réservations par jour, semaine, mois ou année
+                
               </p>
             </div>
             <div style={{ display: 'flex', gap: 3, flexShrink: 0 }}>
@@ -142,19 +199,34 @@ export default function Calendar() {
         )}
 
         <FadeUp delay={20}>
-          <CalendarNav view={view} setView={setView} navLabel={navLabel} navigate={navigate} goToday={goToday} currentDate={currentDate} />
+          <CalendarNav
+            view={view}
+            setView={handleSetView}
+            navLabel={navLabel}
+            navigate={handleNavigate}
+            goToday={handleGoToday}
+            currentDate={currentDate}
+          />
         </FadeUp>
 
         <FadeUp delay={40}>
           {loading ? <Spinner /> : (
             <CalendarWeek
-              view={view} setView={setView}
-              weekDays={weekDays} monthDays={monthDays}
-              currentDate={currentDate} setCurrentDate={setCurrentDate}
-              getByDate={getByDate} getByMonth={getByMonth}
+              view={view}
+              setView={handleSetView}
+              weekDays={weekDays}
+              monthDays={monthDays}
+              currentDate={currentDate}
+              setCurrentDate={setCurrentDate}
+              getByDate={getByDate}
+              getByMonth={getByMonth}
+              onDayChange={setWeekSelectedDay}
             />
           )}
         </FadeUp>
+
+
+
       </div>
     </>
   )

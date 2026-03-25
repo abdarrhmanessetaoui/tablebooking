@@ -9,16 +9,15 @@ use App\Http\Controllers\TimeSlotController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\TableController;
 
-
-// ── Auth ──────────────────────────────────────────────────────────────────────
+// ── Auth ──────────────────────────────────────────────────────────
 Route::post('/login',  [AuthenticatedSessionController::class, 'store']);
 Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->middleware('auth:sanctum');
 
-// ── Public (client booking form) ─────────────────────────────────────────────
+// ── Public ────────────────────────────────────────────────────────
 Route::get('/blocked-dates', [BlockedDateController::class, 'index']);
 Route::get('/time-slots',    [TimeSlotController::class,   'index']);
 
-// ── Protected ─────────────────────────────────────────────────────────────────
+// ── Protected ─────────────────────────────────────────────────────
 Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('/me', fn(Request $request) => response()->json($request->user()));
@@ -28,12 +27,13 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/reports', [RestaurantReservationController::class, 'reports']);
 
     // ── Reservations ──────────────────────────────────────────
-    Route::get   ('/reservations/by-date',               [RestaurantReservationController::class, 'byDate']);
-    Route::get   ('/restaurant/reservations',             [RestaurantReservationController::class, 'index']);
-    Route::get   ('/restaurant/reservations/{id}',        [RestaurantReservationController::class, 'show']);
-    Route::post  ('/restaurant/reservations',             [RestaurantReservationController::class, 'store']);
-    Route::patch ('/restaurant/reservations/{id}/status', [RestaurantReservationController::class, 'updateStatus']);
-    Route::delete('/restaurant/reservations/{id}',        [RestaurantReservationController::class, 'destroy']);
+    Route::get   ('/reservations/by-date',                          [RestaurantReservationController::class, 'byDate']);
+    Route::get   ('/restaurant/reservations',                       [RestaurantReservationController::class, 'index']);
+    Route::post  ('/restaurant/reservations',                       [RestaurantReservationController::class, 'store']);
+    Route::get   ('/restaurant/reservations/{id}',                  [RestaurantReservationController::class, 'show']);
+    Route::patch ('/restaurant/reservations/{id}/status',           [RestaurantReservationController::class, 'updateStatus']);
+    Route::patch ('/restaurant/reservations/{id}/assign-table',     [RestaurantReservationController::class, 'assignTable']);
+    Route::delete('/restaurant/reservations/{id}',                  [RestaurantReservationController::class, 'destroy']);
 
     // ── Restaurant settings ───────────────────────────────────
     Route::get('/restaurant/info',          [RestaurantReservationController::class, 'info']);
@@ -57,10 +57,17 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/services/{idx}', [ServiceController::class, 'destroy']);
 
     // ── Tables ────────────────────────────────────────────────
-    Route::get   ('/tables',              [TableController::class, 'index']);
-    Route::post  ('/tables',              [TableController::class, 'store']);
+    // ⚠️ Static routes MUST come before {idx} routes
+    Route::get('/tables',              [TableController::class,                  'index']);
+    Route::post('/tables',             [TableController::class,                  'store']);
+    Route::get('/tables/busy',         [RestaurantReservationController::class,  'busyTables']);
+    Route::get('/tables/timeline',     [RestaurantReservationController::class,  'timeline']);
     Route::put   ('/tables/{idx}',        [TableController::class, 'update']);
     Route::delete('/tables/{idx}',        [TableController::class, 'destroy']);
     Route::patch ('/tables/{idx}/toggle', [TableController::class, 'toggleActive']);
+    Route::get   ('/table-locations',       [TableController::class, 'indexLocations']);
+    Route::post  ('/table-locations',       [TableController::class, 'storeLocation']);
+    Route::put   ('/table-locations/{id}',  [TableController::class, 'updateLocation']);
+    Route::delete('/table-locations/{id}',  [TableController::class, 'destroyLocation']);
 
 });

@@ -329,7 +329,6 @@ export default function Reports() {
                 Rapports
               </h1>
               <p className="page-subtitle" style={{margin:'6px 0 0',fontSize:12,fontWeight:700,color:GOLD_DK}}>
-                Analytiques complètes de vos réservations
               </p>
             </div>
             <div style={{display:'flex',gap:3,flexShrink:0}}>
@@ -367,13 +366,13 @@ export default function Reports() {
 
         {/* SUMMARY */}
         <FadeUp delay={20}>
-          <SectionTitle title="Résumé général" sub="Données filtrées" count={s.total??0}/>
+          <SectionTitle title="Résumé général" sub="" count={s.total??0}/>
           <div className="rp-sum" style={{marginBottom:32}}>
             <SumCard icon={BarChart2}   value={s.total??0}     label="Total"       accent={DARK}    bg={WHITE}    delay={40} />
             <SumCard icon={CheckCircle} value={s.confirmed??0} label="Confirmées"  accent={GREEN}   bg={GREEN_BG} delay={70} />
             <SumCard icon={Clock}       value={s.pending??0}   label="En attente"  accent={AMBER}   bg={AMBER_BG} delay={100}/>
             <SumCard icon={XCircle}     value={s.cancelled??0} label="Annulées"    accent={RED}     bg={RED_BG}   delay={130}/>
-            <SumCard icon={Users}       value={s.avg_guests ? `${Number(s.avg_guests).toFixed(1)}` : '0'} label="Moy. pers." accent={GOLD_DK} bg={CREAM} delay={160}/>
+            <SumCard icon={Users}       value={s.avg_guests ? `${Number(s.avg_guests).toFixed(1)}` : '0'} label="Moyenne de personnes" accent={GOLD_DK} bg={CREAM} delay={160}/>
           </div>
         </FadeUp>
 
@@ -381,7 +380,7 @@ export default function Reports() {
 
         {/* HEURE + JOUR */}
         <FadeUp delay={0}>
-          <SectionTitle title="Distribution temporelle" sub="Par heure · Par jour de la semaine"/>
+          <SectionTitle title="Distribution temporelle" sub=""/>
           <div className="rp-2" style={{marginBottom:32}}>
             <BarChart data={data?.by_hour} title="Par heure"  subtitle="Créneaux les plus demandés" barColor={GOLD}/>
             <BarChart data={data?.by_day}  title="Par jour"   subtitle="Jours les plus chargés"     barColor={GOLD}/>
@@ -392,7 +391,7 @@ export default function Reports() {
 
         {/* SERVICES + COUVERTS */}
         <FadeUp delay={0}>
-          <SectionTitle title="Services & Couverts" sub="Répartition des formules · Taille des groupes"/>
+          <SectionTitle title="Services & Couverts" sub=""/>
           <div className="rp-2" style={{marginBottom:32}}>
             <ServiceChart data={data?.by_service??{}}/>
             <BarChart data={data?.by_guests} title="Par couverts" subtitle="Taille des groupes" barColor={AMBER}/>
@@ -403,7 +402,7 @@ export default function Reports() {
 
         {/* SEMAINE + MOIS + ANNÉE */}
         <FadeUp delay={0}>
-          <SectionTitle title="Tendances périodiques" sub="Activité semaine · mois · année"/>
+          <SectionTitle title="Tendances périodiques" sub=""/>
           <div className="rp-3" style={{marginBottom:0}}>
             <BarChart data={data?.by_week}  title="Par semaine" subtitle="Activité hebdomadaire" barColor={GOLD}/>
             <BarChart data={data?.by_month} title="Par mois"    subtitle="Activité mensuelle"    barColor={GOLD}/>
