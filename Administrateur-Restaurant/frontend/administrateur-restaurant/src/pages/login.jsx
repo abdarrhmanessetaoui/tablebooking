@@ -15,7 +15,7 @@ const Login = () => {
   return (
     <div
       className="min-h-screen flex flex-col items-center justify-center px-4"
-      style={{ backgroundColor: '#2b2118' }}
+      style={{ backgroundColor: '#ffffff' }}
     >
       <div className="flex items-center justify-center mb-8">
         <img
