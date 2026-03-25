@@ -44,7 +44,7 @@ export default function Layout({ children }) {
           transition: width 0.22s cubic-bezier(0.4,0,0.2,1);
           border-right: 1px solid rgba(200,169,126,0.12);
         }
-        .l-main    { flex: 1; min-width: 0; background: #fff; overflow-x: hidden; }
+        .l-main    { flex: 1; min-width: 0; background: #ffff; overflow-x: hidden; }
         .l-topbar  {
           display: none; align-items: center; justify-content: space-between;
           padding: 0 16px; height: 52px; background: ${DARK};
