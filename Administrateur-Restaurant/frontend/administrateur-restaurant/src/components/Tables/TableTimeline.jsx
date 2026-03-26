@@ -144,7 +144,7 @@ function MiniCal({ value, onChange, t, lang }) {
           onClick={() => setCur(c => c.m === 0 ? { y: c.y - 1, m: 11 } : { y: c.y, m: c.m - 1 })}
           style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, display: 'flex', alignItems: 'center' }}
         >
-          <ChevronLeft size={14} color={GOLD} strokeWidth={2.5} />
+          {lang === 'ar' ? <ChevronRight size={14} color={GOLD} strokeWidth={2.5} /> : <ChevronLeft size={14} color={GOLD} strokeWidth={2.5} />}
         </button>
         <span style={{ fontSize: 11, fontWeight: 900, color: '#fff', textTransform: 'capitalize', letterSpacing: '0.02em' }}>
           {formatMonthYear(cur.y, cur.m, lang)}
@@ -153,7 +153,7 @@ function MiniCal({ value, onChange, t, lang }) {
           onClick={() => setCur(c => c.m === 11 ? { y: c.y + 1, m: 0 } : { y: c.y, m: c.m + 1 })}
           style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, display: 'flex', alignItems: 'center' }}
         >
-          <ChevronRight size={14} color={GOLD} strokeWidth={2.5} />
+          {lang === 'ar' ? <ChevronLeft size={14} color={GOLD} strokeWidth={2.5} /> : <ChevronRight size={14} color={GOLD} strokeWidth={2.5} />}
         </button>
       </div>
 
@@ -234,7 +234,7 @@ function Tip({ res, endTime }) {
       <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
         {[
           { Icon: Clock,    v: `${res.start_time}${endTime ? ` – ${endTime}` : ''}` },
-          { Icon: Users,    v: `${res.guests} pers.` },
+          { Icon: Users,    v: t('count_persons', { count: res.guests }) },
           { Icon: Utensils, v: res.service || null },
         ].filter(x => x.v).map(({ Icon, v }) => (
           <div key={v} style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
@@ -432,7 +432,7 @@ function ResRow({ res, services }) {
           </span>
           <span style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 12, fontWeight: 700, color: DARK }}>
             <Users size={12} color={GOLD_DARK} strokeWidth={2.5} />
-            {res.guests} pers.
+            {t('count_persons', { count: res.guests })}
           </span>
           {res.service && (
             <span style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 12, fontWeight: 700, color: DARK }}>
@@ -460,7 +460,7 @@ function TableCard({ row, services }) {
       {/* Card header */}
       <button
         onClick={() => hasRes && setOpen(o => !o)}
-        style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 10, padding: '12px 14px', background: hasRes ? DARK : '#f0ece8', border: 'none', cursor: hasRes ? 'pointer' : 'default', fontFamily: 'inherit', textAlign: 'left' }}
+        style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 10, padding: '12px 14px', background: hasRes ? DARK : '#f0ece8', border: 'none', cursor: hasRes ? 'pointer' : 'default', fontFamily: 'inherit', textAlign: i18n.language === 'ar' ? 'right' : 'left' }}
       >
         <div style={{ width: 9, height: 9, borderRadius: '50%', flexShrink: 0, background: hasRes ? GREEN : 'rgba(43,33,24,0.22)', boxShadow: hasRes ? `0 0 0 3px ${GREEN}44` : 'none' }} />
         <span style={{ flex: 1, fontSize: 15, fontWeight: 900, color: hasRes ? '#fff' : 'rgba(43,33,24,0.4)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>

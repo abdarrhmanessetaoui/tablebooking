@@ -32,7 +32,7 @@ export default function TableRow({ r, i, selected, highlighted, highlightRef, to
       style={{
         background: bg,
         borderBottom: `1px solid ${BORDER}`,
-        borderLeft: highlighted ? `6px solid ${GOLD}` : selected ? `6px solid ${GOLD}88` : hov ? `6px solid ${GOLD}44` : '6px solid transparent',
+        borderInlineStart: highlighted ? `6px solid ${GOLD}` : selected ? `6px solid ${GOLD}88` : hov ? `6px solid ${GOLD}44` : '6px solid transparent',
         transition: 'background 0.12s, border-color 0.12s',
         cursor: 'pointer',
       }}

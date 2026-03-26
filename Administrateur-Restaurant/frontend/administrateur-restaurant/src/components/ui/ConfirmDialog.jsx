@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { AlertCircle, Trash2, X } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 
 const DARK = '#2b2118'
 const GOLD = '#c8a97e'
@@ -12,6 +13,7 @@ export function confirm(options) {
 }
 
 export default function ConfirmDialog() {
+  const { t } = useTranslation()
   const [dialog, setDialog] = useState(null)
 
   const show = useCallback((d) => setDialog(d), [])
@@ -89,7 +91,7 @@ export default function ConfirmDialog() {
             onMouseEnter={e => e.currentTarget.style.background = '#ede5d8'}
             onMouseLeave={e => e.currentTarget.style.background = '#f5f0eb'}
           >
-            Annuler
+            {dialog.cancelLabel || t('cancel_btn')}
           </button>
           <button onClick={() => handle(true)} style={{
             padding: '10px 20px',
@@ -102,7 +104,7 @@ export default function ConfirmDialog() {
             onMouseEnter={e => e.currentTarget.style.background = isDanger ? '#DC2626' : '#3d2d1e'}
             onMouseLeave={e => e.currentTarget.style.background = isDanger ? '#DC2626' : DARK}
           >
-            {dialog.confirmLabel || 'Confirmer'}
+            {dialog.confirmLabel || t('confirm_btn')}
           </button>
         </div>
       </div>

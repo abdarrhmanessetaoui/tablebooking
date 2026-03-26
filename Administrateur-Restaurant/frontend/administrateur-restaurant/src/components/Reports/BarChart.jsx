@@ -7,7 +7,7 @@ const GOLD_BG = '#ffffff'
 const CREAM   = '#ffffff'
 
 export default function BarChart({ data = {}, title, subtitle, highlight = false }) {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const [mounted, setMounted] = useState(false)
   useEffect(() => { const id = setTimeout(() => setMounted(true), 80); return () => clearTimeout(id) }, [])
 
@@ -38,7 +38,7 @@ export default function BarChart({ data = {}, title, subtitle, highlight = false
           <div style={{ fontSize: 9, fontWeight: 900, letterSpacing: '0.18em', textTransform: 'uppercase', color: highlight ? GOLD : GOLD, marginBottom: 5 }}>{title}</div>
           {subtitle && <div style={{ fontSize: 13, fontWeight: 800, color: highlight ? 'rgba(255,255,255,0.7)' : DARK }}>{subtitle}</div>}
         </div>
-        <div style={{ textAlign: 'right', flexShrink: 0 }}>
+        <div style={{ textAlign: i18n.language === 'ar' ? 'left' : 'right', flexShrink: 0 }}>
           <div style={{ fontSize: 28, fontWeight: 900, color: highlight ? '#fff' : DARK, letterSpacing: '-1.5px', lineHeight: 1 }}>{max}</div>
           <div style={{ fontSize: 9, fontWeight: 900, color: GOLD, textTransform: 'uppercase', letterSpacing: '0.1em', marginTop: 3 }}>{t('reports_module.max_label')} · {topKey}</div>
         </div>

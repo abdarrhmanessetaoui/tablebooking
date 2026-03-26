@@ -22,7 +22,7 @@ const PAGE_TITLES = {
 }
 
 export default function Layout({ children }) {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const { handleLogout }          = useDashboard()
   const [open, setOpen]           = useState(false)
   const [collapsed, setCollapsed] = useState(false)
@@ -70,7 +70,7 @@ export default function Layout({ children }) {
         }
       `}</style>
 
-      <div className="l-root">
+    <div className="l-root" dir={i18n.language === 'ar' ? 'rtl' : 'ltr'}>
 
         {/* Desktop sidebar */}
         <aside className="l-aside">
@@ -115,7 +115,7 @@ export default function Layout({ children }) {
               style={{ height: 24, objectFit: 'contain' }}
               onError={e => { e.target.style.display = 'none' }} />
 
-            <span style={{ fontSize: 11, fontWeight: 700, color: 'rgba(200,169,126,0.6)', minWidth: 72, textAlign: 'right', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+            <span style={{ fontSize: 11, fontWeight: 700, color: 'rgba(200,169,126,0.6)', minWidth: 72, textAlign: i18n.language === 'ar' ? 'left' : 'right', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
               {title}
             </span>
           </header>

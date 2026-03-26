@@ -67,7 +67,7 @@ export default function LanguageSwitcher({ collapsed = false, position = 'top', 
                   color: currentLang === l.code ? GOLD : 'rgba(255,255,255,0.8)',
                   border: 'none',
                   padding: '10px 14px',
-                  textAlign: 'left',
+                  textAlign: i18n.language === 'ar' ? 'right' : 'left',
                   cursor: 'pointer',
                   fontSize: 13,
                   fontWeight: 700,
@@ -127,7 +127,7 @@ export default function LanguageSwitcher({ collapsed = false, position = 'top', 
         <span style={{ display: 'flex', alignItems: 'center', flexShrink: 0, color: 'inherit' }}>
           <Globe size={20} strokeWidth={2} />
         </span>
-        {!collapsed && <span style={{ textAlign: 'left', flex: 1 }}>{t('language')}</span>}
+        {!collapsed && <span style={{ textAlign: i18n.language === 'ar' ? 'right' : 'left', flex: 1 }}>{t('language')}</span>}
       </button>
     </div>
   )

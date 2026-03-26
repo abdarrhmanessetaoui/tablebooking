@@ -11,7 +11,8 @@ const GOLD = '#c8a97e'
 
 
 export default function Sidebar({ handleLogout, onNavClick, collapsed, onToggle }) {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
+  const isRtl = i18n.language === 'ar'
   const [hov,    setHov]    = useState(null)
   const [hovOut, setHovOut] = useState(false)
 
@@ -65,8 +66,8 @@ export default function Sidebar({ handleLogout, onNavClick, collapsed, onToggle 
             onMouseLeave={e => { e.currentTarget.style.background = 'rgba(200,169,126,0.1)'; e.currentTarget.style.color = 'rgba(200,169,126,0.6)' }}
           >
             {collapsed
-              ? <ChevronRight size={14} strokeWidth={2.5} />
-              : <ChevronLeft  size={14} strokeWidth={2.5} />
+              ? (isRtl ? <ChevronLeft size={14} strokeWidth={2.5} /> : <ChevronRight size={14} strokeWidth={2.5} />)
+              : (isRtl ? <ChevronRight size={14} strokeWidth={2.5} /> : <ChevronLeft size={14} strokeWidth={2.5} />)
             }
           </button>
         )}
@@ -135,7 +136,7 @@ export default function Sidebar({ handleLogout, onNavClick, collapsed, onToggle 
             color: hovOut ? '#ff6b6b' : 'rgba(255,255,255,0.4)',
             cursor:'pointer',
             transition: 'background 0.15s, color 0.15s',
-            fontFamily:'inherit', fontSize:14, fontWeight:600, textAlign:'left',
+            fontFamily:'inherit', fontSize:14, fontWeight:600, textAlign: isRtl ? 'right' : 'left',
           }}
         >
           <span style={{ display:'flex', alignItems:'center', flexShrink:0, color:'inherit' }}>

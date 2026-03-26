@@ -97,16 +97,16 @@ export default function ReservationsFilters({
         <div className="filters-search" style={{ position: 'relative' }}>
           <Search
             size={14} color={MUTED} strokeWidth={2.5}
-            style={{ position:'absolute', left:12, top:'50%', transform:'translateY(-50%)', pointerEvents:'none' }}
+            style={{ position:'absolute', insetInlineStart:12, top:'50%', transform:'translateY(-50%)', pointerEvents:'none' }}
           />
           <input
             type="text" placeholder={t('reservation_search_placeholder')}
             value={search} onChange={e => setSearch(e.target.value)}
-            style={{ ...filterInputBase, paddingLeft: 34 }}
+            style={{ ...filterInputBase, paddingInlineStart: 34 }}
           />
           {search && (
             <button onClick={() => setSearch('')}
-              style={{ position:'absolute', right:10, top:'50%', transform:'translateY(-50%)', background:'none', border:'none', cursor:'pointer', padding:4, display:'flex', alignItems:'center' }}>
+              style={{ position:'absolute', insetInlineEnd:10, top:'50%', transform:'translateY(-50%)', background:'none', border:'none', cursor:'pointer', padding:4, display:'flex', alignItems:'center' }}>
               <X size={12} color={MUTED} strokeWidth={2.5} />
             </button>
           )}

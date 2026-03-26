@@ -7,7 +7,8 @@ import { calNavBtnStyle } from '../../../styles/reservations/filters.styles'
 
 export default function CalendarPopup({ filterDate, setFilterDate, onClose, anchorRef }) {
   const { t, i18n } = useTranslation()
-  const lang = i18n.language === 'ar' ? 'ar-MA' : i18n.language === 'fr' ? 'fr-FR' : 'en-US'
+  const isRtl = i18n.language === 'ar'
+  const lang = isRtl ? 'ar-MA' : i18n.language === 'fr' ? 'fr-FR' : 'en-US'
   
   const today    = new Date()
   const initDate = filterDate
@@ -97,13 +98,13 @@ export default function CalendarPopup({ filterDate, setFilterDate, onClose, anch
     }}>
       {/* Header */}
       <div style={{ display:'flex', alignItems:'center', background:DARK, padding:'8px 6px', gap:2 }}>
-        <button onClick={() => setViewYear(y=>y-1)} style={calNavBtnStyle}><ChevronsLeft  size={13} strokeWidth={2.5} /></button>
-        <button onClick={() => navMonth(-1)}         style={calNavBtnStyle}><ChevronLeft   size={13} strokeWidth={2.5} /></button>
+        <button onClick={() => setViewYear(y=>y-1)} style={calNavBtnStyle}>{isRtl ? <ChevronsRight size={13} strokeWidth={2.5} /> : <ChevronsLeft  size={13} strokeWidth={2.5} />}</button>
+        <button onClick={() => navMonth(-1)}         style={calNavBtnStyle}>{isRtl ? <ChevronRight  size={13} strokeWidth={2.5} /> : <ChevronLeft   size={13} strokeWidth={2.5} />}</button>
         <span style={{ flex:1, textAlign:'center', fontSize:13, fontWeight:800, color:GOLD, textTransform:'capitalize' }}>
           {MONTHS[viewMonth]} {viewYear}
         </span>
-        <button onClick={() => navMonth(1)}          style={calNavBtnStyle}><ChevronRight  size={13} strokeWidth={2.5} /></button>
-        <button onClick={() => setViewYear(y=>y+1)}  style={calNavBtnStyle}><ChevronsRight size={13} strokeWidth={2.5} /></button>
+        <button onClick={() => navMonth(1)}          style={calNavBtnStyle}>{isRtl ? <ChevronLeft   size={13} strokeWidth={2.5} /> : <ChevronRight  size={13} strokeWidth={2.5} />}</button>
+        <button onClick={() => setViewYear(y=>y+1)}  style={calNavBtnStyle}>{isRtl ? <ChevronsLeft  size={13} strokeWidth={2.5} /> : <ChevronsRight size={13} strokeWidth={2.5} />}</button>
       </div>
 
       {/* Mode tabs */}

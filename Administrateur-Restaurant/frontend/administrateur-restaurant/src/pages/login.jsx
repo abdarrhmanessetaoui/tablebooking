@@ -5,7 +5,7 @@ import LanguageSwitcher from '../components/LanguageSwitcher'
 import '../index.css'
 
 const Login = () => {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const {
     email, setEmail,
     password, setPassword,
@@ -19,6 +19,7 @@ const Login = () => {
     <div
       className="min-h-screen flex flex-col items-center justify-center px-4"
       style={{ backgroundColor: '#ffffff' }}
+      dir={t('login_module.title') && i18n.language === 'ar' ? 'rtl' : 'ltr'}
     >
       <div className="flex items-center justify-center mb-8">
         <img

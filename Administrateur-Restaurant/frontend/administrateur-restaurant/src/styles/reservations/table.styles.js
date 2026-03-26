@@ -3,7 +3,7 @@ import { DARK, GOLD, CREAM, BORDER } from './tokens'
 export const cellStyle = { padding: '9px 8px' }
 
 export const headerCellStyle = {
-  padding: '11px 8px', textAlign: 'left',
+  padding: '11px 8px', textAlign: 'start',
   fontSize: 9, fontWeight: 900, color: GOLD,
   letterSpacing: '0.12em', textTransform: 'uppercase',
   whiteSpace: 'nowrap',

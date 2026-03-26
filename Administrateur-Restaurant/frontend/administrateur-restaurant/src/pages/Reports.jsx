@@ -143,7 +143,7 @@ function BarChart({ data={}, title, subtitle, highlight=false, barColor=GOLD }) 
           <div style={{fontSize:9,fontWeight:900,letterSpacing:'0.18em',textTransform:'uppercase',color:GOLD,marginBottom:4}}>{title}</div>
           {subtitle&&<div style={{fontSize:13,fontWeight:800,color:headerColor}}>{subtitle}</div>}
         </div>
-        <div style={{textAlign:'right',flexShrink:0}}>
+        <div style={{textAlign: i18n.language === 'ar' ? 'left' : 'right',flexShrink:0}}>
           <div style={{fontSize:26,fontWeight:900,color:highlight?WHITE:DARK,letterSpacing:'-1.5px',lineHeight:1}}>{max}</div>
           <div style={{fontSize:8,fontWeight:900,color:GOLD,textTransform:'uppercase',letterSpacing:'0.1em',marginTop:3}}>{t('reports_module.max_label')} · {topKey}</div>
         </div>
@@ -215,7 +215,7 @@ function ServiceChart({ data={} }) {
           <div style={{fontSize:9,fontWeight:900,letterSpacing:'0.18em',textTransform:'uppercase',color:GOLD,marginBottom:4}}>{t('reports_module.by_service')}</div>
           <div style={{fontSize:13,fontWeight:800,color:DARK}}>{t('reports_module.by_service_sub')}</div>
         </div>
-        <div style={{textAlign:'right'}}>
+        <div style={{textAlign: i18n.language === 'ar' ? 'left' : 'right'}}>
           <div style={{fontSize:26,fontWeight:900,color:DARK,letterSpacing:'-1.5px',lineHeight:1}}>{entries.length}</div>
           <div style={{fontSize:8,fontWeight:900,color:GOLD,textTransform:'uppercase',letterSpacing:'0.1em',marginTop:3}}>{t('reports_module.services')}</div>
         </div>
@@ -241,8 +241,8 @@ function ServiceChart({ data={} }) {
               <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:5}}>
                 <div style={{width:10,height:10,background:COLORS[i%COLORS.length],flexShrink:0}}/>
                 <span style={{flex:1,fontSize:12,fontWeight:800,color:DARK,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{name}</span>
-                <span style={{fontSize:11,fontWeight:900,color:MUTED,minWidth:28,textAlign:'right'}}>{pct}%</span>
-                <span style={{fontSize:13,fontWeight:900,color:DARK,minWidth:22,textAlign:'right'}}>{val}</span>
+                <span style={{fontSize:11,fontWeight:900,color:MUTED,minWidth:28,textAlign: i18n.language === 'ar' ? 'left' : 'right'}}>{pct}%</span>
+                <span style={{fontSize:13,fontWeight:900,color:DARK,minWidth:22,textAlign: i18n.language === 'ar' ? 'left' : 'right'}}>{val}</span>
               </div>
               <div style={{height:3,background: BORDER,overflow:'hidden'}}>
                 <div style={{
