@@ -1,19 +1,10 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { CalendarOff, Calendar, RefreshCw } from 'lucide-react'
 
 const DARK   = '#2b2118'
 const GOLD   = '#c8a97e'
 const BORDER = '#2b2118'
-
-const WEEKDAYS = [
-  { value: '1', label: 'Lundi' },
-  { value: '2', label: 'Mardi' },
-  { value: '3', label: 'Mercredi' },
-  { value: '4', label: 'Jeudi' },
-  { value: '5', label: 'Vendredi' },
-  { value: '6', label: 'Samedi' },
-  { value: '0', label: 'Dimanche' },
-]
 
 const inp = {
   padding: '12px 14px',
@@ -67,6 +58,19 @@ function ModeTab({ active, onClick, icon: Icon, label }) {
 }
 
 export default function BlockedDateForm({ form, setForm, handleBlock, submitting, getDatesToBlock }) {
+  const { t, i18n } = useTranslation()
+  const lang = i18n.language === 'ar' ? 'ar-MA' : i18n.language === 'fr' ? 'fr-FR' : 'en-US'
+
+  const WEEKDAYS = [
+    { value: '1', label: new Intl.DateTimeFormat(lang, { weekday: 'long' }).format(new Date(2024, 0, 1)) }, // Monday
+    { value: '2', label: new Intl.DateTimeFormat(lang, { weekday: 'long' }).format(new Date(2024, 0, 2)) }, // Tuesday
+    { value: '3', label: new Intl.DateTimeFormat(lang, { weekday: 'long' }).format(new Date(2024, 0, 3)) }, // Wednesday
+    { value: '4', label: new Intl.DateTimeFormat(lang, { weekday: 'long' }).format(new Date(2024, 0, 4)) }, // Thursday
+    { value: '5', label: new Intl.DateTimeFormat(lang, { weekday: 'long' }).format(new Date(2024, 0, 5)) }, // Friday
+    { value: '6', label: new Intl.DateTimeFormat(lang, { weekday: 'long' }).format(new Date(2024, 0, 6)) }, // Saturday
+    { value: '0', label: new Intl.DateTimeFormat(lang, { weekday: 'long' }).format(new Date(2023, 11, 31)) }, // Sunday
+  ]
+
   const preview = getDatesToBlock ? getDatesToBlock() : []
   const set = (k, v) => setForm(p => ({ ...p, [k]: v }))
   const fo = e => e.target.style.borderColor = GOLD
@@ -78,6 +82,8 @@ export default function BlockedDateForm({ form, setForm, handleBlock, submitting
     if (form.mode === 'recurring') return !!form.date_from
     return false
   }
+
+  const fmt = (d, opt) => new Date(d).toLocaleDateString(lang, opt)
 
   return (
     <>
@@ -92,25 +98,25 @@ export default function BlockedDateForm({ form, setForm, handleBlock, submitting
 
       <div style={{ background: '#fff', border: `4px solid ${BORDER}`, overflow: 'hidden', width: '100%', boxSizing: 'border-box' }}>
         <div style={{ display: 'flex', borderBottom: `4px solid ${DARK}`, width: '100%', overflow: 'hidden' }}>
-          <ModeTab active={form.mode === 'single'}    onClick={() => set('mode','single')}    icon={CalendarOff} label="Unique" />
-          <ModeTab active={form.mode === 'interval'}  onClick={() => set('mode','interval')}  icon={Calendar}    label="Intervalle" />
-          <ModeTab active={form.mode === 'recurring'} onClick={() => set('mode','recurring')} icon={RefreshCw}   label="Récurrent" />
+          <ModeTab active={form.mode === 'single'}    onClick={() => set('mode','single')}    icon={CalendarOff} label={t('calendar.mode_unique')} />
+          <ModeTab active={form.mode === 'interval'}  onClick={() => set('mode','interval')}  icon={Calendar}    label={t('calendar.mode_interval')} />
+          <ModeTab active={form.mode === 'recurring'} onClick={() => set('mode','recurring')} icon={RefreshCw}   label={t('calendar.mode_recurring')} />
         </div>
 
         <div style={{ padding: 'clamp(14px,4vw,24px)', display: 'flex', flexDirection: 'column', gap: 14 }}>
 
           {form.mode === 'single' && (
-            <Field label="Date à bloquer">
+            <Field label={t('calendar.block_date')}>
               <input type="date" value={form.date} onChange={e => set('date', e.target.value)} style={inp} onFocus={fo} onBlur={bl} />
             </Field>
           )}
 
           {form.mode === 'interval' && (
             <div className="interval-grid">
-              <Field label="Du">
+              <Field label={t('calendar.from')}>
                 <input type="date" value={form.date_from} onChange={e => set('date_from', e.target.value)} style={inp} onFocus={fo} onBlur={bl} />
               </Field>
-              <Field label="Au">
+              <Field label={t('calendar.to')}>
                 <input type="date" value={form.date_to} min={form.date_from} onChange={e => set('date_to', e.target.value)} style={inp} onFocus={fo} onBlur={bl} />
               </Field>
             </div>
@@ -118,29 +124,33 @@ export default function BlockedDateForm({ form, setForm, handleBlock, submitting
 
           {form.mode === 'recurring' && (
             <div className="recurring-grid">
-              <Field label="Jour">
+              <Field label={t('calendar.day')}>
                 <select value={form.weekday} onChange={e => set('weekday', e.target.value)} style={{ ...inp, cursor: 'pointer', paddingRight: 8 }}>
                   {WEEKDAYS.map(d => <option key={d.value} value={d.value}>{d.label}</option>)}
                 </select>
               </Field>
-              <Field label="À partir du">
+              <Field label={t('calendar.start_from')}>
                 <input type="date" value={form.date_from} onChange={e => set('date_from', e.target.value)} style={inp} onFocus={fo} onBlur={bl} />
               </Field>
-              <Field label="Jusqu'au (optionnel)">
+              <Field label={t('calendar.until_optional')}>
                 <input type="date" value={form.until} min={form.date_from} onChange={e => set('until', e.target.value)} style={inp} onFocus={fo} onBlur={bl} />
               </Field>
             </div>
           )}
 
-          <Field label="Raison (optionnel)">
-            <input type="text" placeholder="Ex: Fermeture, Événement privé…" value={form.reason || ''} onChange={e => set('reason', e.target.value)} style={inp} onFocus={fo} onBlur={bl} />
+          <Field label={t('calendar.block_reason')}>
+            <input type="text" placeholder={t('calendar.reason_placeholder')} value={form.reason || ''} onChange={e => set('reason', e.target.value)} style={inp} onFocus={fo} onBlur={bl} />
           </Field>
 
           {preview.length > 0 && (
             <div style={{ padding: '10px 13px', background: '#ffffff', borderLeft: `3px solid ${GOLD}`, fontSize: 13, fontWeight: 700, color: '#a8834e', lineHeight: 1.6 }}>
               {preview.length === 1
-                ? `1 date : ${new Date(preview[0]).toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'long', year:'numeric' })}`
-                : `${preview.length} dates — du ${new Date(preview[0]).toLocaleDateString('fr-FR', { day:'numeric', month:'short' })} au ${new Date(preview[preview.length-1]).toLocaleDateString('fr-FR', { day:'numeric', month:'short', year:'numeric' })}`
+                ? t('calendar.one_date_selected', { date: fmt(preview[0], { weekday:'long', day:'numeric', month:'long', year:'numeric' }) })
+                : t('calendar.multiple_dates_selected', { 
+                    count: preview.length, 
+                    from: fmt(preview[0], { day:'numeric', month:'short' }), 
+                    to: fmt(preview[preview.length-1], { day:'numeric', month:'short', year:'numeric' }) 
+                  })
               }
             </div>
           )}
@@ -162,11 +172,11 @@ export default function BlockedDateForm({ form, setForm, handleBlock, submitting
             onMouseLeave={e => { e.currentTarget.style.background = DARK }}
           >
             <CalendarOff size={15} strokeWidth={2.5} />
-            {submitting ? 'Enregistrement…' : preview.length > 1 ? `Bloquer ${preview.length} dates` : 'Bloquer la date'}
+            {submitting ? t('calendar.registering') : preview.length > 1 ? t('calendar.block_count_dates', { count: preview.length }) : t('calendar.block_date')}
           </button>
 
         </div>
       </div>
     </>
   )
-}
+}

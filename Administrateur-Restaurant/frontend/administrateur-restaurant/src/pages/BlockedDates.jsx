@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { FileDown, Trash2 } from 'lucide-react'
 import useBlockedDates from '../hooks/BlockedDates/useBlockedDates'
 import BlockedDateForm from '../components/BlockedDates/BlockedDateForm'
@@ -38,6 +39,7 @@ function Btn({ children, onClick, primary, disabled, icon: Icon }) {
 }
 
 function BulkBar({ count, onUnblock, onClear }) {
+  const { t } = useTranslation()
   const [hovDel, setHovDel] = useState(false)
   return (
     <div style={{
@@ -58,7 +60,7 @@ function BulkBar({ count, onUnblock, onClear }) {
         fontSize: 12, fontWeight: 900, padding: '0 7px', flexShrink: 0,
       }}>{count}</span>
       <span className="bulk-label" style={{ fontSize: 12, fontWeight: 700, color: '#fff', marginRight: 2 }}>
-        sélectionné{count > 1 ? 's' : ''}
+        {t('calendar.selected_count', { count, plural: count > 1 ? 's' : '' })}
       </span>
 
       <div style={{ width: 1, height: 20, background: DARK, margin: '0 4px', flexShrink: 0 }} />
@@ -74,7 +76,7 @@ function BulkBar({ count, onUnblock, onClear }) {
           transition: 'all 0.15s', flexShrink: 0, minHeight: 34,
         }}>
         <Trash2 size={13} strokeWidth={2.5} />
-        <span className="bulk-label">Débloquer</span>
+        <span className="bulk-label">{t('calendar.unblock_date')}</span>
       </button>
 
       <button onClick={onClear}
@@ -88,13 +90,15 @@ function BulkBar({ count, onUnblock, onClear }) {
         onMouseLeave={e => e.currentTarget.style.color = '#fff'}
       >
         <span style={{ fontSize: 16, lineHeight: 1 }}>✕</span>
-        <span className="bulk-label">Désélectionner</span>
+        <span className="bulk-label">{t('calendar.deselect_all')}</span>
       </button>
     </div>
   )
 }
 
 export default function BlockedDates() {
+  const { t, i18n } = useTranslation()
+  const lang = i18n.language === 'ar' ? 'ar-MA' : i18n.language === 'fr' ? 'fr-FR' : 'en-US'
   const {
     blockedDates, loading, error,
     form, setForm, submitting,
@@ -107,9 +111,9 @@ export default function BlockedDates() {
 
   async function handleBulkUnblock() {
     const ok = await confirm({
-      title:        'Débloquer la sélection',
-      message:      `Voulez-vous débloquer ${selectedDates.length} date${selectedDates.length > 1 ? 's' : ''} ?`,
-      confirmLabel: 'Débloquer', type: 'danger',
+      title:        t('calendar.block_selection'),
+      message:      t('calendar.unblock_selection_msg', { count: selectedDates.length, plural: selectedDates.length > 1 ? 's' : '' }),
+      confirmLabel: t('calendar.unblock_date'), type: 'danger',
     })
     if (!ok) return
     const h = { 'Content-Type': 'application/json', 'Accept': 'application/json', 'Authorization': `Bearer ${getToken()}` }
@@ -118,9 +122,9 @@ export default function BlockedDates() {
         fetch(`http://localhost:8000/api/blocked-dates/${date}`, { method: 'DELETE', headers: h })
       ))
       setBlockedDates(prev => prev.filter(d => !selectedDates.includes(d.date)))
-      toast(`${selectedDates.length} date${selectedDates.length > 1 ? 's débloquées' : ' débloquée'}`, 'warning')
+      toast(t('calendar.dates_success_unblocked', { count: selectedDates.length }), 'warning')
       setSelectedDates([])
-    } catch { toast('Erreur lors du déblocage', 'error') }
+    } catch { toast(t('calendar.error_unblocking'), 'error') }
   }
 
   async function handleExport() {
@@ -133,33 +137,33 @@ export default function BlockedDates() {
       })
       const { jsPDF } = window.jspdf
       const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' })
-      const dateStr = new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
+      const dateStr = new Date().toLocaleDateString(lang, { day: 'numeric', month: 'long', year: 'numeric' })
       doc.setFillColor(43,33,24); doc.rect(0,0,210,32,'F')
       doc.setFont('helvetica','bold'); doc.setFontSize(18); doc.setTextColor(200,169,126)
       doc.text('TableBooking.ma',20,14)
-      doc.setFontSize(9); doc.setTextColor(255,255,255); doc.text('Dates bloquées',20,22)
+      doc.setFontSize(9); doc.setTextColor(255,255,255); doc.text(t('calendar.blocked_dates_list'),20,22)
       doc.setTextColor(200,169,126); doc.setFontSize(8); doc.text(dateStr,190,22,{align:'right'})
       doc.setTextColor(43,33,24); doc.setFontSize(20); doc.setFont('helvetica','bold')
-      doc.text('Dates bloquées',20,48)
+      doc.text(t('calendar.blocked_dates_list'),20,48)
       doc.setFontSize(10); doc.setTextColor(200,169,126)
-      doc.text(`${blockedDates.length} date${blockedDates.length!==1?'s':''} bloquée${blockedDates.length!==1?'s':''}`,20,56)
+      doc.text(t('calendar.dates_success_blocked', { count: blockedDates.length }),20,56)
       doc.setDrawColor(43,33,24); doc.setLineWidth(0.5); doc.line(20,61,190,61)
       let y = 70
       doc.setFillColor(43,33,24); doc.rect(20,y,170,9,'F')
       doc.setTextColor(200,169,126); doc.setFontSize(8); doc.setFont('helvetica','bold')
-      doc.text('DATE BLOQUÉE',24,y+6); y += 9
+      doc.text(t('calendar.blocked_date').toUpperCase(),24,y+6); y += 9
       blockedDates.forEach((d,i) => {
         if (y>270) { doc.addPage(); y=20 }
         doc.setFillColor(i%2===0?255:250,i%2===0?255:248,i%2===0?255:245); doc.rect(20,y,170,9,'F')
         doc.setDrawColor(236,230,222); doc.line(20,y+9,190,y+9)
-        const label = d.date ? new Date(d.date).toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'}) : '—'
+        const label = d.date ? new Date(d.date).toLocaleDateString(lang,{weekday:'long',day:'numeric',month:'long',year:'numeric'}) : '—'
         doc.setTextColor(43,33,24); doc.setFontSize(9); doc.setFont('helvetica','normal')
         doc.text(label.charAt(0).toUpperCase()+label.slice(1),24,y+6); y+=9
       })
       const pH = doc.internal.pageSize.height
       doc.setFillColor(200,169,126); doc.rect(0,pH-10,210,10,'F')
       doc.setTextColor(43,33,24); doc.setFontSize(7); doc.setFont('helvetica','bold')
-      doc.text('TableBooking.ma — Rapport généré automatiquement',20,pH-4)
+      doc.text('TableBooking.ma',20,pH-4)
       doc.text(dateStr,190,pH-4,{align:'right'})
       doc.save(`dates_bloquees_${new Date().toISOString().slice(0,10)}.pdf`)
     } catch(e) { console.error(e) } finally { setExporting(false) }
@@ -195,7 +199,7 @@ export default function BlockedDates() {
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, marginBottom: 8, flexWrap: 'wrap' }}>
             <div style={{ minWidth: 0, flex: 1 }}>
               <h1 style={{ margin: 0, fontSize: 'clamp(20px,5vw,36px)', fontWeight: 900, color: DARK, letterSpacing: '-1.5px', lineHeight: 1 }}>
-                Dates bloquées
+                {t('calendar.blocked_dates_list')}
               </h1>
               <p className="page-subtitle" style={{ margin: '6px 0 0', fontSize: 12, fontWeight: 700, color: GOLD_DK }}>
                
@@ -203,11 +207,12 @@ export default function BlockedDates() {
             </div>
             <div style={{ display: 'flex', gap: 3, flexShrink: 0 }}>
               <Btn icon={FileDown} primary onClick={handleExport} disabled={exporting}>
-                {exporting ? 'Génération…' : 'Exporter PDF'}
+                {exporting ? t('exporting') : t('export_pdf')}
               </Btn>
             </div>
           </div>
         </FadeUp>
+
 
         <FadeUp delay={10}>
           <div style={{ height: 4, background: DARK, margin: '16px 0 28px' }} />
@@ -229,7 +234,7 @@ export default function BlockedDates() {
           <div className="bd-layout">
             <div className="bd-form-sticky" style={{ minWidth: 0 }}>
               <h2 style={{ margin: '0 0 5px', fontSize: 'clamp(15px,2.5vw,22px)', fontWeight: 900, color: DARK, letterSpacing: '-0.8px' }}>
-                Bloquer une date
+                {t('calendar.add_blocked_date')}
               </h2>
               <p className="page-subtitle" style={{ margin: '0 0 16px', fontSize: 12, fontWeight: 700, color: GOLD_DK }}>
                 
@@ -240,7 +245,7 @@ export default function BlockedDates() {
               <div className="bd-mobile-divider" style={{ height: 4, background: DARK, margin: '32px 0 28px' }} />
               <div style={{ marginBottom: 16, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
                 <h2 style={{ margin: 0, fontSize: 'clamp(15px,2.5vw,22px)', fontWeight: 900, color: DARK, letterSpacing: '-0.8px' }}>
-                  Dates bloquées
+                  {t('calendar.blocked_dates_list')}
                 </h2>
                 <span style={{ padding: '4px 10px', background: DARK, fontSize: 11, fontWeight: 900, color: GOLD, letterSpacing: '0.05em', flexShrink: 0 }}>
                   {blockedDates.length}

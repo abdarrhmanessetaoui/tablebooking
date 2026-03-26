@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Trash2, CalendarOff, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react'
 
 const DARK      = '#2b2118'
@@ -8,27 +9,6 @@ const BORDER    = '#2b2118'
 const CREAM     = '#ffffff'
 
 const PAGE_SIZE = 10
-
-function fmt(d) {
-  if (!d) return '—'
-  const dt = new Date(d + 'T00:00:00')
-  if (isNaN(dt)) return d
-  const s = dt.toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'long', year:'numeric' })
-  return s.charAt(0).toUpperCase() + s.slice(1)
-}
-
-function fmtShort(d) {
-  if (!d) return '—'
-  const dt = new Date(d + 'T00:00:00')
-  if (isNaN(dt)) return d
-  const s = dt.toLocaleDateString('fr-FR', { day:'numeric', month:'short', year:'numeric' })
-  return s.charAt(0).toUpperCase() + s.slice(1)
-}
-
-function isPast(d) {
-  const today = new Date(); today.setHours(0,0,0,0)
-  return new Date(d + 'T00:00:00') < today
-}
 
 function useIsMobile(breakpoint = 600) {
   const [isMobile, setIsMobile] = useState(
@@ -86,19 +66,42 @@ function PageBtn({ onClick, disabled, active, children }) {
 }
 
 export default function BlockedDateList({ blockedDates, handleUnblock, selectedDates = [], setSelectedDates }) {
+  const { t, i18n } = useTranslation()
+  const lang = i18n.language === 'ar' ? 'ar-MA' : i18n.language === 'fr' ? 'fr-FR' : 'en-US'
   const [page, setPage] = useState(1)
   const isMobile = useIsMobile(600)
   const isXs     = useIsMobile(400)
 
   useEffect(() => { setPage(1) }, [blockedDates?.length])
 
+  function fmt(d) {
+    if (!d) return '—'
+    const dt = new Date(d + 'T00:00:00')
+    if (isNaN(dt)) return d
+    const s = dt.toLocaleDateString(lang, { weekday:'long', day:'numeric', month:'long', year:'numeric' })
+    return s.charAt(0).toUpperCase() + s.slice(1)
+  }
+
+  function fmtShort(d) {
+    if (!d) return '—'
+    const dt = new Date(d + 'T00:00:00')
+    if (isNaN(dt)) return d
+    const s = dt.toLocaleDateString(lang, { day:'numeric', month:'short', year:'numeric' })
+    return s.charAt(0).toUpperCase() + s.slice(1)
+  }
+
+  function isPast(d) {
+    const today = new Date(); today.setHours(0,0,0,0)
+    return new Date(d + 'T00:00:00') < today
+  }
+
   if (!blockedDates || blockedDates.length === 0) {
     return (
       <div style={{ padding: '56px 16px', textAlign: 'center', background: '#fff', border: `4px solid ${BORDER}` }}>
         <CalendarOff size={40} color={DARK} strokeWidth={1.5} style={{ display: 'block', margin: '0 auto 14px' }} />
-        <p style={{ margin: 0, fontSize: 15, fontWeight: 900, color: DARK }}>Aucune date bloquée</p>
+        <p style={{ margin: 0, fontSize: 15, fontWeight: 900, color: DARK }}>{t('calendar.no_blocked_dates')}</p>
         <p style={{ margin: '6px 0 0', fontSize: 12, fontWeight: 600, color: DARK }}>
-          Utilisez le formulaire pour bloquer des dates.
+          {t('calendar.use_form_to_block')}
         </p>
       </div>
     )
@@ -166,10 +169,10 @@ export default function BlockedDateList({ blockedDates, handleUnblock, selectedD
         {selectedDates.length > 0 && !allSelected && (
           <div style={{ padding: '9px 14px', background: '#ffffff', borderBottom: `1px solid #e8e0d6`, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, flexWrap: 'wrap' }}>
             <span style={{ fontSize: 12, fontWeight: 700, color: GOLD_DARK }}>
-              {selectedDates.length} sélectionné{selectedDates.length > 1 ? 's' : ''}
+              {t('calendar.selected_count', { count: selectedDates.length, plural: selectedDates.length > 1 ? 's' : '' })}
             </span>
             <button onClick={() => setSelectedDates(blockedDates.map(d => d.date))} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 800, color: DARK, textDecoration: 'underline', fontFamily: 'inherit', padding: 0 }}>
-              Tout sélectionner ({blockedDates.length})
+              {t('calendar.select_all_with_count', { count: blockedDates.length })}
             </button>
           </div>
         )}
@@ -178,10 +181,10 @@ export default function BlockedDateList({ blockedDates, handleUnblock, selectedD
         {allSelected && blockedDates.length > PAGE_SIZE && (
           <div style={{ padding: '9px 14px', background: '#ffffff', borderBottom: `1px solid #b8ddb8`, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, flexWrap: 'wrap' }}>
             <span style={{ fontSize: 12, fontWeight: 700, color: '#2d6a2d' }}>
-              {blockedDates.length} dates sélectionnées
+              {t('calendar.dates_success_blocked', { count: blockedDates.length })}
             </span>
             <button onClick={() => setSelectedDates([])} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 800, color: '#2d6a2d', textDecoration: 'underline', fontFamily: 'inherit', padding: 0 }}>
-              Désélectionner tout
+              {t('calendar.deselect_all')}
             </button>
           </div>
         )}
@@ -193,8 +196,8 @@ export default function BlockedDateList({ blockedDates, handleUnblock, selectedD
           padding: '10px 12px', background: DARK, alignItems: 'center', gap: 8
         }}>
           <Checkbox checked={pageAllSel} indeterminate={pageSomeSel} onChange={togglePage} />
-          <span style={{ fontSize: 9, fontWeight: 900, color: GOLD, letterSpacing: '0.2em', textTransform: 'uppercase' }}>Date bloquée</span>
-          {!isMobile && <span style={{ fontSize: 9, fontWeight: 900, color: GOLD, letterSpacing: '0.2em', textTransform: 'uppercase' }}>Raison</span>}
+          <span style={{ fontSize: 9, fontWeight: 900, color: GOLD, letterSpacing: '0.2em', textTransform: 'uppercase' }}>{t('calendar.blocked_date')}</span>
+          {!isMobile && <span style={{ fontSize: 9, fontWeight: 900, color: GOLD, letterSpacing: '0.2em', textTransform: 'uppercase' }}>{t('calendar.block_reason')}</span>}
           {!isMobile && <span style={{ fontSize: 9, fontWeight: 900, color: GOLD, letterSpacing: '0.2em', textTransform: 'uppercase' }}>Action</span>}
         </div>
 
@@ -252,7 +255,7 @@ export default function BlockedDateList({ blockedDates, handleUnblock, selectedD
                     letterSpacing: '0.12em', textTransform: 'uppercase',
                     background: '#ffffff', padding: '1px 6px',
                   }}>
-                    Passée
+                    {t('calendar.past')}
                   </span>
                 )}
               </div>
@@ -285,7 +288,7 @@ export default function BlockedDateList({ blockedDates, handleUnblock, selectedD
                   }}
                   onMouseEnter={e => e.currentTarget.style.opacity = 0.85}
                   onMouseLeave={e => e.currentTarget.style.opacity = 1}
-                  title="Débloquer">
+                  title={t('calendar.unblock_date')}>
                   <Trash2 size={14} strokeWidth={2.5} />
                 </button>
               </div>
