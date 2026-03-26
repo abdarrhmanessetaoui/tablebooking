@@ -17,7 +17,10 @@ export function localToday() {
   )
 }
 
+import { useTranslation } from 'react-i18next'
+
 export default function useTablesTimeline(initialDate = null) {
+  const { t } = useTranslation()
   const [date,     setDate]     = useState(initialDate ?? localToday())
   const [timeline, setTimeline] = useState([])
   const [allOH,    setAllOH]    = useState([])
@@ -49,7 +52,7 @@ export default function useTablesTimeline(initialDate = null) {
       const data = await res.json()
       setTimeline(Array.isArray(data) ? data : [])
     } catch {
-      setError('Impossible de charger le planning.')
+      setError(t('tables_module.error_loading'))
       setTimeline([])
     } finally {
       setLoading(false)

@@ -2,11 +2,11 @@ import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Trash2, CalendarOff, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react'
 
-const DARK      = '#2b2118'
-const GOLD      = '#c8a97e'
+const DARK = '#2b2118'
+const GOLD = '#c8a97e'
 const GOLD_DARK = '#a8834e'
-const BORDER    = '#2b2118'
-const CREAM     = '#ffffff'
+const BORDER = '#2b2118'
+const CREAM = '#ffffff'
 
 const PAGE_SIZE = 10
 
@@ -33,7 +33,7 @@ function Checkbox({ checked, indeterminate, onChange }) {
     }}>
       {checked && (
         <svg width="9" height="7" viewBox="0 0 10 8" fill="none">
-          <path d="M1 4L3.5 6.5L9 1" stroke={GOLD} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
+          <path d="M1 4L3.5 6.5L9 1" stroke={GOLD} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
       )}
       {indeterminate && !checked && (
@@ -70,7 +70,7 @@ export default function BlockedDateList({ blockedDates, handleUnblock, selectedD
   const lang = i18n.language === 'ar' ? 'ar-MA' : i18n.language === 'fr' ? 'fr-FR' : 'en-US'
   const [page, setPage] = useState(1)
   const isMobile = useIsMobile(600)
-  const isXs     = useIsMobile(400)
+  const isXs = useIsMobile(400)
 
   useEffect(() => { setPage(1) }, [blockedDates?.length])
 
@@ -78,7 +78,7 @@ export default function BlockedDateList({ blockedDates, handleUnblock, selectedD
     if (!d) return '—'
     const dt = new Date(d + 'T00:00:00')
     if (isNaN(dt)) return d
-    const s = dt.toLocaleDateString(lang, { weekday:'long', day:'numeric', month:'long', year:'numeric' })
+    const s = dt.toLocaleDateString(lang, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
     return s.charAt(0).toUpperCase() + s.slice(1)
   }
 
@@ -86,12 +86,12 @@ export default function BlockedDateList({ blockedDates, handleUnblock, selectedD
     if (!d) return '—'
     const dt = new Date(d + 'T00:00:00')
     if (isNaN(dt)) return d
-    const s = dt.toLocaleDateString(lang, { day:'numeric', month:'short', year:'numeric' })
+    const s = dt.toLocaleDateString(lang, { day: 'numeric', month: 'short', year: 'numeric' })
     return s.charAt(0).toUpperCase() + s.slice(1)
   }
 
   function isPast(d) {
-    const today = new Date(); today.setHours(0,0,0,0)
+    const today = new Date(); today.setHours(0, 0, 0, 0)
     return new Date(d + 'T00:00:00') < today
   }
 
@@ -108,21 +108,21 @@ export default function BlockedDateList({ blockedDates, handleUnblock, selectedD
   }
 
   const sorted = [...blockedDates].sort((a, b) => {
-    const today = new Date(); today.setHours(0,0,0,0)
+    const today = new Date(); today.setHours(0, 0, 0, 0)
     const aPast = new Date(a.date + 'T00:00:00') < today
     const bPast = new Date(b.date + 'T00:00:00') < today
-    if (!aPast && bPast)  return -1
-    if (aPast  && !bPast) return  1
+    if (!aPast && bPast) return -1
+    if (aPast && !bPast) return 1
     if (!aPast && !bPast) return a.date.localeCompare(b.date)
     return b.date.localeCompare(a.date)
   })
 
-  const total   = Math.ceil(sorted.length / PAGE_SIZE)
-  const safe    = Math.min(page, total)
-  const items   = sorted.slice((safe - 1) * PAGE_SIZE, safe * PAGE_SIZE)
+  const total = Math.ceil(sorted.length / PAGE_SIZE)
+  const safe = Math.min(page, total)
+  const items = sorted.slice((safe - 1) * PAGE_SIZE, safe * PAGE_SIZE)
 
   const allSelected = blockedDates.length > 0 && blockedDates.every(d => selectedDates.includes(d.date))
-  const pageAllSel  = items.length > 0 && items.every(d => selectedDates.includes(d.date))
+  const pageAllSel = items.length > 0 && items.every(d => selectedDates.includes(d.date))
   const pageSomeSel = items.some(d => selectedDates.includes(d.date)) && !pageAllSel
 
   function togglePage() {
@@ -143,7 +143,7 @@ export default function BlockedDateList({ blockedDates, handleUnblock, selectedD
       const p = new Set([1, safe - 1, safe, safe + 1, total].filter(n => n >= 1 && n <= total))
       const s = [...p].sort((a, b) => a - b)
       const result = []
-      s.forEach((n, i) => { if (i > 0 && n - s[i-1] > 1) result.push('…'); result.push(n) })
+      s.forEach((n, i) => { if (i > 0 && n - s[i - 1] > 1) result.push('…'); result.push(n) })
       return result
     }
     if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1)
@@ -203,11 +203,11 @@ export default function BlockedDateList({ blockedDates, handleUnblock, selectedD
 
         {/* Rows */}
         {items.map((d, i) => {
-          const past     = isPast(d.date)
+          const past = isPast(d.date)
           const selected = selectedDates.includes(d.date)
-          const idx      = (safe - 1) * PAGE_SIZE + i
-          const bg       = selected ? '#ffffff' : idx % 2 === 0 ? '#fff' : CREAM
-          const reason   = d.reason || d.notes || d.label || ''   // fallback field names
+          const idx = (safe - 1) * PAGE_SIZE + i
+          const bg = selected ? '#ffffff' : idx % 2 === 0 ? '#fff' : CREAM
+          const reason = d.reason || d.notes || d.label || ''   // fallback field names
 
           return (
             <div key={d.date ?? i} className="bd-row" onClick={() => toggleOne(d.date)}

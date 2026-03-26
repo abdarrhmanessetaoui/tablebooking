@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Plus, Check, X, LayoutGrid } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 
 const DARK   = '#2b2118'
 const GOLD   = '#c8a97e'
@@ -40,6 +41,7 @@ function Field({ label, children }) {
 
 // locations = [{ id, name, color }, ...]  — passed from parent via useTableLocations
 export default function TableForm({ initial = EMPTY, onSave, saving, editingNumber, onCancel, locations = [] }) {
+  const { t } = useTranslation()
   const defaultLocation = initial.location || locations[0]?.name || ''
   const [form, setForm] = useState({ ...EMPTY, ...initial, location: initial.location || defaultLocation })
 
@@ -61,33 +63,33 @@ export default function TableForm({ initial = EMPTY, onSave, saving, editingNumb
       <div style={{ padding: '12px 16px', background: DARK, display: 'flex', alignItems: 'center', gap: 8 }}>
         <LayoutGrid size={14} strokeWidth={2.5} color={GOLD} />
         <span style={{ fontSize: 11, fontWeight: 900, color: GOLD, letterSpacing: '0.12em', textTransform: 'uppercase' }}>
-          {editingNumber ? `Modifier — Table ${editingNumber}` : 'Nouvelle table'}
+          {editingNumber ? t('tables_module.edit_table_name', { number: editingNumber }) : t('tables_module.new_table')}
         </span>
       </div>
 
       <div style={{ padding: 'clamp(14px,4vw,24px)', display: 'flex', flexDirection: 'column', gap: 14 }}>
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-          <Field label="Numéro / Nom">
+          <Field label={t('tables_module.number_label')}>
             <input
-              type="text" value={form.number} placeholder="Ex: T1, Table 4"
+              type="text" value={form.number} placeholder={t('tables_module.number_placeholder')}
               onChange={e => set('number')(e.target.value)}
               style={inp} onFocus={fo} onBlur={bl}
             />
           </Field>
-          <Field label="Capacité (pers.)">
+          <Field label={t('tables_module.capacity_label')}>
             <input
-              type="number" value={form.capacity} placeholder="4"
+              type="number" value={form.capacity} placeholder={t('tables_module.capacity_placeholder', { defaultValue: '4' })}
               onChange={e => set('capacity')(e.target.value)}
               style={inp} onFocus={fo} onBlur={bl}
             />
           </Field>
         </div>
 
-        <Field label="Emplacement">
+        <Field label={t('tables_module.location_label')}>
           {locations.length === 0 ? (
             <div style={{ ...inp, color: 'rgba(43,33,24,0.4)', fontSize: 12, display: 'flex', alignItems: 'center', pointerEvents: 'none' }}>
-              Aucun emplacement — créez-en d'abord
+              {t('tables_module.location_empty')}
             </div>
           ) : (
             <select
@@ -96,7 +98,7 @@ export default function TableForm({ initial = EMPTY, onSave, saving, editingNumb
               style={{ ...inp, cursor: 'pointer' }}
               onFocus={fo} onBlur={bl}
             >
-              <option value="">Choisir un emplacement…</option>
+              <option value="">{t('tables_module.location_choose')}</option>
               {locations.map(l => (
                 <option key={l.id} value={l.name}>{l.name}</option>
               ))}
@@ -121,10 +123,10 @@ export default function TableForm({ initial = EMPTY, onSave, saving, editingNumb
           onMouseLeave={e => { e.currentTarget.style.background = DARK }}
         >
           {saving
-            ? 'Enregistrement…'
+            ? t('tables_module.saving')
             : editingNumber
-              ? <><Check size={15} strokeWidth={2.5} /> Enregistrer les modifications</>
-              : <><Plus size={15} strokeWidth={2.5} /> Ajouter la table</>
+              ? <><Check size={15} strokeWidth={2.5} /> {t('tables_module.save_changes_btn')}</>
+              : <><Plus size={15} strokeWidth={2.5} /> {t('tables_module.add_table_btn')}</>
           }
         </button>
 
@@ -138,7 +140,7 @@ export default function TableForm({ initial = EMPTY, onSave, saving, editingNumb
             onMouseEnter={e => { e.currentTarget.style.background = '#ffffff'; e.currentTarget.style.color = '#a8834e'; e.currentTarget.style.borderColor = GOLD }}
             onMouseLeave={e => { e.currentTarget.style.background = 'none'; e.currentTarget.style.color = DARK; e.currentTarget.style.borderColor = BORDER }}
           >
-            <X size={13} strokeWidth={2.5} /> Annuler la modification
+            <X size={13} strokeWidth={2.5} /> {t('tables_module.cancel_edit')}
           </button>
         )}
       </div>

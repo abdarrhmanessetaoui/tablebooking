@@ -4,6 +4,7 @@ import {
   ToggleLeft, ToggleRight,
   ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight,
 } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 
 const DARK     = '#2b2118'
 const GOLD     = '#c8a97e'
@@ -81,6 +82,7 @@ function PageBtn({ onClick, disabled, active, children }) {
 
 /* ── Single table row — mirrors ServiceRow exactly ── */
 function TableRow({ tbl, isEditing, isSelected, onEdit, onDelete, onToggle, onSelect, idx }) {
+  const { t } = useTranslation()
   const locStyle = LOC_COLORS[tbl.location] || { bg: '#f5f5f5', color: '#666' }
   const bg = isSelected ? '#ffffff' : isEditing ? '#ffffff' : idx % 2 === 0 ? '#fff' : CREAM
 
@@ -113,7 +115,7 @@ function TableRow({ tbl, isEditing, isSelected, onEdit, onDelete, onToggle, onSe
         {/* Name + inactive badge */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8, flexWrap: 'wrap' }}>
           <p style={{ margin: 0, fontSize: 15, fontWeight: 900, color: DARK, letterSpacing: '-0.4px' }}>
-            Table {tbl.number}
+            {t('tables_module.header_table', { defaultValue: 'Table' }).charAt(0).toUpperCase() + t('tables_module.header_table', { defaultValue: 'Table' }).slice(1).toLowerCase()} {tbl.number}
           </p>
           {!tbl.active && (
             <span style={{
@@ -121,7 +123,7 @@ function TableRow({ tbl, isEditing, isSelected, onEdit, onDelete, onToggle, onSe
               fontSize: 9, fontWeight: 900, color: '#999',
               letterSpacing: '0.12em', textTransform: 'uppercase',
             }}>
-              Inactive
+              {t('tables_module.inactive')}
             </span>
           )}
         </div>
@@ -135,7 +137,7 @@ function TableRow({ tbl, isEditing, isSelected, onEdit, onDelete, onToggle, onSe
             whiteSpace: 'nowrap',
           }}>
             <Users size={10} strokeWidth={2.5} color={GOLD} />
-            {tbl.capacity} Personnes max
+            {tbl.capacity} {t('tables_module.persons_max')}
           </span>
           <span style={{
             display: 'inline-flex', alignItems: 'center', gap: 5,
@@ -158,7 +160,7 @@ function TableRow({ tbl, isEditing, isSelected, onEdit, onDelete, onToggle, onSe
         {/* Edit */}
         <button
           onClick={() => onEdit(tbl)}
-          title="Modifier"
+          title={t('tables_module.edit')}
           style={{
             display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
             padding: 6, borderRadius: '50%',
@@ -174,7 +176,7 @@ function TableRow({ tbl, isEditing, isSelected, onEdit, onDelete, onToggle, onSe
         {/* Delete */}
         <button
           onClick={() => onDelete(tbl)}
-          title="Supprimer"
+          title={t('tables_module.delete')}
           style={{
             display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
             padding: 6, borderRadius: '50%',
@@ -194,11 +196,12 @@ function TableRow({ tbl, isEditing, isSelected, onEdit, onDelete, onToggle, onSe
 
 /* Toggle button — top slot of the actions column */
 function ToggleActionBtn({ tbl, onToggle }) {
+  const { t } = useTranslation()
   const isActive = tbl.active
   return (
     <button
       onClick={() => onToggle(tbl)}
-      title={isActive ? 'Désactiver' : 'Activer'}
+      title={isActive ? t('tables_module.deactivate') : t('tables_module.activate')}
       style={{
         display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
         padding: 6, borderRadius: '50%',
@@ -218,6 +221,7 @@ function ToggleActionBtn({ tbl, onToggle }) {
 }
 
 export default function TableList({ tables, editingTbl, onEdit, onDelete, onToggle, selectedTables, setSelectedTables }) {
+  const { t } = useTranslation()
   const [page, setPage] = useState(1)
   const isXs = useIsMobile(400)
 
@@ -227,9 +231,9 @@ export default function TableList({ tables, editingTbl, onEdit, onDelete, onTogg
     return (
       <div style={{ padding: '56px 16px', textAlign: 'center', background: '#fff', border: `4px solid ${BORDER}` }}>
         <LayoutGrid size={40} color={DARK} strokeWidth={1.5} style={{ display: 'block', margin: '0 auto 14px' }} />
-        <p style={{ margin: 0, fontSize: 15, fontWeight: 900, color: DARK }}>Aucune table configurée</p>
+        <p style={{ margin: 0, fontSize: 15, fontWeight: 900, color: DARK }}>{t('tables_module.no_tables_found')}</p>
         <p style={{ margin: '6px 0 0', fontSize: 12, fontWeight: 600, color: DARK }}>
-          Utilisez le formulaire pour ajouter une table.
+          {t('tables_module.use_form_to_add')}
         </p>
       </div>
     )
@@ -273,9 +277,9 @@ export default function TableList({ tables, editingTbl, onEdit, onDelete, onTogg
       {/* Stats bar */}
       <div style={{ display: 'flex', gap: 0, marginBottom: 12 }}>
         {[
-          { label: 'Total',    val: tables.length },
-          { label: 'Actives',  val: activeCnt },
-          { label: 'Capacité', val: `${totalCap} Personnes` },
+          { label: t('tables_module.total'),    val: tables.length },
+          { label: t('tables_module.actives'),  val: activeCnt },
+          { label: t('tables_module.capacity'), val: `${totalCap} ${t('tables_module.persons')}` },
         ].map((s, i) => (
           <div key={i} style={{
             flex: 1,
@@ -296,13 +300,13 @@ export default function TableList({ tables, editingTbl, onEdit, onDelete, onTogg
         {selectedTables.length > 0 && !allSel && (
           <div style={{ padding: '9px 14px', background: '#ffffff', borderBottom: `1px solid #e8e0d6`, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, flexWrap: 'wrap' }}>
             <span style={{ fontSize: 12, fontWeight: 700, color: GOLD_DK }}>
-              {selectedTables.length} sélectionnée{selectedTables.length > 1 ? 's' : ''}
+              {t('tables_module.selected_count', { count: selectedTables.length })}
             </span>
             <button
               onClick={() => setSelectedTables(tables.map(t => t.idx))}
               style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 800, color: DARK, textDecoration: 'underline', fontFamily: 'inherit', padding: 0 }}
             >
-              Tout sélectionner ({tables.length})
+              {t('tables_module.select_all', { count: tables.length })}
             </button>
           </div>
         )}
@@ -310,12 +314,12 @@ export default function TableList({ tables, editingTbl, onEdit, onDelete, onTogg
         {/* All selected banner */}
         {allSel && tables.length > PAGE_SIZE && (
           <div style={{ padding: '9px 14px', background: GREEN_BG, borderBottom: `1px solid #b8ddb8`, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, flexWrap: 'wrap' }}>
-            <span style={{ fontSize: 12, fontWeight: 700, color: GREEN }}>{tables.length} tables sélectionnées</span>
+            <span style={{ fontSize: 12, fontWeight: 700, color: GREEN }}>{t('tables_module.tables_selected_count', { count: tables.length })}</span>
             <button
               onClick={() => setSelectedTables([])}
               style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 800, color: GREEN, textDecoration: 'underline', fontFamily: 'inherit', padding: 0 }}
             >
-              Désélectionner tout
+              {t('tables_module.deselect_all')}
             </button>
           </div>
         )}
@@ -329,10 +333,10 @@ export default function TableList({ tables, editingTbl, onEdit, onDelete, onTogg
             <Checkbox checked={pageAllSel} indeterminate={pageSomeSel} onChange={togglePage} />
           </div>
           <span style={{ fontSize: 9, fontWeight: 900, color: GOLD, letterSpacing: '0.2em', textTransform: 'uppercase' }}>
-            Nom de la table
+            {t('tables_module.table_name_col')}
           </span>
           <span style={{ fontSize: 9, fontWeight: 900, color: GOLD, letterSpacing: '0.2em', textTransform: 'uppercase', paddingRight: 4 }}>
-            Actions
+            {t('tables_module.actions_col')}
           </span>
         </div>
 

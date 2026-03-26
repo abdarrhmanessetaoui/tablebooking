@@ -5,6 +5,7 @@ import {
 } from 'lucide-react'
 import useTablesTimeline from '../../hooks/Tables/useTablesTimeline'
 import { RED } from '../../styles/dashboard/tokens'
+import { useTranslation } from 'react-i18next'
 
 // ─── Design tokens ───────────────────────────────────────────────
 const DARK      = '#2b2118'
@@ -14,10 +15,8 @@ const CREAM     = '#ffffff'
 const BORDER    = 'rgba(43,33,24,0.10)'
 const GREEN     = '#16A34A'
 
-const STATUS = {
-  Confirmed: { bg: '#16A34A', border: '#86efac', text: '#fff', label: 'Confirmée'  },
-  Pending:   { bg: '#b45309', border: '#fcd34d', text: '#fff', label: 'En attente' },
-}
+// We'll update STATUS labels inside the component now, because we need `t`
+// We'll keep a function to get statuses or just do it inline where used.
 
 // ─── CRITICAL: compute today in LOCAL timezone, not UTC ──────────
 // new Date().toISOString() is UTC — in UTC+1/+2 it returns "yesterday"
@@ -109,7 +108,7 @@ function buildLanes(reservations, services) {
 // ─── Mini Calendar ────────────────────────────────────────────────
 // NOTE: today is computed internally from LOCAL date — never trust a prop
 // for correctness, but we still accept value/onChange from outside.
-function MiniCal({ value, onChange }) {
+function MiniCal({ value, onChange, t }) {
   // Always compute today locally — no prop dependency
   const todayISO  = TODAY
   const todayDate = new Date(todayISO + 'T00:00:00')
@@ -196,15 +195,26 @@ function MiniCal({ value, onChange }) {
           onMouseEnter={e => { if (value !== todayISO) e.currentTarget.style.background = '#e8e0d8' }}
           onMouseLeave={e => { if (value !== todayISO) e.currentTarget.style.background = CREAM }}
         >
-          Aujourd'hui
+          {t('tables_module.timeline_today_badge', { defaultValue: "Aujourd'hui" })}
         </button>
       </div>
     </div>
   )
 }
 
+function MiniCalWithRef(props) {
+  const { t } = useTranslation()
+  return <MiniCal {...props} t={t} />
+}
+
+
 // ─── Tooltip ─────────────────────────────────────────────────────
 function Tip({ res, endTime }) {
+  const { t } = useTranslation()
+  const STATUS = {
+    Confirmed: { bg: '#16A34A', border: '#86efac', text: '#fff', label: t('tables_module.confirmed', { defaultValue: 'Confirmée' }) },
+    Pending:   { bg: '#b45309', border: '#fcd34d', text: '#fff', label: t('tables_module.pending', { defaultValue: 'En attente' }) },
+  }
   const sc = STATUS[res.status] ?? STATUS.Pending
   return (
     <div style={{ position: 'absolute', bottom: 'calc(100% + 8px)', left: '50%', transform: 'translateX(-50%)', background: DARK, padding: '10px 14px', zIndex: 9999, pointerEvents: 'none', boxShadow: '0 8px 28px rgba(0,0,0,0.55)', minWidth: 200, maxWidth: 260, fontFamily: "inherit" }}>
@@ -233,6 +243,11 @@ function Tip({ res, endTime }) {
 // ─── Timeline block (desktop) ─────────────────────────────────────
 function Block({ res, laneCount, laneIdx, hS, hE, services, trackPx }) {
   const [hov, setHov] = useState(false)
+  const { t } = useTranslation()
+  const STATUS = {
+    Confirmed: { bg: '#16A34A', border: '#86efac', text: '#fff', label: t('tables_module.confirmed', { defaultValue: 'Confirmée' }) },
+    Pending:   { bg: '#b45309', border: '#fcd34d', text: '#fff', label: t('tables_module.pending', { defaultValue: 'En attente' }) },
+  }
 
   const dur     = getDur(services, res.service)
   const sD      = toDecimal(res.start_time) ?? 0
@@ -306,6 +321,7 @@ function Block({ res, laneCount, laneIdx, hS, hE, services, trackPx }) {
 
 // ─── Desktop timeline row ─────────────────────────────────────────
 function TimelineRow({ row, isLast, hS, hE, hours, totalH, services, isToday, labelW }) {
+  const { t } = useTranslation()
   const hasRes    = row.reservations.length > 0
   const laned     = buildLanes(row.reservations, services)
   const laneCount = laned.length > 0 ? Math.max(...laned.map(r => r.lane)) + 1 : 1
@@ -361,7 +377,7 @@ function TimelineRow({ row, isLast, hS, hE, hours, totalH, services, isToday, la
         {/* Empty label */}
         {!hasRes && (
           <span style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', fontSize: 8, fontWeight: 900, color: 'rgba(43,33,24,0.07)', letterSpacing: '0.35em', textTransform: 'uppercase', pointerEvents: 'none', userSelect: 'none' }}>
-            libre
+            {t('tables_module.free')}
           </span>
         )}
         {/* Blocks */}
@@ -375,6 +391,11 @@ function TimelineRow({ row, isLast, hS, hE, hours, totalH, services, isToday, la
 
 // ─── Mobile: single reservation row ──────────────────────────────
 function ResRow({ res, services }) {
+  const { t } = useTranslation()
+  const STATUS = {
+    Confirmed: { bg: '#16A34A', border: '#86efac', text: '#fff', label: t('tables_module.confirmed', { defaultValue: 'Confirmée' }) },
+    Pending:   { bg: '#b45309', border: '#fcd34d', text: '#fff', label: t('tables_module.pending', { defaultValue: 'En attente' }) },
+  }
   const sc  = STATUS[res.status] ?? STATUS.Pending
   const dur = getDur(services, res.service)
   const sD  = toDecimal(res.start_time) ?? 0
@@ -419,6 +440,7 @@ function ResRow({ res, services }) {
 
 // ─── Mobile: table card ───────────────────────────────────────────
 function TableCard({ row, services }) {
+  const { t } = useTranslation()
   const [open, setOpen] = useState(true)
   const hasRes = row.reservations.length > 0
   const sorted = [...row.reservations].sort(
@@ -439,7 +461,7 @@ function TableCard({ row, services }) {
         {hasRes ? (
           <>
             <span style={{ fontSize: 11, fontWeight: 900, padding: '3px 10px', background: GOLD, color: DARK, borderRadius: 2, flexShrink: 0 }}>
-              {row.reservations.length} rés.
+              {t('tables_module.res_count', { count: row.reservations.length })}
             </span>
             <ChevronDown
               size={16} color={GOLD} strokeWidth={2.5}
@@ -447,7 +469,7 @@ function TableCard({ row, services }) {
             />
           </>
         ) : (
-          <span style={{ fontSize: 11, fontWeight: 700, color: 'rgba(43,33,24,0.35)', fontStyle: 'italic' }}>libre</span>
+          <span style={{ fontSize: 11, fontWeight: 700, color: 'rgba(43,33,24,0.35)', fontStyle: 'italic' }}>{t('tables_module.free')}</span>
         )}
       </button>
 
@@ -461,6 +483,7 @@ function TableCard({ row, services }) {
 
 // ─── Main component ───────────────────────────────────────────────
 export default function TableTimeline({ controlledDate = null }) {
+  const { t } = useTranslation()
   const { timeline, loading, error, date, setDate, allOH, services } = useTablesTimeline()
 
   // IMPORTANT: compute isToday using LOCAL date, never hook's stale UTC string
@@ -528,7 +551,7 @@ export default function TableTimeline({ controlledDate = null }) {
               </span>
               {isToday && (
                 <span style={{ fontSize: 10, fontWeight: 900, color: GOLD, padding: '1px 7px', border: `1px solid ${GOLD}55`, letterSpacing: '0.05em' }}>
-                  Aujourd'hui
+                  {t('tables_module.timeline_today_badge', { defaultValue: "Aujourd'hui" })}
                 </span>
               )}
             </span>
@@ -541,7 +564,7 @@ export default function TableTimeline({ controlledDate = null }) {
           {/* Calendar dropdown */}
           {calOpen && (
             <div>
-              <MiniCal
+              <MiniCalWithRef
                 value={date}
                 onChange={(d) => { setDate(d); setCalOpen(false) }}
               />
@@ -552,7 +575,7 @@ export default function TableTimeline({ controlledDate = null }) {
           {loading && (
             <div style={{ padding: '40px 0', textAlign: 'center' }}>
               <div className="circular-spinner" style={{ width: 28, height: 28, borderRadius: '50%', border: `4px solid ${BORDER}`, borderTopColor: GOLD, animation: 'tl-spin 0.8s linear infinite', margin: '0 auto 10px' }} />
-              <p style={{ margin: 0, fontSize: 12, fontWeight: 700, color: 'rgba(43,33,24,0.3)' }}>Chargement…</p>
+              <p style={{ margin: 0, fontSize: 12, fontWeight: 700, color: 'rgba(43,33,24,0.3)' }}>{t('tables_module.loading')}</p>
             </div>
           )}
 
@@ -560,8 +583,8 @@ export default function TableTimeline({ controlledDate = null }) {
           {!loading && timeline.length === 0 && (
             <div style={{ padding: '40px 20px', textAlign: 'center', background: '#fff', border: `4px solid ${DARK}` }}>
               <LayoutGrid size={28} color={DARK} strokeWidth={1.2} style={{ display: 'block', margin: '0 auto 10px', opacity: 0.12 }} />
-              <p style={{ margin: '0 0 4px', fontSize: 13, fontWeight: 900, color: DARK }}>Aucune table configurée</p>
-              <p style={{ margin: 0, fontSize: 11, fontWeight: 600, color: 'rgba(43,33,24,0.35)' }}>Ajoutez des tables dans la section Tables.</p>
+              <p style={{ margin: '0 0 4px', fontSize: 13, fontWeight: 900, color: DARK }}>{t('tables_module.no_tables_found')}</p>
+              <p style={{ margin: 0, fontSize: 11, fontWeight: 600, color: 'rgba(43,33,24,0.35)' }}>{t('tables_module.timeline_no_tables')}</p>
             </div>
           )}
 
@@ -570,9 +593,9 @@ export default function TableTimeline({ controlledDate = null }) {
             <div style={{ padding: '12px 14px', background: '#ffffff', border: `1px solid rgba(200,169,126,0.3)`, display: 'flex', alignItems: 'center', gap: 10 }}>
               <CalendarDays size={14} color={GOLD_DARK} strokeWidth={2} style={{ flexShrink: 0 }} />
               <p style={{ margin: 0, fontSize: 13, fontWeight: 800, color: DARK }}>
-                Aucune réservation {isToday ? "aujourd'hui" : `le ${formatShort(date)}`}
+                {t('tables_module.timeline_no_reservations', { dateStr: isToday ? t('tables_module.timeline_today') : t('tables_module.timeline_on', { date: formatShort(date) }) })}
                 <span style={{ fontWeight: 600, color: GOLD_DARK, marginLeft: 8 }}>
-                  · {timeline.length} table{timeline.length > 1 ? 's' : ''} libre{timeline.length > 1 ? 's' : ''}
+                  {t('tables_module.timeline_free_tables', { count: timeline.length })}
                 </span>
               </p>
             </div>
@@ -594,7 +617,7 @@ export default function TableTimeline({ controlledDate = null }) {
         <div style={{ display: 'flex', gap: 14, alignItems: 'flex-start' }}>
           {/* Sidebar */}
           <div style={{ width: 196, flexShrink: 0 }}>
-            <MiniCal value={date} onChange={setDate} />
+            <MiniCalWithRef value={date} onChange={setDate} />
             <div style={{ marginTop: 8, padding: '8px 12px', background: DARK, display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
               <CalendarDays size={11} color={GOLD} strokeWidth={2.5} />
               <span style={{ fontSize: 11, fontWeight: 800, color: '#fff', textTransform: 'capitalize', flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
@@ -602,7 +625,7 @@ export default function TableTimeline({ controlledDate = null }) {
               </span>
               {isToday && (
                 <span style={{ fontSize: 9, fontWeight: 900, color: GOLD, letterSpacing: '0.08em', border: `1px solid ${GOLD}55`, padding: '1px 6px', flexShrink: 0 }}>
-                  Aujourd'hui
+                  {t('tables_module.timeline_today_badge', { defaultValue: "Aujourd'hui" })}
                 </span>
               )}
             </div>
@@ -613,15 +636,15 @@ export default function TableTimeline({ controlledDate = null }) {
             {loading && (
               <div style={{ padding: '40px 0', textAlign: 'center' }}>
                 <div className="circular-spinner" style={{ width: 28, height: 28, borderRadius: '50%', border: `4px solid ${BORDER}`, borderTopColor: GOLD, animation: 'tl-spin 0.8s linear infinite', margin: '0 auto 10px' }} />
-                <p style={{ margin: 0, fontSize: 12, fontWeight: 700, color: 'rgba(43,33,24,0.3)' }}>Chargement…</p>
+                <p style={{ margin: 0, fontSize: 12, fontWeight: 700, color: 'rgba(43,33,24,0.3)' }}>{t('tables_module.loading')}</p>
               </div>
             )}
 
             {!loading && timeline.length === 0 && (
               <div style={{ padding: '40px 24px', textAlign: 'center', background: '#fff', border: `4px solid ${DARK}` }}>
                 <LayoutGrid size={28} color={DARK} strokeWidth={1.2} style={{ display: 'block', margin: '0 auto 10px', opacity: 0.12 }} />
-                <p style={{ margin: '0 0 4px', fontSize: 13, fontWeight: 900, color: DARK }}>Aucune table configurée</p>
-                <p style={{ margin: 0, fontSize: 11, fontWeight: 600, color: 'rgba(43,33,24,0.35)' }}>Ajoutez des tables dans la section Tables.</p>
+                <p style={{ margin: '0 0 4px', fontSize: 13, fontWeight: 900, color: DARK }}>{t('tables_module.no_tables_found')}</p>
+                <p style={{ margin: 0, fontSize: 11, fontWeight: 600, color: 'rgba(43,33,24,0.35)' }}>{t('tables_module.timeline_no_tables')}</p>
               </div>
             )}
 
@@ -629,9 +652,9 @@ export default function TableTimeline({ controlledDate = null }) {
               <div style={{ padding: '11px 14px', background: '#ffffff', border: `1px solid rgba(200,169,126,0.28)`, display: 'flex', alignItems: 'center', gap: 9, marginBottom: 2 }}>
                 <CalendarDays size={13} color={GOLD_DARK} strokeWidth={2} style={{ flexShrink: 0 }} />
                 <p style={{ margin: 0, fontSize: 12, fontWeight: 800, color: DARK }}>
-                  Aucune réservation {isToday ? "aujourd'hui" : `le ${formatShort(date)}`}
+                  {t('tables_module.timeline_no_reservations', { dateStr: isToday ? t('tables_module.timeline_today') : t('tables_module.timeline_on', { date: formatShort(date) }) })}
                   <span style={{ fontWeight: 600, color: GOLD_DARK, marginLeft: 8 }}>
-                    · {timeline.length} table{timeline.length > 1 ? 's' : ''} libre{timeline.length > 1 ? 's' : ''}
+                    {t('tables_module.timeline_free_tables', { count: timeline.length })}
                   </span>
                 </p>
               </div>
@@ -644,7 +667,7 @@ export default function TableTimeline({ controlledDate = null }) {
                   <div className="tl-hrow" style={{ display: 'grid', gridTemplateColumns: `${labelW}px 1fr`, background: DARK }}>
                     <div style={{ padding: '7px 10px', borderRight: `1px solid rgba(200,169,126,0.15)`, display: 'flex', alignItems: 'center', gap: 6 }}>
                       <LayoutGrid size={10} color={GOLD} strokeWidth={2.5} />
-                      <span style={{ fontSize: 9, fontWeight: 900, color: GOLD, letterSpacing: '0.14em', textTransform: 'uppercase' }}>Table</span>
+                      <span style={{ fontSize: 9, fontWeight: 900, color: GOLD, letterSpacing: '0.14em', textTransform: 'uppercase' }}>{t('tables_module.header_table', { defaultValue: 'Table' })}</span>
                     </div>
                     <div style={{ position: 'relative', height: 30, overflow: 'hidden' }}>
                       {hours.map((h, i) => {

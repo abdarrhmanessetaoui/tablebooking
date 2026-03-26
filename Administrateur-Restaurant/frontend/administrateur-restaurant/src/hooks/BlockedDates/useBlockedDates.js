@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react'
 import { getToken } from '../../utils/auth'
-import { toast }   from '../../components/ui/Toast'
+import { toast } from '../../components/ui/Toast'
 import { confirm } from '../../components/ui/ConfirmDialog'
 
-const API_GET   = 'http://localhost:8000/api/admin/blocked-dates'
+const API_GET = 'http://localhost:8000/api/admin/blocked-dates'
 const API_WRITE = 'http://localhost:8000/api/blocked-dates'
 
 const headers = () => ({
@@ -13,28 +13,28 @@ const headers = () => ({
 })
 
 const EMPTY_FORM = {
-  mode:      'single',
-  date:      '',
+  mode: 'single',
+  date: '',
   date_from: '',
-  date_to:   '',
-  weekday:   '1',
-  until:     '',
-  reason:    '',
+  date_to: '',
+  weekday: '1',
+  until: '',
+  reason: '',
 }
 
 export default function useBlockedDates() {
   const [blockedDates, setBlockedDates] = useState([])
-  const [loading,      setLoading]      = useState(true)
-  const [error,        setError]        = useState('')
-  const [form,         setForm]         = useState(EMPTY_FORM)
-  const [submitting,   setSubmitting]   = useState(false)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
+  const [form, setForm] = useState(EMPTY_FORM)
+  const [submitting, setSubmitting] = useState(false)
 
   useEffect(() => { fetchBlockedDates() }, [])
 
   const fetchBlockedDates = async () => {
     setLoading(true)
     try {
-      const res  = await fetch(API_GET, { headers: headers() })
+      const res = await fetch(API_GET, { headers: headers() })
       const data = await res.json()
       setBlockedDates(Array.isArray(data) ? data : [])
     } catch {
@@ -63,10 +63,10 @@ export default function useBlockedDates() {
 
     } else if (form.mode === 'recurring') {
       if (!form.date_from) return []
-      const start   = new Date(form.date_from)
-      const end     = form.until ? new Date(form.until) : new Date(new Date().getFullYear() + 2, 11, 31)
+      const start = new Date(form.date_from)
+      const end = form.until ? new Date(form.until) : new Date(new Date().getFullYear() + 2, 11, 31)
       const weekday = parseInt(form.weekday)
-      const cur     = new Date(start)
+      const cur = new Date(start)
       while (cur.getDay() !== weekday) cur.setDate(cur.getDate() + 1)
       while (cur <= end) {
         dates.push(cur.toISOString().slice(0, 10))
@@ -78,17 +78,17 @@ export default function useBlockedDates() {
   }
 
   const handleBlock = async () => {
-    const dates  = getDatesToBlock()
+    const dates = getDatesToBlock()
     const reason = form.reason || null
     if (dates.length === 0) return
 
     if (dates.length > 10) {
       const ok = await confirm({
-        title:        'Bloquer plusieurs dates',
-        message:      `Vous allez bloquer ${dates.length} dates.`,
-        sub:          'Cette action peut prendre un moment.',
+        title: 'Bloquer plusieurs dates',
+        message: `Vous allez bloquer ${dates.length} dates.`,
+        sub: 'Cette action peut prendre un moment.',
         confirmLabel: 'Confirmer',
-        type:         'warning',
+        type: 'warning',
       })
       if (!ok) return
     }
@@ -97,9 +97,9 @@ export default function useBlockedDates() {
     setError('')
     try {
       const res = await fetch(API_WRITE + '/bulk', {
-        method:  'POST',
+        method: 'POST',
         headers: headers(),
-        body:    JSON.stringify({ dates, reason }),
+        body: JSON.stringify({ dates, reason }),
       })
 
       if (!res.ok) {
@@ -107,9 +107,9 @@ export default function useBlockedDates() {
         const added = []
         for (const date of dates) {
           const r = await fetch(API_WRITE, {
-            method:  'POST',
+            method: 'POST',
             headers: headers(),
-            body:    JSON.stringify({ date, reason }),
+            body: JSON.stringify({ date, reason }),
           })
           if (r.ok) added.push(await r.json())
         }
@@ -119,7 +119,7 @@ export default function useBlockedDates() {
             .sort((a, b) => a.date.localeCompare(b.date))
         )
       } else {
-        const data     = await res.json()
+        const data = await res.json()
         const newDates = Array.isArray(data) ? data : data.dates || []
         setBlockedDates(prev =>
           [...prev, ...newDates]
@@ -147,10 +147,10 @@ export default function useBlockedDates() {
       weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
     })
     const ok = await confirm({
-      title:        'Débloquer la date',
-      message:      `Voulez-vous débloquer le ${label} ?`,
+      title: 'Débloquer la date',
+      message: `Voulez-vous débloquer le ${label} ?`,
       confirmLabel: 'Débloquer',
-      type:         'danger',
+      type: 'danger',
     })
     if (!ok) return
     try {

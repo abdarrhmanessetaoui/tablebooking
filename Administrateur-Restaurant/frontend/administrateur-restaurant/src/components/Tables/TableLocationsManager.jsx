@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Plus, Trash2, Pencil, Check, X, MapPin } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 
 const DARK   = '#2b2118'
 const GOLD   = '#c8a97e'
@@ -57,6 +58,7 @@ const inp = {
 // Props: locations, loading, saving, onAdd, onUpdate, onDelete
 // Hook (useTableLocations) is called in Tables.jsx — data flows down as props
 export default function TableLocationsManager({ locations = [], loading, saving, onAdd, onUpdate, onDelete }) {
+  const { t } = useTranslation()
   const [newName,   setNewName]   = useState('')
   const [newColor,  setNewColor]  = useState(PRESET_COLORS[0])
   const [editingId, setEditingId] = useState(null)
@@ -79,7 +81,7 @@ export default function TableLocationsManager({ locations = [], loading, saving,
       <div style={{ padding: '12px 16px', background: DARK, display: 'flex', alignItems: 'center', gap: 8 }}>
         <MapPin size={14} strokeWidth={2.5} color={GOLD} />
         <span style={{ fontSize: 11, fontWeight: 900, color: GOLD, letterSpacing: '0.12em', textTransform: 'uppercase' }}>
-          Emplacements
+          {t('tables_module.locations')}
         </span>
         <span style={{ marginLeft: 'auto', minWidth: 20, height: 20, background: GOLD, color: DARK, fontSize: 11, fontWeight: 900, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 6px' }}>
           {locations.length}
@@ -91,11 +93,11 @@ export default function TableLocationsManager({ locations = [], loading, saving,
         {/* Add new */}
         <div style={{ marginBottom: 16, padding: 14, background: '#ffffff', border: `1px solid rgba(43,33,24,0.1)` }}>
           <p style={{ margin: '0 0 10px', fontSize: 9, fontWeight: 900, color: DARK, letterSpacing: '0.16em', textTransform: 'uppercase' }}>
-            Nouvel emplacement
+            {t('tables_module.new_location')}
           </p>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             <input
-              type="text" placeholder="Ex: Rooftop, Jardin, VIP…"
+              type="text" placeholder={t('tables_module.location_placeholder')}
               value={newName} onChange={e => setNewName(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && onAdd(newName, newColor, () => setNewName(''))}
               style={inp}
@@ -114,17 +116,17 @@ export default function TableLocationsManager({ locations = [], loading, saving,
               }}
             >
               <Plus size={13} strokeWidth={2.5} />
-              {saving ? 'Enregistrement…' : "Ajouter l'emplacement"}
+              {saving ? t('tables_module.saving') : t('tables_module.add_location')}
             </button>
           </div>
         </div>
 
         {/* List */}
         {loading ? (
-          <p style={{ fontSize: 12, fontWeight: 700, color: DARK, textAlign: 'center', padding: '20px 0' }}>Chargement…</p>
+          <p style={{ fontSize: 12, fontWeight: 700, color: DARK, textAlign: 'center', padding: '20px 0' }}>{t('tables_module.loading_tables')}</p>
         ) : locations.length === 0 ? (
           <p style={{ fontSize: 12, fontWeight: 700, color: 'rgba(43,33,24,0.4)', textAlign: 'center', padding: '20px 0' }}>
-            Aucun emplacement — ajoutez-en un ci-dessus.
+            {t('tables_module.no_locations')}
           </p>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
@@ -144,7 +146,7 @@ export default function TableLocationsManager({ locations = [], loading, saving,
                       />
                       <ColorPicker value={editColor} onChange={setEditColor} />
                     </div>
-                    <button onClick={saveEdit} disabled={!editName.trim() || saving} title="Enregistrer"
+                    <button onClick={saveEdit} disabled={!editName.trim() || saving} title={t('tables_module.save_changes_btn')}
                       style={{
                         padding: 6, borderRadius: '50%',
                         background: '#16A34A', border: 'none', color: '#fff',
@@ -157,7 +159,7 @@ export default function TableLocationsManager({ locations = [], loading, saving,
                     >
                       <Check size={14} strokeWidth={2.5} />
                     </button>
-                    <button onClick={cancelEdit} title="Annuler"
+                    <button onClick={cancelEdit} title={t('tables_module.cancel_edit')}
                       style={{
                         padding: 6, borderRadius: '50%',
                         background: DARK, border: 'none', color: '#fff',
@@ -174,7 +176,7 @@ export default function TableLocationsManager({ locations = [], loading, saving,
                   <>
                     <span style={{ width: 12, height: 12, borderRadius: '50%', background: loc.color, flexShrink: 0 }} />
                     <span style={{ flex: 1, fontSize: 13, fontWeight: 700, color: DARK }}>{loc.name}</span>
-                    <button onClick={() => startEdit(loc)} title="Modifier"
+                    <button onClick={() => startEdit(loc)} title={t('tables_module.edit')}
                       style={{
                         padding: 6, borderRadius: '50%',
                         background: GOLD, border: 'none', color: '#fff',
@@ -186,7 +188,7 @@ export default function TableLocationsManager({ locations = [], loading, saving,
                     >
                       <Pencil size={14} strokeWidth={2.5} />
                     </button>
-                    <button onClick={() => onDelete(loc)} title="Supprimer"
+                    <button onClick={() => onDelete(loc)} title={t('tables_module.delete')}
                       style={{
                         padding: 6, borderRadius: '50%',
                         background: '#DC2626', border: 'none', color: '#fff',

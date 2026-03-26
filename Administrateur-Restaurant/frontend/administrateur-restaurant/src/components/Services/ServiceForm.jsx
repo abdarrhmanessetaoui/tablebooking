@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Plus, Check, X, Utensils } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 
 const DARK    = '#2b2118'
 const GOLD    = '#c8a97e'
@@ -7,16 +8,6 @@ const GOLD_DK = '#a8834e'
 const BORDER  = '#2b2118'
 
 const EMPTY = { name: '', price: '', capacity: '', duration: '', available_days: [0,1,2,3,4,5,6] }
-
-const DAYS = [
-  { idx: 0, short: 'Dim', full: 'Dimanche' },
-  { idx: 1, short: 'Lun', full: 'Lundi' },
-  { idx: 2, short: 'Mar', full: 'Mardi' },
-  { idx: 3, short: 'Mer', full: 'Mercredi' },
-  { idx: 4, short: 'Jeu', full: 'Jeudi' },
-  { idx: 5, short: 'Ven', full: 'Vendredi' },
-  { idx: 6, short: 'Sam', full: 'Samedi' },
-]
 
 const inp = {
   padding: '12px 14px',
@@ -50,6 +41,17 @@ function Field({ label, children }) {
 }
 
 function DayPicker({ value = [0,1,2,3,4,5,6], onChange }) {
+  const { t } = useTranslation()
+  const DAYS = [
+    { idx: 0, short: t('services_module.dim_short'), full: t('services_module.dim_full') },
+    { idx: 1, short: t('services_module.lun_short'), full: t('services_module.lun_full') },
+    { idx: 2, short: t('services_module.mar_short'), full: t('services_module.mar_full') },
+    { idx: 3, short: t('services_module.mer_short'), full: t('services_module.mer_full') },
+    { idx: 4, short: t('services_module.jeu_short'), full: t('services_module.jeu_full') },
+    { idx: 5, short: t('services_module.ven_short'), full: t('services_module.ven_full') },
+    { idx: 6, short: t('services_module.sam_short'), full: t('services_module.sam_full') },
+  ]
+
   function toggle(idx) {
     if (value.includes(idx)) {
       if (value.length === 1) return  // keep at least 1
@@ -61,7 +63,7 @@ function DayPicker({ value = [0,1,2,3,4,5,6], onChange }) {
 
   return (
     <div>
-      <Label>Jours disponibles</Label>
+      <Label>{t('services_module.available_days')}</Label>
       <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', marginTop: 2 }}>
         {DAYS.map(d => {
           const active = value.includes(d.idx)
@@ -94,8 +96,8 @@ function DayPicker({ value = [0,1,2,3,4,5,6], onChange }) {
       </div>
       <p style={{ margin: '6px 0 0', fontSize: 10, fontWeight: 700, color: GOLD_DK }}>
         {value.length === 7
-          ? 'Disponible tous les jours'
-          : `Disponible ${value.length} jour${value.length > 1 ? 's' : ''} / semaine — ${value.map(i => DAYS[i].full).join(', ')}`
+          ? t('services_module.available_every_day')
+          : t('services_module.available_days_count', { count: value.length, days: value.map(i => DAYS[i].full).join(', ') })
         }
       </p>
     </div>
@@ -103,6 +105,7 @@ function DayPicker({ value = [0,1,2,3,4,5,6], onChange }) {
 }
 
 export default function ServiceForm({ initial = EMPTY, onSave, saving, editingName, onCancel }) {
+  const { t } = useTranslation()
   const [form, setForm] = useState({ ...EMPTY, ...initial })
 
   // Re-sync form whenever the edited service changes (or editing starts/stops)
@@ -134,31 +137,31 @@ export default function ServiceForm({ initial = EMPTY, onSave, saving, editingNa
       <div style={{ padding: '12px 16px', background: DARK, display: 'flex', alignItems: 'center', gap: 8 }}>
         <Utensils size={14} strokeWidth={2.5} color={GOLD} />
         <span style={{ fontSize: 11, fontWeight: 900, color: GOLD, letterSpacing: '0.12em', textTransform: 'uppercase' }}>
-          {editingName ? `Modifier — ${editingName}` : 'Nouveau service'}
+          {editingName ? t('services_module.edit_service_name', { name: editingName }) : t('services_module.new_service')}
         </span>
       </div>
 
       <div style={{ padding: 'clamp(14px,4vw,24px)', display: 'flex', flexDirection: 'column', gap: 14 }}>
 
-        <Field label="Nom du service">
-          <input type="text" value={form.name} placeholder="Ex: Couscous du Vendredi"
+        <Field label={t('services_module.service_name_label')}>
+          <input type="text" value={form.name} placeholder={t('services_module.service_name_placeholder')}
             onChange={e => set('name')(e.target.value)}
             style={inp} onFocus={fo} onBlur={bl}
           />
         </Field>
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-          <Field label="Prix (dh)">
+          <Field label={t('services_module.price_label')}>
             <input type="number" value={form.price} placeholder="0"
               onChange={e => set('price')(e.target.value)} style={inp} onFocus={fo} onBlur={bl} />
           </Field>
-          <Field label="Capacité (pers.)">
+          <Field label={t('services_module.capacity_label')}>
             <input type="number" value={form.capacity} placeholder="15"
               onChange={e => set('capacity')(e.target.value)} style={inp} onFocus={fo} onBlur={bl} />
           </Field>
         </div>
 
-        <Field label="Durée (min)">
+        <Field label={t('services_module.duration_label')}>
           <input type="number" value={form.duration} placeholder="60"
             onChange={e => set('duration')(e.target.value)} style={inp} onFocus={fo} onBlur={bl} />
         </Field>
@@ -185,10 +188,10 @@ export default function ServiceForm({ initial = EMPTY, onSave, saving, editingNa
           onMouseEnter={e => { if (valid && !saving) e.currentTarget.style.background = '#3d2d1e' }}
           onMouseLeave={e => { e.currentTarget.style.background = DARK }}
         >
-          {saving ? 'Enregistrement…'
+          {saving ? t('services_module.saving')
             : editingName
-              ? <><Check size={15} strokeWidth={2.5} /> Enregistrer les modifications</>
-              : <><Plus size={15} strokeWidth={2.5} /> Ajouter le service</>
+              ? <><Check size={15} strokeWidth={2.5} /> {t('services_module.save_changes_btn')}</>
+              : <><Plus size={15} strokeWidth={2.5} /> {t('services_module.add_service_btn')}</>
           }
         </button>
 
@@ -202,7 +205,7 @@ export default function ServiceForm({ initial = EMPTY, onSave, saving, editingNa
             onMouseEnter={e => { e.currentTarget.style.background = '#ffffff'; e.currentTarget.style.color = GOLD_DK; e.currentTarget.style.borderColor = GOLD }}
             onMouseLeave={e => { e.currentTarget.style.background = 'none'; e.currentTarget.style.color = DARK; e.currentTarget.style.borderColor = BORDER }}
           >
-            <X size={13} strokeWidth={2.5} /> Annuler la modification
+            <X size={13} strokeWidth={2.5} /> {t('services_module.cancel_edit')}
           </button>
         )}
 

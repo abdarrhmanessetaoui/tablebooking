@@ -5,6 +5,7 @@ import Spinner  from '../components/Dashboard/Spinner'
 import ServiceForm from '../components/Services/ServiceForm'
 import ServiceList from '../components/Services/ServiceList'
 import useServices  from '../hooks/Services/useServices'
+import { useTranslation } from 'react-i18next'
 
 const DARK    = '#2b2118'
 const GOLD    = '#c8a97e'
@@ -36,6 +37,7 @@ function Btn({ children, onClick, primary, disabled, icon: Icon }) {
 }
 
 export default function Services() {
+  const { t, i18n } = useTranslation()
   const {
     services, loading, error,
     editingSvc, setEditingSvc,
@@ -54,29 +56,30 @@ export default function Services() {
       })
       const { jsPDF } = window.jspdf
       const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' })
-      const dateStr = new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
+      const langMap = { ar: 'ar-MA', fr: 'fr-FR', en: 'en-US' }
+      const dateStr = new Date().toLocaleDateString(langMap[i18n.language] || 'en-US', { day: 'numeric', month: 'long', year: 'numeric' })
       doc.setFillColor(43,33,24); doc.rect(0,0,210,32,'F')
       doc.setFont('helvetica','bold'); doc.setFontSize(18); doc.setTextColor(200,169,126)
       doc.text('TableBooking.ma',20,14)
-      doc.setFontSize(9); doc.setTextColor(255,255,255); doc.text('Services',20,22)
+      doc.setFontSize(9); doc.setTextColor(255,255,255); doc.text(t('services_module.title'),20,22)
       doc.setTextColor(200,169,126); doc.setFontSize(8); doc.text(dateStr,190,22,{align:'right'})
-      doc.setTextColor(43,33,24); doc.setFontSize(20); doc.text('Services',20,48)
+      doc.setTextColor(43,33,24); doc.setFontSize(20); doc.text(t('services_module.title'),20,48)
       doc.setFontSize(10); doc.setTextColor(200,169,126)
-      doc.text(`${services.length} service${services.length!==1?'s':''}`,20,56)
+      doc.text(t('services_module.service_count', { count: services.length }),20,56)
       doc.setDrawColor(43,33,24); doc.setLineWidth(0.5); doc.line(20,61,190,61)
       let y = 70
       doc.setFillColor(43,33,24); doc.rect(20,y,170,9,'F')
       doc.setTextColor(200,169,126); doc.setFontSize(8); doc.setFont('helvetica','bold')
-      doc.text('NOM',24,y+6); doc.text('PRIX',90,y+6); doc.text('CAPACITÉ',130,y+6); doc.text('DURÉE',165,y+6)
+      doc.text(t('services_module.name_header'),24,y+6); doc.text(t('services_module.price_header'),90,y+6); doc.text(t('services_module.capacity_header'),130,y+6); doc.text(t('services_module.duration_header'),165,y+6)
       y += 9
       services.forEach((svc,i) => {
         if (y>270) { doc.addPage(); y=20 }
         doc.setFillColor(i%2===0?255:250,i%2===0?255:248,i%2===0?255:245); doc.rect(20,y,170,9,'F')
         doc.setTextColor(43,33,24); doc.setFontSize(9); doc.setFont('helvetica','normal')
         doc.text(svc.name||'—',24,y+6)
-        doc.text(Number(svc.price)>0?`${svc.price} dh`:'Gratuit',90,y+6)
-        doc.text(`${svc.capacity} pers.`,130,y+6)
-        doc.text(`${svc.duration} min`,165,y+6)
+        doc.text(Number(svc.price)>0?`${svc.price} dh`:t('services_module.free'),90,y+6)
+        doc.text(`${svc.capacity} ` + t('pers_short', { defaultValue: 'pers.' }),130,y+6)
+        doc.text(`${svc.duration} ` + t('min', { defaultValue: 'min' }),165,y+6)
         y+=9
       })
       const pH = doc.internal.pageSize.height
@@ -117,7 +120,7 @@ export default function Services() {
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, marginBottom: 8, flexWrap: 'wrap' }}>
             <div style={{ minWidth: 0, flex: 1 }}>
               <h1 style={{ margin: 0, fontSize: 'clamp(20px,5vw,36px)', fontWeight: 900, color: DARK, letterSpacing: '-1.5px', lineHeight: 1 }}>
-                Services
+                {t('services_module.title')}
               </h1>
               <p className="page-subtitle" style={{ margin: '6px 0 0', fontSize: 12, fontWeight: 700, color: GOLD_DK }}>
               
@@ -125,7 +128,7 @@ export default function Services() {
             </div>
             <div style={{ display: 'flex', gap: 3, flexShrink: 0 }}>
               <Btn icon={FileDown} primary onClick={handleExport} disabled={exporting}>
-                {exporting ? 'Génération…' : 'Exporter PDF'}
+                {exporting ? t('services_module.export_generating') : t('services_module.export_pdf')}
               </Btn>
             </div>
           </div>
@@ -149,7 +152,7 @@ export default function Services() {
             {/* LEFT — form */}
             <div className="svc-form-sticky" style={{ minWidth: 0 }}>
               <h2 style={{ margin: '0 0 5px', fontSize: 'clamp(15px,2.5vw,22px)', fontWeight: 900, color: DARK, letterSpacing: '-0.8px' }}>
-                {editingSvc ? 'Modifier le service' : 'Ajouter un service'}
+                {editingSvc ? t('services_module.edit_service_title') : t('services_module.add_service_title')}
               </h2>
               <p className="page-subtitle" style={{ margin: '0 0 16px', fontSize: 12, fontWeight: 700, color: GOLD_DK }}>
             
@@ -180,7 +183,7 @@ export default function Services() {
 
               <div style={{ marginBottom: 16, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
                 <h2 style={{ margin: 0, fontSize: 'clamp(15px,2.5vw,22px)', fontWeight: 900, color: DARK, letterSpacing: '-0.8px' }}>
-                  Services configurés
+                  {t('services_module.configured_services')}
                 </h2>
                 <span style={{ padding: '4px 10px', background: DARK, fontSize: 11, fontWeight: 900, color: GOLD, letterSpacing: '0.05em', flexShrink: 0 }}>
                   {services.length}

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { getToken }  from '../../utils/auth'
 import { toast }     from '../../components/ui/Toast'
 import { confirm }   from '../../components/ui/ConfirmDialog'
+import { useTranslation } from 'react-i18next'
 
 const API = 'http://localhost:8000/api/tables'
 
@@ -12,6 +13,7 @@ const hdrs = () => ({
 })
 
 export default function useTables() {
+  const { t } = useTranslation()
   const [tables,     setTables]     = useState([])
   const [loading,    setLoading]    = useState(true)
   const [error,      setError]      = useState('')
@@ -27,7 +29,7 @@ export default function useTables() {
       const data = await res.json()
       setTables(Array.isArray(data) ? data : [])
     } catch {
-      setError('Impossible de charger les tables.')
+      setError(t('tables_module.error_loading'))
     } finally {
       setLoading(false)
     }
@@ -51,7 +53,7 @@ export default function useTables() {
             ? { ...t, number: form.number, capacity: parseInt(form.capacity), location: form.location }
             : t
         ))
-        toast(`Table ${form.number} modifiée`, 'success')
+        toast(t('tables_module.table_modified', { number: form.number }), 'success')
         setEditingTbl(null)
       } else {
         const res  = await fetch(API, {
@@ -65,11 +67,11 @@ export default function useTables() {
         })
         const data = await res.json()
         setTables(prev => [...prev, data])
-        toast(`Table ${form.number} ajoutée`, 'success')
+        toast(t('tables_module.table_added', { number: form.number }), 'success')
         if (resetForm) resetForm()
       }
     } catch {
-      toast(editingTbl ? 'Impossible de modifier' : "Impossible d'ajouter", 'error')
+      toast(editingTbl ? t('tables_module.error_modifying') : t('tables_module.error_adding'), 'error')
     } finally {
       setSaving(false)
     }
@@ -77,10 +79,10 @@ export default function useTables() {
 
   async function handleDelete(tbl) {
     const ok = await confirm({
-      title:        'Supprimer la table',
-      message:      `Voulez-vous supprimer la table ${tbl.number} ?`,
-      sub:          'Cette action est irréversible.',
-      confirmLabel: 'Supprimer',
+      title:        t('tables_module.delete_table_title'),
+      message:      t('tables_module.delete_table_msg', { number: tbl.number }),
+      sub:          t('tables_module.delete_table_sub'),
+      confirmLabel: t('tables_module.delete'),
       type:         'danger',
     })
     if (!ok) return
@@ -88,9 +90,9 @@ export default function useTables() {
       await fetch(`${API}/${tbl.idx}`, { method: 'DELETE', headers: hdrs() })
       setTables(prev => prev.filter(t => t.idx !== tbl.idx))
       if (editingTbl?.idx === tbl.idx) setEditingTbl(null)
-      toast(`Table ${tbl.number} supprimée`, 'warning')
+      toast(t('tables_module.table_deleted', { number: tbl.number }), 'warning')
     } catch {
-      toast('Impossible de supprimer', 'error')
+      toast(t('tables_module.error_deleting'), 'error')
     }
   }
 
@@ -100,9 +102,9 @@ export default function useTables() {
       setTables(prev => prev.map(t =>
         t.idx === tbl.idx ? { ...t, active: !t.active } : t
       ))
-      toast(`Table ${tbl.number} ${tbl.active ? 'désactivée' : 'activée'}`, 'success')
+      toast(t('tables_module.table_status_changed', { number: tbl.number, status: tbl.active ? t('tables_module.deactivated_status') : t('tables_module.activated_status') }), 'success')
     } catch {
-      toast('Impossible de modifier le statut', 'error')
+      toast(t('tables_module.error_status_change'), 'error')
     }
   }
 
