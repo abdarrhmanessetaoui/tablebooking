@@ -3,88 +3,12 @@ import { navItems, LogoutIcon } from '../data/sidebarItems'
 import { useState } from 'react'
 import { ChevronLeft, ChevronRight, Globe } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import LanguageSwitcher from './LanguageSwitcher'
 
 const DARK = '#2b2118'
 const GOLD = '#c8a97e'
 
-function LanguageSelector({ collapsed }) {
-  const { t, i18n } = useTranslation()
-  const [open, setOpen] = useState(false)
-  const [hovBtn, setHovBtn] = useState(false)
-  const [hovItem, setHovItem] = useState(null)
 
-  const langs = [
-    { code: 'en', label: 'English' },
-    { code: 'fr', label: 'Français' },
-    { code: 'ar', label: 'العربية' }
-  ]
-
-  const currentLang = i18n.language || 'fr'
-
-  const handleSelect = (code) => {
-    i18n.changeLanguage(code)
-    localStorage.setItem('lang', code)
-    setOpen(false)
-  }
-
-  return (
-    <div style={{ position: 'relative', width: '100%', marginBottom: 4 }}>
-      {open && (
-        <>
-          <div style={{ position: 'fixed', inset: 0, zIndex: 40 }} onClick={() => setOpen(false)} />
-          <div style={{
-            position: 'absolute', bottom: '100%', left: collapsed ? '50%' : 0,
-            transform: collapsed ? 'translateX(-50%)' : 'none',
-            marginBottom: 8, background: DARK, border: `2px solid ${GOLD}`,
-            zIndex: 50, display: 'flex', flexDirection: 'column',
-            minWidth: 140, padding: 4,
-          }}>
-            {langs.map((l, i) => (
-              <button
-                key={l.code}
-                onClick={() => handleSelect(l.code)}
-                onMouseEnter={() => setHovItem(i)}
-                onMouseLeave={() => setHovItem(null)}
-                style={{
-                  background: hovItem === i ? 'rgba(200,169,126,0.15)' : 'transparent',
-                  color: currentLang === l.code ? GOLD : 'rgba(255,255,255,0.8)',
-                  border: 'none', padding: '10px 14px', textAlign: 'left',
-                  cursor: 'pointer', fontSize: 13, fontWeight: 700, fontFamily: 'inherit',
-                  transition: 'background 0.15s, color 0.15s',
-                }}
-              >
-                {l.label}
-              </button>
-            ))}
-          </div>
-        </>
-      )}
-      <button
-        onClick={() => setOpen(!open)}
-        onMouseEnter={() => setHovBtn(true)}
-        onMouseLeave={() => setHovBtn(false)}
-        title={collapsed ? t('language') : undefined}
-        style={{
-          width: '100%', display: 'flex', alignItems: 'center',
-          gap: collapsed ? 0 : 13,
-          justifyContent: collapsed ? 'center' : 'flex-start',
-          padding: collapsed ? '13px 0' : '13px 16px',
-          background: open ? 'rgba(200,169,126,0.15)' : hovBtn ? 'rgba(200,169,126,0.1)' : 'transparent',
-          border: 'none',
-          color: open || hovBtn ? GOLD : 'rgba(255,255,255,0.4)',
-          cursor: 'pointer',
-          transition: 'background 0.15s, color 0.15s',
-          fontFamily: 'inherit', fontSize: 14, fontWeight: 600,
-        }}
-      >
-        <span style={{ display: 'flex', alignItems: 'center', flexShrink: 0, color: 'inherit' }}>
-          <Globe size={22} strokeWidth={2} />
-        </span>
-        {!collapsed && <span style={{ textAlign: 'left', flex: 1 }}>{t('language')}</span>}
-      </button>
-    </div>
-  )
-}
 
 export default function Sidebar({ handleLogout, onNavClick, collapsed, onToggle }) {
   const { t } = useTranslation()
@@ -194,7 +118,7 @@ export default function Sidebar({ handleLogout, onNavClick, collapsed, onToggle 
       {/* FOOTER ACTIONS */}
       <div style={{ padding: collapsed ? '10px 8px 28px' : '10px 8px 28px', borderTop:`2px solid rgba(200,169,126,0.18)`, flexShrink:0 }}>
         
-        <LanguageSelector collapsed={collapsed} />
+        <LanguageSwitcher collapsed={collapsed} dark={true} />
 
         <button
           onClick={handleLogout}

@@ -1,6 +1,7 @@
 import React from 'react'
 import { useTranslation } from 'react-i18next'
 import useLogin from '../hooks/useLogin'
+import LanguageSwitcher from '../components/LanguageSwitcher'
 import '../index.css'
 
 const Login = () => {
@@ -102,6 +103,10 @@ const Login = () => {
           >
             {loading ? t('login_module.logging_in') : t('login_module.log_in')}
           </button>
+        </div>
+        
+        <div style={{ marginTop: 24, paddingTop: 16, borderTop: '1px solid rgba(200,169,126,0.18)' }}>
+          <LanguageSwitcher position="top" />
         </div>
 
       </div>
