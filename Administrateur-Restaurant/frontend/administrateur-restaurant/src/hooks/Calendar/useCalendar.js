@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import { getToken } from '../../utils/auth'
 
 const toDateString = (date) => date.toISOString().split('T')[0]
@@ -37,6 +38,9 @@ const getMonthDays = (date) => {
 }
 
 export default function useCalendar() {
+  const { t, i18n } = useTranslation()
+  const lang = i18n.language === 'ar' ? 'ar-MA' : i18n.language === 'fr' ? 'fr-FR' : 'en-US'
+
   const [currentDate, setCurrentDate]   = useState(new Date())
   const [view, setView]                 = useState('week')
   const [reservations, setReservations] = useState([])
@@ -61,7 +65,7 @@ export default function useCalendar() {
       const data = await res.json()
       setReservations(Array.isArray(data) ? data : [])
     } catch {
-      setError('Impossible de charger les réservations.')
+      setError(t('error_loading_reservations'))
       setReservations([])
     } finally {
       setLoading(false)
@@ -102,18 +106,19 @@ export default function useCalendar() {
 
   const navLabel = () => {
     if (view === 'day')
-      return currentDate.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
+      return currentDate.toLocaleDateString(lang, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
     if (view === 'week') {
-      const start = weekDays[0].toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })
-      const end   = weekDays[6].toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' })
+      const start = weekDays[0].toLocaleDateString(lang, { day: 'numeric', month: 'short' })
+      const end   = weekDays[6].toLocaleDateString(lang, { day: 'numeric', month: 'short', year: 'numeric' })
       return `${start} — ${end}`
     }
     if (view === 'month')
-      return currentDate.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })
+      return currentDate.toLocaleDateString(lang, { month: 'long', year: 'numeric' })
     if (view === 'year')
       return currentDate.getFullYear().toString()
     return ''
   }
+
 
   return {
     view, setView,

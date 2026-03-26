@@ -1,10 +1,10 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { ChevronLeft, ChevronRight, CalendarDays } from 'lucide-react'
 
 const DARK = '#2b2118'
 const GOLD = '#c8a97e'
-const VIEWS       = ['day', 'week', 'month', 'year']
-const VIEW_LABELS = { day: 'Jour', week: 'Semaine', month: 'Mois', year: 'Année' }
+const VIEWS = ['day', 'week', 'month', 'year']
 
 function ArrowBtn({ onClick, children }) {
   const [h, setH] = useState(false)
@@ -24,7 +24,8 @@ function ArrowBtn({ onClick, children }) {
 }
 
 export default function CalendarNav({ view, setView, navLabel, navigate, goToday, currentDate }) {
-  const isToday   = new Date().toDateString() === currentDate.toDateString()
+  const { t } = useTranslation()
+  const isToday = new Date().toDateString() === currentDate.toDateString()
   const [hToday, setHToday] = useState(false)
 
   return (
@@ -63,7 +64,7 @@ export default function CalendarNav({ view, setView, navLabel, navigate, goToday
             <button onClick={goToday}
               onMouseEnter={() => setHToday(true)} onMouseLeave={() => setHToday(false)}
               style={{ padding: '10px 16px', background: hToday ? GOLD : '#fff', border: `4px solid ${hToday ? GOLD : 'rgba(43,33,24,0.18)'}`, color: DARK, fontSize: 11, fontWeight: 900, cursor: 'pointer', transition: 'all 0.13s', fontFamily: 'inherit', letterSpacing: '0.04em', whiteSpace: 'nowrap' }}>
-              Aujourd'hui
+              {t('today')}
             </button>
           )}
         </div>
@@ -76,11 +77,11 @@ export default function CalendarNav({ view, setView, navLabel, navigate, goToday
                 background: view === v ? DARK : '#fff',
                 color: view === v ? '#fff' : DARK,
               }}>
-              {VIEW_LABELS[v]}
+              {t(v)}
             </button>
           ))}
         </div>
       </div>
     </>
   )
-}
+}

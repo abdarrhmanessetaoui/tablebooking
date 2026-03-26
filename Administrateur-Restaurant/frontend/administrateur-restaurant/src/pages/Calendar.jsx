@@ -1,8 +1,9 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { FileDown } from 'lucide-react'
 import useCalendar   from '../hooks/Calendar/useCalendar'
 import CalendarNav   from '../components/Calendar/CalendarNav'
-import CalendarWeek  from '../components/Calendar/CalendarWeek'
+import CalendarWeek  from '../components/Calendar/Calendarweek'
 import FadeUp        from '../components/Dashboard/FadeUp'
 import Spinner       from '../components/Dashboard/Spinner'
 
@@ -35,6 +36,8 @@ function Btn({ children, onClick, primary, disabled, icon: Icon }) {
 }
 
 export default function Calendar() {
+  const { t, i18n } = useTranslation()
+  const lang = i18n.language === 'ar' ? 'ar-MA' : i18n.language === 'fr' ? 'fr-FR' : 'en-US'
   const {
     view, setView, currentDate, setCurrentDate,
     weekDays, monthDays, loading, error,
@@ -108,38 +111,39 @@ export default function Calendar() {
       })
       const { jsPDF } = window.jspdf
       const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' })
-      const dateStr = new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
+      const dateStr = new Date().toLocaleDateString(lang, { day: 'numeric', month: 'long', year: 'numeric' })
 
       doc.setFillColor(43,33,24); doc.rect(0,0,210,32,'F')
       doc.setFont('helvetica','bold'); doc.setFontSize(18); doc.setTextColor(200,169,126); doc.text('TableBooking.ma',20,14)
-      doc.setFontSize(9); doc.setTextColor(255,255,255); doc.text('Planning — '+navLabel(),20,22)
+      doc.setFontSize(9); doc.setTextColor(255,255,255); doc.text(t('planning') + ' — ' + navLabel(),20,22)
       doc.setTextColor(200,169,126); doc.setFontSize(8); doc.text(dateStr,190,22,{align:'right'})
-      doc.setTextColor(43,33,24); doc.setFontSize(20); doc.text('Planning des réservations',20,48)
+      doc.setTextColor(43,33,24); doc.setFontSize(20); doc.text(t('planning_pdf_title'),20,48)
       doc.setFontSize(10); doc.setTextColor(200,169,126); doc.text(navLabel(),20,56)
       doc.setDrawColor(43,33,24); doc.setLineWidth(0.5); doc.line(20,61,190,61)
 
       let y = 70
       doc.setFillColor(43,33,24); doc.rect(20,y,170,9,'F')
       doc.setTextColor(200,169,126); doc.setFontSize(8)
-      doc.text('NOM',24,y+6); doc.text('DATE',80,y+6); doc.text('HEURE',120,y+6); doc.text('STATUT',155,y+6)
+      doc.text(t('name').toUpperCase(),24,y+6); doc.text(t('date').toUpperCase(),80,y+6); doc.text(t('time').toUpperCase(),120,y+6); doc.text(t('status').toUpperCase(),155,y+6)
       y += 9
 
-      const allRes = view==='day' ? getByDate(currentDate)
-        : view==='week' ? weekDays.flatMap(d => getByDate(d))
+      const allRes = view === 'day' ? getByDate(currentDate)
+        : view === 'week' ? weekDays.flatMap(d => getByDate(d))
         : reservations || []
 
-      allRes.forEach((r,i) => {
-        if (y>270) { doc.addPage(); y=20 }
-        doc.setFillColor(i%2===0?255:250, i%2===0?255:248, i%2===0?255:245)
-        doc.rect(20,y,170,9,'F')
-        doc.setDrawColor(236,230,222); doc.line(20,y+9,190,y+9)
-        doc.setTextColor(43,33,24); doc.setFontSize(9); doc.setFont('helvetica','normal')
-        doc.text(r.name||'—',24,y+6)
-        doc.text(r.date?new Date(r.date).toLocaleDateString('fr-FR'):'—',80,y+6)
-        doc.text(r.start_time||'—',120,y+6)
-        const sc = {Confirmed:[43,33,24],Pending:[168,131,78],Cancelled:[43,33,24]}[r.status]||[43,33,24]
-        doc.setTextColor(...sc); doc.setFont('helvetica','bold')
-        doc.text(r.status==='Confirmed'?'Confirmée':r.status==='Pending'?'En attente':'Annulée',155,y+6)
+      allRes.forEach((r, i) => {
+        if (y > 270) { doc.addPage(); y = 20 }
+        doc.setFillColor(i % 2 === 0 ? 255 : 250, i % 2 === 0 ? 255 : 248, i % 2 === 0 ? 255 : 245)
+        doc.rect(20, y, 170, 9, 'F')
+        doc.setDrawColor(236, 230, 222); doc.line(20, y + 9, 190, y + 9)
+        doc.setTextColor(43, 33, 24); doc.setFontSize(9); doc.setFont('helvetica', 'normal')
+        doc.text(r.name || '—', 24, y + 6)
+        doc.text(r.date ? new Date(r.date).toLocaleDateString(lang) : '—', 80, y + 6)
+        doc.text(r.start_time || '—', 120, y + 6)
+        const sc = { Confirmed: [43, 33, 24], Pending: [168, 131, 78], Cancelled: [43, 33, 24] }[r.status] || [43, 33, 24]
+        doc.setTextColor(...sc); doc.setFont('helvetica', 'bold')
+        const statusLabel = r.status === 'Confirmed' ? t('status_confirmed') : r.status === 'Pending' ? t('status_pending') : t('status_cancelled')
+        doc.text(statusLabel, 155, y + 6)
         y += 9
       })
 
@@ -172,7 +176,7 @@ export default function Calendar() {
           <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12, marginBottom: 8, flexWrap: 'wrap' }}>
             <div>
               <h1 style={{ margin: 0, fontSize: 'clamp(22px,4vw,36px)', fontWeight: 900, color: DARK, letterSpacing: '-1.5px', lineHeight: 1 }}>
-                Planning
+                {t('planning')}
               </h1>
               <p className="page-subtitle" style={{ margin: '6px 0 0', fontSize: 12, fontWeight: 700, color: GOLD_DK }}>
                 
@@ -180,11 +184,12 @@ export default function Calendar() {
             </div>
             <div style={{ display: 'flex', gap: 3, flexShrink: 0 }}>
               <Btn icon={FileDown} primary onClick={handleExport} disabled={exporting}>
-                {exporting ? 'Génération…' : 'Exporter PDF'}
+                {exporting ? t('exporting') : t('export_pdf')}
               </Btn>
             </div>
           </div>
         </FadeUp>
+
 
         <FadeUp delay={10}>
           <div style={{ height: 4, background: DARK, margin: '16px 0 24px' }} />
