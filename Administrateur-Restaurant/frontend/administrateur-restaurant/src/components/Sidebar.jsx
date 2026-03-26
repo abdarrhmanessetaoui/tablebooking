@@ -1,12 +1,93 @@
 import { NavLink } from 'react-router-dom'
 import { navItems, LogoutIcon } from '../data/sidebarItems'
 import { useState } from 'react'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Globe } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 
 const DARK = '#2b2118'
 const GOLD = '#c8a97e'
 
+function LanguageSelector({ collapsed }) {
+  const { t, i18n } = useTranslation()
+  const [open, setOpen] = useState(false)
+  const [hovBtn, setHovBtn] = useState(false)
+  const [hovItem, setHovItem] = useState(null)
+
+  const langs = [
+    { code: 'en', label: 'English' },
+    { code: 'fr', label: 'Français' },
+    { code: 'ar', label: 'العربية' }
+  ]
+
+  const currentLang = i18n.language || 'fr'
+
+  const handleSelect = (code) => {
+    i18n.changeLanguage(code)
+    localStorage.setItem('lang', code)
+    setOpen(false)
+  }
+
+  return (
+    <div style={{ position: 'relative', width: '100%', marginBottom: 4 }}>
+      {open && (
+        <>
+          <div style={{ position: 'fixed', inset: 0, zIndex: 40 }} onClick={() => setOpen(false)} />
+          <div style={{
+            position: 'absolute', bottom: '100%', left: collapsed ? '50%' : 0,
+            transform: collapsed ? 'translateX(-50%)' : 'none',
+            marginBottom: 8, background: DARK, border: `2px solid ${GOLD}`,
+            zIndex: 50, display: 'flex', flexDirection: 'column',
+            minWidth: 140, padding: 4,
+          }}>
+            {langs.map((l, i) => (
+              <button
+                key={l.code}
+                onClick={() => handleSelect(l.code)}
+                onMouseEnter={() => setHovItem(i)}
+                onMouseLeave={() => setHovItem(null)}
+                style={{
+                  background: hovItem === i ? 'rgba(200,169,126,0.15)' : 'transparent',
+                  color: currentLang === l.code ? GOLD : 'rgba(255,255,255,0.8)',
+                  border: 'none', padding: '10px 14px', textAlign: 'left',
+                  cursor: 'pointer', fontSize: 13, fontWeight: 700, fontFamily: 'inherit',
+                  transition: 'background 0.15s, color 0.15s',
+                }}
+              >
+                {l.label}
+              </button>
+            ))}
+          </div>
+        </>
+      )}
+      <button
+        onClick={() => setOpen(!open)}
+        onMouseEnter={() => setHovBtn(true)}
+        onMouseLeave={() => setHovBtn(false)}
+        title={collapsed ? t('language') : undefined}
+        style={{
+          width: '100%', display: 'flex', alignItems: 'center',
+          gap: collapsed ? 0 : 13,
+          justifyContent: collapsed ? 'center' : 'flex-start',
+          padding: collapsed ? '13px 0' : '13px 16px',
+          background: open ? 'rgba(200,169,126,0.15)' : hovBtn ? 'rgba(200,169,126,0.1)' : 'transparent',
+          border: 'none',
+          color: open || hovBtn ? GOLD : 'rgba(255,255,255,0.4)',
+          cursor: 'pointer',
+          transition: 'background 0.15s, color 0.15s',
+          fontFamily: 'inherit', fontSize: 14, fontWeight: 600,
+        }}
+      >
+        <span style={{ display: 'flex', alignItems: 'center', flexShrink: 0, color: 'inherit' }}>
+          <Globe size={22} strokeWidth={2} />
+        </span>
+        {!collapsed && <span style={{ textAlign: 'left', flex: 1 }}>{t('language')}</span>}
+      </button>
+    </div>
+  )
+}
+
 export default function Sidebar({ handleLogout, onNavClick, collapsed, onToggle }) {
+  const { t } = useTranslation()
   const [hov,    setHov]    = useState(null)
   const [hovOut, setHovOut] = useState(false)
 
@@ -22,7 +103,7 @@ export default function Sidebar({ handleLogout, onNavClick, collapsed, onToggle 
       {/* LOGO */}
       <div style={{
         padding: collapsed ? '28px 0 24px' : '28px 24px 24px',
-        borderBottom: `1px solid rgba(200,169,126,0.18)`,
+        borderBottom: `2px solid rgba(200,169,126,0.18)`,
         flexShrink: 0,
         display: 'flex', alignItems: 'center',
         justifyContent: collapsed ? 'center' : 'space-between',
@@ -47,12 +128,12 @@ export default function Sidebar({ handleLogout, onNavClick, collapsed, onToggle 
         {onToggle && (
           <button
             onClick={onToggle}
-            title={collapsed ? 'Agrandir' : 'Réduire'}
+            title={collapsed ? t('expand') : t('collapse')}
             style={{
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               width: 28, height: 28, flexShrink: 0,
               background: 'rgba(200,169,126,0.1)',
-              border: '1px solid rgba(200,169,126,0.2)',
+              border: '2px solid rgba(200,169,126,0.2)',
               color: 'rgba(200,169,126,0.6)',
               cursor: 'pointer', transition: 'all 0.15s',
             }}
@@ -80,7 +161,7 @@ export default function Sidebar({ handleLogout, onNavClick, collapsed, onToggle 
             onClick={onNavClick}
             onMouseEnter={() => setHov(i)}
             onMouseLeave={() => setHov(null)}
-            title={collapsed ? item.label : undefined}
+            title={collapsed ? t(item.i18nKey) : undefined}
             style={({ isActive }) => ({
               display: 'flex', alignItems: 'center',
               gap: collapsed ? 0 : 13,
@@ -101,7 +182,7 @@ export default function Sidebar({ handleLogout, onNavClick, collapsed, onToggle 
                 </span>
                 {!collapsed && (
                   <span style={{ fontSize:14, fontWeight: isActive ? 900 : 600, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>
-                    {item.label}
+                    {t(item.i18nKey)}
                   </span>
                 )}
               </>
@@ -110,19 +191,21 @@ export default function Sidebar({ handleLogout, onNavClick, collapsed, onToggle 
         ))}
       </nav>
 
-      {/* LOGOUT */}
-      <div style={{ padding: collapsed ? '10px 8px 28px' : '10px 8px 28px', borderTop:`1px solid rgba(200,169,126,0.18)`, flexShrink:0 }}>
+      {/* FOOTER ACTIONS */}
+      <div style={{ padding: collapsed ? '10px 8px 28px' : '10px 8px 28px', borderTop:`2px solid rgba(200,169,126,0.18)`, flexShrink:0 }}>
+        
+        <LanguageSelector collapsed={collapsed} />
+
         <button
           onClick={handleLogout}
           onMouseEnter={() => setHovOut(true)}
           onMouseLeave={() => setHovOut(false)}
-          title={collapsed ? 'Déconnexion' : undefined}
+          title={collapsed ? t('logout') : undefined}
           style={{
             width:'100%', display:'flex', alignItems:'center',
             gap: collapsed ? 0 : 13,
             justifyContent: collapsed ? 'center' : 'flex-start',
             padding: collapsed ? '13px 0' : '13px 16px',
-            marginTop: 8,
             background: hovOut ? 'rgba(255,80,80,0.18)' : 'transparent',
             border: 'none',
             color: hovOut ? '#ff6b6b' : 'rgba(255,255,255,0.4)',
@@ -134,7 +217,7 @@ export default function Sidebar({ handleLogout, onNavClick, collapsed, onToggle 
           <span style={{ display:'flex', alignItems:'center', flexShrink:0, color:'inherit' }}>
             <LogoutIcon />
           </span>
-          {!collapsed && <span>Déconnexion</span>}
+          {!collapsed && <span>{t('logout')}</span>}
         </button>
       </div>
     </div>

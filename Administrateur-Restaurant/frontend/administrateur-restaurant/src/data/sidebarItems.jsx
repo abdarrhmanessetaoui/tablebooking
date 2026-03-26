@@ -4,14 +4,14 @@ import {
 } from 'lucide-react'
 
 export const navItems = [
-  { to: '/dashboard', label: 'Tableau de bord', icon: <Home size={22} strokeWidth={2} /> },
-  { to: '/reservations',  label: 'Réservations',    icon: <BookOpen        size={22} strokeWidth={2} /> },
-  { to: '/calendar',      label: 'Planning',        icon: <CalendarDays    size={22} strokeWidth={2} /> },
-  { to: '/blocked-dates', label: 'Dates bloquées',  icon: <CalendarOff     size={22} strokeWidth={2} /> },
-  { to: '/services',      label: 'Services',        icon: <Utensils        size={22} strokeWidth={2} /> },
-  { to: '/tables',       label: 'Tables',         icon: <LayoutGrid     size={22} strokeWidth={2} /> },
-  { to: '/reports',       label: 'Rapports',        icon: <BarChart2       size={22} strokeWidth={2} /> },
-  { to: '/settings',      label: 'Paramètres',      icon: <Settings        size={22} strokeWidth={2} /> },
+  { to: '/dashboard', label: 'Tableau de bord', i18nKey: 'dashboard', icon: <Home size={22} strokeWidth={2} /> },
+  { to: '/reservations',  label: 'Réservations', i18nKey: 'reservations',    icon: <BookOpen        size={22} strokeWidth={2} /> },
+  { to: '/calendar',      label: 'Planning', i18nKey: 'planning',        icon: <CalendarDays    size={22} strokeWidth={2} /> },
+  { to: '/blocked-dates', label: 'Dates bloquées', i18nKey: 'blocked_dates',  icon: <CalendarOff     size={22} strokeWidth={2} /> },
+  { to: '/services',      label: 'Services', i18nKey: 'services',        icon: <Utensils        size={22} strokeWidth={2} /> },
+  { to: '/tables',       label: 'Tables', i18nKey: 'tables',         icon: <LayoutGrid     size={22} strokeWidth={2} /> },
+  { to: '/reports',       label: 'Rapports', i18nKey: 'reports',        icon: <BarChart2       size={22} strokeWidth={2} /> },
+  { to: '/settings',      label: 'Paramètres', i18nKey: 'settings',      icon: <Settings        size={22} strokeWidth={2} /> },
 ]
 
 export function LogoutIcon() {
