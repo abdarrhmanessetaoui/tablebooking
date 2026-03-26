@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useLocation } from 'react-router-dom'
 import useDashboard from '../hooks/Dashboard/useDashboard'
 import Sidebar from './Sidebar'
@@ -10,22 +11,24 @@ const SW_OPEN      = 220
 const SW_COLLAPSED = 64
 
 const PAGE_TITLES = {
-  '/dashboard':     'Dashboard',
-  '/reservations':  'Réservations',
-  '/blocked-dates': 'Dates bloquées',
-  '/calendar':      'Planning',
-  '/services':      'Services',
-  '/reports':       'Rapports',
-  '/settings':      'Paramètres',
-  '/tables': 'Tables',
+  '/dashboard':     'dashboard',
+  '/reservations':  'reservations',
+  '/blocked-dates': 'blocked_dates',
+  '/calendar':      'planning',
+  '/services':      'services',
+  '/reports':       'reports',
+  '/settings':      'settings',
+  '/tables':        'tables',
 }
 
 export default function Layout({ children }) {
+  const { t } = useTranslation()
   const { handleLogout }          = useDashboard()
   const [open, setOpen]           = useState(false)
   const [collapsed, setCollapsed] = useState(false)
   const location                  = useLocation()
-  const title                     = PAGE_TITLES[location.pathname] || 'Dashboard'
+  const titleKey                  = PAGE_TITLES[location.pathname] || 'dashboard'
+  const title                     = t(titleKey)
   const SW                        = collapsed ? SW_COLLAPSED : SW_OPEN
 
   return (

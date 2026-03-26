@@ -1,12 +1,10 @@
 import { useState, useEffect, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import { X, Calendar, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 
 const DARK = '#2b2118'
 const GOLD = '#c8a97e'
-
-const MONTHS_FR = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre']
-const DAYS_FR   = ['Lu','Ma','Me','Je','Ve','Sa','Di']
 
 const navBtnStyle = {
   background: 'none', border: 'none', cursor: 'pointer',
@@ -16,6 +14,31 @@ const navBtnStyle = {
 
 /* ── Calendar Popup (identical to Reservations) ── */
 function CalendarPopup({ filterDate, setFilterDate, onClose, anchorRef }) {
+  const { t } = useTranslation()
+  const MONTHS = [
+    t('services_module.jan_full', { defaultValue: 'January' }),
+    t('services_module.feb_full', { defaultValue: 'February' }),
+    t('services_module.mar_full', { defaultValue: 'March' }),
+    t('services_module.apr_full', { defaultValue: 'April' }),
+    t('services_module.may_full', { defaultValue: 'May' }),
+    t('services_module.jun_full', { defaultValue: 'June' }),
+    t('services_module.jul_full', { defaultValue: 'July' }),
+    t('services_module.aug_full', { defaultValue: 'August' }),
+    t('services_module.sep_full', { defaultValue: 'September' }),
+    t('services_module.oct_full', { defaultValue: 'October' }),
+    t('services_module.nov_full', { defaultValue: 'November' }),
+    t('services_module.dec_full', { defaultValue: 'December' })
+  ]
+  const DAYS = [
+    t('services_module.mon_short', { defaultValue: 'Mo' }),
+    t('services_module.tue_short', { defaultValue: 'Tu' }),
+    t('services_module.wed_short', { defaultValue: 'We' }),
+    t('services_module.thu_short', { defaultValue: 'Th' }),
+    t('services_module.fri_short', { defaultValue: 'Fr' }),
+    t('services_module.sat_short', { defaultValue: 'Sa' }),
+    t('services_module.sun_short', { defaultValue: 'Su' })
+  ]
+
   const today    = new Date()
   const initDate = filterDate
     ? (filterDate.length === 7 ? new Date(filterDate + '-01') : new Date(filterDate))
@@ -122,19 +145,19 @@ function CalendarPopup({ filterDate, setFilterDate, onClose, anchorRef }) {
     >
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', background: DARK, padding: '8px 6px', gap: 2 }}>
-        <button onClick={() => setViewYear(y => y - 1)} style={navBtnStyle} title="Année précédente">
+        <button onClick={() => setViewYear(y => y - 1)} style={navBtnStyle} title={t('reports_module.prev_year')}>
           <ChevronsLeft size={13} strokeWidth={2.5} />
         </button>
-        <button onClick={() => navMonth(-1)} style={navBtnStyle} title="Mois précédent">
+        <button onClick={() => navMonth(-1)} style={navBtnStyle} title={t('reports_module.prev_month')}>
           <ChevronLeft size={13} strokeWidth={2.5} />
         </button>
         <span style={{ flex: 1, textAlign: 'center', fontSize: 13, fontWeight: 800, color: GOLD, letterSpacing: '0.02em' }}>
-          {MONTHS_FR[viewMonth]} {viewYear}
+          {MONTHS[viewMonth]} {viewYear}
         </span>
-        <button onClick={() => navMonth(1)} style={navBtnStyle} title="Mois suivant">
+        <button onClick={() => navMonth(1)} style={navBtnStyle} title={t('reports_module.next_month')}>
           <ChevronRight size={13} strokeWidth={2.5} />
         </button>
-        <button onClick={() => setViewYear(y => y + 1)} style={navBtnStyle} title="Année suivante">
+        <button onClick={() => setViewYear(y => y + 1)} style={navBtnStyle} title={t('reports_module.next_year')}>
           <ChevronsRight size={13} strokeWidth={2.5} />
         </button>
       </div>
@@ -152,7 +175,7 @@ function CalendarPopup({ filterDate, setFilterDate, onClose, anchorRef }) {
             marginBottom: mode === m ? -2 : 0,
             transition: 'all 0.12s',
           }}>
-            {m === 'day' ? 'Jour' : 'Mois'}
+            {m === 'day' ? t('reports_module.mode_day') : t('reports_module.mode_month')}
           </button>
         ))}
       </div>
@@ -160,12 +183,12 @@ function CalendarPopup({ filterDate, setFilterDate, onClose, anchorRef }) {
       {/* Day grid */}
       {mode === 'day' && (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7,1fr)', padding: '6px 8px 10px' }}>
-          {DAYS_FR.map(d => (
+          {DAYS.map(d => (
             <div key={d} style={{
               textAlign: 'center', fontSize: 10, fontWeight: 800,
               color: '#2b2118', padding: '4px 0', letterSpacing: '0.06em',
             }}>
-              {d}
+              {d.charAt(0)}
             </div>
           ))}
           {dayCells.map((c, i) => (
@@ -193,7 +216,7 @@ function CalendarPopup({ filterDate, setFilterDate, onClose, anchorRef }) {
       {/* Month grid */}
       {mode === 'month' && (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 4, padding: 8 }}>
-          {MONTHS_FR.map((m, i) => {
+          {MONTHS.map((m, i) => {
             const isCurrent  = i === today.getMonth() && viewYear === today.getFullYear()
             const isSelected = selMonth && selMon === i && selYear === viewYear
             return (
@@ -224,7 +247,7 @@ function CalendarPopup({ filterDate, setFilterDate, onClose, anchorRef }) {
           fontSize: 11, fontWeight: 700, color: DARK,
           background: '#ffffff', textAlign: 'center', letterSpacing: '0.04em',
         }}>
-          {String(selDay).padStart(2,'0')} {MONTHS_FR[selMon]} {selYear}
+          {String(selDay).padStart(2,'0')} {MONTHS[selMon]} {selYear}
         </div>
       )}
     </div>
@@ -241,20 +264,35 @@ export default function ReportsFilters({
   clearFilters,
   services = [],
 }) {
+  const { t } = useTranslation()
+  const MONTHS = [
+    t('services_module.jan_full', { defaultValue: 'January' }),
+    t('services_module.feb_full', { defaultValue: 'February' }),
+    t('services_module.mar_full', { defaultValue: 'March' }),
+    t('services_module.apr_full', { defaultValue: 'April' }),
+    t('services_module.may_full', { defaultValue: 'May' }),
+    t('services_module.jun_full', { defaultValue: 'June' }),
+    t('services_module.jul_full', { defaultValue: 'July' }),
+    t('services_module.aug_full', { defaultValue: 'August' }),
+    t('services_module.sep_full', { defaultValue: 'September' }),
+    t('services_module.oct_full', { defaultValue: 'October' }),
+    t('services_module.nov_full', { defaultValue: 'November' }),
+    t('services_module.dec_full', { defaultValue: 'December' })
+  ]
   const [calOpen, setCalOpen] = useState(false)
   const anchorRef = useRef(null)
 
   const hasFilters = filterStatus !== 'all' || filterDate || (filterService && filterService !== 'all')
 
   function dateLabel() {
-    if (!filterDate) return 'Choisir une date'
+    if (!filterDate) return t('reports_module.choose_date')
     if (filterDate.length === 7) {
       const [y, m] = filterDate.split('-')
-      return `${MONTHS_FR[parseInt(m) - 1]} ${y}`
+      return `${MONTHS[parseInt(m) - 1]} ${y}`
     }
     if (filterDate.length === 10) {
       const [y, m, d] = filterDate.split('-')
-      return `${parseInt(d)} ${MONTHS_FR[parseInt(m) - 1]} ${y}`
+      return `${parseInt(d)} ${MONTHS[parseInt(m) - 1]} ${y}`
     }
     return filterDate
   }
@@ -290,16 +328,16 @@ export default function ReportsFilters({
         {/* Status */}
         <select value={filterStatus} onChange={e => setFilterStatus(e.target.value)}
           style={{ ...base, cursor: 'pointer' }}>
-          <option value="all">Tous les statuts</option>
-          <option value="Pending">En attente</option>
-          <option value="Confirmed">Confirmées</option>
-          <option value="Cancelled">Annulées</option>
+          <option value="all">{t('reports_module.all_statuses')}</option>
+          <option value="Pending">{t('reports_module.pending')}</option>
+          <option value="Confirmed">{t('reports_module.confirmed')}</option>
+          <option value="Cancelled">{t('reports_module.cancelled')}</option>
         </select>
 
         {/* Service */}
         <select value={filterService ?? 'all'} onChange={e => setFilterService(e.target.value)}
           style={{ ...base, cursor: 'pointer' }}>
-          <option value="all">Tous les services</option>
+          <option value="all">{t('reports_module.all_services')}</option>
           {services.map(s => <option key={s} value={s}>{s}</option>)}
         </select>
 
@@ -327,7 +365,7 @@ export default function ReportsFilters({
           {filterDate && (
             <button
               onClick={e => { e.stopPropagation(); setFilterDate(''); setCalOpen(false) }}
-              title="Effacer la date"
+              title={t('reports_module.clear_date_btn')}
               style={{
                 position: 'absolute', right: 36, top: '50%', transform: 'translateY(-50%)',
                 background: 'none', border: 'none', cursor: 'pointer', padding: '4px 6px',
@@ -351,7 +389,7 @@ export default function ReportsFilters({
               cursor: 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap',
             }}>
               <X size={13} strokeWidth={2.5} />
-              Effacer les filtres
+              {t('reports_module.clear_filters')}
             </button>
           </div>
         )}

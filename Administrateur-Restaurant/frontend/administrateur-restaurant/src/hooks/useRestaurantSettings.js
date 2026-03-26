@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { getToken } from '../utils/auth'
 import { toast } from '../components/ui/Toast'
+import i18n from '../i18n'
 
 const BASE  = 'http://localhost:8000/api'
 const hGet  = () => ({ 'Accept': 'application/json', 'Authorization': `Bearer ${getToken()}` })
@@ -65,7 +66,7 @@ export default function useRestaurantSettings() {
           defaultstatus:         d.default_status ?? 'Pending',
         })
       })
-      .catch(() => toast('Erreur de chargement des informations', 'error'))
+      .catch(() => toast(i18n.t('settings_module.error_loading_info'), 'error'))
       .finally(() => setInfoLoading(false))
   }, [])
 
@@ -86,7 +87,7 @@ export default function useRestaurantSettings() {
       const firstOpen = (d.working_dates ?? [false,true,true,true,true,true,true]).findIndex(Boolean)
       if (firstOpen >= 0) setActiveDay(firstOpen)
     })
-    .catch(() => toast('Erreur de chargement des horaires', 'error'))
+    .catch(() => toast(i18n.t('settings_module.error_loading_hours'), 'error'))
     .finally(() => { setHoursLoading(false); setServicesLoading(false) })
   }, [])
 
@@ -123,8 +124,8 @@ export default function useRestaurantSettings() {
         method: 'PUT', headers: hJson(), body: JSON.stringify(info),
       })
       if (!res.ok) throw new Error(res.status)
-      toast('Informations enregistrées', 'success')
-    } catch { toast("Impossible d'enregistrer les informations", 'error') }
+      toast(i18n.t('settings_module.info_saved'), 'success')
+    } catch { toast(i18n.t('settings_module.error_saving_info'), 'error') }
     finally { setSavingInfo(false) }
   }
 
@@ -139,8 +140,8 @@ export default function useRestaurantSettings() {
         }),
       })
       if (!res.ok) throw new Error(res.status)
-      toast('Horaires enregistrés', 'success')
-    } catch { toast("Impossible d'enregistrer les horaires", 'error') }
+      toast(i18n.t('settings_module.hours_saved'), 'success')
+    } catch { toast(i18n.t('settings_module.error_saving_hours'), 'error') }
     finally { setSavingHours(false) }
   }
 
@@ -151,8 +152,8 @@ export default function useRestaurantSettings() {
         method: 'PUT', headers: hJson(), body: JSON.stringify(notifications),
       })
       if (!res.ok) throw new Error(res.status)
-      toast('Notifications enregistrées', 'success')
-    } catch { toast("Impossible d'enregistrer les notifications", 'error') }
+      toast(i18n.t('settings_module.notif_saved'), 'success')
+    } catch { toast(i18n.t('settings_module.error_saving_notif'), 'error') }
     finally { setSavingNotif(false) }
   }
 

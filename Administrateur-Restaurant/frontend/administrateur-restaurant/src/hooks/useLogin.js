@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { saveToken } from '../utils/auth'
+import i18n from '../i18n'
 
 export default function useLogin() {
   const navigate = useNavigate()
@@ -13,7 +14,7 @@ export default function useLogin() {
 
   const handleLogin = async () => {
     if (!email || !password) {
-      setError('Please enter your email and password.')
+      setError(i18n.t('login_module.error_empty'))
       return
     }
 
@@ -30,7 +31,7 @@ export default function useLogin() {
       const data = await response.json()
 
       if (!response.ok) {
-        setError(data.message || 'Login failed.')
+        setError(data.message || i18n.t('login_module.error_failed'))
         return
       }
 
@@ -38,7 +39,7 @@ export default function useLogin() {
       navigate('/dashboard')
 
     } catch (err) {
-      setError('Cannot connect to server. Please try again.')
+      setError(i18n.t('login_module.error_connection'))
     } finally {
       setLoading(false)
     }

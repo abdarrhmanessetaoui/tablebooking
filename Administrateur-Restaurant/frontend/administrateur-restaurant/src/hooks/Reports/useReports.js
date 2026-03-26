@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useMemo } from 'react'
 import { getToken } from '../../utils/auth'
+import i18n from '../../i18n'
 
 function getWeekNum(d) {
   const t = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()))
@@ -7,10 +8,17 @@ function getWeekNum(d) {
   const y0 = new Date(Date.UTC(t.getUTCFullYear(), 0, 1))
   return Math.ceil((((t - y0) / 86400000) + 1) / 7)
 }
-const FR_DAYS   = ['Dim','Lun','Mar','Mer','Jeu','Ven','Sam']
-const FR_MONTHS = ['Janv','Févr','Mars','Avr','Mai','Juin','Juil','Août','Sept','Oct','Nov','Déc']
-
 function inc(obj, key) { obj[key] = (obj[key] || 0) + 1 }
+
+const getDayKey = (d) => {
+  const keys = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat']
+  return i18n.t(`tables_module.${keys[d.getDay()]}`)
+}
+
+const getMonthKey = (m, y) => {
+  const keys = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec']
+  return `${i18n.t(`services_module.${keys[m]}_short`)} ${y}`
+}
 
 function filterByPeriod(rows, period) {
   if (period === 'all') return rows
@@ -41,7 +49,7 @@ function filterByDate(rows, filterDate) {
 
 function aggregate(rows) {
   const by_hour    = {}
-  const by_day     = { Lun:0, Mar:0, Mer:0, Jeu:0, Ven:0, Sam:0, Dim:0 }
+  const by_day     = {}
   const by_week    = {}
   const by_month   = {}
   const by_year    = {}
@@ -56,14 +64,14 @@ function aggregate(rows) {
     if (r.guests) { guests_sum += parseInt(r.guests); guests_n++ }
     if (r.start_time) inc(by_hour, r.start_time.slice(0, 5))
     if (r.service)    inc(by_service, r.service)
-    if (r.guests)     inc(by_guests, parseInt(r.guests) + ' personnes')
+    if (r.guests)     inc(by_guests, i18n.t('reports_module.persons_count', { count: parseInt(r.guests) }))
     if (r.date) {
       const d  = new Date(r.date)
       const yr = d.getFullYear(), mo = d.getMonth()
-      inc(by_day, FR_DAYS[d.getDay()])
+      inc(by_day, getDayKey(d))
       const wn = getWeekNum(d)
-      inc(by_week,  `S${String(wn).padStart(2,'0')} '${String(yr).slice(2)}`)
-      inc(by_month, `${FR_MONTHS[mo]} ${yr}`)
+      inc(by_week,  `${i18n.t('reports_module.week_prefix')}${String(wn).padStart(2,'0')} '${String(yr).slice(2)}`)
+      inc(by_month, getMonthKey(mo, yr))
       inc(by_year,  String(yr))
     }
   }
@@ -71,7 +79,13 @@ function aggregate(rows) {
     by_hour:    Object.fromEntries(Object.entries(by_hour).sort()),
     by_day,
     by_week:    Object.fromEntries(Object.entries(by_week).sort()),
-    by_month,
+    by_month:   Object.fromEntries(Object.entries(by_month).sort((a,b)=>{
+      // attempt year sort, then month sort
+      const [m1,y1]=a[0].split(' ')
+      const [m2,y2]=b[0].split(' ')
+      if (y1!==y2) return y1-y2
+      return 0 // key sort is tricky here due to localized names, but the backend usually sends them in order or we can improve this if needed
+    })),
     by_year:    Object.fromEntries(Object.entries(by_year).sort()),
     by_guests:  Object.fromEntries(Object.entries(by_guests).sort((a,b) => parseInt(a[0]) - parseInt(b[0]))),
     by_service: Object.fromEntries(Object.entries(by_service).sort((a,b) => b[1] - a[1])),
@@ -97,11 +111,11 @@ export default function useReports() {
       const res = await fetch('http://localhost:8000/api/restaurant/reservations', {
         headers: { 'Accept': 'application/json', 'Authorization': `Bearer ${getToken()}` }
       })
-      if (!res.ok) throw new Error(`Erreur ${res.status}`)
+      if (!res.ok) throw new Error(`${i18n.t('dashboard.error_prefix', { defaultValue: 'Error' })} ${res.status}`)
       const json = await res.json()
       setRows(Array.isArray(json) ? json : [])
     } catch (e) {
-      setError(e.message || 'Impossible de charger les rapports.')
+      setError(e.message || i18n.t('reports_module.error_loading'))
     } finally { setLoading(false) }
   }, [])
 

@@ -1,8 +1,10 @@
 import React from 'react'
+import { useTranslation } from 'react-i18next'
 import useLogin from '../hooks/useLogin'
 import '../index.css'
 
 const Login = () => {
+  const { t } = useTranslation()
   const {
     email, setEmail,
     password, setPassword,
@@ -20,7 +22,7 @@ const Login = () => {
       <div className="flex items-center justify-center mb-8">
         <img
           src="images/tablebooking.png"
-          alt="TableBooking Logo"
+          alt={t('login_module.logo_alt')}
           className="h-12 sm:h-16 object-contain"
         />
       </div>
@@ -35,7 +37,7 @@ const Login = () => {
 
         <div className="mb-4">
           <label className="block text-sm text-gray-700 mb-1" htmlFor="email">
-            Username or Email Address
+            {t('login_module.username_or_email')}
           </label>
           <input
             id="email"
@@ -49,7 +51,7 @@ const Login = () => {
 
         <div className="mb-5">
           <label className="block text-sm text-gray-700 mb-1" htmlFor="password">
-            Password
+            {t('login_module.password')}
           </label>
           <div className="relative">
             <input
@@ -89,7 +91,7 @@ const Login = () => {
               onChange={() => setRememberMe(!rememberMe)}
               className="w-3.5 h-3.5"
             />
-            <span className="text-xs text-gray-700">Remember Me</span>
+            <span className="text-xs text-gray-700">{t('login_module.remember_me')}</span>
           </label>
           <button
             type="button"
@@ -98,7 +100,7 @@ const Login = () => {
             className="text-white text-sm font-medium px-4 py-1.5 hover:opacity-90 transition-opacity focus:outline-none disabled:opacity-60"
             style={{ backgroundColor: '#c8a97e' }}
           >
-            {loading ? 'Logging in...' : 'Log In'}
+            {loading ? t('login_module.logging_in') : t('login_module.log_in')}
           </button>
         </div>
 
