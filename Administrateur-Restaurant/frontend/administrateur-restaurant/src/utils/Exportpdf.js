@@ -205,7 +205,7 @@ export function exportPDF(stats, reservations = [], tabLabel = "Aujourd'hui") {
 
     // Status pill
     doc.setFillColor(...sm.rgb)
-    doc.roundedRect(cols.status.x + 5, y + 2.5, 28, 5.5, 1, 1, 'F')
+    doc.rect(cols.status.x + 5, y + 2.5, 28, 5.5, 'F')
     doc.setFont('helvetica','bold'); doc.setFontSize(6.5); setW()
     doc.text(sm.label, cols.status.x + 19, y + 6.3, { align:'center' })
 

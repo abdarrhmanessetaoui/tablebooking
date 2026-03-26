@@ -9,19 +9,26 @@ export const headerCellStyle = {
   whiteSpace: 'nowrap',
 }
 
-export const actionBtnStyle = (hov, danger) => ({
-  width: 28, height: 28,
-  display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-  background: danger ? (hov ? '#dc2626' : '#fef2f2') : (hov ? DARK : '#f5f0eb'),
-  border: 'none', cursor: 'pointer',
-  transition: 'all 0.15s', flexShrink: 0,
-})
+export const actionBtnStyle = (hov, danger, success) => {
+  let bg = '#C8A97E';
+  if (danger) bg = '#DC2626';
+  else if (success) bg = '#16A34A';
+
+  return {
+    padding: 6, borderRadius: '50%',
+    display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+    background: bg,
+    border: 'none', cursor: 'pointer',
+    transition: 'opacity 0.15s', flexShrink: 0,
+    opacity: hov ? 0.85 : 1,
+  };
+};
 
 export const pageBtnStyle = (active, hov, disabled) => ({
   minWidth: 32, height: 32, padding: '0 6px',
   display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
   background: active ? DARK : hov && !disabled ? '#f0ebe4' : '#fff',
-  border: `1.5px solid ${active ? DARK : BORDER}`,
+  border: `4px solid ${active ? DARK : BORDER}`,
   color: active ? GOLD : disabled ? 'rgba(43,33,24,0.25)' : DARK,
   fontSize: 12, fontWeight: active ? 900 : 700,
   cursor: disabled ? 'not-allowed' : 'pointer',
@@ -31,7 +38,7 @@ export const pageBtnStyle = (active, hov, disabled) => ({
 export const checkboxStyle = (checked) => ({
   width: 17, height: 17, flexShrink: 0,
   background: checked ? DARK : '#fff',
-  border: `2px solid ${checked ? DARK : 'rgba(43,33,24,0.2)'}`,
+  border: `4px solid ${checked ? DARK : 'rgba(43,33,24,0.2)'}`,
   display: 'flex', alignItems: 'center', justifyContent: 'center',
   cursor: 'pointer', transition: 'all 0.15s',
 })

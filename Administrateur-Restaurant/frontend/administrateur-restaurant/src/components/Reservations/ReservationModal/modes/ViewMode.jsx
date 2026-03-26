@@ -19,16 +19,18 @@ export default function ViewMode({ editing, setForm, setModalMode, handleDelete 
         <InfoRow icon={FileText}     label="Notes"    value={editing?.notes}      />
       </div>
       <StatusBadge status={editing?.status} />
-      <div style={{ height:2, background:'#f0ebe4' }} />
+      <div style={{ height:4, background:'#f0ebe4' }} />
       <div style={{ display:'flex', gap:8 }}>
         <button onClick={() => { setForm({...editing}); setModalMode('edit') }}
           style={{ flex:1, padding:'12px', background:DARK, border:'none', fontSize:13, fontWeight:800, color:GOLD, cursor:'pointer' }}>
           Modifier le statut
         </button>
         <button onClick={() => handleDelete(editing.id)}
-          onMouseEnter={() => setHovDel(true)} onMouseLeave={() => setHovDel(false)}
-          style={{ padding:'12px 16px', background:hovDel?RED:'#fef2f2', border:'none', cursor:'pointer', transition:'background 0.15s', display:'flex', alignItems:'center' }}>
-          <Trash2 size={16} strokeWidth={2.5} color={hovDel?'#fff':RED} />
+          style={{ padding: 10, borderRadius: '50%', background:RED, border:'none', cursor:'pointer', transition:'opacity 0.15s', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}
+          onMouseEnter={e => e.currentTarget.style.opacity = 0.85}
+          onMouseLeave={e => e.currentTarget.style.opacity = 1}
+        >
+          <Trash2 size={18} strokeWidth={2.5} color="#fff" />
         </button>
       </div>
     </>

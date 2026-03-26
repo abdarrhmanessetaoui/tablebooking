@@ -1,17 +1,17 @@
 export const tabPanelCSS = `
   .db-card {
     background: #fff;
-    border: 2px solid #2b2118;
+    border: 4px solid #2b2118;
     overflow: hidden;
   }
   .db-body {
     display: grid;
     grid-template-columns: 260px 1fr;
     align-items: stretch;
-    min-height: 400px;
+    min-height: 600px;
   }
   .db-left {
-    border-right: 2px solid #2b2118;
+    border-right: 4px solid #2b2118;
     display: flex;
     flex-direction: column;
   }
@@ -34,7 +34,7 @@ export const tabPanelCSS = `
   }
   @media (max-width: 860px) {
     .db-body         { grid-template-columns: 1fr; min-height: auto; }
-    .db-left         { border-right: none; border-bottom: 2px solid #2b2118; }
+    .db-left         { border-right: none; border-bottom: 4px solid #2b2118; }
     .db-stats-sticky { position: static; }
     .db-stat-blocks  { flex-direction: row; }
   }
@@ -54,7 +54,7 @@ export const heroSection = {
   display:      'flex',
   alignItems:   'center',
   gap:          20,
-  borderBottom: `2px solid #2b2118`,
+  borderBottom: `4px solid #2b2118`,
   background:   '#fff',
   flexShrink:   0,
 }

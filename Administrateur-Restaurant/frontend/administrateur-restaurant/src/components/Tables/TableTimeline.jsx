@@ -10,7 +10,7 @@ import { RED } from '../../styles/dashboard/tokens'
 const DARK      = '#2b2118'
 const GOLD      = '#c8a97e'
 const GOLD_DARK = '#a8834e'
-const CREAM     = '#faf8f5'
+const CREAM     = '#ffffff'
 const BORDER    = 'rgba(43,33,24,0.10)'
 const GREEN     = '#16A34A'
 
@@ -130,7 +130,7 @@ function MiniCal({ value, onChange }) {
   }
 
   return (
-    <div style={{ background: '#fff', border: `2px solid ${DARK}`, userSelect: 'none' }}>
+    <div style={{ background: '#fff', border: `4px solid ${DARK}`, userSelect: 'none' }}>
       {/* Month nav */}
       <div style={{ background: DARK, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 10px' }}>
         <button
@@ -209,7 +209,7 @@ function Tip({ res, endTime }) {
   return (
     <div style={{ position: 'absolute', bottom: 'calc(100% + 8px)', left: '50%', transform: 'translateX(-50%)', background: DARK, padding: '10px 14px', zIndex: 9999, pointerEvents: 'none', boxShadow: '0 8px 28px rgba(0,0,0,0.55)', minWidth: 200, maxWidth: 260, fontFamily: "inherit" }}>
       <div style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '2px 8px', background: sc.bg, marginBottom: 8 }}>
-        <span style={{ width: 4, height: 4, borderRadius: '50%', background: sc.border }} />
+        <span style={{ width: 4, height: 6, borderRadius: '50%', background: sc.border }} />
         <span style={{ fontSize: 9, fontWeight: 900, color: sc.text, letterSpacing: '0.12em', textTransform: 'uppercase' }}>{sc.label}</span>
       </div>
       <p style={{ margin: '0 0 8px', fontSize: 13, fontWeight: 900, color: '#fff', whiteSpace: 'normal', wordBreak: 'break-word' }}>{res.customer_name}</p>
@@ -355,9 +355,7 @@ function TimelineRow({ row, isLast, hS, hE, hours, totalH, services, isToday, la
           const dec = now.getHours() + now.getMinutes() / 60
           if (dec < hS || dec > hE) return null
           return (
-            <div style={{ position: 'absolute', left: `${((dec - hS) / totalH) * 100}%`, top: 0, bottom: 0, width: 2, background: RED, zIndex: 40, pointerEvents: 'none', boxShadow: `0 0 6px ${RED}88` }}>
-              <div style={{ position: 'absolute', top: -3, left: '50%', transform: 'translateX(-50%)', width: 7, height: 7, borderRadius: '50%', background: RED }} />
-            </div>
+            <div style={{ position: 'absolute', left: `${((dec - hS) / totalH) * 100}%`, top: 0, bottom: 0, width: 2, background: RED, zIndex: 40, pointerEvents: 'none', boxShadow: `0 0 6px ${RED}88` }} />
           )
         })()}
         {/* Empty label */}
@@ -428,7 +426,7 @@ function TableCard({ row, services }) {
   )
 
   return (
-    <div style={{ border: `2px solid ${DARK}`, overflow: 'hidden', background: '#fff' }}>
+    <div style={{ border: `4px solid ${DARK}`, overflow: 'hidden', background: '#fff' }}>
       {/* Card header */}
       <button
         onClick={() => hasRes && setOpen(o => !o)}
@@ -500,16 +498,17 @@ export default function TableTimeline({ controlledDate = null }) {
   const totalRes   = timeline.reduce((s, t) => s + t.reservations.length, 0)
 
   return (
-    <div ref={rootRef} style={{ fontFamily: "'Plus Jakarta Sans','DM Sans',system-ui,sans-serif" }}>
+    <div ref={rootRef} style={{ fontFamily: "'Inter',system-ui,-apple-system,sans-serif" }}>
       <style>{`
         @keyframes tl-spin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
         .tl-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-        .tl-inner  { min-width: 420px; border: 2px solid ${DARK}; overflow: hidden; }
+        .tl-inner  { min-width: 420px; border: 4px solid ${DARK}; overflow: hidden; }
         .tl-hrow   { position: sticky; top: 0; z-index: 20; }
+        .circular-spinner { border-radius: 50% !important; }
       `}</style>
 
       {error && (
-        <div style={{ marginBottom: 10, padding: '10px 14px', background: '#fef2f2', borderLeft: `3px solid ${RED}`, fontSize: 12, fontWeight: 700, color: RED }}>
+        <div style={{ marginBottom: 10, padding: '10px 14px', background: '#ffffff', borderLeft: `3px solid ${RED}`, fontSize: 12, fontWeight: 700, color: RED }}>
           {error}
         </div>
       )}
@@ -552,14 +551,14 @@ export default function TableTimeline({ controlledDate = null }) {
           {/* Loading */}
           {loading && (
             <div style={{ padding: '40px 0', textAlign: 'center' }}>
-              <div style={{ width: 22, height: 22, borderRadius: '50%', border: `3px solid ${BORDER}`, borderTopColor: GOLD, animation: 'tl-spin 0.8s linear infinite', margin: '0 auto 10px' }} />
+              <div className="circular-spinner" style={{ width: 28, height: 28, borderRadius: '50%', border: `4px solid ${BORDER}`, borderTopColor: GOLD, animation: 'tl-spin 0.8s linear infinite', margin: '0 auto 10px' }} />
               <p style={{ margin: 0, fontSize: 12, fontWeight: 700, color: 'rgba(43,33,24,0.3)' }}>Chargement…</p>
             </div>
           )}
 
           {/* No tables */}
           {!loading && timeline.length === 0 && (
-            <div style={{ padding: '40px 20px', textAlign: 'center', background: '#fff', border: `2px solid ${DARK}` }}>
+            <div style={{ padding: '40px 20px', textAlign: 'center', background: '#fff', border: `4px solid ${DARK}` }}>
               <LayoutGrid size={28} color={DARK} strokeWidth={1.2} style={{ display: 'block', margin: '0 auto 10px', opacity: 0.12 }} />
               <p style={{ margin: '0 0 4px', fontSize: 13, fontWeight: 900, color: DARK }}>Aucune table configurée</p>
               <p style={{ margin: 0, fontSize: 11, fontWeight: 600, color: 'rgba(43,33,24,0.35)' }}>Ajoutez des tables dans la section Tables.</p>
@@ -568,7 +567,7 @@ export default function TableTimeline({ controlledDate = null }) {
 
           {/* No reservations */}
           {!loading && timeline.length > 0 && totalRes === 0 && (
-            <div style={{ padding: '12px 14px', background: '#fdf6ec', border: `1px solid rgba(200,169,126,0.3)`, display: 'flex', alignItems: 'center', gap: 10 }}>
+            <div style={{ padding: '12px 14px', background: '#ffffff', border: `1px solid rgba(200,169,126,0.3)`, display: 'flex', alignItems: 'center', gap: 10 }}>
               <CalendarDays size={14} color={GOLD_DARK} strokeWidth={2} style={{ flexShrink: 0 }} />
               <p style={{ margin: 0, fontSize: 13, fontWeight: 800, color: DARK }}>
                 Aucune réservation {isToday ? "aujourd'hui" : `le ${formatShort(date)}`}
@@ -613,13 +612,13 @@ export default function TableTimeline({ controlledDate = null }) {
           <div style={{ flex: 1, minWidth: 0 }}>
             {loading && (
               <div style={{ padding: '40px 0', textAlign: 'center' }}>
-                <div style={{ width: 22, height: 22, borderRadius: '50%', border: `3px solid ${BORDER}`, borderTopColor: GOLD, animation: 'tl-spin 0.8s linear infinite', margin: '0 auto 10px' }} />
+                <div className="circular-spinner" style={{ width: 28, height: 28, borderRadius: '50%', border: `4px solid ${BORDER}`, borderTopColor: GOLD, animation: 'tl-spin 0.8s linear infinite', margin: '0 auto 10px' }} />
                 <p style={{ margin: 0, fontSize: 12, fontWeight: 700, color: 'rgba(43,33,24,0.3)' }}>Chargement…</p>
               </div>
             )}
 
             {!loading && timeline.length === 0 && (
-              <div style={{ padding: '40px 24px', textAlign: 'center', background: '#fff', border: `2px solid ${DARK}` }}>
+              <div style={{ padding: '40px 24px', textAlign: 'center', background: '#fff', border: `4px solid ${DARK}` }}>
                 <LayoutGrid size={28} color={DARK} strokeWidth={1.2} style={{ display: 'block', margin: '0 auto 10px', opacity: 0.12 }} />
                 <p style={{ margin: '0 0 4px', fontSize: 13, fontWeight: 900, color: DARK }}>Aucune table configurée</p>
                 <p style={{ margin: 0, fontSize: 11, fontWeight: 600, color: 'rgba(43,33,24,0.35)' }}>Ajoutez des tables dans la section Tables.</p>
@@ -627,7 +626,7 @@ export default function TableTimeline({ controlledDate = null }) {
             )}
 
             {!loading && timeline.length > 0 && totalRes === 0 && (
-              <div style={{ padding: '11px 14px', background: '#fdf6ec', border: `1px solid rgba(200,169,126,0.28)`, display: 'flex', alignItems: 'center', gap: 9, marginBottom: 2 }}>
+              <div style={{ padding: '11px 14px', background: '#ffffff', border: `1px solid rgba(200,169,126,0.28)`, display: 'flex', alignItems: 'center', gap: 9, marginBottom: 2 }}>
                 <CalendarDays size={13} color={GOLD_DARK} strokeWidth={2} style={{ flexShrink: 0 }} />
                 <p style={{ margin: 0, fontSize: 12, fontWeight: 800, color: DARK }}>
                   Aucune réservation {isToday ? "aujourd'hui" : `le ${formatShort(date)}`}

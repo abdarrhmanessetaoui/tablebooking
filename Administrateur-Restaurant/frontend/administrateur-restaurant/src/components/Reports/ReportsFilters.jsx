@@ -115,9 +115,9 @@ function CalendarPopup({ filterDate, setFilterDate, onClose, anchorRef }) {
         width: pos.width,
         zIndex: 99999,
         background: '#fff',
-        border: `2px solid ${DARK}`,
+        border: `4px solid ${DARK}`,
         boxShadow: '0 8px 32px rgba(43,33,24,0.22)',
-        fontFamily: "'Plus Jakarta Sans','DM Sans',system-ui,sans-serif",
+        fontFamily: "'Inter',system-ui,-apple-system,sans-serif",
       }}
     >
       {/* Header */}
@@ -140,7 +140,7 @@ function CalendarPopup({ filterDate, setFilterDate, onClose, anchorRef }) {
       </div>
 
       {/* Mode toggle */}
-      <div style={{ display: 'flex', borderBottom: '2px solid #e8e0d8' }}>
+      <div style={{ display: 'flex', borderBottom: '4px solid #e8e0d8' }}>
         {['day', 'month'].map(m => (
           <button key={m} onClick={() => setMode(m)} style={{
             flex: 1, padding: '7px', fontSize: 11, fontWeight: 800,
@@ -148,7 +148,7 @@ function CalendarPopup({ filterDate, setFilterDate, onClose, anchorRef }) {
             background: 'none', border: 'none', cursor: 'pointer',
             fontFamily: 'inherit',
             color: mode === m ? DARK : '#2b2118',
-            borderBottom: mode === m ? `2px solid ${DARK}` : 'none',
+            borderBottom: mode === m ? `4px solid ${DARK}` : 'none',
             marginBottom: mode === m ? -2 : 0,
             transition: 'all 0.12s',
           }}>
@@ -222,7 +222,7 @@ function CalendarPopup({ filterDate, setFilterDate, onClose, anchorRef }) {
         <div style={{
           padding: '6px 10px', borderTop: '1px solid #e8e0d8',
           fontSize: 11, fontWeight: 700, color: DARK,
-          background: '#faf8f5', textAlign: 'center', letterSpacing: '0.04em',
+          background: '#ffffff', textAlign: 'center', letterSpacing: '0.04em',
         }}>
           {String(selDay).padStart(2,'0')} {MONTHS_FR[selMon]} {selYear}
         </div>
@@ -260,7 +260,7 @@ export default function ReportsFilters({
   }
 
   const base = {
-    background: '#fff', border: '2px solid #2b2118',
+    background: '#fff', border: '4px solid #2b2118',
     padding: '10px 14px', fontSize: 13, fontWeight: 600,
     color: DARK, fontFamily: 'inherit',
     outline: 'none', boxSizing: 'border-box',
@@ -311,7 +311,7 @@ export default function ReportsFilters({
               display: 'flex', alignItems: 'center', justifyContent: 'space-between',
               gap: 8, width: '100%', padding: '10px 14px',
               background: filterDate ? DARK : '#fff',
-              border: filterDate ? 'none' : '2px solid #e8e0d8',
+              border: filterDate ? 'none' : '4px solid #e8e0d8',
               fontSize: 13, fontWeight: 800,
               color: filterDate ? GOLD : '#2b2118',
               cursor: 'pointer', fontFamily: 'inherit',

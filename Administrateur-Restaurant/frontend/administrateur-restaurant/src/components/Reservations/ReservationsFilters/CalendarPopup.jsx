@@ -83,9 +83,9 @@ export default function CalendarPopup({ filterDate, setFilterDate, onClose, anch
   return createPortal(
     <div ref={popupRef} style={{
       position:'fixed', top:pos.top, left:pos.left, width:pos.width??280,
-      zIndex:99999, background:'#fff', border:`2px solid ${DARK}`,
+      zIndex:99999, background:'#fff', border:`4px solid ${DARK}`,
       boxShadow:'0 8px 32px rgba(43,33,24,0.22)',
-      fontFamily:"'Plus Jakarta Sans','DM Sans',system-ui,sans-serif",
+      fontFamily:"'Inter',system-ui,-apple-system,sans-serif",
     }}>
       {/* Header */}
       <div style={{ display:'flex', alignItems:'center', background:DARK, padding:'8px 6px', gap:2 }}>
@@ -99,14 +99,14 @@ export default function CalendarPopup({ filterDate, setFilterDate, onClose, anch
       </div>
 
       {/* Mode tabs */}
-      <div style={{ display:'flex', borderBottom:`2px solid rgba(43,33,24,0.12)` }}>
+      <div style={{ display:'flex', borderBottom:`4px solid rgba(43,33,24,0.12)` }}>
         {['day','month'].map(m => (
           <button key={m} onClick={() => setMode(m)} style={{
             flex:1, padding:'7px', fontSize:11, fontWeight:800,
             textTransform:'uppercase', letterSpacing:'0.08em',
             background:'none', border:'none', cursor:'pointer',
             fontFamily:'inherit', color:DARK,
-            borderBottom: mode===m ? `2px solid ${DARK}` : 'none',
+            borderBottom: mode===m ? `4px solid ${DARK}` : 'none',
             marginBottom: mode===m ? -2 : 0,
           }}>
             {m==='day' ? 'Jour' : 'Mois'}
@@ -156,7 +156,7 @@ export default function CalendarPopup({ filterDate, setFilterDate, onClose, anch
       )}
 
       {selFull && (
-        <div style={{ padding:'6px 10px', borderTop:`1px solid rgba(43,33,24,0.1)`, fontSize:11, fontWeight:700, color:DARK, background:'#faf8f5', textAlign:'center' }}>
+        <div style={{ padding:'6px 10px', borderTop:`1px solid rgba(43,33,24,0.1)`, fontSize:11, fontWeight:700, color:DARK, background:'#ffffff', textAlign:'center' }}>
           {String(selDay).padStart(2,'0')} {MONTHS_FR[selMon]} {selYear}
         </div>
       )}

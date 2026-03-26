@@ -5,7 +5,7 @@ const DARK      = '#2b2118'
 const GOLD      = '#c8a97e'
 const GOLD_DARK = '#a8834e'
 const BORDER    = '#2b2118'
-const CREAM     = '#faf8f5'
+const CREAM     = '#ffffff'
 
 const PAGE_SIZE = 10
 
@@ -47,7 +47,7 @@ function Checkbox({ checked, indeterminate, onChange }) {
     <div onClick={e => { e.stopPropagation(); onChange() }} style={{
       width: 18, height: 18, flexShrink: 0,
       background: checked || indeterminate ? DARK : '#fff',
-      border: `2px solid ${DARK}`,
+      border: `4px solid ${DARK}`,
       display: 'flex', alignItems: 'center', justifyContent: 'center',
       cursor: 'pointer', transition: 'all 0.15s', padding: 2, margin: -2,
     }}>
@@ -57,7 +57,7 @@ function Checkbox({ checked, indeterminate, onChange }) {
         </svg>
       )}
       {indeterminate && !checked && (
-        <div style={{ width: 7, height: 2, background: GOLD }} />
+        <div style={{ width: 7, height: 4, background: GOLD }} />
       )}
     </div>
   )
@@ -72,7 +72,7 @@ function PageBtn({ onClick, disabled, active, children }) {
         minWidth: 36, height: 36, padding: '0 6px',
         display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
         background: active ? DARK : hov && !disabled ? '#FBF5EA' : '#fff',
-        border: `1.5px solid ${DARK}`,
+        border: `4px solid ${DARK}`,
         color: active ? GOLD : DARK,
         fontSize: 12, fontWeight: active ? 900 : 700,
         cursor: disabled ? 'not-allowed' : 'pointer',
@@ -94,7 +94,7 @@ export default function BlockedDateList({ blockedDates, handleUnblock, selectedD
 
   if (!blockedDates || blockedDates.length === 0) {
     return (
-      <div style={{ padding: '56px 16px', textAlign: 'center', background: '#fff', border: `1.5px solid ${BORDER}` }}>
+      <div style={{ padding: '56px 16px', textAlign: 'center', background: '#fff', border: `4px solid ${BORDER}` }}>
         <CalendarOff size={40} color={DARK} strokeWidth={1.5} style={{ display: 'block', margin: '0 auto 14px' }} />
         <p style={{ margin: 0, fontSize: 15, fontWeight: 900, color: DARK }}>Aucune date bloquée</p>
         <p style={{ margin: '6px 0 0', fontSize: 12, fontWeight: 600, color: DARK }}>
@@ -164,7 +164,7 @@ export default function BlockedDateList({ blockedDates, handleUnblock, selectedD
 
         {/* Partial selection banner */}
         {selectedDates.length > 0 && !allSelected && (
-          <div style={{ padding: '9px 14px', background: '#fdf6ec', borderBottom: `1px solid #e8d8b0`, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, flexWrap: 'wrap' }}>
+          <div style={{ padding: '9px 14px', background: '#ffffff', borderBottom: `1px solid #e8e0d6`, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, flexWrap: 'wrap' }}>
             <span style={{ fontSize: 12, fontWeight: 700, color: GOLD_DARK }}>
               {selectedDates.length} sélectionné{selectedDates.length > 1 ? 's' : ''}
             </span>
@@ -176,7 +176,7 @@ export default function BlockedDateList({ blockedDates, handleUnblock, selectedD
 
         {/* All selected banner */}
         {allSelected && blockedDates.length > PAGE_SIZE && (
-          <div style={{ padding: '9px 14px', background: '#f0f7f0', borderBottom: `1px solid #b8ddb8`, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, flexWrap: 'wrap' }}>
+          <div style={{ padding: '9px 14px', background: '#ffffff', borderBottom: `1px solid #b8ddb8`, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, flexWrap: 'wrap' }}>
             <span style={{ fontSize: 12, fontWeight: 700, color: '#2d6a2d' }}>
               {blockedDates.length} dates sélectionnées
             </span>
@@ -203,7 +203,7 @@ export default function BlockedDateList({ blockedDates, handleUnblock, selectedD
           const past     = isPast(d.date)
           const selected = selectedDates.includes(d.date)
           const idx      = (safe - 1) * PAGE_SIZE + i
-          const bg       = selected ? '#fdf6ec' : idx % 2 === 0 ? '#fff' : CREAM
+          const bg       = selected ? '#ffffff' : idx % 2 === 0 ? '#fff' : CREAM
           const reason   = d.reason || d.notes || d.label || ''   // fallback field names
 
           return (
@@ -248,9 +248,9 @@ export default function BlockedDateList({ blockedDates, handleUnblock, selectedD
                 {past && (
                   <span style={{
                     display: 'inline-block', marginTop: 4,
-                    fontSize: 9, fontWeight: 900, color: '#b94040',
+                    fontSize: 9, fontWeight: 900, color: '#DC2626',
                     letterSpacing: '0.12em', textTransform: 'uppercase',
-                    background: '#fdf0f0', padding: '1px 6px',
+                    background: '#ffffff', padding: '1px 6px',
                   }}>
                     Passée
                   </span>
@@ -275,23 +275,20 @@ export default function BlockedDateList({ blockedDates, handleUnblock, selectedD
               )}
 
               {/* Unblock button */}
-              <button onClick={e => { e.stopPropagation(); handleUnblock(d.date) }}
-                style={{
-                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-                  width: '100%',
-                  padding: isMobile ? '10px 0' : '10px 18px',
-                  background: DARK, border: 'none', color: '#fff',
-                  fontSize: 13, fontWeight: 800, cursor: 'pointer',
-                  transition: 'background 0.15s',
-                  fontFamily: 'inherit', whiteSpace: 'nowrap', minHeight: 40,
-                  WebkitTapHighlightColor: 'transparent',
-                }}
-                onMouseEnter={e => e.currentTarget.style.background = '#b94040'}
-                onMouseLeave={e => e.currentTarget.style.background = DARK}
-                title="Débloquer">
-                <Trash2 size={14} strokeWidth={2.2} />
-                <span className="unblock-label">Débloquer</span>
-              </button>
+              <div style={{ padding: '0 12px', display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
+                <button onClick={e => { e.stopPropagation(); handleUnblock(d.date) }}
+                  style={{
+                    display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                    padding: 6, borderRadius: '50%',
+                    background: '#DC2626', border: 'none', color: '#fff',
+                    cursor: 'pointer', transition: 'opacity 0.15s',
+                  }}
+                  onMouseEnter={e => e.currentTarget.style.opacity = 0.85}
+                  onMouseLeave={e => e.currentTarget.style.opacity = 1}
+                  title="Débloquer">
+                  <Trash2 size={14} strokeWidth={2.5} />
+                </button>
+              </div>
             </div>
           )
         })}
@@ -301,7 +298,7 @@ export default function BlockedDateList({ blockedDates, handleUnblock, selectedD
           <div style={{
             display: 'flex', alignItems: 'center', justifyContent: 'space-between',
             flexWrap: 'wrap', gap: 8, padding: '12px 14px',
-            borderTop: `1.5px solid ${BORDER}`, background: CREAM,
+            borderTop: `4px solid ${BORDER}`, background: CREAM,
           }}>
             <span style={{ fontSize: 11, fontWeight: 700, color: DARK, flexShrink: 0 }}>
               {(safe - 1) * PAGE_SIZE + 1}–{Math.min(safe * PAGE_SIZE, sorted.length)} / {sorted.length}

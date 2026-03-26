@@ -7,7 +7,7 @@ import Spinner from '../components/Dashboard/Spinner'
 const DARK    = '#2b2118'
 const GOLD    = '#c8a97e'
 const GOLD_DK = '#a8834e'
-const CREAM   = '#faf8f5'
+const CREAM   = '#ffffff'
 const BORDER  = '#2b2118'
 
 const FR_DAYS      = ['Dim','Lun','Mar','Mer','Jeu','Ven','Sam']
@@ -21,23 +21,24 @@ function Label({ children }) {
   )
 }
 
-function TextInput({ value, onChange, placeholder, type = 'text', icon: Icon, disabled }) {
+function TextInput({ value, onChange, placeholder, type = 'text', icon: Icon, disabled, readOnly }) {
   const [focused, setFocused] = useState(false)
   return (
     <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
       {Icon && <Icon size={14} strokeWidth={2} color={focused ? GOLD : DARK}
         style={{ position: 'absolute', left: 12, flexShrink: 0, transition: 'color 0.15s', pointerEvents: 'none' }} />}
-      <input type={type} value={value ?? ''} onChange={e => onChange(e.target.value)}
-        placeholder={placeholder} disabled={disabled}
+      <input type={type} value={value ?? ''} onChange={e => { if (!readOnly) onChange(e.target.value) }}
+        placeholder={placeholder} disabled={disabled} readOnly={readOnly}
         onFocus={() => setFocused(true)} onBlur={() => setFocused(false)}
         style={{
           width: '100%', boxSizing: 'border-box',
           padding: Icon ? '11px 14px 11px 36px' : '11px 14px',
-          border: `2px solid ${focused ? GOLD : BORDER}`,
+          border: `4px solid ${focused ? GOLD : BORDER}`,
           fontSize: 13, fontWeight: 700, color: DARK,
           fontFamily: 'inherit', outline: 'none',
-          background: disabled ? CREAM : '#fff',
+          background: disabled || readOnly ? CREAM : '#fff',
           borderRadius: 0, transition: 'border-color 0.15s', WebkitAppearance: 'none',
+          cursor: readOnly ? 'text' : (disabled ? 'not-allowed' : 'text'),
         }}
       />
     </div>
@@ -50,7 +51,7 @@ function TimeInput({ value, onChange, max }) {
       onChange={e => onChange(e.target.value)}
       style={{
         width: 52, textAlign: 'center',
-        border: `2px solid ${BORDER}`, padding: '10px 6px',
+        border: `4px solid ${BORDER}`, padding: '10px 6px',
         fontSize: 15, fontWeight: 900, color: DARK,
         fontFamily: 'inherit', outline: 'none',
         background: '#fff', borderRadius: 0, WebkitAppearance: 'none',
@@ -88,7 +89,7 @@ function SaveBtn({ onClick, saving }) {
 function Section({ icon: Icon, title, action, children, defaultOpen = true }) {
   const [open, setOpen] = useState(defaultOpen)
   return (
-    <div style={{ background: '#fff', border: `2px solid ${DARK}`, overflow: 'hidden' }}>
+    <div style={{ background: '#fff', border: `4px solid ${DARK}`, overflow: 'hidden' }}>
       <div onClick={() => setOpen(o => !o)} style={{
         padding: '12px 16px', background: DARK,
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
@@ -139,7 +140,7 @@ function TabBtn({ active, onClick, children, disabled }) {
       style={{
         padding: '9px 16px',
         background: active ? DARK : hov ? CREAM : '#fff',
-        border: `2px solid ${active ? DARK : BORDER}`,
+        border: `4px solid ${active ? DARK : BORDER}`,
         color: active ? GOLD : DARK,
         fontSize: 12, fontWeight: 800,
         cursor: disabled ? 'default' : 'pointer',
@@ -193,10 +194,10 @@ export default function Settings() {
 
       <div style={{
         minHeight: '100vh', background: CREAM,
-        fontFamily: "'Plus Jakarta Sans','DM Sans',system-ui,sans-serif",
+        fontFamily: "'Inter',system-ui,-apple-system,sans-serif",
         padding: 'clamp(14px,3vw,40px) clamp(12px,4vw,36px)', width: '100%',
       }}>
-        <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800;900&display=swap" rel="stylesheet" />
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
 
         <FadeUp delay={0}>
           <h1 style={{ margin: 0, fontSize: 'clamp(20px,5vw,36px)', fontWeight: 900, color: DARK, letterSpacing: '-1.5px', lineHeight: 1 }}>
@@ -207,7 +208,7 @@ export default function Settings() {
         </FadeUp>
 
         <FadeUp delay={10}>
-          <div style={{ height: 2, background: DARK, margin: '16px 0 32px' }} />
+          <div style={{ height: 4, background: DARK, margin: '16px 0 32px' }} />
         </FadeUp>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 20, maxWidth: 900 }}>
@@ -248,7 +249,7 @@ export default function Settings() {
                     placeholder="Quelques mots sur votre restaurant…" rows={3}
                     style={{
                       width: '100%', padding: '11px 14px',
-                      border: `2px solid ${BORDER}`, fontSize: 13, fontWeight: 600, color: DARK,
+                      border: `4px solid ${BORDER}`, fontSize: 13, fontWeight: 600, color: DARK,
                       fontFamily: 'inherit', outline: 'none', background: '#fff',
                       borderRadius: 0, resize: 'vertical', transition: 'border-color 0.15s',
                     }}
@@ -278,7 +279,7 @@ export default function Settings() {
                       style={{
                         display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3,
                         background: isActive ? GOLD : open ? DARK : '#fff',
-                        border: `2px solid ${isActive ? GOLD_DK : DARK}`,
+                        border: `4px solid ${isActive ? GOLD_DK : DARK}`,
                         color: isActive ? DARK : open ? GOLD : DARK,
                         cursor: 'pointer', transition: 'all 0.15s', fontFamily: 'inherit',
                       }}
@@ -302,17 +303,17 @@ export default function Settings() {
                   <span style={{ fontSize: 16, fontWeight: 900, color: DARK }}>{FR_DAYS_FULL[activeDay]}</span>
                   <span style={{
                     fontSize: 11, fontWeight: 800,
-                    color: isDayOpen ? '#16a34a' : '#b94040',
-                    background: isDayOpen ? '#f0f7f0' : '#fdf0f0',
-                    padding: '3px 10px', border: `1.5px solid ${isDayOpen ? '#16a34a' : '#b94040'}`,
+                    color: '#ffffff',
+                    background: isDayOpen ? '#16A34A' : '#DC2626',
+                    padding: '3px 10px', border: `4px solid ${isDayOpen ? '#16A34A' : '#DC2626'}`,
                   }}>
                     {isDayOpen ? 'Ouvert' : 'Fermé'}
                   </span>
                   {isDayOpen && servicesOnActiveDay.length > 0 && (
                     <span style={{
-                      fontSize: 11, fontWeight: 800, color: GOLD_DK,
-                      background: '#fdf6ec', padding: '3px 10px',
-                      border: `1.5px solid #e8c87a`,
+                      fontSize: 11, fontWeight: 800, color: '#ffffff',
+                      background: '#e8c87a', padding: '3px 10px',
+                      border: `4px solid #e8c87a`,
                     }}>
                       {servicesOnActiveDay.length} service{servicesOnActiveDay.length > 1 ? 's' : ''}
                     </span>
@@ -323,26 +324,29 @@ export default function Settings() {
                   title={isDayOpen ? 'Marquer Fermé' : 'Marquer Ouvert'}
                   style={{
                     display: 'flex', alignItems: 'center', gap: 6,
-                    padding: '8px 16px', fontSize: 11, fontWeight: 900,
-                    background: isDayOpen ? '#fdf0f0' : '#f0f7f0',
-                    border: `2px solid ${isDayOpen ? '#b94040' : '#16a34a'}`,
-                    color: isDayOpen ? '#b94040' : '#16a34a',
-                    cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.15s', flexShrink: 0,
-                  }}>
+                    padding: '8px 14px', fontSize: 11, fontWeight: 900, borderRadius: 6,
+                    background: isDayOpen ? '#DC2626' : '#16A34A',
+                    border: 'none',
+                    color: '#fff',
+                    cursor: 'pointer', fontFamily: 'inherit', transition: 'opacity 0.15s', flexShrink: 0,
+                  }}
+                  onMouseEnter={e => e.currentTarget.style.opacity = 0.85}
+                  onMouseLeave={e => e.currentTarget.style.opacity = 1}
+                >
                   {isDayOpen
-                    ? <><X size={12} strokeWidth={2.5} /><span className="toggle-btn-text">Marquer Fermé</span></>
-                    : <><Check size={12} strokeWidth={2.5} /><span className="toggle-btn-text">Marquer Ouvert</span></>
+                    ? <><X size={14} color="#fff" strokeWidth={2.5} /><span className="toggle-btn-text">Marquer Fermé</span></>
+                    : <><Check size={14} color="#fff" strokeWidth={2.5} /><span className="toggle-btn-text">Marquer Ouvert</span></>
                   }
                 </button>
               </div>
 
               {/* ── Content ── */}
               {!isDayOpen ? (
-                <div style={{ padding: '20px 24px', background: '#fdf0f0', border: `2px solid #fecaca`, fontSize: 13, fontWeight: 700, color: '#b94040' }}>
+                <div style={{ padding: '20px 24px', background: '#ffffff', border: `4px solid #DC2626`, fontSize: 13, fontWeight: 700, color: '#DC2626' }}>
                   Ce jour est marqué comme fermé — aucun horaire à configurer.
                 </div>
               ) : servicesOnActiveDay.length === 0 ? (
-                <div style={{ padding: '20px 24px', background: '#fdf6ec', border: `2px solid #e8c87a`, fontSize: 13, fontWeight: 700, color: GOLD_DK }}>
+                <div style={{ padding: '20px 24px', background: '#ffffff', border: `4px solid #e8c87a`, fontSize: 13, fontWeight: 700, color: GOLD_DK }}>
                   Aucun service n'est disponible le {FR_DAYS_FULL[activeDay].toLowerCase()}.
                   Configurez les jours disponibles depuis la page <strong>Services</strong>.
                 </div>
@@ -358,7 +362,7 @@ export default function Settings() {
                   </div>
 
                   {currentSlot && (
-                    <div style={{ background: CREAM, border: `2px solid ${DARK}`, padding: 'clamp(14px,3vw,24px)' }}>
+                    <div style={{ background: CREAM, border: `4px solid ${DARK}`, padding: 'clamp(14px,3vw,24px)' }}>
                       <div style={{ marginBottom: 10, fontSize: 12, fontWeight: 800, color: GOLD_DK }}>
                         {currentSvc?.name ?? 'Service'} · {FR_DAYS_FULL[activeDay]}
                       </div>
@@ -402,16 +406,16 @@ export default function Settings() {
               <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
                 <Grid>
                   <Field label="Nom expéditeur">
-                    <TextInput value={notifications.fp_from_name} onChange={v => setNotifField('fp_from_name', v)} placeholder="TableBooking.ma" />
+                    <TextInput readOnly value={notifications.fp_from_name} onChange={v => setNotifField('fp_from_name', v)} placeholder="TableBooking.ma" />
                   </Field>
                   <Field label="Email expéditeur">
-                    <TextInput disabled icon={Mail} value={notifications.fp_from_email} onChange={v => setNotifField('fp_from_email', v)} placeholder="reservation@tablebooking.ma" type="email" />
+                    <TextInput readOnly icon={Mail} value={notifications.fp_from_email} onChange={v => setNotifField('fp_from_email', v)} placeholder="reservation@tablebooking.ma" type="email" />
                   </Field>
                 </Grid>
                 <Field label="Emails destinataires (séparés par des virgules)">
                   <TextInput icon={Mail} value={notifications.fp_destination_emails} onChange={v => setNotifField('fp_destination_emails', v)} placeholder="manager@resto.ma, chef@resto.ma" />
                 </Field>
-                <div style={{ height: 2, background: DARK, opacity: 0.08 }} />
+                <div style={{ height: 4, background: DARK, opacity: 0.08 }} />
                 <div>
                   <Label>Statut par défaut des nouvelles réservations</Label>
                   <div style={{ display: 'flex', gap: 6, marginTop: 8, flexWrap: 'wrap' }}>

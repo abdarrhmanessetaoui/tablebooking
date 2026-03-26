@@ -6,7 +6,7 @@ const GOLD   = '#c8a97e'
 const BORDER = '#2b2118'
 
 const PRESET_COLORS = [
-  '#4f6ef7', '#16a34a', '#a8834e', '#b94040',
+  '#4f6ef7', '#16a34a', '#a8834e', '#DC2626',
   '#0891b2', '#7c3aed', '#db2777', '#d97706',
   '#475569', '#15803d',
 ]
@@ -16,7 +16,7 @@ function ColorDot({ color, selected, onClick }) {
     <button onClick={onClick} title={color} style={{
       width: 22, height: 22, borderRadius: '50%',
       background: color,
-      border: selected ? `3px solid ${DARK}` : '2px solid transparent',
+      border: selected ? `3px solid ${DARK}` : '4px solid transparent',
       cursor: 'pointer', flexShrink: 0,
       boxShadow: selected ? `0 0 0 1px ${color}` : 'none',
       transition: 'transform 0.1s',
@@ -35,7 +35,7 @@ function ColorPicker({ value, onChange }) {
         <div style={{
           width: 22, height: 22, borderRadius: '50%',
           background: PRESET_COLORS.includes(value) ? '#e5e7eb' : value,
-          border: `2px solid ${DARK}`,
+          border: `4px solid ${DARK}`,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           fontSize: 13, fontWeight: 900, color: DARK,
         }}>+</div>
@@ -47,7 +47,7 @@ function ColorPicker({ value, onChange }) {
 }
 
 const inp = {
-  padding: '9px 12px', border: `2px solid ${BORDER}`,
+  padding: '9px 12px', border: `4px solid ${BORDER}`,
   fontSize: 13, fontWeight: 700, color: DARK,
   fontFamily: 'inherit', outline: 'none',
   background: '#fff', borderRadius: 0,
@@ -73,7 +73,7 @@ export default function TableLocationsManager({ locations = [], loading, saving,
   }
 
   return (
-    <div style={{ background: '#fff', border: `1.5px solid ${BORDER}`, fontFamily: "'Plus Jakarta Sans','DM Sans',system-ui,sans-serif" }}>
+    <div style={{ background: '#fff', border: `4px solid ${BORDER}`, fontFamily: "'Inter',system-ui,-apple-system,sans-serif" }}>
 
       {/* Header */}
       <div style={{ padding: '12px 16px', background: DARK, display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -89,7 +89,7 @@ export default function TableLocationsManager({ locations = [], loading, saving,
       <div style={{ padding: 16 }}>
 
         {/* Add new */}
-        <div style={{ marginBottom: 16, padding: 14, background: '#faf8f5', border: `1px solid rgba(43,33,24,0.1)` }}>
+        <div style={{ marginBottom: 16, padding: 14, background: '#ffffff', border: `1px solid rgba(43,33,24,0.1)` }}>
           <p style={{ margin: '0 0 10px', fontSize: 9, fontWeight: 900, color: DARK, letterSpacing: '0.16em', textTransform: 'uppercase' }}>
             Nouvel emplacement
           </p>
@@ -131,8 +131,8 @@ export default function TableLocationsManager({ locations = [], loading, saving,
             {locations.map(loc => (
               <div key={loc.id} style={{
                 display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px',
-                border: `1.5px solid rgba(43,33,24,0.1)`,
-                background: editingId === loc.id ? '#faf8f5' : '#fff',
+                border: `4px solid rgba(43,33,24,0.1)`,
+                background: editingId === loc.id ? '#ffffff' : '#fff',
               }}>
                 {editingId === loc.id ? (
                   <>
@@ -145,12 +145,29 @@ export default function TableLocationsManager({ locations = [], loading, saving,
                       <ColorPicker value={editColor} onChange={setEditColor} />
                     </div>
                     <button onClick={saveEdit} disabled={!editName.trim() || saving} title="Enregistrer"
-                      style={{ padding: '8px 10px', background: DARK, border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', flexShrink: 0 }}>
-                      <Check size={13} color={GOLD} strokeWidth={2.5} />
+                      style={{
+                        padding: 6, borderRadius: '50%',
+                        background: '#16A34A', border: 'none', color: '#fff',
+                        cursor: !editName.trim() || saving ? 'not-allowed' : 'pointer',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+                        transition: 'opacity 0.15s', opacity: !editName.trim() || saving ? 0.45 : 1,
+                      }}
+                      onMouseEnter={e => { if (editName.trim() && !saving) e.currentTarget.style.opacity = 0.85 }}
+                      onMouseLeave={e => e.currentTarget.style.opacity = !editName.trim() || saving ? 0.45 : 1}
+                    >
+                      <Check size={14} strokeWidth={2.5} />
                     </button>
                     <button onClick={cancelEdit} title="Annuler"
-                      style={{ padding: '8px 10px', background: 'none', border: `1.5px solid rgba(43,33,24,0.2)`, cursor: 'pointer', display: 'flex', alignItems: 'center', flexShrink: 0 }}>
-                      <X size={13} color={DARK} strokeWidth={2.5} />
+                      style={{
+                        padding: 6, borderRadius: '50%',
+                        background: DARK, border: 'none', color: '#fff',
+                        cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+                        transition: 'opacity 0.15s',
+                      }}
+                      onMouseEnter={e => e.currentTarget.style.opacity = 0.85}
+                      onMouseLeave={e => e.currentTarget.style.opacity = 1}
+                    >
+                      <X size={14} strokeWidth={2.5} />
                     </button>
                   </>
                 ) : (
@@ -158,18 +175,28 @@ export default function TableLocationsManager({ locations = [], loading, saving,
                     <span style={{ width: 12, height: 12, borderRadius: '50%', background: loc.color, flexShrink: 0 }} />
                     <span style={{ flex: 1, fontSize: 13, fontWeight: 700, color: DARK }}>{loc.name}</span>
                     <button onClick={() => startEdit(loc)} title="Modifier"
-                      style={{ padding: '5px 9px', background: 'none', border: `1.5px solid rgba(43,33,24,0.15)`, cursor: 'pointer', display: 'flex', alignItems: 'center' }}
-                      onMouseEnter={e => e.currentTarget.style.borderColor = DARK}
-                      onMouseLeave={e => e.currentTarget.style.borderColor = 'rgba(43,33,24,0.15)'}
+                      style={{
+                        padding: 6, borderRadius: '50%',
+                        background: GOLD, border: 'none', color: '#fff',
+                        cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        transition: 'opacity 0.15s',
+                      }}
+                      onMouseEnter={e => e.currentTarget.style.opacity = 0.85}
+                      onMouseLeave={e => e.currentTarget.style.opacity = 1}
                     >
-                      <Pencil size={12} color={DARK} strokeWidth={2.5} />
+                      <Pencil size={14} strokeWidth={2.5} />
                     </button>
                     <button onClick={() => onDelete(loc)} title="Supprimer"
-                      style={{ padding: '5px 9px', background: 'none', border: `1.5px solid rgba(185,64,64,0.2)`, cursor: 'pointer', display: 'flex', alignItems: 'center' }}
-                      onMouseEnter={e => { e.currentTarget.style.background = '#fef2f2'; e.currentTarget.style.borderColor = '#b94040' }}
-                      onMouseLeave={e => { e.currentTarget.style.background = 'none'; e.currentTarget.style.borderColor = 'rgba(185,64,64,0.2)' }}
+                      style={{
+                        padding: 6, borderRadius: '50%',
+                        background: '#DC2626', border: 'none', color: '#fff',
+                        cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        transition: 'opacity 0.15s',
+                      }}
+                      onMouseEnter={e => e.currentTarget.style.opacity = 0.85}
+                      onMouseLeave={e => e.currentTarget.style.opacity = 1}
                     >
-                      <Trash2 size={12} color="#b94040" strokeWidth={2.5} />
+                      <Trash2 size={14} strokeWidth={2.5} />
                     </button>
                   </>
                 )}

@@ -9,7 +9,7 @@ export default function Checkbox({ checked, indeterminate, onChange }) {
           <path d="M1 4L3.5 6.5L9 1" stroke={GOLD} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
         </svg>
       )}
-      {indeterminate && !checked && <div style={{ width:7, height:2, background:GOLD }} />}
+      {indeterminate && !checked && <div style={{ width:7, height:4, background:GOLD }} />}
     </div>
   )
 }

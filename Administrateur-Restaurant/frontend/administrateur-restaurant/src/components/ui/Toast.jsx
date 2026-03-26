@@ -2,10 +2,10 @@ import { useState, useEffect, useCallback } from 'react'
 import { CheckCircle, XCircle, AlertCircle, X } from 'lucide-react'
 
 const TYPES = {
-  success: { bg: '#f0fdf4', border: '#bbf7d0', color: '#166534', icon: CheckCircle, dot: '#16a34a' },
-  error:   { bg: '#fef2f2', border: '#fecaca', color: '#991b1b', icon: XCircle,     dot: '#dc2626' },
-  warning: { bg: '#fffbeb', border: '#fde68a', color: '#92400e', icon: AlertCircle, dot: '#c8a97e' },
-  info:    { bg: '#fdf6ec', border: '#e8d8b0', color: '#a8834e', icon: AlertCircle, dot: '#c8a97e' },
+  success: { bg: '#ffffff', border: '#16A34A', color: '#16A34A', icon: CheckCircle, dot: '#16A34A' },
+  error:   { bg: '#ffffff', border: '#DC2626', color: '#DC2626', icon: XCircle,     dot: '#DC2626' },
+  warning: { bg: '#ffffff', border: '#C8A97E', color: '#a8834e', icon: AlertCircle, dot: '#C8A97E' },
+  info:    { bg: '#ffffff', border: '#C8A97E', color: '#a8834e', icon: AlertCircle, dot: '#C8A97E' },
 }
 
 let _addToast = null
@@ -46,12 +46,12 @@ export default function ToastContainer() {
             display: 'flex', alignItems: 'center', gap: 10,
             padding: '12px 16px',
             background: cfg.bg,
-            border: `1.5px solid ${cfg.border}`,
-            borderLeft: `4px solid ${cfg.dot}`,
+            border: `4px solid ${cfg.border}`,
+            borderLeft: `6px solid ${cfg.dot}`,
             boxShadow: '0 4px 20px rgba(43,33,24,0.12)',
             minWidth: 280, maxWidth: 380,
             animation: 'toastIn 0.22s ease',
-            fontFamily: "'Plus Jakarta Sans','DM Sans',system-ui,sans-serif",
+            fontFamily: "'Inter',system-ui,-apple-system,sans-serif",
           }}>
             <Icon size={15} color={cfg.dot} strokeWidth={2.5} style={{ flexShrink: 0 }} />
             <span style={{ flex: 1, fontSize: 13, fontWeight: 700, color: cfg.color, lineHeight: 1.4 }}>

@@ -3,7 +3,7 @@ import { DARK, GOLD, GOLD_DARK } from '../../../styles/reservations/tokens'
 export default function ServiceInfoCard({ svc, openDaysLabel }) {
   if (!svc) return null
   return (
-    <div style={{ padding:'12px 14px', background:'#faf8f5', borderLeft:`3px solid ${GOLD}`, display:'flex', flexDirection:'column', gap:8 }}>
+    <div style={{ padding:'12px 14px', background:'#ffffff', borderLeft:`3px solid ${GOLD}`, display:'flex', flexDirection:'column', gap:8 }}>
       {[
         { Icon:Clock,       text:`Durée : `, bold:`${svc.duration} min` },
         { Icon:Users,       text:`Capacité max : `, bold:`${svc.capacity} personne${svc.capacity>1?'s':''}` },

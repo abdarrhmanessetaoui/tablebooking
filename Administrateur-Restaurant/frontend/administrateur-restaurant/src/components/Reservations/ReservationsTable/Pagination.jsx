@@ -33,7 +33,7 @@ export default function Pagination({ total, page, pageSize, setPage, setPageSize
   }
 
   return (
-    <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', flexWrap:'wrap', gap:10, padding:'12px 16px', borderTop:`1.5px solid ${BORDER}`, background:CREAM }}>
+    <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', flexWrap:'wrap', gap:10, padding:'12px 16px', borderTop:`4px solid ${BORDER}`, background:CREAM }}>
       <div style={{ display:'flex', alignItems:'center', gap:10, flexWrap:'wrap' }}>
         <span style={{ fontSize:12, fontWeight:700, color:DARK }}>
           {start + 1}–{Math.min(start + pageSize, total)} / {total}
@@ -41,7 +41,7 @@ export default function Pagination({ total, page, pageSize, setPage, setPageSize
         <select
           value={pageSize}
           onChange={e => { setPageSize(Number(e.target.value)); setPage(1) }}
-          style={{ padding:'4px 8px', border:`1.5px solid ${BORDER}`, fontSize:12, fontWeight:700, color:DARK, background:'#fff', cursor:'pointer', outline:'none', fontFamily:'inherit' }}
+          style={{ padding:'4px 8px', border:`4px solid ${BORDER}`, fontSize:12, fontWeight:700, color:DARK, background:'#fff', cursor:'pointer', outline:'none', fontFamily:'inherit' }}
         >
           {PAGE_SIZES.map(s => <option key={s} value={s}>{s} / page</option>)}
         </select>

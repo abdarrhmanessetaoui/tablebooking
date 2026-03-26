@@ -5,14 +5,14 @@ const DARK    = '#2b2118'
 const GOLD    = '#c8a97e'
 const GOLD_DK = '#a8834e'
 const BORDER  = '#2b2118'
-const CREAM   = '#faf8f5'
-const RED     = '#b94040'
-const RED_BG  = '#fdf0f0'
+const CREAM   = '#ffffff'
+const RED     = '#DC2626'
+const RED_BG  = '#ffffff'
 
 const DAYS_SHORT = ['Dim','Lun','Mar','Mer','Jeu','Ven','Sam']
 
 function ServiceRow({ svc, isEditing, onEdit, onDelete, idx }) {
-  const bg          = isEditing ? '#fdf6ec' : idx % 2 === 0 ? '#fff' : CREAM
+  const bg          = isEditing ? '#ffffff' : idx % 2 === 0 ? '#fff' : CREAM
   const availDays   = svc.available_days ?? [0,1,2,3,4,5,6]
   const allDays     = availDays.length === 7
 
@@ -32,15 +32,15 @@ function ServiceRow({ svc, isEditing, onEdit, onDelete, idx }) {
 
         {/* Info badges */}
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 8 }}>
-          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '3px 9px', background: '#fdf6ec', fontSize: 11, fontWeight: 800, color: GOLD_DK }}>
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '3px 9px', background: '#ffffff', fontSize: 11, fontWeight: 800, color: GOLD_DK }}>
             <DollarSign size={10} strokeWidth={2.5} color={GOLD} />
             {Number(svc.price) > 0 ? `${svc.price} dh` : 'Gratuit'}
           </span>
-          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '3px 9px', background: '#fdf6ec', fontSize: 11, fontWeight: 700, color: GOLD_DK }}>
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '3px 9px', background: '#ffffff', fontSize: 11, fontWeight: 700, color: GOLD_DK }}>
             <Users size={10} strokeWidth={2.5} color={GOLD} />
             {svc.capacity} personnes max
           </span>
-          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '3px 9px', background: '#fdf6ec', fontSize: 11, fontWeight: 700, color: GOLD_DK }}>
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '3px 9px', background: '#ffffff', fontSize: 11, fontWeight: 700, color: GOLD_DK }}>
             <Clock size={10} strokeWidth={2.5} color={GOLD} />
             {svc.duration} min
           </span>
@@ -49,7 +49,7 @@ function ServiceRow({ svc, isEditing, onEdit, onDelete, idx }) {
         {/* Days row */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 4, flexWrap: 'wrap' }}>
           {allDays ? (
-            <span style={{ fontSize: 10, fontWeight: 800, color: GOLD_DK, padding: '2px 8px', background: '#fdf6ec' }}>
+            <span style={{ fontSize: 10, fontWeight: 800, color: GOLD_DK, padding: '2px 8px', background: '#ffffff' }}>
               Tous les jours
             </span>
           ) : (
@@ -72,32 +72,30 @@ function ServiceRow({ svc, isEditing, onEdit, onDelete, idx }) {
       </div>
 
       {/* Actions */}
-      <div style={{ display: 'flex', flexDirection: 'column', borderLeft: `1px solid #e8e0d8` }}>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '8px 12px', borderLeft: `1px solid #e8e0d8` }}>
         <button onClick={() => onEdit(svc)} title="Modifier"
           style={{
-            flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center',
-            padding: '0 18px',
-            background: isEditing ? '#fdf6ec' : 'none',
-            border: 'none', borderBottom: '1px solid #e8e0d8',
-            color: isEditing ? GOLD : DARK,
-            cursor: 'pointer', transition: 'all 0.15s', minHeight: 44,
+            display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+            padding: 6, borderRadius: '50%',
+            background: GOLD, border: 'none', color: '#fff',
+            cursor: 'pointer', transition: 'opacity 0.15s',
           }}
-          onMouseEnter={e => { e.currentTarget.style.background = DARK; e.currentTarget.style.color = GOLD }}
-          onMouseLeave={e => { e.currentTarget.style.background = isEditing ? '#fdf6ec' : 'none'; e.currentTarget.style.color = isEditing ? GOLD : DARK }}
+          onMouseEnter={e => e.currentTarget.style.opacity = 0.85}
+          onMouseLeave={e => e.currentTarget.style.opacity = 1}
         >
-          <Pencil size={13} strokeWidth={2.5} />
+          <Pencil size={14} strokeWidth={2.5} />
         </button>
         <button onClick={() => onDelete(svc)} title="Supprimer"
           style={{
-            flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center',
-            padding: '0 18px', background: 'none',
-            border: 'none', color: DARK,
-            cursor: 'pointer', transition: 'all 0.15s', minHeight: 44,
+            display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+            padding: 6, borderRadius: '50%',
+            background: RED, border: 'none', color: '#fff',
+            cursor: 'pointer', transition: 'opacity 0.15s',
           }}
-          onMouseEnter={e => { e.currentTarget.style.background = RED_BG; e.currentTarget.style.color = RED }}
-          onMouseLeave={e => { e.currentTarget.style.background = 'none'; e.currentTarget.style.color = DARK }}
+          onMouseEnter={e => e.currentTarget.style.opacity = 0.85}
+          onMouseLeave={e => e.currentTarget.style.opacity = 1}
         >
-          <Trash2 size={13} strokeWidth={2.5} />
+          <Trash2 size={14} strokeWidth={2.5} />
         </button>
       </div>
     </div>
@@ -107,7 +105,7 @@ function ServiceRow({ svc, isEditing, onEdit, onDelete, idx }) {
 export default function ServiceList({ services, editingSvc, onEdit, onDelete }) {
   if (services.length === 0) {
     return (
-      <div style={{ padding: '56px 16px', textAlign: 'center', background: '#fff', border: `1.5px solid ${BORDER}` }}>
+      <div style={{ padding: '56px 16px', textAlign: 'center', background: '#fff', border: `4px solid ${BORDER}` }}>
         <Utensils size={40} color={DARK} strokeWidth={1.5} style={{ display: 'block', margin: '0 auto 14px' }} />
         <p style={{ margin: 0, fontSize: 15, fontWeight: 900, color: DARK }}>Aucun service configuré</p>
         <p style={{ margin: '6px 0 0', fontSize: 12, fontWeight: 600, color: DARK }}>
@@ -119,7 +117,7 @@ export default function ServiceList({ services, editingSvc, onEdit, onDelete }) 
 
   return (
     <>
-      <style>{`@media (hover: hover) { .svc-row:hover { background: #fdf6ec !important; } }`}</style>
+      <style>{`@media (hover: hover) { .svc-row:hover { background: #ffffff !important; } }`}</style>
       <div style={{ border: `1px solid ${BORDER}`, overflow: 'hidden' }}>
         {/* Header */}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', padding: '10px 16px', background: DARK }}>

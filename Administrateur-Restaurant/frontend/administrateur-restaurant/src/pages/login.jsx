@@ -25,10 +25,10 @@ const Login = () => {
         />
       </div>
 
-      <div className="bg-white rounded shadow-xl px-6 sm:px-8 pt-6 pb-7 w-full max-w-sm">
+      <div className="bg-white shadow-xl px-6 sm:px-8 pt-6 pb-7 w-full max-w-sm">
 
         {error && (
-          <div className="mb-4 px-3 py-2 bg-red-50 border border-red-200 rounded text-xs text-red-600">
+          <div className="mb-4 px-3 py-2 border text-xs" style={{ backgroundColor: '#ffffff', borderColor: '#DC2626', color: '#DC2626' }}>
             {error}
           </div>
         )}
@@ -43,7 +43,7 @@ const Login = () => {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             onKeyDown={handleKeyDown}
-            className="w-full border border-gray-300 rounded px-3 py-2 text-sm text-gray-800 focus:outline-none focus:border-gray-400"
+            className="w-full border border-gray-300 px-3 py-2 text-sm text-gray-800 focus:outline-none focus:border-gray-400"
           />
         </div>
 
@@ -58,7 +58,7 @@ const Login = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               onKeyDown={handleKeyDown}
-              className="w-full border border-gray-300 rounded px-3 py-2 text-sm text-gray-800 focus:outline-none focus:border-gray-400 pr-9"
+              className="w-full border border-gray-300 px-3 py-2 text-sm text-gray-800 focus:outline-none focus:border-gray-400 pr-9"
             />
             <button
               type="button"
@@ -95,7 +95,7 @@ const Login = () => {
             type="button"
             onClick={handleLogin}
             disabled={loading}
-            className="text-white text-sm font-medium px-4 py-1.5 rounded hover:opacity-90 transition-opacity focus:outline-none disabled:opacity-60"
+            className="text-white text-sm font-medium px-4 py-1.5 hover:opacity-90 transition-opacity focus:outline-none disabled:opacity-60"
             style={{ backgroundColor: '#c8a97e' }}
           >
             {loading ? 'Logging in...' : 'Log In'}

@@ -31,12 +31,12 @@ export default function Layout({ children }) {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800;900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         html, body { background: #fff; }
         body { overflow-x: hidden; }
 
-        .l-root  { min-height: 100vh; display: flex; font-family: 'Plus Jakarta Sans','DM Sans',system-ui,sans-serif; }
+        .l-root  { min-height: 100vh; display: flex; font-family: 'Inter',system-ui,-apple-system,sans-serif; }
         .l-aside {
           flex-shrink: 0; position: sticky; top: 0; height: 100vh;
           overflow: hidden; z-index: 20;

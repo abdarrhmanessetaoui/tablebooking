@@ -13,11 +13,11 @@ function trunc(str, max=14) {
 
 export default function TableRow({ r, i, selected, highlighted, highlightRef, toggleOne, openView, openEdit, handleDelete, onOpenAssign }) {
   const [hov, setHov] = useState(false)
-  const s = STATUS_CONFIG[r.status] || { bg:'#fdf6ec', color:DARK, label:r.status||'—', dot:'#c8a97e' }
+  const s = STATUS_CONFIG[r.status] || { bg:'#ffffff', color:DARK, label:r.status||'—', dot:'#c8a97e' }
 
   let rowBg = i % 2 === 0 ? '#fff' : CREAM
-  if (selected)    rowBg = '#fdf6ec'
-  if (highlighted) rowBg = '#fff8ec'
+  if (selected)    rowBg = '#ffffff'
+  if (highlighted) rowBg = '#ffffff'
   const bg = (!selected && !highlighted && hov) ? '#f5ede0' : rowBg
 
   return (
@@ -30,7 +30,7 @@ export default function TableRow({ r, i, selected, highlighted, highlightRef, to
       style={{
         background: bg,
         borderBottom: `1px solid ${BORDER}`,
-        borderLeft: highlighted ? `4px solid ${GOLD}` : selected ? `4px solid ${GOLD}88` : hov ? `4px solid ${GOLD}44` : '4px solid transparent',
+        borderLeft: highlighted ? `6px solid ${GOLD}` : selected ? `6px solid ${GOLD}88` : hov ? `6px solid ${GOLD}44` : '6px solid transparent',
         transition: 'background 0.12s, border-color 0.12s',
         cursor: 'pointer',
       }}

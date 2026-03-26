@@ -11,7 +11,7 @@ export default function StepDateTime({ form, setForm, blockedDates, disabledDays
   return (
     <>
       {!form.service && (
-        <div style={{ padding:'10px 14px', background:'#fdf6ec', borderLeft:`3px solid ${GOLD}`, fontSize:12, fontWeight:700, color:GOLD_DARK }}>
+        <div style={{ padding:'10px 14px', background:'#ffffff', borderLeft:`3px solid ${GOLD}`, fontSize:12, fontWeight:700, color:GOLD_DARK }}>
           Sélectionnez d'abord une formule à l'étape précédente.
         </div>
       )}
@@ -29,7 +29,7 @@ export default function StepDateTime({ form, setForm, blockedDates, disabledDays
               )}
             </>
           ) : (
-            <div style={{ padding:'10px 14px', background:'#faf8f5', fontSize:12, fontWeight:700, color:'rgba(43,33,24,0.4)' }}>
+            <div style={{ padding:'10px 14px', background:'#ffffff', fontSize:12, fontWeight:700, color:'rgba(43,33,24,0.4)' }}>
               Choisissez d'abord une formule à l'étape précédente.
             </div>
           )}

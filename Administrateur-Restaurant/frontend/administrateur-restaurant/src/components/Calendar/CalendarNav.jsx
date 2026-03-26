@@ -12,9 +12,9 @@ function ArrowBtn({ onClick, children }) {
     <button onClick={onClick}
       onMouseEnter={() => setH(true)} onMouseLeave={() => setH(false)}
       style={{
-        width: 40, height: 40, display: 'flex', alignItems: 'center', justifyContent: 'center',
+        width: 40, height: 60, display: 'flex', alignItems: 'center', justifyContent: 'center',
         background: h ? DARK : '#fff',
-        border: `2px solid ${h ? DARK : 'rgba(43,33,24,0.18)'}`,
+        border: `4px solid ${h ? DARK : 'rgba(43,33,24,0.18)'}`,
         color: h ? '#fff' : DARK,
         cursor: 'pointer', transition: 'all 0.13s', flexShrink: 0,
       }}>
@@ -32,8 +32,8 @@ export default function CalendarNav({ view, setView, navLabel, navigate, goToday
       <style>{`
         .cnav { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 28px; }
         .cnav-left  { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
-        .cnav-label { display: flex; align-items: center; gap: 9px; padding: 10px 16px; border: 2px solid ${DARK}; background: #fff; min-width: 0; }
-        .cnav-views { display: flex; border: 2px solid ${DARK}; overflow: hidden; }
+        .cnav-label { display: flex; align-items: center; gap: 9px; padding: 10px 16px; border: 4px solid ${DARK}; background: #fff; min-width: 0; }
+        .cnav-views { display: flex; border: 4px solid ${DARK}; overflow: hidden; }
         .cnav-views button { padding: 10px 14px; border: none; background: #fff; color: ${DARK}; font-size: 11px; font-weight: 900; cursor: pointer; transition: all 0.13s; font-family: inherit; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; }
         @media(max-width:600px){
           .cnav { flex-direction: column; align-items: flex-start; }
@@ -62,7 +62,7 @@ export default function CalendarNav({ view, setView, navLabel, navigate, goToday
           {!isToday && (
             <button onClick={goToday}
               onMouseEnter={() => setHToday(true)} onMouseLeave={() => setHToday(false)}
-              style={{ padding: '10px 16px', background: hToday ? GOLD : '#fff', border: `2px solid ${hToday ? GOLD : 'rgba(43,33,24,0.18)'}`, color: DARK, fontSize: 11, fontWeight: 900, cursor: 'pointer', transition: 'all 0.13s', fontFamily: 'inherit', letterSpacing: '0.04em', whiteSpace: 'nowrap' }}>
+              style={{ padding: '10px 16px', background: hToday ? GOLD : '#fff', border: `4px solid ${hToday ? GOLD : 'rgba(43,33,24,0.18)'}`, color: DARK, fontSize: 11, fontWeight: 900, cursor: 'pointer', transition: 'all 0.13s', fontFamily: 'inherit', letterSpacing: '0.04em', whiteSpace: 'nowrap' }}>
               Aujourd'hui
             </button>
           )}

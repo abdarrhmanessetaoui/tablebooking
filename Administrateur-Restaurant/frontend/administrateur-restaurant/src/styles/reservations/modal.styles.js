@@ -2,7 +2,7 @@ import { DARK, GOLD, CREAM, BORDER } from './tokens'
 
 export const inputStyle = {
   width: '100%', boxSizing: 'border-box',
-  border: `2px solid #e8e0d8`, background: '#fff',
+  border: `4px solid #e8e0d8`, background: '#fff',
   padding: '10px 14px', fontSize: 14, fontWeight: 600,
   color: DARK, fontFamily: 'inherit', outline: 'none',
 }
@@ -19,7 +19,7 @@ export const overlayStyle = {
   background: 'rgba(43,33,24,0.6)',
   display: 'flex', alignItems: 'center',
   justifyContent: 'center', padding: 16,
-  fontFamily: "'Plus Jakarta Sans','DM Sans',system-ui,sans-serif",
+  fontFamily: "'Inter',system-ui,-apple-system,sans-serif",
 }
 
 export const panelStyle = {
@@ -36,7 +36,7 @@ export const headerStyle = {
 }
 
 export const summaryBoxStyle = {
-  background: '#faf8f5', padding: '14px 18px',
+  background: '#ffffff', padding: '14px 18px',
   display: 'flex', flexDirection: 'column', gap: 8,
   borderLeft: `3px solid ${GOLD}`,
 }

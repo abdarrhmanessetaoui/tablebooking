@@ -9,19 +9,19 @@ const DARK     = '#2b2118'
 const GOLD     = '#c8a97e'
 const GOLD_DK  = '#a8834e'
 const BORDER   = '#2b2118'
-const CREAM    = '#faf8f5'
-const RED      = '#b94040'
-const RED_BG   = '#fdf0f0'
+const CREAM    = '#ffffff'
+const RED      = '#DC2626'
+const RED_BG   = '#ffffff'
 const GREEN    = '#16a34a'
-const GREEN_BG = '#f0f7f0'
+const GREEN_BG = '#ffffff'
 
 const PAGE_SIZE = 10
 
 const LOC_COLORS = {
   'Intérieur':   { bg: '#f0f4ff', color: '#3b5bdb' },
   'Terrasse':    { bg: '#f0fdf4', color: '#16a34a' },
-  'Bar':         { bg: '#fdf6ec', color: '#a8834e' },
-  'Salon privé': { bg: '#fdf0f0', color: '#b94040' },
+  'Bar':         { bg: '#ffffff', color: '#a8834e' },
+  'Salon privé': { bg: '#ffffff', color: '#DC2626' },
 }
 
 function useIsMobile(bp = 600) {
@@ -41,7 +41,7 @@ function Checkbox({ checked, indeterminate, onChange }) {
       style={{
         width: 18, height: 18, flexShrink: 0,
         background: checked || indeterminate ? DARK : '#fff',
-        border: `2px solid ${DARK}`,
+        border: `4px solid ${DARK}`,
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         cursor: 'pointer', transition: 'all 0.15s',
       }}
@@ -51,7 +51,7 @@ function Checkbox({ checked, indeterminate, onChange }) {
           <path d="M1 4L3.5 6.5L9 1" stroke={GOLD} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
       )}
-      {indeterminate && !checked && <div style={{ width: 7, height: 2, background: GOLD }} />}
+      {indeterminate && !checked && <div style={{ width: 7, height: 4, background: GOLD }} />}
     </div>
   )
 }
@@ -66,7 +66,7 @@ function PageBtn({ onClick, disabled, active, children }) {
         minWidth: 36, height: 36, padding: '0 6px',
         display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
         background: active ? DARK : hov && !disabled ? '#FBF5EA' : '#fff',
-        border: `1.5px solid ${DARK}`,
+        border: `4px solid ${DARK}`,
         color: active ? GOLD : DARK,
         fontSize: 12, fontWeight: active ? 900 : 700,
         cursor: disabled ? 'not-allowed' : 'pointer',
@@ -82,7 +82,7 @@ function PageBtn({ onClick, disabled, active, children }) {
 /* ── Single table row — mirrors ServiceRow exactly ── */
 function TableRow({ tbl, isEditing, isSelected, onEdit, onDelete, onToggle, onSelect, idx }) {
   const locStyle = LOC_COLORS[tbl.location] || { bg: '#f5f5f5', color: '#666' }
-  const bg = isSelected ? '#fdf6ec' : isEditing ? '#fdf6ec' : idx % 2 === 0 ? '#fff' : CREAM
+  const bg = isSelected ? '#ffffff' : isEditing ? '#ffffff' : idx % 2 === 0 ? '#fff' : CREAM
 
   return (
     <div
@@ -130,7 +130,7 @@ function TableRow({ tbl, isEditing, isSelected, onEdit, onDelete, onToggle, onSe
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
           <span style={{
             display: 'inline-flex', alignItems: 'center', gap: 5,
-            padding: '3px 9px', background: '#fdf6ec',
+            padding: '3px 9px', background: '#ffffff',
             fontSize: 11, fontWeight: 800, color: GOLD_DK,
             whiteSpace: 'nowrap',
           }}>
@@ -149,8 +149,8 @@ function TableRow({ tbl, isEditing, isSelected, onEdit, onDelete, onToggle, onSe
         </div>
       </div>
 
-      {/* Actions cell — stacked like ServiceRow */}
-      <div style={{ display: 'flex', flexDirection: 'column', borderLeft: `1px solid #e8e0d8` }}>
+      {/* Actions cell */}
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '8px 12px', borderLeft: `1px solid #e8e0d8` }}>
 
         {/* Toggle */}
         <ToggleActionBtn tbl={tbl} onToggle={onToggle} />
@@ -160,20 +160,15 @@ function TableRow({ tbl, isEditing, isSelected, onEdit, onDelete, onToggle, onSe
           onClick={() => onEdit(tbl)}
           title="Modifier"
           style={{
-            flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center',
-            padding: '0 18px', minHeight: 36,
-            background: isEditing ? '#fdf6ec' : 'none',
-            border: 'none', borderBottom: `1px solid #e8e0d8`,
-            color: isEditing ? GOLD : DARK,
-            cursor: 'pointer', transition: 'all 0.15s',
+            display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+            padding: 6, borderRadius: '50%',
+            background: GOLD, border: 'none', color: '#fff',
+            cursor: 'pointer', transition: 'opacity 0.15s',
           }}
-          onMouseEnter={e => { e.currentTarget.style.background = DARK; e.currentTarget.style.color = GOLD }}
-          onMouseLeave={e => {
-            e.currentTarget.style.background = isEditing ? '#fdf6ec' : 'none'
-            e.currentTarget.style.color = isEditing ? GOLD : DARK
-          }}
+          onMouseEnter={e => e.currentTarget.style.opacity = 0.85}
+          onMouseLeave={e => e.currentTarget.style.opacity = 1}
         >
-          <Pencil size={13} strokeWidth={2.5} />
+          <Pencil size={14} strokeWidth={2.5} />
         </button>
 
         {/* Delete */}
@@ -181,15 +176,15 @@ function TableRow({ tbl, isEditing, isSelected, onEdit, onDelete, onToggle, onSe
           onClick={() => onDelete(tbl)}
           title="Supprimer"
           style={{
-            flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center',
-            padding: '0 18px', minHeight: 36,
-            background: 'none', border: 'none',
-            color: DARK, cursor: 'pointer', transition: 'all 0.15s',
+            display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+            padding: 6, borderRadius: '50%',
+            background: RED, border: 'none', color: '#fff',
+            cursor: 'pointer', transition: 'opacity 0.15s',
           }}
-          onMouseEnter={e => { e.currentTarget.style.background = RED_BG; e.currentTarget.style.color = RED }}
-          onMouseLeave={e => { e.currentTarget.style.background = 'none'; e.currentTarget.style.color = DARK }}
+          onMouseEnter={e => e.currentTarget.style.opacity = 0.85}
+          onMouseLeave={e => e.currentTarget.style.opacity = 1}
         >
-          <Trash2 size={13} strokeWidth={2.5} />
+          <Trash2 size={14} strokeWidth={2.5} />
         </button>
 
       </div>
@@ -205,30 +200,19 @@ function ToggleActionBtn({ tbl, onToggle }) {
       onClick={() => onToggle(tbl)}
       title={isActive ? 'Désactiver' : 'Activer'}
       style={{
-        flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-        padding: '0 14px', minHeight: 36,
-        background: isActive ? GREEN_BG : 'none',
-        border: 'none', borderBottom: `1px solid #e8e0d8`,
-        color: isActive ? GREEN : '#bbb',
-        cursor: 'pointer', transition: 'all 0.15s',
-        whiteSpace: 'nowrap',
+        display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+        padding: 6, borderRadius: '50%',
+        background: isActive ? GREEN : '#aaa', // green if active, grey if inactive
+        border: 'none', color: '#fff',
+        cursor: 'pointer', transition: 'opacity 0.15s',
       }}
-      onMouseEnter={e => {
-        e.currentTarget.style.background = isActive ? RED_BG : GREEN_BG
-        e.currentTarget.style.color      = isActive ? RED    : GREEN
-      }}
-      onMouseLeave={e => {
-        e.currentTarget.style.background = isActive ? GREEN_BG : 'none'
-        e.currentTarget.style.color      = isActive ? GREEN   : '#bbb'
-      }}
+      onMouseEnter={e => e.currentTarget.style.opacity = 0.85}
+      onMouseLeave={e => e.currentTarget.style.opacity = 1}
     >
       {isActive
         ? <ToggleRight size={14} strokeWidth={2.5} />
         : <ToggleLeft  size={14} strokeWidth={2.5} />
       }
-      <span style={{ fontSize: 10, fontWeight: 900, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
-        {isActive ? 'Actif' : 'Inactif'}
-      </span>
     </button>
   )
 }
@@ -241,7 +225,7 @@ export default function TableList({ tables, editingTbl, onEdit, onDelete, onTogg
 
   if (!tables || tables.length === 0) {
     return (
-      <div style={{ padding: '56px 16px', textAlign: 'center', background: '#fff', border: `1.5px solid ${BORDER}` }}>
+      <div style={{ padding: '56px 16px', textAlign: 'center', background: '#fff', border: `4px solid ${BORDER}` }}>
         <LayoutGrid size={40} color={DARK} strokeWidth={1.5} style={{ display: 'block', margin: '0 auto 14px' }} />
         <p style={{ margin: 0, fontSize: 15, fontWeight: 900, color: DARK }}>Aucune table configurée</p>
         <p style={{ margin: '6px 0 0', fontSize: 12, fontWeight: 600, color: DARK }}>
@@ -284,7 +268,7 @@ export default function TableList({ tables, editingTbl, onEdit, onDelete, onTogg
 
   return (
     <>
-      <style>{`@media (hover: hover) { .tbl-row:hover { background: #fdf6ec !important; } }`}</style>
+      <style>{`@media (hover: hover) { .tbl-row:hover { background: #ffffff !important; } }`}</style>
 
       {/* Stats bar */}
       <div style={{ display: 'flex', gap: 0, marginBottom: 12 }}>
@@ -310,7 +294,7 @@ export default function TableList({ tables, editingTbl, onEdit, onDelete, onTogg
 
         {/* Partial selection banner */}
         {selectedTables.length > 0 && !allSel && (
-          <div style={{ padding: '9px 14px', background: '#fdf6ec', borderBottom: `1px solid #e8d8b0`, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, flexWrap: 'wrap' }}>
+          <div style={{ padding: '9px 14px', background: '#ffffff', borderBottom: `1px solid #e8e0d6`, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, flexWrap: 'wrap' }}>
             <span style={{ fontSize: 12, fontWeight: 700, color: GOLD_DK }}>
               {selectedTables.length} sélectionnée{selectedTables.length > 1 ? 's' : ''}
             </span>
@@ -372,7 +356,7 @@ export default function TableList({ tables, editingTbl, onEdit, onDelete, onTogg
           <div style={{
             display: 'flex', alignItems: 'center', justifyContent: 'space-between',
             flexWrap: 'wrap', gap: 8, padding: '12px 14px',
-            borderTop: `1.5px solid ${BORDER}`, background: CREAM,
+            borderTop: `4px solid ${BORDER}`, background: CREAM,
           }}>
             <span style={{ fontSize: 11, fontWeight: 700, color: DARK, flexShrink: 0 }}>
               {(safe - 1) * PAGE_SIZE + 1}–{Math.min(safe * PAGE_SIZE, tables.length)} / {tables.length}

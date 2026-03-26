@@ -17,7 +17,7 @@ const WEEKDAYS = [
 
 const inp = {
   padding: '12px 14px',
-  border: `2px solid ${BORDER}`,
+  border: `4px solid ${BORDER}`,
   fontSize: 14, fontWeight: 700, color: DARK,
   fontFamily: 'inherit', outline: 'none', background: '#fff',
   transition: 'border-color 0.15s',
@@ -90,8 +90,8 @@ export default function BlockedDateForm({ form, setForm, handleBlock, submitting
         .recurring-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; }
       `}</style>
 
-      <div style={{ background: '#fff', border: `1.5px solid ${BORDER}`, overflow: 'hidden', width: '100%', boxSizing: 'border-box' }}>
-        <div style={{ display: 'flex', borderBottom: `2px solid ${DARK}`, width: '100%', overflow: 'hidden' }}>
+      <div style={{ background: '#fff', border: `4px solid ${BORDER}`, overflow: 'hidden', width: '100%', boxSizing: 'border-box' }}>
+        <div style={{ display: 'flex', borderBottom: `4px solid ${DARK}`, width: '100%', overflow: 'hidden' }}>
           <ModeTab active={form.mode === 'single'}    onClick={() => set('mode','single')}    icon={CalendarOff} label="Unique" />
           <ModeTab active={form.mode === 'interval'}  onClick={() => set('mode','interval')}  icon={Calendar}    label="Intervalle" />
           <ModeTab active={form.mode === 'recurring'} onClick={() => set('mode','recurring')} icon={RefreshCw}   label="Récurrent" />
@@ -137,7 +137,7 @@ export default function BlockedDateForm({ form, setForm, handleBlock, submitting
           </Field>
 
           {preview.length > 0 && (
-            <div style={{ padding: '10px 13px', background: '#fdf6ec', borderLeft: `3px solid ${GOLD}`, fontSize: 13, fontWeight: 700, color: '#a8834e', lineHeight: 1.6 }}>
+            <div style={{ padding: '10px 13px', background: '#ffffff', borderLeft: `3px solid ${GOLD}`, fontSize: 13, fontWeight: 700, color: '#a8834e', lineHeight: 1.6 }}>
               {preview.length === 1
                 ? `1 date : ${new Date(preview[0]).toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'long', year:'numeric' })}`
                 : `${preview.length} dates — du ${new Date(preview[0]).toLocaleDateString('fr-FR', { day:'numeric', month:'short' })} au ${new Date(preview[preview.length-1]).toLocaleDateString('fr-FR', { day:'numeric', month:'short', year:'numeric' })}`

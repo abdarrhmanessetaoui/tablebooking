@@ -3,23 +3,23 @@ import { Clock, Users, CalendarOff } from 'lucide-react'
 
 const DARK    = '#2b2118'
 const GOLD    = '#c8a97e'
-const CREAM   = '#faf8f5'
-const GOLD_BG = '#fdf6ec'
+const CREAM   = '#ffffff'
+const GOLD_BG = '#ffffff'
 
 const DAYS_SHORT  = ['LUN','MAR','MER','JEU','VEN','SAM','DIM']
 const DAYS_FULL   = ['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche']
 const MONTHS_FULL = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre']
 
 const STATUS = {
-  Confirmed: { bg: '#f0f7f0', border: '#16a34a', text: '#2d6a2d', dot: '#16a34a', label: 'Confirmée'  },
-  Pending:   { bg: '#fdf6ec', border: '#c8a97e', text: '#a8834e', dot: '#c8a97e', label: 'En attente' },
-  Cancelled: { bg: '#fdf0f0', border: '#dc2626', text: '#b94040', dot: '#dc2626', label: 'Annulée'    },
+  Confirmed: { bg: '#ffffff', border: '#16a34a', text: '#2d6a2d', dot: '#16a34a', label: 'Confirmée'  },
+  Pending:   { bg: '#ffffff', border: '#c8a97e', text: '#a8834e', dot: '#c8a97e', label: 'En attente' },
+  Cancelled: { bg: '#ffffff', border: '#dc2626', text: '#DC2626', dot: '#dc2626', label: 'Annulée'    },
 }
 
 function Badge({ status }) {
   const s = STATUS[status] || STATUS.Pending
   return (
-    <span style={{ display:'inline-flex', alignItems:'center', gap:5, padding:'3px 10px', background:s.bg, border:`1.5px solid ${s.border}`, fontSize:9, fontWeight:900, color:s.text, letterSpacing:'0.15em', textTransform:'uppercase', whiteSpace:'nowrap' }}>
+    <span style={{ display:'inline-flex', alignItems:'center', gap:5, padding:'3px 10px', background:s.bg, border:`4px solid ${s.border}`, fontSize:9, fontWeight:900, color:s.text, letterSpacing:'0.15em', textTransform:'uppercase', whiteSpace:'nowrap' }}>
       <span style={{ width:5, height:5, borderRadius:'50%', background:s.dot, flexShrink:0 }} />
       {s.label}
     </span>
@@ -85,7 +85,7 @@ function DayView({ date, getByDate }) {
   const cancelled = reservations.filter(r => r.status === 'Cancelled').length
 
   return (
-    <div style={{ border:`2px solid ${DARK}` }}>
+    <div style={{ border:`4px solid ${DARK}` }}>
       <div style={{ padding:'20px 24px', background:DARK, display:'flex', flexWrap:'wrap', alignItems:'flex-start', justifyContent:'space-between', gap:16 }}>
         <div>
           <h3 style={{ margin:'0 0 4px', fontSize:'clamp(15px,2.2vw,20px)', fontWeight:900, color:'#fff', letterSpacing:'-0.6px', textTransform:'capitalize' }}>
@@ -103,7 +103,7 @@ function DayView({ date, getByDate }) {
       </div>
       {reservations.length === 0 ? <Empty /> : hours.map((h, hi) => (
         <div key={h}>
-          <div style={{ display:'flex', alignItems:'center', gap:16, padding:'12px 24px', background:'#fff', borderTop: hi>0 ? `2px solid ${DARK}` : '1px solid rgba(43,33,24,0.08)' }}>
+          <div style={{ display:'flex', alignItems:'center', gap:16, padding:'12px 24px', background:'#fff', borderTop: hi>0 ? `4px solid ${DARK}` : '1px solid rgba(43,33,24,0.08)' }}>
             <span style={{ fontSize:13, fontWeight:900, color:GOLD, minWidth:44 }}>{h}:00</span>
             <div style={{ flex:1, height:1, background:'rgba(43,33,24,0.07)' }} />
             <span style={{ fontSize:11, fontWeight:800, color:'rgba(43,33,24,0.3)' }}>{groups[h].length} Reservation</span>
@@ -144,7 +144,7 @@ function WeekView({ weekDays, getByDate, onDayChange }) {
             const count   = getByDate(day).length
             return (
               <button key={i} onClick={() => selectDay(i)}
-                style={{ flexShrink:0, display:'flex', flexDirection:'column', alignItems:'center', padding:'10px 14px', gap:3, background: active ? DARK : '#fff', border:`2px solid ${active ? DARK : isToday ? GOLD : 'rgba(43,33,24,0.15)'}`, color: active ? '#fff' : DARK, cursor:'pointer', transition:'all 0.13s', fontFamily:'inherit' }}>
+                style={{ flexShrink:0, display:'flex', flexDirection:'column', alignItems:'center', padding:'10px 14px', gap:3, background: active ? DARK : '#fff', border:`4px solid ${active ? DARK : isToday ? GOLD : 'rgba(43,33,24,0.15)'}`, color: active ? '#fff' : DARK, cursor:'pointer', transition:'all 0.13s', fontFamily:'inherit' }}>
                 <span style={{ fontSize:8, fontWeight:900, letterSpacing:'0.2em', color: active ? GOLD : isToday ? GOLD : 'rgba(43,33,24,0.4)' }}>{DAYS_SHORT[i]}</span>
                 <span style={{ fontSize:20, fontWeight:900, lineHeight:1 }}>{day.getDate()}</span>
                 {count > 0 && <span style={{ fontSize:10, fontWeight:900, color:GOLD }}>{count}</span>}
@@ -152,7 +152,7 @@ function WeekView({ weekDays, getByDate, onDayChange }) {
             )
           })}
         </div>
-        <div style={{ border:`2px solid ${DARK}` }}>
+        <div style={{ border:`4px solid ${DARK}` }}>
           <div style={{ padding:'14px 20px', background:DARK, display:'flex', alignItems:'center', justifyContent:'space-between', flexWrap:'wrap', gap:8 }}>
             <span style={{ fontSize:14, fontWeight:900, color:'#fff', letterSpacing:'-0.4px', textTransform:'capitalize' }}>
               {DAYS_FULL[activeDay]}, {weekDays[activeDay]?.toLocaleDateString('fr-FR', { day:'numeric', month:'long' })}
@@ -196,7 +196,7 @@ function MonthView({ monthDays, currentDate, getByDate, setCurrentDate, setView 
   const [hovIdx, setHovIdx] = useState(null)
 
   return (
-    <div style={{ border:`2px solid ${DARK}` }}>
+    <div style={{ border:`4px solid ${DARK}` }}>
       <div style={{ display:'grid', gridTemplateColumns:'repeat(7,1fr)', background:DARK }}>
         {['LUN','MAR','MER','JEU','VEN','SAM','DIM'].map(d => (
           <div key={d} style={{ padding:'10px 4px', textAlign:'center', fontSize:9, fontWeight:900, color:GOLD, letterSpacing:'0.15em' }}>{d}</div>
@@ -243,15 +243,15 @@ function YearView({ currentDate, getByMonth, setCurrentDate, setView }) {
           <div key={i}
             onClick={() => { setCurrentDate(new Date(currentDate.getFullYear(), i, 1)); setView('month') }}
             onMouseEnter={() => setHovIdx(i)} onMouseLeave={() => setHovIdx(null)}
-            style={{ padding:'20px 18px', border:`2px solid ${isCurrent?GOLD:DARK}`, background: isCurrent ? GOLD_BG : hov ? CREAM : '#fff', cursor:'pointer', transition:'all 0.13s' }}>
+            style={{ padding:'20px 18px', border:`4px solid ${isCurrent?GOLD:DARK}`, background: isCurrent ? GOLD_BG : hov ? CREAM : '#fff', cursor:'pointer', transition:'all 0.13s' }}>
             <div style={{ fontSize:9, fontWeight:900, color: isCurrent?GOLD:DARK, letterSpacing:'0.2em', textTransform:'uppercase', marginBottom:10 }}>{month}</div>
             <div style={{ fontSize:40, fontWeight:900, color:DARK, lineHeight:1, letterSpacing:'-2px', marginBottom:4 }}>{res.length}</div>
             <div style={{ fontSize:12, fontWeight:700, color:GOLD, marginBottom: res.length>0?14:0 }}>Reservationervation{res.length!==1?'s':''}</div>
             {res.length > 0 && (
-              <div style={{ borderTop:`2px solid ${DARK}`, paddingTop:12, display:'flex', flexDirection:'column', gap:5 }}>
+              <div style={{ borderTop:`4px solid ${DARK}`, paddingTop:12, display:'flex', flexDirection:'column', gap:5 }}>
                 {confirmed>0 && <div style={{ display:'flex', justifyContent:'space-between' }}><span style={{ fontSize:11, fontWeight:700, color:'#2d6a2d' }}>Confirmées</span><span style={{ fontSize:15, fontWeight:900, color:'#16a34a' }}>{confirmed}</span></div>}
                 {pending>0   && <div style={{ display:'flex', justifyContent:'space-between' }}><span style={{ fontSize:11, fontWeight:700, color:DARK }}>En attente</span><span style={{ fontSize:15, fontWeight:900, color:GOLD }}>{pending}</span></div>}
-                {cancelled>0 && <div style={{ display:'flex', justifyContent:'space-between' }}><span style={{ fontSize:11, fontWeight:700, color:'#b94040' }}>Annulées</span><span style={{ fontSize:15, fontWeight:900, color:'#dc2626' }}>{cancelled}</span></div>}
+                {cancelled>0 && <div style={{ display:'flex', justifyContent:'space-between' }}><span style={{ fontSize:11, fontWeight:700, color:'#DC2626' }}>Annulées</span><span style={{ fontSize:15, fontWeight:900, color:'#dc2626' }}>{cancelled}</span></div>}
               </div>
             )}
           </div>

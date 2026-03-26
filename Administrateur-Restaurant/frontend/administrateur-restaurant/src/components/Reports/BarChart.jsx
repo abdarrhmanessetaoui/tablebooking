@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react'
 
 const DARK    = '#2b2118'
 const GOLD    = '#c8a97e'
-const GOLD_BG = '#fdf6ec'
-const CREAM   = '#faf8f5'
+const GOLD_BG = '#ffffff'
+const CREAM   = '#ffffff'
 
 export default function BarChart({ data = {}, title, subtitle, highlight = false }) {
   const [mounted, setMounted] = useState(false)
@@ -15,7 +15,7 @@ export default function BarChart({ data = {}, title, subtitle, highlight = false
   const topKey  = entries.find(([, v]) => v === max)?.[0] ?? '—'
 
   if (entries.length === 0) return (
-    <div style={{ background: '#fff', border: `2px solid ${DARK}`, padding: '28px 24px' }}>
+    <div style={{ background: '#fff', border: `4px solid ${DARK}`, padding: '28px 24px' }}>
       <div style={{ fontSize: 9, fontWeight: 900, color: GOLD, letterSpacing: '0.18em', textTransform: 'uppercase', marginBottom: 4 }}>{title}</div>
       {subtitle && <div style={{ fontSize: 12, fontWeight: 700, color: 'rgba(43,33,24,0.4)', marginBottom: 20 }}>{subtitle}</div>}
       <div style={{ height: 120, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, fontWeight: 900, color: 'rgba(43,33,24,0.15)' }}>
@@ -28,10 +28,10 @@ export default function BarChart({ data = {}, title, subtitle, highlight = false
   const lblSize = entries.length > 20 ? 7 : entries.length > 12 ? 8 : 10
 
   return (
-    <div style={{ background: '#fff', border: `2px solid ${DARK}`, flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
+    <div style={{ background: '#fff', border: `4px solid ${DARK}`, flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
 
       {/* ── Header ── */}
-      <div style={{ padding: '18px 20px 16px', borderBottom: `2px solid ${DARK}`, background: highlight ? DARK : '#fff', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12 }}>
+      <div style={{ padding: '18px 20px 16px', borderBottom: `4px solid ${DARK}`, background: highlight ? DARK : '#fff', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12 }}>
         <div>
           <div style={{ fontSize: 9, fontWeight: 900, letterSpacing: '0.18em', textTransform: 'uppercase', color: highlight ? GOLD : GOLD, marginBottom: 5 }}>{title}</div>
           {subtitle && <div style={{ fontSize: 13, fontWeight: 800, color: highlight ? 'rgba(255,255,255,0.7)' : DARK }}>{subtitle}</div>}

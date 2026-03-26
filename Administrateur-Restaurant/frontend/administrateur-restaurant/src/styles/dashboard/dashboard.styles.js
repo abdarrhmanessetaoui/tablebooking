@@ -99,7 +99,7 @@ import {
   
     .db-tabs {
       display: flex;
-      border-bottom: 2px solid ${DARK};
+      border-bottom: 4px solid ${DARK};
       margin-bottom: 8px;
       overflow-x: auto;
       scrollbar-width: none;
@@ -128,7 +128,7 @@ import {
       flex-shrink: 0;
     }
     .db-tab:hover:not(.active) {
-      background: #fdf0d5;
+      background: #f5f0eb;
     }
     .db-tab.active {
       background: ${DARK};
@@ -147,5 +147,5 @@ import {
       font-weight: 900;
     }
     .db-tab.active .tab-pill       { background: ${GOLD}22;   color: ${GOLD};  }
-    .db-tab:not(.active) .tab-pill { background: ${AMBER_BG}; color: ${AMBER}; }
+    .db-tab:not(.active) .tab-pill { background: #ffffff; color: ${AMBER}; }
   `

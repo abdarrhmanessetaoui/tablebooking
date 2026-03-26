@@ -6,7 +6,7 @@ export default function EditMode({ editing, form, setForm, handleSubmit, onClose
   const [hov, setHov] = useState(false)
   return (
     <>
-      <div style={{ background:'#faf8f5', padding:'14px 18px', display:'flex', flexDirection:'column', gap:8 }}>
+      <div style={{ background:'#ffffff', padding:'14px 18px', display:'flex', flexDirection:'column', gap:8 }}>
         {[['Date',editing?.date],['Heure',editing?.start_time],['Couverts',editing?.guests]].map(([l,v]) => v ? (
           <div key={l} style={{ display:'flex', justifyContent:'space-between' }}>
             <span style={{ fontSize:12, fontWeight:700, color:'#aaa' }}>{l}</span>

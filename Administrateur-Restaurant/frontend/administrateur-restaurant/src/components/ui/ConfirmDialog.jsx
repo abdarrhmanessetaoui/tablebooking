@@ -33,7 +33,7 @@ export default function ConfirmDialog() {
       display: 'flex', alignItems: 'center', justifyContent: 'center',
       padding: 16,
       animation: 'fadeIn 0.15s ease',
-      fontFamily: "'Plus Jakarta Sans','DM Sans',system-ui,sans-serif",
+      fontFamily: "'Inter',system-ui,-apple-system,sans-serif",
     }}>
       <style>{`
         @keyframes fadeIn { from{opacity:0} to{opacity:1} }
@@ -93,14 +93,14 @@ export default function ConfirmDialog() {
           </button>
           <button onClick={() => handle(true)} style={{
             padding: '10px 20px',
-            background: isDanger ? '#b94040' : DARK,
+            background: isDanger ? '#DC2626' : DARK,
             border: 'none',
             fontSize: 13, fontWeight: 800,
             color: isDanger ? '#fff' : GOLD,
             cursor: 'pointer', fontFamily: 'inherit',
           }}
-            onMouseEnter={e => e.currentTarget.style.background = isDanger ? '#991b1b' : '#3d2d1e'}
-            onMouseLeave={e => e.currentTarget.style.background = isDanger ? '#b94040' : DARK}
+            onMouseEnter={e => e.currentTarget.style.background = isDanger ? '#DC2626' : '#3d2d1e'}
+            onMouseLeave={e => e.currentTarget.style.background = isDanger ? '#DC2626' : DARK}
           >
             {dialog.confirmLabel || 'Confirmer'}
           </button>

@@ -15,7 +15,7 @@ export default function Sidebar({ handleLogout, onNavClick, collapsed, onToggle 
       width: '100%', height: '100%',
       background: DARK,
       display: 'flex', flexDirection: 'column',
-      fontFamily: "'Plus Jakarta Sans','DM Sans',system-ui,sans-serif",
+      fontFamily: "'Inter',system-ui,-apple-system,sans-serif",
       overflow: 'hidden',
     }}>
 

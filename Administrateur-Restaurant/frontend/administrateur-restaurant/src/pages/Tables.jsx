@@ -15,9 +15,9 @@ import { getToken }          from '../utils/auth'
 const DARK    = '#2b2118'
 const GOLD    = '#c8a97e'
 const GOLD_DK = '#a8834e'
-const RED     = '#b94040'
-const RED_BG  = '#fdf0f0'
-const CREAM   = '#faf8f5'
+const RED     = '#DC2626'
+const RED_BG  = '#ffffff'
+const CREAM   = '#ffffff'
 
 const API  = 'http://localhost:8000/api/tables'
 const hdrs = () => ({
@@ -253,16 +253,16 @@ export default function Tables() {
           .tbl-form-sticky { position: sticky; top: 24px; }
           .tbl-mob-divider { display: none !important; }
         }
-        @media (max-width: 600px) { button { min-height: 40px; } }
+        @media (max-width: 600px) { button { min-height: 60px; } }
       `}</style>
 
       <div style={{
         background: CREAM,
-        fontFamily: "'Plus Jakarta Sans','DM Sans',system-ui,sans-serif",
+        fontFamily: "'Inter',system-ui,-apple-system,sans-serif",
         padding: 'clamp(14px,3vw,40px) clamp(12px,4vw,36px)',
         boxSizing: 'border-box', width: '100%', overflowX: 'hidden',
       }}>
-        <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800;900&display=swap" rel="stylesheet" />
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
 
         <FadeUp delay={0}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, marginBottom: 8, flexWrap: 'wrap' }}>
@@ -280,7 +280,7 @@ export default function Tables() {
         </FadeUp>
 
         <FadeUp delay={10}>
-          <div style={{ height: 2, background: DARK, margin: '16px 0 28px' }} />
+          <div style={{ height: 4, background: DARK, margin: '16px 0 28px' }} />
         </FadeUp>
 
         {error && (
@@ -343,7 +343,7 @@ export default function Tables() {
 
             {/* ── Right column: table list ── */}
             <div>
-              <div className="tbl-mob-divider" style={{ height: 2, background: DARK, margin: '32px 0 28px' }} />
+              <div className="tbl-mob-divider" style={{ height: 4, background: DARK, margin: '32px 0 28px' }} />
               <div style={{ marginBottom: 16, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
                 <h2 style={{ margin: 0, fontSize: 'clamp(15px,2.5vw,22px)', fontWeight: 900, color: DARK, letterSpacing: '-0.8px' }}>
                   Tables configurées
@@ -369,11 +369,11 @@ export default function Tables() {
         {/* ── Timeline ── */}
         <FadeUp delay={50}>
           <div style={{ margin: '40px 0 0', display: 'flex', alignItems: 'center', gap: 14 }}>
-            <div style={{ height: 2, background: DARK, flex: 1 }} />
+            <div style={{ height: 4, background: DARK, flex: 1 }} />
             <span style={{ fontSize: 9, fontWeight: 900, color: DARK, letterSpacing: '0.2em', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>
               Occupation des tables
             </span>
-            <div style={{ height: 2, background: DARK, flex: 1 }} />
+            <div style={{ height: 4, background: DARK, flex: 1 }} />
           </div>
           <TableTimeline />
         </FadeUp>

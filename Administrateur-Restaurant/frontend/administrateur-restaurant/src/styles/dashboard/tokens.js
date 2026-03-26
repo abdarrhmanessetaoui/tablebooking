@@ -4,13 +4,13 @@
 
 // ── Core palette ─────────────────────────────────────────────────
 export const DARK     = '#2b2118'
-export const GOLD     = '#c8a97e'
+export const GOLD     = '#C8A97E'
 export const GOLD_DK  = '#a8834e'
 export const WHITE    = '#ffffff'
 
-// ── Brown replaces all grays ──────────────────────────────────────
-export const CREAM    = '#ffffff'   // was #faf8f5 — brown tint background
-export const BORDER   = '#e8e0d6  '   // was #e8e0d6 — brown border
+// ── Background — pure white everywhere ───────────────────────────
+export const CREAM    = '#ffffff'
+export const BORDER   = '#e8e0d6'
 
 // ── Semantic colors ───────────────────────────────────────────────
 export const GREEN    = '#16A34A'
@@ -19,12 +19,12 @@ export const GREEN_BG = '#ffffff'
 export const RED      = '#DC2626'
 export const RED_BG   = '#ffffff'
 
-export const AMBER    = '#c2410c'
+export const AMBER    = '#C8A97E'
 export const AMBER_BG = '#ffffff'
 
 // ── Typography ────────────────────────────────────────────────────
-export const FONT_FAMILY = "'Plus Jakarta Sans','DM Sans',system-ui,sans-serif"
-export const FONT_URL    = "https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800;900&display=swap"
+export const FONT_FAMILY = "'Inter',system-ui,-apple-system,sans-serif"
+export const FONT_URL    = "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
 
 // ── Fixed dates ───────────────────────────────────────────────────
 export const TODAY_DATE    = new Date().toISOString().slice(0, 10)

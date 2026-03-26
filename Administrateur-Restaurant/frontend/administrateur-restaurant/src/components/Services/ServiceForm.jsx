@@ -20,7 +20,7 @@ const DAYS = [
 
 const inp = {
   padding: '12px 14px',
-  border: `2px solid ${BORDER}`,
+  border: `4px solid ${BORDER}`,
   fontSize: 14, fontWeight: 700, color: DARK,
   fontFamily: 'inherit', outline: 'none', background: '#fff',
   transition: 'border-color 0.15s',
@@ -73,7 +73,7 @@ function DayPicker({ value = [0,1,2,3,4,5,6], onChange }) {
                 display: 'flex', flexDirection: 'column', alignItems: 'center',
                 padding: '8px 10px', minWidth: 42, gap: 2,
                 background: active ? DARK : '#f5f0eb',
-                border: `2px solid ${active ? DARK : '#e8e0d8'}`,
+                border: `4px solid ${active ? DARK : '#e8e0d8'}`,
                 color: active ? GOLD : '#bbb',
                 cursor: 'pointer', transition: 'all 0.15s', fontFamily: 'inherit',
               }}
@@ -87,7 +87,7 @@ function DayPicker({ value = [0,1,2,3,4,5,6], onChange }) {
               <span style={{ fontSize: 10, fontWeight: 900, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
                 {d.short}
               </span>
-              {active && <div style={{ width: 4, height: 4, background: GOLD, borderRadius: '50%' }} />}
+              {active && <div style={{ width: 4, height: 6, background: GOLD, borderRadius: '50%' }} />}
             </button>
           )
         })}
@@ -128,7 +128,7 @@ export default function ServiceForm({ initial = EMPTY, onSave, saving, editingNa
   }
 
   return (
-    <div style={{ background: '#fff', border: `1.5px solid ${BORDER}`, overflow: 'hidden' }}>
+    <div style={{ background: '#fff', border: `4px solid ${BORDER}`, overflow: 'hidden' }}>
 
       {/* Header */}
       <div style={{ padding: '12px 16px', background: DARK, display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -164,7 +164,7 @@ export default function ServiceForm({ initial = EMPTY, onSave, saving, editingNa
         </Field>
 
         {/* Days picker */}
-        <div style={{ padding: '14px', background: '#faf8f5', border: `1.5px solid #e8e0d8` }}>
+        <div style={{ padding: '14px', background: '#ffffff', border: `4px solid #e8e0d8` }}>
           <DayPicker
             value={form.available_days ?? [0,1,2,3,4,5,6]}
             onChange={v => set('available_days')(v)}
@@ -195,11 +195,11 @@ export default function ServiceForm({ initial = EMPTY, onSave, saving, editingNa
         {editingName && (
           <button onClick={onCancel} style={{
             display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-            padding: '11px', background: 'none', border: `1.5px solid ${BORDER}`,
+            padding: '11px', background: 'none', border: `4px solid ${BORDER}`,
             fontSize: 12, fontWeight: 800, color: DARK,
             cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.15s', width: '100%',
           }}
-            onMouseEnter={e => { e.currentTarget.style.background = '#fdf6ec'; e.currentTarget.style.color = GOLD_DK; e.currentTarget.style.borderColor = GOLD }}
+            onMouseEnter={e => { e.currentTarget.style.background = '#ffffff'; e.currentTarget.style.color = GOLD_DK; e.currentTarget.style.borderColor = GOLD }}
             onMouseLeave={e => { e.currentTarget.style.background = 'none'; e.currentTarget.style.color = DARK; e.currentTarget.style.borderColor = BORDER }}
           >
             <X size={13} strokeWidth={2.5} /> Annuler la modification

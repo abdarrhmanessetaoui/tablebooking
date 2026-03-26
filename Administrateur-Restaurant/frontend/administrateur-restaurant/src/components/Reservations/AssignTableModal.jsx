@@ -8,14 +8,14 @@ const DARK      = '#2b2118'
 const GOLD      = '#c8a97e'
 const GOLD_DARK = '#a8834e'
 const BORDER    = 'rgba(43,33,24,0.12)'
-const CREAM     = '#faf8f5'
+const CREAM     = '#ffffff'
 const BASE      = 'http://localhost:8000/api'
 
 const LOC_COLORS = {
   'Intérieur':   { bg: '#eef2ff', color: '#4f6ef7' },
   'Terrasse':    { bg: '#f0fdf4', color: '#16a34a' },
-  'Bar':         { bg: '#fdf6ec', color: '#a8834e' },
-  'Salon privé': { bg: '#fdf0f0', color: '#b94040' },
+  'Bar':         { bg: '#ffffff', color: '#a8834e' },
+  'Salon privé': { bg: '#ffffff', color: '#DC2626' },
 }
 
 export default function AssignTableModal({ reservation, onClose, onAssigned }) {
@@ -79,11 +79,11 @@ export default function AssignTableModal({ reservation, onClose, onAssigned }) {
       border:        RED,
       background:    '#fff5f5',
       cursor:        'not-allowed',
-      iconBg:        '#fef2f2',
+      iconBg:        '#ffffff',
       iconColor:     RED,
       textColor:     'rgba(43,33,24,0.45)',
       badge:         { bg: RED, color: '#fff', text: 'Occupée' },
-      capacityBg:    '#fef2f2',
+      capacityBg:    '#ffffff',
       capacityColor: RED,
     },
     insufficient: {
@@ -94,7 +94,7 @@ export default function AssignTableModal({ reservation, onClose, onAssigned }) {
       iconColor:     'rgba(43,33,24,0.25)',
       textColor:     'rgba(43,33,24,0.35)',
       badge:         { bg: '#e5e7eb', color: '#9ca3af', text: 'Insuffisante' },
-      capacityBg:    '#fef2f2',
+      capacityBg:    '#ffffff',
       capacityColor: RED,
     },
     selected: {
@@ -158,7 +158,7 @@ export default function AssignTableModal({ reservation, onClose, onAssigned }) {
         background: 'rgba(43,33,24,0.65)',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         padding: 16,
-        fontFamily: "'Plus Jakarta Sans','DM Sans',system-ui,sans-serif",
+        fontFamily: "'Inter',system-ui,-apple-system,sans-serif",
       }}
       onClick={e => { if (e.target === e.currentTarget) onClose() }}
     >
@@ -205,7 +205,7 @@ export default function AssignTableModal({ reservation, onClose, onAssigned }) {
 
         {/* Error */}
         {error && (
-          <div style={{ margin: '10px 22px 0', padding: '10px 12px', background: '#fef2f2', borderLeft: `3px solid ${RED}`, fontSize: 12, fontWeight: 700, color: RED, display: 'flex', alignItems: 'center', gap: 8 }}>
+          <div style={{ margin: '10px 22px 0', padding: '10px 12px', background: '#ffffff', borderLeft: `3px solid ${RED}`, fontSize: 12, fontWeight: 700, color: RED, display: 'flex', alignItems: 'center', gap: 8 }}>
             <AlertTriangle size={14} strokeWidth={2.5} />
             {error}
           </div>
@@ -269,8 +269,8 @@ export default function AssignTableModal({ reservation, onClose, onAssigned }) {
                       position: 'relative', display: 'flex', alignItems: 'center',
                       justifyContent: 'space-between', padding: '10px 14px',
                       cursor: cfg.cursor, background: cfg.background,
-                      border: `1.5px solid ${cfg.border}`,
-                      borderLeft: `4px solid ${cfg.border}`,
+                      border: `4px solid ${cfg.border}`,
+                      borderLeft: `6px solid ${cfg.border}`,
                       transition: 'all 0.12s',
                       filter: isDisabled ? 'grayscale(0.2)' : 'none',
                     }}
@@ -341,9 +341,9 @@ export default function AssignTableModal({ reservation, onClose, onAssigned }) {
         </div>
 
         {/* Footer */}
-        <div style={{ padding: '12px 22px', borderTop: `2px solid ${BORDER}`, background: CREAM, display: 'flex', gap: 8, flexShrink: 0 }}>
+        <div style={{ padding: '12px 22px', borderTop: `4px solid ${BORDER}`, background: CREAM, display: 'flex', gap: 8, flexShrink: 0 }}>
           <button onClick={onClose}
-            style={{ flex: 1, padding: '11px', background: '#fff', border: `2px solid ${DARK}`, fontSize: 13, fontWeight: 800, color: DARK, cursor: 'pointer', fontFamily: 'inherit' }}
+            style={{ flex: 1, padding: '11px', background: '#fff', border: `4px solid ${DARK}`, fontSize: 13, fontWeight: 800, color: DARK, cursor: 'pointer', fontFamily: 'inherit' }}
             onMouseEnter={e => e.currentTarget.style.background = CREAM}
             onMouseLeave={e => e.currentTarget.style.background = '#fff'}
           >

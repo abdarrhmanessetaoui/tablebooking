@@ -7,7 +7,7 @@ export default function Spinner() {
       alignItems: 'center', justifyContent: 'center',
       height: '100vh', background: B.pageBg, gap: 16,
     }}>
-      <div style={{
+      <div className="circular-spinner" style={{
         width: 36, height: 36,
         border: `3px solid #EBEBEB`,
         borderTop: `3px solid ${B.brown}`,
@@ -17,7 +17,10 @@ export default function Spinner() {
       <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: B.inkMute }}>
         Chargement...
       </p>
-      <style>{`@keyframes sp { to { transform: rotate(360deg) } }`}</style>
+      <style>{`
+        @keyframes sp { to { transform: rotate(360deg) } }
+        .circular-spinner { border-radius: 50% !important; }
+      `}</style>
     </div>
   )
 }

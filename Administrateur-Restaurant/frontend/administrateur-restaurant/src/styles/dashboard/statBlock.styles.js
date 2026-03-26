@@ -6,7 +6,7 @@ export const wrapper = (bg, accent) => ({
   display:       'flex',
   flexDirection: 'column',
   gap:           8,
-  borderLeft:    `4px solid ${accent}`,
+  borderLeft:    `6px solid ${accent}`,
   borderBottom:  `1px solid ${BORDER}`,
 })
 
@@ -54,7 +54,7 @@ export const progressRow = {
 
 export const progressTrack = {
   flex:       1,
-  height:     4,
+  height:     6,
   background: BORDER,
   overflow:   'hidden',
   flexShrink: 0,

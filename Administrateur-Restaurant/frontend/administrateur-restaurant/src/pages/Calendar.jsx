@@ -9,8 +9,8 @@ import Spinner       from '../components/Dashboard/Spinner'
 const DARK    = '#2b2118'
 const GOLD    = '#c8a97e'
 const GOLD_DK = '#a8834e'
-const RED_BG  = '#fdf0f0'
-const RED     = '#b94040'
+const RED_BG  = '#ffffff'
+const RED     = '#DC2626'
 
 function Btn({ children, onClick, primary, disabled, icon: Icon }) {
   const [hov, setHov] = useState(false)
@@ -161,11 +161,11 @@ export default function Calendar() {
       `}</style>
 
       <div style={{
-        minHeight: '100vh', background: '#faf8f5',
-        fontFamily: "'Plus Jakarta Sans','DM Sans',system-ui,sans-serif",
+        minHeight: '100vh', background: '#ffffff',
+        fontFamily: "'Inter',system-ui,-apple-system,sans-serif",
         padding: 'clamp(16px,3vw,40px) clamp(12px,3vw,36px)',
       }}>
-        <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800;900&display=swap" rel="stylesheet" />
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
         <style>{`* { box-sizing: border-box; }`}</style>
 
         <FadeUp delay={0}>
@@ -187,7 +187,7 @@ export default function Calendar() {
         </FadeUp>
 
         <FadeUp delay={10}>
-          <div style={{ height: 2, background: DARK, margin: '16px 0 24px' }} />
+          <div style={{ height: 4, background: DARK, margin: '16px 0 24px' }} />
         </FadeUp>
 
         {error && (

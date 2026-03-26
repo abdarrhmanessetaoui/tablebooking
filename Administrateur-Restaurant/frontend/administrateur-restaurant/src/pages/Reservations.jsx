@@ -355,11 +355,11 @@ export default function Reservations() {
       `}</style>
 
       <div style={{
-        minHeight: '100vh', background: '#faf8f5',
-        fontFamily: "'Plus Jakarta Sans','DM Sans',system-ui,sans-serif",
+        minHeight: '100vh', background: '#ffffff',
+        fontFamily: "'Inter',system-ui,-apple-system,sans-serif",
         padding: 'clamp(16px,3vw,40px) clamp(12px,3vw,36px)',
       }}>
-        <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800;900&display=swap" rel="stylesheet" />
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
 
         <FadeUp delay={0}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, marginBottom: 28, flexWrap: 'wrap' }}>
@@ -383,12 +383,12 @@ export default function Reservations() {
         </FadeUp>
 
         <FadeUp delay={10}>
-          <div style={{ height: 2, background: DARK, marginBottom: 24 }} />
+          <div style={{ height: 4, background: DARK, marginBottom: 24 }} />
         </FadeUp>
 
         {error && (
           <FadeUp delay={20}>
-            <div style={{ marginBottom: 16, padding: '11px 16px', background: '#fdf0f0', borderLeft: '3px solid #b94040', fontSize: 12, fontWeight: 700, color: '#b94040', display: 'flex', alignItems: 'center', gap: 8 }}>
+            <div style={{ marginBottom: 16, padding: '11px 16px', background: '#ffffff', borderLeft: '3px solid #DC2626', fontSize: 12, fontWeight: 700, color: '#DC2626', display: 'flex', alignItems: 'center', gap: 8 }}>
               <XCircle size={14} strokeWidth={2.5} />
               {error}
             </div>

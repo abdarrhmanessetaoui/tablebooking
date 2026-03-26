@@ -9,7 +9,7 @@ const EMPTY = { number: '', capacity: '', location: '' }
 
 const inp = {
   padding: '12px 14px',
-  border: `2px solid ${BORDER}`,
+  border: `4px solid ${BORDER}`,
   fontSize: 14, fontWeight: 700, color: DARK,
   fontFamily: 'inherit', outline: 'none', background: '#fff',
   transition: 'border-color 0.15s',
@@ -55,7 +55,7 @@ export default function TableForm({ initial = EMPTY, onSave, saving, editingNumb
   }
 
   return (
-    <div style={{ background: '#fff', border: `1.5px solid ${BORDER}`, overflow: 'hidden' }}>
+    <div style={{ background: '#fff', border: `4px solid ${BORDER}`, overflow: 'hidden' }}>
 
       {/* Header */}
       <div style={{ padding: '12px 16px', background: DARK, display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -131,11 +131,11 @@ export default function TableForm({ initial = EMPTY, onSave, saving, editingNumb
         {editingNumber && (
           <button onClick={onCancel} style={{
             display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-            padding: '11px', background: 'none', border: `1.5px solid ${BORDER}`,
+            padding: '11px', background: 'none', border: `4px solid ${BORDER}`,
             fontSize: 12, fontWeight: 800, color: DARK,
             cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.15s', width: '100%',
           }}
-            onMouseEnter={e => { e.currentTarget.style.background = '#fdf6ec'; e.currentTarget.style.color = '#a8834e'; e.currentTarget.style.borderColor = GOLD }}
+            onMouseEnter={e => { e.currentTarget.style.background = '#ffffff'; e.currentTarget.style.color = '#a8834e'; e.currentTarget.style.borderColor = GOLD }}
             onMouseLeave={e => { e.currentTarget.style.background = 'none'; e.currentTarget.style.color = DARK; e.currentTarget.style.borderColor = BORDER }}
           >
             <X size={13} strokeWidth={2.5} /> Annuler la modification

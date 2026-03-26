@@ -27,7 +27,7 @@ export default function MiniCalendar({ value, onChange, blockedDates = [], disab
   }
 
   return (
-    <div style={{ border:'2px solid #e8e0d8', background:'#fff' }}>
+    <div style={{ border:'4px solid #e8e0d8', background:'#fff' }}>
       <div style={{ background:DARK, display:'flex', alignItems:'center', justifyContent:'space-between', padding:'10px 14px' }}>
         <button onClick={() => setCur(c=>c.m===0?{y:c.y-1,m:11}:{y:c.y,m:c.m-1})} style={{ background:'none', border:'none', cursor:'pointer', display:'flex', padding:4 }}>
           <ChevronLeft size={16} color={GOLD} />
@@ -37,7 +37,7 @@ export default function MiniCalendar({ value, onChange, blockedDates = [], disab
           <ChevronRight size={16} color={GOLD} />
         </button>
       </div>
-      <div style={{ display:'grid', gridTemplateColumns:'repeat(7,1fr)', background:'#faf8f5', borderBottom:'1px solid #e8e0d8' }}>
+      <div style={{ display:'grid', gridTemplateColumns:'repeat(7,1fr)', background:'#ffffff', borderBottom:'1px solid #e8e0d8' }}>
         {DAYS.map((d,i) => <div key={i} style={{ padding:'6px 0', textAlign:'center', fontSize:10, fontWeight:900, color:GOLD_DARK }}>{d}</div>)}
       </div>
       <div style={{ display:'grid', gridTemplateColumns:'repeat(7,1fr)', padding:'6px 4px' }}>
@@ -50,7 +50,7 @@ export default function MiniCalendar({ value, onChange, blockedDates = [], disab
           return (
             <button key={day} onClick={()=>pick(day)} disabled={disabled} style={{
               padding:'7px 0', border:'none', borderRadius:2,
-              background:isSel?DARK:(isBlk||isOff)?'#fdf0f0':'transparent',
+              background:isSel?DARK:(isBlk||isOff)?'#ffffff':'transparent',
               color:isSel?GOLD:(isBlk||isOff)?'#e0a0a0':isPast?'#ccc':isTdy?GOLD_DARK:DARK,
               fontSize:13, fontWeight:(isSel||isTdy)?900:600,
               cursor:disabled?'not-allowed':'pointer',
@@ -60,7 +60,7 @@ export default function MiniCalendar({ value, onChange, blockedDates = [], disab
         })}
       </div>
       <div style={{ padding:'6px 12px 10px', borderTop:'1px solid #f0ebe4', display:'flex', gap:12 }}>
-        {[{c:'#b94040',l:'Bloqué / Fermé'},{c:GOLD_DARK,l:"Aujourd'hui"}].map(({c,l}) => (
+        {[{c:'#DC2626',l:'Bloqué / Fermé'},{c:GOLD_DARK,l:"Aujourd'hui"}].map(({c,l}) => (
           <span key={l} style={{ fontSize:10, fontWeight:700, color:c, display:'flex', alignItems:'center', gap:4 }}>
             <span style={{ width:7, height:7, borderRadius:'50%', background:c, display:'inline-block' }} />{l}
           </span>

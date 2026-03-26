@@ -10,14 +10,14 @@ import ReportsFilters from '../components/Reports/ReportsFilters'
 const DARK     = '#2b2118'
 const GOLD     = '#c8a97e'
 const GOLD_DK  = '#a8834e'
-const CREAM    = '#faf8f5'
+const CREAM    = '#ffffff'
 const WHITE    = '#ffffff'
-const GREEN    = '#1a6e42'
-const GREEN_BG = '#edfaf4'
-const RED      = '#b94040'
-const RED_BG   = '#fdf0f0'
-const AMBER    = '#a8670a'
-const AMBER_BG = '#fff8ec'
+const GREEN    = '#16A34A'
+const GREEN_BG = '#ffffff'
+const RED      = '#DC2626'
+const RED_BG   = '#ffffff'
+const AMBER    = '#C8A97E'
+const AMBER_BG = '#ffffff'
 const BORDER   = '#2b2118'
 const MUTED    = '#2b2118'
 
@@ -123,8 +123,8 @@ function BarChart({ data={}, title, subtitle, highlight=false, barColor=GOLD }) 
   const headerColor = highlight ? '#2b2118' : DARK
 
   if (!entries.length) return (
-    <div style={{border:`2px solid ${DARK}`,background:WHITE,display:'flex',flexDirection:'column'}}>
-      <div style={{padding:'14px 18px 12px',borderBottom:`2px solid ${DARK}`,background:headerBg}}>
+    <div style={{border:`4px solid ${DARK}`,background:WHITE,display:'flex',flexDirection:'column'}}>
+      <div style={{padding:'14px 18px 12px',borderBottom:`4px solid ${DARK}`,background:headerBg}}>
         <div style={{fontSize:9,fontWeight:900,color:GOLD,letterSpacing:'0.18em',textTransform:'uppercase',marginBottom:4}}>{title}</div>
         {subtitle&&<div style={{fontSize:13,fontWeight:800,color:headerColor}}>{subtitle}</div>}
       </div>
@@ -135,8 +135,8 @@ function BarChart({ data={}, title, subtitle, highlight=false, barColor=GOLD }) 
   )
 
   return (
-    <div style={{border:`2px solid ${DARK}`,background:WHITE,display:'flex',flexDirection:'column',minWidth:0}}>
-      <div style={{padding:'14px 18px 12px',borderBottom:`2px solid ${DARK}`,background:headerBg,display:'flex',alignItems:'flex-start',justifyContent:'space-between',gap:10}}>
+    <div style={{border:`4px solid ${DARK}`,background:WHITE,display:'flex',flexDirection:'column',minWidth:0}}>
+      <div style={{padding:'14px 18px 12px',borderBottom:`4px solid ${DARK}`,background:headerBg,display:'flex',alignItems:'flex-start',justifyContent:'space-between',gap:10}}>
         <div style={{minWidth:0}}>
           <div style={{fontSize:9,fontWeight:900,letterSpacing:'0.18em',textTransform:'uppercase',color:GOLD,marginBottom:4}}>{title}</div>
           {subtitle&&<div style={{fontSize:13,fontWeight:800,color:headerColor}}>{subtitle}</div>}
@@ -194,8 +194,8 @@ function ServiceChart({ data={} }) {
   useState(() => { const id = setTimeout(() => setMounted(true), 80); return () => clearTimeout(id) })
 
   if (!entries.length) return (
-    <div style={{border:`2px solid ${DARK}`,background:WHITE,display:'flex',flexDirection:'column',minHeight:200}}>
-      <div style={{padding:'14px 18px 12px',borderBottom:`2px solid ${DARK}`}}>
+    <div style={{border:`4px solid ${DARK}`,background:WHITE,display:'flex',flexDirection:'column',minHeight:200}}>
+      <div style={{padding:'14px 18px 12px',borderBottom:`4px solid ${DARK}`}}>
         <div style={{fontSize:9,fontWeight:900,color:GOLD,letterSpacing:'0.18em',textTransform:'uppercase',marginBottom:4}}>Par service</div>
         <div style={{fontSize:13,fontWeight:800,color:DARK}}>Répartition des formules</div>
       </div>
@@ -206,8 +206,8 @@ function ServiceChart({ data={} }) {
   )
 
   return (
-    <div style={{border:`2px solid ${DARK}`,background:WHITE,display:'flex',flexDirection:'column'}}>
-      <div style={{padding:'14px 18px 12px',borderBottom:`2px solid ${DARK}`,display:'flex',alignItems:'flex-start',justifyContent:'space-between'}}>
+    <div style={{border:`4px solid ${DARK}`,background:WHITE,display:'flex',flexDirection:'column'}}>
+      <div style={{padding:'14px 18px 12px',borderBottom:`4px solid ${DARK}`,display:'flex',alignItems:'flex-start',justifyContent:'space-between'}}>
         <div>
           <div style={{fontSize:9,fontWeight:900,letterSpacing:'0.18em',textTransform:'uppercase',color:GOLD,marginBottom:4}}>Par service</div>
           <div style={{fontSize:13,fontWeight:800,color:DARK}}>Répartition des formules</div>
@@ -302,7 +302,7 @@ export default function Reports() {
           .btn-label     { display:none!important; }
           .page-subtitle { display:none!important; }
         }
-        .rp-sum{ display:grid; grid-template-columns:repeat(5,1fr); gap:2px; background:${DARK}; border:2px solid ${DARK}; }
+        .rp-sum{ display:grid; grid-template-columns:repeat(5,1fr); gap:2px; background:${DARK}; border:4px solid ${DARK}; }
         @media(max-width:860px){ .rp-sum{ grid-template-columns:repeat(3,1fr); } }
         @media(max-width:520px){ .rp-sum{ grid-template-columns:repeat(2,1fr); } }
         .rp-2{ display:grid; grid-template-columns:1fr 1fr; gap:8px; }
@@ -313,12 +313,12 @@ export default function Reports() {
       `}</style>
 
       <div style={{
-        minHeight:'100vh', background:CREAM,
-        fontFamily:"'Plus Jakarta Sans','DM Sans',system-ui,sans-serif",
+        minHeight:'100vh', background:'#ffffff',
+        fontFamily:"'Inter',system-ui,-apple-system,sans-serif",
         padding:'clamp(16px,3vw,40px) clamp(12px,3vw,36px)',
         boxSizing:'border-box',
       }}>
-        <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800;900&display=swap" rel="stylesheet"/>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
         <style>{`*{box-sizing:border-box;}`}</style>
 
         {/* HEADER */}
@@ -341,7 +341,7 @@ export default function Reports() {
 
         {/* DIVIDER */}
         <FadeUp delay={10}>
-          <div style={{height:2,background:DARK,margin:'16px 0 28px'}}/>
+          <div style={{height:4,background:DARK,margin:'16px 0 28px'}}/>
         </FadeUp>
 
         {/* ERROR */}
@@ -376,7 +376,7 @@ export default function Reports() {
           </div>
         </FadeUp>
 
-        <div style={{height:2,background:DARK,margin:'0 0 32px'}}/>
+        <div style={{height:4,background:DARK,margin:'0 0 32px'}}/>
 
         {/* HEURE + JOUR */}
         <FadeUp delay={0}>
@@ -387,7 +387,7 @@ export default function Reports() {
           </div>
         </FadeUp>
 
-        <div style={{height:2,background:DARK,margin:'0 0 32px'}}/>
+        <div style={{height:4,background:DARK,margin:'0 0 32px'}}/>
 
         {/* SERVICES + COUVERTS */}
         <FadeUp delay={0}>
@@ -398,7 +398,7 @@ export default function Reports() {
           </div>
         </FadeUp>
 
-        <div style={{height:2,background:DARK,margin:'0 0 32px'}}/>
+        <div style={{height:4,background:DARK,margin:'0 0 32px'}}/>
 
         {/* SEMAINE + MOIS + ANNÉE */}
         <FadeUp delay={0}>
