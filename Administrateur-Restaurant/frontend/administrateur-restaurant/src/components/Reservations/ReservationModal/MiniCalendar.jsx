@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useTranslation } from "react-i18next"
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { DARK, GOLD, GOLD_DARK } from '../../../styles/reservations/tokens'
 
@@ -6,6 +7,8 @@ const MONTHS = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Aoû
 const DAYS   = ['L','M','M','J','V','S','D']
 
 export default function MiniCalendar({ value, onChange, blockedDates = [], disabledDays = [] }) {
+  const { t } = useTranslation()
+
   const today    = new Date(); today.setHours(0,0,0,0)
   const todayISO = today.toISOString().slice(0,10)
   const init     = value ? new Date(value+'T00:00:00') : today
@@ -32,14 +35,24 @@ export default function MiniCalendar({ value, onChange, blockedDates = [], disab
         <button onClick={() => setCur(c=>c.m===0?{y:c.y-1,m:11}:{y:c.y,m:c.m-1})} style={{ background:'none', border:'none', cursor:'pointer', display:'flex', padding:4 }}>
           <ChevronLeft size={16} color={GOLD} />
         </button>
-        <span style={{ fontSize:13, fontWeight:900, color:'#fff' }}>{MONTHS[cur.m]} {cur.y}</span>
+
+        <span style={{ fontSize:13, fontWeight:900, color:'#fff' }}>
+          {t(`months.${cur.m}`)} {cur.y}
+        </span>
+
         <button onClick={() => setCur(c=>c.m===11?{y:c.y+1,m:0}:{y:c.y,m:c.m+1})} style={{ background:'none', border:'none', cursor:'pointer', display:'flex', padding:4 }}>
           <ChevronRight size={16} color={GOLD} />
         </button>
       </div>
+
       <div style={{ display:'grid', gridTemplateColumns:'repeat(7,1fr)', background:'#faf8f5', borderBottom:'1px solid #e8e0d8' }}>
-        {DAYS.map((d,i) => <div key={i} style={{ padding:'6px 0', textAlign:'center', fontSize:10, fontWeight:900, color:GOLD_DARK }}>{d}</div>)}
+        {DAYS.map((d,i) => (
+          <div key={i} style={{ padding:'6px 0', textAlign:'center', fontSize:10, fontWeight:900, color:GOLD_DARK }}>
+            {t(`days.${i}`)}
+          </div>
+        ))}
       </div>
+
       <div style={{ display:'grid', gridTemplateColumns:'repeat(7,1fr)', padding:'6px 4px' }}>
         {cells.map((day,i) => {
           if (!day) return <div key={`e${i}`} />
@@ -59,8 +72,9 @@ export default function MiniCalendar({ value, onChange, blockedDates = [], disab
           )
         })}
       </div>
+
       <div style={{ padding:'6px 12px 10px', borderTop:'1px solid #f0ebe4', display:'flex', gap:12 }}>
-        {[{c:'#b94040',l:'Bloqué / Fermé'},{c:GOLD_DARK,l:"Aujourd'hui"}].map(({c,l}) => (
+        {[{c:'#b94040',l:t('blocked_closed')},{c:GOLD_DARK,l:t('today')}].map(({c,l}) => (
           <span key={l} style={{ fontSize:10, fontWeight:700, color:c, display:'flex', alignItems:'center', gap:4 }}>
             <span style={{ width:7, height:7, borderRadius:'50%', background:c, display:'inline-block' }} />{l}
           </span>

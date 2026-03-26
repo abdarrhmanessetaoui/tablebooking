@@ -15,6 +15,7 @@ export default function useDashboard() {
         },
       })
     } catch (e) {
+      console.error(e);
       // fail silently, still log out client side
     }
 

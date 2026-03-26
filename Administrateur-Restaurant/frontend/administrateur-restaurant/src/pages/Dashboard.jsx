@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { useNavigate }   from 'react-router-dom'
 import { FileDown }      from 'lucide-react'
 
+
 import useDashboardStats from '../hooks/Dashboard/useDashboardStats'
 import useRestaurantInfo from '../hooks/useRestaurantInfo'
 import FadeUp            from '../components/Dashboard/FadeUp'
@@ -11,6 +12,7 @@ import LiveClock         from '../components/Dashboard/LiveClock'
 import TabPanel          from '../components/Dashboard/TabPanel'
 import { exportPDF }     from '../utils/exportPDF'
 import { getToken }      from '../utils/auth'
+import { useTranslation } from 'react-i18next'
 
 import {
   page, header, headerLeft,
@@ -24,10 +26,11 @@ import {
 
 export default function Dashboard() {
   const { stats, loading, error, refetch } = useDashboardStats()
-  const { info }   = useRestaurantInfo()
-  const navigate   = useNavigate()
+  const { info } = useRestaurantInfo()
+  const navigate = useNavigate()
+  const { t } = useTranslation()
 
-  const [tab,       setTab]       = useState('today')
+  const [tab,setTab] = useState('today')
   const [exporting, setExporting] = useState(false)
   const [todayRes,  setTodayRes]  = useState([])
   const [tomRes,    setTomRes]    = useState([])
@@ -64,22 +67,21 @@ export default function Dashboard() {
     return () => clearInterval(id)
   }, [loadAll])
 
-  // ── Tab config ──────────────────────────────────────────────────
+  // ── Tabs ──────────────────────────────────────────────────
   const TABS = [
-    { key: 'today',    label: "Aujourd'hui", res: todayRes, date: TODAY_DATE    },
-    { key: 'tomorrow', label: 'Demain',      res: tomRes,   date: TOMORROW_DATE },
-    { key: 'month',    label: 'Ce mois',     res: monthRes, date: null          },
+    { key: 'today',    label: t('today'),    res: todayRes, date: TODAY_DATE },
+    { key: 'tomorrow', label: t('tomorrow'), res: tomRes,   date: TOMORROW_DATE },
+    { key: 'month',    label: t('month'),    res: monthRes, date: null },
   ]
+
   const active = TABS.find(t => t.key === tab)
 
-  // ── Row click → navigate to reservation ─────────────────────────
   function handleRowClick(r) {
     navigate('/reservations', {
       state: { openId: r.id, filterDate: active?.date ?? null }
     })
   }
 
-  // ── PDF export ──────────────────────────────────────────────────
   async function handleExport() {
     setExporting(true)
     try {
@@ -92,7 +94,7 @@ export default function Dashboard() {
           document.head.appendChild(s)
         })
       }
-      exportPDF(stats, active?.res || [], active?.label || "Aujourd'hui")
+      exportPDF(stats, active?.res || [], active?.label || t('today'))
     } catch (e) {
       console.error(e)
     } finally {
@@ -112,42 +114,42 @@ export default function Dashboard() {
 
       <div style={page}>
 
-        {/* ── Header ─────────────────────────────────────────── */}
+        {/* Header */}
         <FadeUp delay={0}>
           <div style={header}>
             <div style={headerLeft}>
-              <h1 style={h1}>Tableau de bord</h1>
+              <h1 style={h1}>{t('dashboard')}</h1>
               <p className="page-subtitle" style={subtitle}>
                 <LiveClock />
               </p>
             </div>
             <div style={{ display: 'flex', gap: 3, flexShrink: 0 }}>
               <Btn icon={FileDown} primary onClick={handleExport} disabled={exporting}>
-                {exporting ? 'Export…' : 'Exporter PDF'}
+                {exporting ? t('exporting') : t('export_pdf')}
               </Btn>
             </div>
           </div>
         </FadeUp>
 
-        {/* ── Divider ────────────────────────────────────────── */}
+        {/* Divider */}
         <FadeUp delay={10}>
           <div style={divider} />
         </FadeUp>
 
-        {/* ── Tabs ───────────────────────────────────────────── */}
+        {/* Tabs */}
         <FadeUp delay={20}>
           <div className="db-tabs">
-            {TABS.map(t => (
+            {TABS.map(tItem => (
               <button
-                key={t.key}
-                className={`db-tab${tab === t.key ? ' active' : ''}`}
-                onClick={() => setTab(t.key)}
+                key={tItem.key}
+                className={`db-tab${tab === tItem.key ? ' active' : ''}`}
+                onClick={() => setTab(tItem.key)}
               >
-                {t.label}
-                {t.key === 'today' && stats.today_pending > 0 && (
+                {tItem.label}
+                {tItem.key === 'today' && stats.today_pending > 0 && (
                   <span className="tab-pill">{stats.today_pending}</span>
                 )}
-                {t.key === 'tomorrow' && (stats.tomorrow_pending ?? 0) > 0 && (
+                {tItem.key === 'tomorrow' && (stats.tomorrow_pending ?? 0) > 0 && (
                   <span className="tab-pill">{stats.tomorrow_pending}</span>
                 )}
               </button>
@@ -155,7 +157,7 @@ export default function Dashboard() {
           </div>
         </FadeUp>
 
-        {/* ── Tab content ────────────────────────────────────── */}
+        {/* Content */}
         <FadeUp delay={30} key={tab}>
           <TabPanel
             tab={tab}
@@ -169,11 +171,11 @@ export default function Dashboard() {
           />
         </FadeUp>
 
-        {/* ── Error ──────────────────────────────────────────── */}
+        {/* Error */}
         {error && (
           <FadeUp delay={0}>
             <div style={errorBanner}>
-              Erreur de chargement — {error}
+              {t('loading_error')} — {error}
             </div>
           </FadeUp>
         )}

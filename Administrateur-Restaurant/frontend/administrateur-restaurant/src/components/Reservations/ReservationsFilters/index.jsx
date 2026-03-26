@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
+import { useTranslation } from "react-i18next"
 import { Search, X, Calendar } from 'lucide-react'
 import CalendarPopup from './CalendarPopup.jsx'
 import { DARK, GOLD, GOLD_DARK } from '../../../styles/reservations/tokens.js'
@@ -8,20 +9,22 @@ import { getToken } from '../../../utils/auth.js'
 const MONTHS_FR = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre']
 const MUTED     = 'rgba(43,33,24,0.35)'
 
-function dateLabel(filterDate) {
-  if (!filterDate) return 'Choisir une date'
+function dateLabel(filterDate, t) {
+  if (!filterDate) return t('choose_date')
+
   if (filterDate.length === 7) {
     const [y, m] = filterDate.split('-')
-    return `${MONTHS_FR[parseInt(m)-1]} ${y}`
+    return `${t(`months.${parseInt(m)-1}`)} ${y}`
   }
+
   if (filterDate.length === 10) {
     const [y, m, d] = filterDate.split('-')
-    return `${parseInt(d)} ${MONTHS_FR[parseInt(m)-1]} ${y}`
+    return `${parseInt(d)} ${t(`months.${parseInt(m)-1}`)} ${y}`
   }
+
   return filterDate
 }
 
-// Mirrors dateBtnStyle logic but for <select> elements
 function selectActiveStyle(isActive) {
   return {
     ...filterInputBase,
@@ -36,14 +39,16 @@ function selectActiveStyle(isActive) {
 }
 
 export default function ReservationsFilters({
-  search,        setSearch,
-  filterStatus,  setFilterStatus,
+  search, setSearch,
+  filterStatus, setFilterStatus,
   filterService, setFilterService,
-  filterDate,    setFilterDate,
-  filterTable,   setFilterTable,
+  filterDate, setFilterDate,
+  filterTable, setFilterTable,
   clearFilters,
   services = [],
 }) {
+  const { t } = useTranslation()
+
   const [calOpen, setCalOpen] = useState(false)
   const [tables,  setTables]  = useState([])
   const anchorRef = useRef(null)
@@ -85,7 +90,6 @@ export default function ReservationsFilters({
           .filters-clear { grid-column: auto; }
         }
 
-        /* Unified active select: gold options stay readable in dropdown */
         .filter-select option {
           background: #fff;
           color: #2b2118;
@@ -95,17 +99,20 @@ export default function ReservationsFilters({
 
       <div className="filters-wrap">
 
-        {/* ── Search ── */}
+        {/* Search */}
         <div className="filters-search" style={{ position: 'relative' }}>
-          <Search
-            size={14} color={MUTED} strokeWidth={2.5}
+          <Search size={14} color={MUTED} strokeWidth={2.5}
             style={{ position:'absolute', left:12, top:'50%', transform:'translateY(-50%)', pointerEvents:'none' }}
           />
+
           <input
-            type="text" placeholder="Rechercher…"
-            value={search} onChange={e => setSearch(e.target.value)}
+            type="text"
+            placeholder={t('search')}
+            value={search}
+            onChange={e => setSearch(e.target.value)}
             style={{ ...filterInputBase, paddingLeft: 34 }}
           />
+
           {search && (
             <button onClick={() => setSearch('')}
               style={{ position:'absolute', right:10, top:'50%', transform:'translateY(-50%)', background:'none', border:'none', cursor:'pointer', padding:4, display:'flex', alignItems:'center' }}>
@@ -114,54 +121,55 @@ export default function ReservationsFilters({
           )}
         </div>
 
-        {/* ── Status ── */}
+        {/* Status */}
         <select
           className="filter-select"
           value={filterStatus}
           onChange={e => setFilterStatus(e.target.value)}
           style={selectActiveStyle(statusActive)}
         >
-          <option value="all">Tous les statuts</option>
-          <option value="Pending">En attente</option>
-          <option value="Confirmed">Confirmées</option>
-          <option value="Cancelled">Annulées</option>
+          <option value="all">{t('all_status')}</option>
+          <option value="Pending">{t('pending')}</option>
+          <option value="Confirmed">{t('confirmed')}</option>
+          <option value="Cancelled">{t('cancelled')}</option>
         </select>
 
-        {/* ── Service ── */}
+        {/* Service */}
         <select
           className="filter-select"
           value={filterService ?? 'all'}
           onChange={e => setFilterService(e.target.value)}
           style={selectActiveStyle(serviceActive)}
         >
-          <option value="all">Tous les services</option>
+          <option value="all">{t('all_services')}</option>
           {services.map(s => <option key={s} value={s}>{s}</option>)}
         </select>
 
-        {/* ── Table ── */}
+        {/* Table */}
         <select
           className="filter-select"
           value={filterTable ?? 'all'}
           onChange={e => setFilterTable(e.target.value)}
           style={selectActiveStyle(tableActive)}
         >
-          <option value="all">Toutes les tables</option>
-          {tables.map(t => (
-            <option key={t.idx} value={String(t.idx)}>
-              Table {t.number}{t.location ? ` — ${t.location}` : ''}
-            </option>
-          ))}
-          <option value="unassigned">Non assignées</option>
+          <option value="all">{t('all_tables')}</option>
+{tables.map(table => (
+  <option key={table.idx} value={String(table.idx)}>
+    {t('table')} {table.number}{table.location ? ` — ${table.location}` : ''}
+  </option>
+))}
+          <option value="unassigned">{t('unassigned')}</option>
         </select>
 
-        {/* ── Date ── */}
+        {/* Date */}
         <div className="filters-date" ref={anchorRef}>
           <button onClick={() => setCalOpen(o => !o)} style={dateBtnStyle(!!filterDate)}>
             <span style={{ overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
-              {dateLabel(filterDate)}
+              {dateLabel(filterDate, t)}
             </span>
             <Calendar size={14} strokeWidth={2.2} style={{ flexShrink: 0 }} />
           </button>
+
           {filterDate && (
             <button
               onClick={e => { e.stopPropagation(); setFilterDate(''); setCalOpen(false) }}
@@ -172,13 +180,13 @@ export default function ReservationsFilters({
           )}
         </div>
 
-        {/* ── Clear all ── */}
+        {/* Clear */}
         {hasFilters && (
           <div className="filters-clear">
             <button onClick={clearFilters}
               style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:6, padding:'10px 14px', width:'100%', background:DARK, border:'none', fontSize:12, fontWeight:800, color:GOLD, cursor:'pointer', fontFamily:'inherit', whiteSpace:'nowrap' }}>
               <X size={13} strokeWidth={2.5} />
-              Effacer les filtres
+              {t('clear_filters')}
             </button>
           </div>
         )}

@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Clock, Users, Utensils, ChevronRight, User2 } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import Badge from './Badge'
 import {
   row, nameWrapper, nameInner, nameTxt, phoneTxt,
@@ -19,6 +20,7 @@ function fmtDate(iso) {
 
 export default function ResRow({ r, i, tpl, showDate, onRowClick }) {
   const [hov, setHov] = useState(false)
+  const { t } = useTranslation() // 👈 i18next hook
 
   return (
     <div
@@ -52,13 +54,13 @@ export default function ResRow({ r, i, tpl, showDate, onRowClick }) {
       {/* Guests */}
       <span style={guestsTxt}>
         <Users size={11} strokeWidth={2.5} color={DARK} />
-        {r.guests}
+        {r.guests} {t('guests')}
       </span>
 
       {/* Service chip */}
       <span style={serviceChip}>
         <Utensils size={11} strokeWidth={2.5} color={GOLD_DK} style={{ flexShrink: 0 }} />
-        <span style={serviceText}>{r.service || '—'}</span>
+        <span style={serviceText}>{r.service || t('no_service')}</span>
       </span>
 
       {/* Status badge */}

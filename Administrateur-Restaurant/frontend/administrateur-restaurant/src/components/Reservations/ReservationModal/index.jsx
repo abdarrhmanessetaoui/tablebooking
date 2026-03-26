@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useTranslation } from "react-i18next"
 import { createPortal } from 'react-dom'
 import useModalData   from '../../../hooks/Reservations/useModalData'
 import useTimeSlots   from '../../../hooks/Reservations/useTimeSlots'
@@ -12,6 +13,8 @@ import { overlayStyle, panelStyle } from '../../../styles/reservations/modal.sty
 
 export default function ReservationModal({ modalMode, editing, form, setForm, handleSubmit, handleCreate, handleDelete, setModalMode }) {
   const [step, setStep] = useState(1)
+  const { t } = useTranslation()
+
   const close = () => { setModalMode(null); setStep(1) }
 
   const { services, allOH, workingDates, blockedDates } = useModalData()
@@ -30,25 +33,61 @@ export default function ReservationModal({ modalMode, editing, form, setForm, ha
         )}
 
         <div style={{ padding:'24px 26px', display:'flex', flexDirection:'column', gap:20 }}>
+          
           {modalMode==='view' && editing && (
             <ViewMode editing={editing} setForm={setForm} setModalMode={setModalMode} handleDelete={handleDelete} />
           )}
+
           {modalMode==='edit' && (
             <EditMode editing={editing} form={form} setForm={setForm} handleSubmit={handleSubmit} onClose={close} />
           )}
+
           {modalMode==='create' && step===1 && (
-            <StepService form={form} setForm={setForm} services={services} selectedSvc={selectedSvc} maxGuests={maxGuests} openDaysLabel={openDaysLabel}
-              onNext={() => { if(!form.service){alert('Veuillez choisir une formule.');return} if(!form.guests){alert('Veuillez choisir le nombre de personnes.');return} setStep(2) }} />
+            <StepService 
+              form={form} 
+              setForm={setForm} 
+              services={services} 
+              selectedSvc={selectedSvc} 
+              maxGuests={maxGuests} 
+              openDaysLabel={openDaysLabel}
+              onNext={() => { 
+                if(!form.service){ alert(t('choose_service')); return } 
+                if(!form.guests){ alert(t('choose_guests')); return } 
+                setStep(2) 
+              }} 
+            />
           )}
+
           {modalMode==='create' && step===2 && (
-            <StepDateTime form={form} setForm={setForm} blockedDates={blockedDates} disabledDays={disabledDays} timeSlots={timeSlots} selectedSvc={selectedSvc}
+            <StepDateTime 
+              form={form} 
+              setForm={setForm} 
+              blockedDates={blockedDates} 
+              disabledDays={disabledDays} 
+              timeSlots={timeSlots} 
+              selectedSvc={selectedSvc}
               onBack={() => setStep(1)}
-              onNext={() => { if(!form.date){alert('Veuillez choisir une date.');return} if(!form.start_time){alert('Veuillez choisir une heure.');return} setStep(3) }} />
+              onNext={() => { 
+                if(!form.date){ alert(t('choose_date')); return } 
+                if(!form.start_time){ alert(t('choose_time')); return } 
+                setStep(3) 
+              }} 
+            />
           )}
+
           {modalMode==='create' && step===3 && (
-            <StepContact form={form} setForm={setForm} onBack={() => setStep(2)}
-              onSubmit={() => { if(!form.name){alert('Le nom est obligatoire.');return} handleCreate(); setStep(1) }} />
+            <StepContact 
+              form={form} 
+              setForm={setForm} 
+              onBack={() => setStep(2)}
+              onSubmit={() => { 
+                if(!form.name){ alert(t('name_required')); return } 
+                handleCreate(); 
+                setStep(1) 
+              }} 
+            />
           )}
+
         </div>
       </div>
     </div>,

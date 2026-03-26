@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'  // ← مهم
 import useCountUp from '../../hooks/Dashboard/useCountUp'
 import {
   wrapper, labelRow, labelText,
@@ -7,7 +8,8 @@ import {
   progressFill, progressPct,
 } from '../../styles/dashboard/statBlock.styles'
 
-export default function StatBlock({ icon: Icon, value, label, accent, bg, delay = 0, total = 0 }) {
+export default function StatBlock({ icon: Icon, value, labelKey, accent, bg, delay = 0, total = 0 }) {
+  const { t } = useTranslation()  // ← نجيب الدالة ديال الترجمة
   const n   = useCountUp(value, 700, delay)
   const pct = total > 0 ? Math.round((value / total) * 100) : null
   const [w, setW] = useState(0)
@@ -19,11 +21,10 @@ export default function StatBlock({ icon: Icon, value, label, accent, bg, delay 
 
   return (
     <div style={wrapper(bg, accent)}>
-
       {/* Label */}
       <div style={labelRow}>
         <Icon size={10} strokeWidth={2.5} color={accent} />
-        <span style={labelText(accent)}>{label}</span>
+        <span style={labelText(accent)}>{t(labelKey)}</span>  {/* ← استعملنا المفتاح */}
       </div>
 
       {/* Number */}
@@ -40,7 +41,6 @@ export default function StatBlock({ icon: Icon, value, label, accent, bg, delay 
           <span style={progressPct(accent)}>{pct}%</span>
         </div>
       )}
-
     </div>
   )
 }

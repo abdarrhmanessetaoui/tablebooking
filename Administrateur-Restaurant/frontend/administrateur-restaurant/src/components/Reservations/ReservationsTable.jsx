@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
+import { useTranslation } from 'react-i18next'
 import {
   Eye, Pencil, Trash2,
   ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight,
@@ -13,12 +14,6 @@ const GOLD      = '#c8a97e'
 const GOLD_DARK = '#a8834e'
 const CREAM     = '#faf8f5'
 const BORDER    = 'rgba(43,33,24,0.12)'
-
-const STATUS = {
-  Confirmed: { bg: '#f0fdf4', color: '#16a34a', label: 'Confirmée',  dot: GREEN },
-  Pending:   { bg: '#fdf6ec', color: '#a8834e', label: 'En attente', dot: '#c8a97e' },
-  Cancelled: { bg: '#fef2f2', color: '#dc2626', label: 'Annulée',    dot: RED   },
-}
 
 const PAGE_SIZES = [10, 25, 50, 100]
 
@@ -85,6 +80,7 @@ function PageBtn({ onClick, disabled, active, children }) {
 
 // ── Assign table cell — inline compact button ──────────────────────
 function AssignTableCell({ r, onOpenAssign }) {
+  const { t } = useTranslation()
   const [hov, setHov] = useState(false)
   const hasTable = !!r.table_idx
 
@@ -94,7 +90,7 @@ function AssignTableCell({ r, onOpenAssign }) {
         onClick={e => { e.stopPropagation(); onOpenAssign(r) }}
         onMouseEnter={() => setHov(true)}
         onMouseLeave={() => setHov(false)}
-        title="Changer la table"
+        title={t('change_table')}
         style={{
           display: 'inline-flex', alignItems: 'center', gap: 4,
           padding: '3px 8px',
@@ -127,13 +123,21 @@ function AssignTableCell({ r, onOpenAssign }) {
       }}
     >
       <Link2 size={10} strokeWidth={2.5} />
-      Assigner
+      {t('assign')}
     </button>
   )
 }
 
 // ── Mobile card ────────────────────────────────────────────────────
 function MobileCard({ r, selected, highlighted, onToggle, openView, openEdit, handleDelete, rowRef, onOpenAssign }) {
+  const { t } = useTranslation()
+
+  const STATUS = {
+    Confirmed: { bg: '#f0fdf4', color: '#16a34a', label: t('confirmed'), dot: GREEN },
+    Pending:   { bg: '#fdf6ec', color: '#a8834e', label: t('pending'),   dot: '#c8a97e' },
+    Cancelled: { bg: '#fef2f2', color: '#dc2626', label: t('cancelled'), dot: RED   },
+  }
+
   const s = STATUS[r.status] || { bg: '#fdf6ec', color: DARK, label: r.status || '—', dot: '#c8a97e' }
   return (
     <div ref={rowRef} style={{
@@ -144,7 +148,7 @@ function MobileCard({ r, selected, highlighted, onToggle, openView, openEdit, ha
     }}>
       {highlighted && (
         <div style={{ position: 'absolute', top: 10, right: 14, fontSize: 9, fontWeight: 900, color: GOLD_DARK, letterSpacing: '0.12em', textTransform: 'uppercase', background: '#fdf6ec', padding: '2px 7px', border: `1px solid ${GOLD}55` }}>
-          Sélectionnée
+          {t('highlighted')}
         </div>
       )}
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
@@ -174,10 +178,10 @@ function MobileCard({ r, selected, highlighted, onToggle, openView, openEdit, ha
       </div>
       <div style={{ display: 'flex', gap: 4 }}>
         <button onClick={() => openView(r)} style={{ flex: 1, padding: '8px', background: highlighted ? GOLD : '#f5f0eb', border: 'none', fontSize: 11, fontWeight: 700, color: DARK, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5, fontFamily: 'inherit' }}>
-          <Eye size={12} strokeWidth={2.5} /> Voir
+          <Eye size={12} strokeWidth={2.5} /> {t('view')}
         </button>
         <button onClick={() => openEdit(r)} style={{ flex: 1, padding: '8px', background: DARK, border: 'none', fontSize: 11, fontWeight: 700, color: GOLD, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5, fontFamily: 'inherit' }}>
-          <Pencil size={12} strokeWidth={2.5} /> Modifier
+          <Pencil size={12} strokeWidth={2.5} /> {t('edit')}
         </button>
         <button onClick={() => handleDelete(r.id)} style={{ width: 36, padding: '8px', background: '#fef2f2', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <Trash2 size={12} strokeWidth={2.5} color={RED} />
@@ -189,7 +193,15 @@ function MobileCard({ r, selected, highlighted, onToggle, openView, openEdit, ha
 
 // ── Desktop row ────────────────────────────────────────────────────
 function TableRow({ r, i, selected, highlighted, highlightRef, toggleOne, openView, openEdit, handleDelete, onOpenAssign }) {
+  const { t } = useTranslation()
   const [hov, setHov] = useState(false)
+
+  const STATUS = {
+    Confirmed: { bg: '#f0fdf4', color: '#16a34a', label: t('confirmed'), dot: GREEN },
+    Pending:   { bg: '#fdf6ec', color: '#a8834e', label: t('pending'),   dot: '#c8a97e' },
+    Cancelled: { bg: '#fef2f2', color: '#dc2626', label: t('cancelled'), dot: RED   },
+  }
+
   const s = STATUS[r.status] || { bg: '#fdf6ec', color: DARK, label: r.status || '—', dot: '#c8a97e' }
 
   let rowBg = i % 2 === 0 ? '#fff' : CREAM
@@ -264,9 +276,9 @@ function TableRow({ r, i, selected, highlighted, highlightRef, toggleOne, openVi
       </td>
       <td style={{ ...cell, padding: '9px 10px' }}>
         <div style={{ display: 'flex', gap: 3 }}>
-          <ActionBtn icon={Eye}    title="Voir"      onClick={() => openView(r)} />
-          <ActionBtn icon={Pencil} title="Modifier"  onClick={() => openEdit(r)} />
-          <ActionBtn icon={Trash2} title="Supprimer" onClick={() => handleDelete(r.id)} danger />
+          <ActionBtn icon={Eye}    title={t('view')}    onClick={() => openView(r)} />
+          <ActionBtn icon={Pencil} title={t('edit')}    onClick={() => openEdit(r)} />
+          <ActionBtn icon={Trash2} title={t('delete')}  onClick={() => handleDelete(r.id)} danger />
         </div>
       </td>
     </tr>
@@ -278,6 +290,7 @@ export default function ReservationsTable({
   reservations, openView, openEdit, handleDelete,
   selectedIds, setSelectedIds, highlightId, onTableAssigned,
 }) {
+  const { t } = useTranslation()
   const [page,         setPage]         = useState(1)
   const [pageSize,     setPageSize]     = useState(25)
   const [assignTarget, setAssignTarget] = useState(null)
@@ -288,7 +301,7 @@ export default function ReservationsTable({
   useEffect(() => {
     if (!highlightId) return
     const idx = reservations.findIndex(r => r.id === highlightId)
-    if (idx === -1) return
+    if (idx === -1) return 
     setPage(Math.floor(idx / pageSize) + 1)
     setTimeout(() => { highlightRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' }) }, 120)
   }, [highlightId, pageSize, reservations])
@@ -324,17 +337,16 @@ export default function ReservationsTable({
     return pages
   }
 
-  // ── Column definitions — NO responsive hiding, use scroll instead
   const HEADERS = [
-    { label: 'Nom'       },
-    { label: 'Tél.'      },
-    { label: 'Date'      },
-    { label: 'Heure'     },
-    { label: 'Pers.'     },
-    { label: 'Service'   },
-    { label: 'Table'     },
-    { label: 'Statut'    },
-    { label: 'Actions'   },
+    { label: t('name')    },
+    { label: t('phone')   },
+    { label: t('date')    },
+    { label: t('time')    },
+    { label: t('guests')  },
+    { label: t('service') },
+    { label: t('table')   },
+    { label: t('status')  },
+    { label: t('actions') },
   ]
 
   return (
@@ -357,18 +369,22 @@ export default function ReservationsTable({
 
         {someSelected && (
           <div style={{ padding: '9px 16px', background: '#fdf6ec', borderBottom: `1px solid #e8d8b0`, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, flexWrap: 'wrap' }}>
-            <span style={{ fontSize: 12, fontWeight: 700, color: GOLD_DARK }}>{selectedIds.length} sélectionné{selectedIds.length > 1 ? 's' : ''}</span>
+            <span style={{ fontSize: 12, fontWeight: 700, color: GOLD_DARK }}>
+              {t('selected', { count: selectedIds.length })}
+            </span>
             <button onClick={toggleAll} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 800, color: DARK, textDecoration: 'underline', fontFamily: 'inherit', padding: 0 }}>
-              Sélectionner les {reservations.length} réservations
+              {t('select_all_reservations', { count: reservations.length })}
             </button>
           </div>
         )}
 
         {allSelected && reservations.length > pageSize && (
           <div style={{ padding: '9px 16px', background: '#f0fdf4', borderBottom: `1px solid #bbf7d0`, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, flexWrap: 'wrap' }}>
-            <span style={{ fontSize: 12, fontWeight: 700, color: '#16a34a' }}>Toutes les {reservations.length} réservations sélectionnées</span>
+            <span style={{ fontSize: 12, fontWeight: 700, color: '#16a34a' }}>
+              {t('all_reservations_selected', { count: reservations.length })}
+            </span>
             <button onClick={() => setSelectedIds([])} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 800, color: '#16a34a', textDecoration: 'underline', fontFamily: 'inherit', padding: 0 }}>
-              Désélectionner tout
+              {t('deselect_all')}
             </button>
           </div>
         )}
@@ -376,7 +392,9 @@ export default function ReservationsTable({
         {highlightId && pageItems.some(r => r.id === highlightId) && (
           <div style={{ padding: '9px 16px', background: '#fff8ec', borderBottom: `2px solid ${GOLD}66`, display: 'flex', alignItems: 'center', gap: 10 }}>
             <span style={{ width: 8, height: 8, borderRadius: '50%', background: GOLD, flexShrink: 0, boxShadow: `0 0 0 3px ${GOLD}33` }} />
-            <span style={{ fontSize: 12, fontWeight: 700, color: GOLD_DARK }}>Réservation sélectionnée depuis le tableau de bord</span>
+            <span style={{ fontSize: 12, fontWeight: 700, color: GOLD_DARK }}>
+              {t('reservation_selected_from_dashboard')}
+            </span>
           </div>
         )}
 
@@ -410,7 +428,7 @@ export default function ReservationsTable({
               {pageItems.length === 0 && (
                 <tr>
                   <td colSpan={10} style={{ padding: '52px 24px', textAlign: 'center', fontSize: 13, fontWeight: 700, color: DARK }}>
-                    Aucune réservation trouvée
+                    {t('N_reservations')}
                   </td>
                 </tr>
               )}
@@ -423,16 +441,20 @@ export default function ReservationsTable({
           <div style={{ padding: '11px 16px', background: DARK, display: 'flex', alignItems: 'center', gap: 10 }}>
             <Checkbox checked={pageAllSel} indeterminate={pageSomeSel} onChange={togglePage} />
             <span style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.55)', flex: 1 }}>
-              {selectedIds.length > 0 ? `${selectedIds.length} sélectionné${selectedIds.length > 1 ? 's' : ''}` : 'Sélectionner la page'}
+              {selectedIds.length > 0
+                ? t('selected', { count: selectedIds.length })
+                : t('select_page')}
             </span>
             {someSelected && (
               <button onClick={toggleAll} style={{ background: 'none', border: `1px solid rgba(200,169,126,0.4)`, padding: '4px 10px', fontSize: 10, fontWeight: 700, color: GOLD, cursor: 'pointer', fontFamily: 'inherit' }}>
-                Tout ({reservations.length})
+                {t('all_count', { count: reservations.length })}
               </button>
             )}
           </div>
           {pageItems.length === 0 ? (
-            <div style={{ padding: '48px 24px', textAlign: 'center', fontSize: 13, fontWeight: 700, color: DARK }}>Aucune réservation trouvée</div>
+            <div style={{ padding: '48px 24px', textAlign: 'center', fontSize: 13, fontWeight: 700, color: DARK }}>
+              {t('N_reservations')}
+            </div>
           ) : pageItems.map(r => (
             <MobileCard key={r.id} r={r}
               selected={selectedIds.includes(r.id)} highlighted={r.id === highlightId}
@@ -453,7 +475,7 @@ export default function ReservationsTable({
               </span>
               <select value={pageSize} onChange={e => { setPageSize(Number(e.target.value)); setPage(1) }}
                 style={{ padding: '4px 8px', border: `1.5px solid ${BORDER}`, fontSize: 12, fontWeight: 700, color: DARK, background: '#fff', cursor: 'pointer', outline: 'none', fontFamily: 'inherit' }}>
-                {PAGE_SIZES.map(s => <option key={s} value={s}>{s} / page</option>)}
+                {PAGE_SIZES.map(s => <option key={s} value={s}>{s} {t('per_page')}</option>)}
               </select>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}>

@@ -1,5 +1,4 @@
-import { useState, useEffect, useMemo } from 'react'
-
+import { useEffect, useMemo } from 'react'
 function generateSlots(oh, durationMin = 30) {
   if (!oh) return []
   const h1 = parseInt(oh.h1 ?? 12), m1 = parseInt(oh.m1 ?? 0)

@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useTranslation } from "react-i18next"
 import { Eye, Pencil, Trash2, CalendarDays, Clock3, Users, Utensils, User2, Phone } from 'lucide-react'
 import Checkbox        from './Checkbox'
 import ActionBtn       from './ActionBtn'
@@ -12,6 +13,7 @@ function trunc(str, max=14) {
 }
 
 export default function TableRow({ r, i, selected, highlighted, highlightRef, toggleOne, openView, openEdit, handleDelete, onOpenAssign }) {
+  const { t } = useTranslation()
   const [hov, setHov] = useState(false)
   const s = STATUS_CONFIG[r.status] || { bg:'#fdf6ec', color:DARK, label:r.status||'—', dot:'#c8a97e' }
 
@@ -87,9 +89,9 @@ export default function TableRow({ r, i, selected, highlighted, highlightRef, to
       </td>
       <td style={{ ...cellStyle, padding:'9px 10px' }}>
         <div style={{ display:'flex', gap:3 }}>
-          <ActionBtn icon={Eye}    title="Voir"      onClick={() => openView(r)} />
-          <ActionBtn icon={Pencil} title="Modifier"  onClick={() => openEdit(r)} />
-          <ActionBtn icon={Trash2} title="Supprimer" onClick={() => handleDelete(r.id)} danger />
+          <ActionBtn icon={Eye}    title={t('view')}      onClick={() => openView(r)} />
+          <ActionBtn icon={Pencil} title={t('edit')}      onClick={() => openEdit(r)} />
+          <ActionBtn icon={Trash2} title={t('delete')}    onClick={() => handleDelete(r.id)} danger />
         </div>
       </td>
     </tr>

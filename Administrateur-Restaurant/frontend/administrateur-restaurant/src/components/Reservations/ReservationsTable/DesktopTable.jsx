@@ -1,12 +1,38 @@
 import { useRef } from 'react'
+import { useTranslation } from 'react-i18next'
 import TableRow from './TableRow'
 import Checkbox from './Checkbox'
-import { DARK, GOLD, BORDER } from '../../../styles/reservations/tokens'
+import { DARK } from '../../../styles/reservations/tokens'
 import { headerCellStyle } from '../../../styles/reservations/table.styles'
 
-const HEADERS = ['Nom','Tél.','Date','Heure','Pers.','Service','Table','Statut','Actions']
+export default function DesktopTable({
+  pageItems,
+  selectedIds,
+  highlightId,
+  toggleOne,
+  pageAllSel,
+  pageSomeSel,
+  togglePage,
+  openView,
+  openEdit,
+  handleDelete,
+  onOpenAssign,
+  highlightRef
+}) {
+  const { t } = useTranslation()
 
-export default function DesktopTable({ pageItems, selectedIds, highlightId, toggleOne, pageAllSel, pageSomeSel, togglePage, openView, openEdit, handleDelete, onOpenAssign, highlightRef }) {
+  const HEADERS = [
+    t('name'),       // Nom
+    t('phone'),      // Tél.
+    t('date'),       // Date
+    t('time'),       // Heure
+    t('guests'),     // Pers.
+    t('service'),    // Service
+    t('table'),      // Table
+    t('status'),     // Statut
+    t('actions')     // Actions
+  ]
+
   return (
     <div style={{ width:'100%', overflowX:'auto' }}>
       <table style={{ width:'100%', borderCollapse:'collapse', minWidth:800 }}>
@@ -35,7 +61,7 @@ export default function DesktopTable({ pageItems, selectedIds, highlightId, togg
           {pageItems.length === 0 && (
             <tr>
               <td colSpan={10} style={{ padding:'52px 24px', textAlign:'center', fontSize:13, fontWeight:700, color:DARK }}>
-                Aucune réservation trouvée
+                {t('no_reservations')}
               </td>
             </tr>
           )}

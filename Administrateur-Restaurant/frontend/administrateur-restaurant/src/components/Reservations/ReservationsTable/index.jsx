@@ -1,17 +1,20 @@
 import { useState, useEffect, useRef } from 'react'
+import { useTranslation } from 'react-i18next'
 import DesktopTable    from './DesktopTable'
 import MobileCards     from './MobileCards'
 import Pagination      from './Pagination'
 import AssignTableModal from '../AssignTableModal'
-import { DARK, GOLD, GOLD_DARK, CREAM, BORDER, GREEN } from '../../../styles/reservations/tokens'
+import { DARK, GOLD, GOLD_DARK, BORDER } from '../../../styles/reservations/tokens'
 
 export default function ReservationsTable({
   reservations, openView, openEdit, handleDelete,
   selectedIds, setSelectedIds, highlightId, onTableAssigned,
 }) {
-  const [page,         setPage]         = useState(1)
-  const [pageSize,     setPageSize]     = useState(25)
-  const [assignTarget, setAssignTarget] = useState(null)
+  const { t } = useTranslation()
+
+  const [page,setPage]= useState(1)
+  const [pageSize,setPageSize]= useState(25)
+  const [assignTarget,setAssignTarget] = useState(null)
   const highlightRef = useRef(null)
 
   useEffect(() => { setPage(1) }, [reservations.length])
@@ -66,24 +69,30 @@ export default function ReservationsTable({
         {/* Selection banners */}
         {someSelected && (
           <div style={{ padding:'9px 16px', background:'#fdf6ec', borderBottom:`1px solid #e8d8b0`, display:'flex', alignItems:'center', justifyContent:'space-between', gap:8, flexWrap:'wrap' }}>
-            <span style={{ fontSize:12, fontWeight:700, color:GOLD_DARK }}>{selectedIds.length} sélectionné{selectedIds.length>1?'s':''}</span>
+            <span style={{ fontSize:12, fontWeight:700, color:GOLD_DARK }}>
+              {selectedIds.length} {t('selected', { count: selectedIds.length })}
+            </span>
             <button onClick={toggleAll} style={{ background:'none', border:'none', cursor:'pointer', fontSize:12, fontWeight:800, color:DARK, textDecoration:'underline', fontFamily:'inherit', padding:0 }}>
-              Sélectionner les {reservations.length} réservations
+              {t('select_all_reservations', { count: reservations.length })}
             </button>
           </div>
         )}
         {allSelected && reservations.length > pageSize && (
           <div style={{ padding:'9px 16px', background:'#f0fdf4', borderBottom:`1px solid #bbf7d0`, display:'flex', alignItems:'center', justifyContent:'space-between', gap:8, flexWrap:'wrap' }}>
-            <span style={{ fontSize:12, fontWeight:700, color:'#16a34a' }}>Toutes les {reservations.length} réservations sélectionnées</span>
+            <span style={{ fontSize:12, fontWeight:700, color:'#16a34a' }}>
+              {t('all_reservations_selected', { count: reservations.length })}
+            </span>
             <button onClick={() => setSelectedIds([])} style={{ background:'none', border:'none', cursor:'pointer', fontSize:12, fontWeight:800, color:'#16a34a', textDecoration:'underline', fontFamily:'inherit', padding:0 }}>
-              Désélectionner tout
+              {t('deselect_all')}
             </button>
           </div>
         )}
         {highlightId && pageItems.some(r => r.id === highlightId) && (
           <div style={{ padding:'9px 16px', background:'#fff8ec', borderBottom:`2px solid ${GOLD}66`, display:'flex', alignItems:'center', gap:10 }}>
             <span style={{ width:8, height:8, borderRadius:'50%', background:GOLD, flexShrink:0, boxShadow:`0 0 0 3px ${GOLD}33` }} />
-            <span style={{ fontSize:12, fontWeight:700, color:GOLD_DARK }}>Réservation sélectionnée depuis le tableau de bord</span>
+            <span style={{ fontSize:12, fontWeight:700, color:GOLD_DARK }}>
+              {t('reservation_selected_from_dashboard')}
+            </span>
           </div>
         )}
 

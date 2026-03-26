@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next"
 import { Eye, Pencil, Trash2, CalendarDays, Clock3, Users, Utensils } from 'lucide-react'
 import Checkbox        from './Checkbox'
 import AssignTableCell from './AssignTableCell'
@@ -9,6 +10,7 @@ function trunc(str, max=16) {
 }
 
 export default function MobileCard({ r, selected, highlighted, rowRef, onToggle, openView, openEdit, handleDelete, onOpenAssign }) {
+  const { t } = useTranslation()
   const s = STATUS_CONFIG[r.status] || { bg:'#fdf6ec', color:DARK, label:r.status||'—', dot:'#c8a97e' }
 
   return (
@@ -20,7 +22,7 @@ export default function MobileCard({ r, selected, highlighted, rowRef, onToggle,
     }}>
       {highlighted && (
         <div style={{ position:'absolute', top:10, right:14, fontSize:9, fontWeight:900, color:GOLD_DARK, letterSpacing:'0.12em', textTransform:'uppercase', background:'#fdf6ec', padding:'2px 7px', border:`1px solid ${GOLD}55` }}>
-          Sélectionnée
+          {t('highlighted')}
         </div>
       )}
 
@@ -40,10 +42,10 @@ export default function MobileCard({ r, selected, highlighted, rowRef, onToggle,
       {/* Chips */}
       <div style={{ display:'flex', flexWrap:'wrap', gap:6, marginBottom:10 }}>
         {[
-          { Icon:CalendarDays, value:r.date,                        gold:false },
-          { Icon:Clock3,       value:r.start_time,                  gold:false },
-          { Icon:Users,        value:r.guests?`${r.guests}p`:null,  gold:false },
-          { Icon:Utensils,     value:trunc(r.service),               gold:true  },
+          { Icon:CalendarDays, value:r.date,                        gold:false, label:t('chip_date') },
+          { Icon:Clock3,       value:r.start_time,                  gold:false, label:t('chip_time') },
+          { Icon:Users,        value:r.guests?`${r.guests}p`:null,  gold:false, label:t('chip_guests') },
+          { Icon:Utensils,     value:trunc(r.service),               gold:true,  label:t('chip_service') },
         ].filter(x=>x.value).map((item,i) => (
           <span key={i} style={{ display:'inline-flex', alignItems:'center', gap:5, padding:'4px 9px', background:item.gold?'#f5f0eb':CREAM, fontSize:11, fontWeight:700, color:item.gold?GOLD_DARK:DARK }}>
             <item.Icon size={11} strokeWidth={2.5} color={item.gold?GOLD_DARK:DARK} />
@@ -56,10 +58,10 @@ export default function MobileCard({ r, selected, highlighted, rowRef, onToggle,
       {/* Actions */}
       <div style={{ display:'flex', gap:4 }}>
         <button onClick={() => openView(r)} style={{ flex:1, padding:'8px', background:highlighted?GOLD:'#f5f0eb', border:'none', fontSize:11, fontWeight:700, color:DARK, cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', gap:5, fontFamily:'inherit' }}>
-          <Eye size={12} strokeWidth={2.5} /> Voir
+          <Eye size={12} strokeWidth={2.5} /> {t('view')}
         </button>
         <button onClick={() => openEdit(r)} style={{ flex:1, padding:'8px', background:DARK, border:'none', fontSize:11, fontWeight:700, color:GOLD, cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', gap:5, fontFamily:'inherit' }}>
-          <Pencil size={12} strokeWidth={2.5} /> Modifier
+          <Pencil size={12} strokeWidth={2.5} /> {t('edit')}
         </button>
         <button onClick={() => handleDelete(r.id)} style={{ width:36, padding:'8px', background:'#fef2f2', border:'none', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center' }}>
           <Trash2 size={12} strokeWidth={2.5} color={RED} />

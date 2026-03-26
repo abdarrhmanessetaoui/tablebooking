@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useTranslation } from "react-i18next"
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react'
 import { DARK, GOLD, CREAM, BORDER } from '../../../styles/reservations/tokens'
 import { pageBtnStyle } from '../../../styles/reservations/table.styles'
@@ -19,6 +20,7 @@ function PageBtn({ onClick, disabled, active, children }) {
 }
 
 export default function Pagination({ total, page, pageSize, setPage, setPageSize, start }) {
+  const { t } = useTranslation()
   const totalPages = Math.ceil(total / pageSize) || 1
   const safePage   = Math.min(page, totalPages)
 
@@ -43,7 +45,7 @@ export default function Pagination({ total, page, pageSize, setPage, setPageSize
           onChange={e => { setPageSize(Number(e.target.value)); setPage(1) }}
           style={{ padding:'4px 8px', border:`1.5px solid ${BORDER}`, fontSize:12, fontWeight:700, color:DARK, background:'#fff', cursor:'pointer', outline:'none', fontFamily:'inherit' }}
         >
-          {PAGE_SIZES.map(s => <option key={s} value={s}>{s} / page</option>)}
+          {PAGE_SIZES.map(s => <option key={s} value={s}>{s} {t('per_page')}</option>)}
         </select>
       </div>
       <div style={{ display:'flex', alignItems:'center', gap:3 }}>
