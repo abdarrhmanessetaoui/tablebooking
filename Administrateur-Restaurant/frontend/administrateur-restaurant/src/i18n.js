@@ -359,7 +359,14 @@ const resources = {
         "res_count": "{{count}} res.",
         "confirmed": "Confirmed",
         "pending": "Pending",
-        "loading": "Loading..."
+        "loading": "Loading...",
+        "mon": "M",
+        "tue": "T",
+        "wed": "W",
+        "thu": "T",
+        "fri": "F",
+        "sat": "S",
+        "sun": "S"
       },
       "person": "person",
       "persons": "persons",
@@ -726,7 +733,14 @@ const resources = {
         "res_count": "{{count}} rés.",
         "confirmed": "Confirmée",
         "pending": "En attente",
-        "loading": "Chargement…"
+        "loading": "Chargement…",
+        "mon": "L",
+        "tue": "M",
+        "wed": "M",
+        "thu": "J",
+        "fri": "V",
+        "sat": "S",
+        "sun": "D"
       },
       "person": "personne",
       "persons": "personnes",
@@ -1094,7 +1108,14 @@ const resources = {
         "res_count": "{{count}} حجوزات",
         "confirmed": "مؤكدة",
         "pending": "قيد الانتظار",
-        "loading": "جاري التحميل..."
+        "loading": "جاري التحميل...",
+        "mon": "ن",
+        "tue": "ث",
+        "wed": "ر",
+        "thu": "خ",
+        "fri": "ج",
+        "sat": "س",
+        "sun": "أ"
       },
       "person": "شخص",
       "persons": "أشخاص",

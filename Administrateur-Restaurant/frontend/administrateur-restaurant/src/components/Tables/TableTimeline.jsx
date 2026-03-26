@@ -43,14 +43,14 @@ function decimalToTime(dec) {
   const m = Math.round((dec - Math.floor(dec)) * 60)
   return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`
 }
-function formatShort(iso) {
+function formatShort(iso, lang = 'fr-FR') {
   if (!iso) return ''
-  return new Date(iso + 'T00:00:00').toLocaleDateString('fr-FR', {
+  return new Date(iso + 'T00:00:00').toLocaleDateString(lang, {
     weekday: 'long', day: 'numeric', month: 'long',
   })
 }
-function formatMonthYear(y, m) {
-  return new Date(y, m, 1).toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })
+function formatMonthYear(y, m, lang = 'fr-FR') {
+  return new Date(y, m, 1).toLocaleDateString(lang, { month: 'long', year: 'numeric' })
 }
 function toISO(y, m, d) {
   return `${y}-${String(m + 1).padStart(2,'0')}-${String(d).padStart(2,'0')}`
@@ -108,14 +108,22 @@ function buildLanes(reservations, services) {
 // ─── Mini Calendar ────────────────────────────────────────────────
 // NOTE: today is computed internally from LOCAL date — never trust a prop
 // for correctness, but we still accept value/onChange from outside.
-function MiniCal({ value, onChange, t }) {
+function MiniCal({ value, onChange, t, lang }) {
   // Always compute today locally — no prop dependency
   const todayISO  = TODAY
   const todayDate = new Date(todayISO + 'T00:00:00')
   const init      = value ? new Date(value + 'T00:00:00') : todayDate
   const [cur, setCur] = useState({ y: init.getFullYear(), m: init.getMonth() })
 
-  const DAYS  = ['L','M','M','J','V','S','D']
+  const DAYS  = [
+    t('tables_module.mon'),
+    t('tables_module.tue'),
+    t('tables_module.wed'),
+    t('tables_module.thu'),
+    t('tables_module.fri'),
+    t('tables_module.sat'),
+    t('tables_module.sun'),
+  ]
   const dim   = (y, m) => new Date(y, m + 1, 0).getDate()
   const first = (y, m) => { const d = new Date(y, m, 1).getDay(); return d === 0 ? 6 : d - 1 }
 
@@ -139,7 +147,7 @@ function MiniCal({ value, onChange, t }) {
           <ChevronLeft size={14} color={GOLD} strokeWidth={2.5} />
         </button>
         <span style={{ fontSize: 11, fontWeight: 900, color: '#fff', textTransform: 'capitalize', letterSpacing: '0.02em' }}>
-          {formatMonthYear(cur.y, cur.m)}
+          {formatMonthYear(cur.y, cur.m, lang)}
         </span>
         <button
           onClick={() => setCur(c => c.m === 11 ? { y: c.y + 1, m: 0 } : { y: c.y, m: c.m + 1 })}
@@ -203,8 +211,8 @@ function MiniCal({ value, onChange, t }) {
 }
 
 function MiniCalWithRef(props) {
-  const { t } = useTranslation()
-  return <MiniCal {...props} t={t} />
+  const { t, i18n } = useTranslation()
+  return <MiniCal {...props} t={t} lang={i18n.language} />
 }
 
 
@@ -483,7 +491,7 @@ function TableCard({ row, services }) {
 
 // ─── Main component ───────────────────────────────────────────────
 export default function TableTimeline({ controlledDate = null }) {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const { timeline, loading, error, date, setDate, allOH, services } = useTablesTimeline()
 
   // IMPORTANT: compute isToday using LOCAL date, never hook's stale UTC string
@@ -547,7 +555,7 @@ export default function TableTimeline({ controlledDate = null }) {
             <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               <CalendarDays size={14} color={GOLD} strokeWidth={2.5} />
               <span style={{ fontSize: 13, fontWeight: 800, color: '#fff', textTransform: 'capitalize' }}>
-                {formatShort(date)}
+                {formatShort(date, i18n.language)}
               </span>
               {isToday && (
                 <span style={{ fontSize: 10, fontWeight: 900, color: GOLD, padding: '1px 7px', border: `1px solid ${GOLD}55`, letterSpacing: '0.05em' }}>
@@ -593,7 +601,7 @@ export default function TableTimeline({ controlledDate = null }) {
             <div style={{ padding: '12px 14px', background: '#ffffff', border: `1px solid rgba(200,169,126,0.3)`, display: 'flex', alignItems: 'center', gap: 10 }}>
               <CalendarDays size={14} color={GOLD_DARK} strokeWidth={2} style={{ flexShrink: 0 }} />
               <p style={{ margin: 0, fontSize: 13, fontWeight: 800, color: DARK }}>
-                {t('tables_module.timeline_no_reservations', { dateStr: isToday ? t('tables_module.timeline_today') : t('tables_module.timeline_on', { date: formatShort(date) }) })}
+                {t('tables_module.timeline_no_reservations', { dateStr: isToday ? t('tables_module.timeline_today') : t('tables_module.timeline_on', { date: formatShort(date, i18n.language) }) })}
                 <span style={{ fontWeight: 600, color: GOLD_DARK, marginLeft: 8 }}>
                   {t('tables_module.timeline_free_tables', { count: timeline.length })}
                 </span>
@@ -621,7 +629,7 @@ export default function TableTimeline({ controlledDate = null }) {
             <div style={{ marginTop: 8, padding: '8px 12px', background: DARK, display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
               <CalendarDays size={11} color={GOLD} strokeWidth={2.5} />
               <span style={{ fontSize: 11, fontWeight: 800, color: '#fff', textTransform: 'capitalize', flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                {formatShort(date)}
+                {formatShort(date, i18n.language)}
               </span>
               {isToday && (
                 <span style={{ fontSize: 9, fontWeight: 900, color: GOLD, letterSpacing: '0.08em', border: `1px solid ${GOLD}55`, padding: '1px 6px', flexShrink: 0 }}>
@@ -652,7 +660,7 @@ export default function TableTimeline({ controlledDate = null }) {
               <div style={{ padding: '11px 14px', background: '#ffffff', border: `1px solid rgba(200,169,126,0.28)`, display: 'flex', alignItems: 'center', gap: 9, marginBottom: 2 }}>
                 <CalendarDays size={13} color={GOLD_DARK} strokeWidth={2} style={{ flexShrink: 0 }} />
                 <p style={{ margin: 0, fontSize: 12, fontWeight: 800, color: DARK }}>
-                  {t('tables_module.timeline_no_reservations', { dateStr: isToday ? t('tables_module.timeline_today') : t('tables_module.timeline_on', { date: formatShort(date) }) })}
+                  {t('tables_module.timeline_no_reservations', { dateStr: isToday ? t('tables_module.timeline_today') : t('tables_module.timeline_on', { date: formatShort(date, i18n.language) }) })}
                   <span style={{ fontWeight: 600, color: GOLD_DARK, marginLeft: 8 }}>
                     {t('tables_module.timeline_free_tables', { count: timeline.length })}
                   </span>

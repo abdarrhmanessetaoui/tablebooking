@@ -11,6 +11,7 @@ import useTableLocations     from '../hooks/Tables/useTableLocations'
 import { confirm }           from '../components/ui/ConfirmDialog'
 import { toast }             from '../components/ui/Toast'
 import { getToken }          from '../utils/auth'
+import { useTranslation } from 'react-i18next'
 
 const DARK    = '#2b2118'
 const GOLD    = '#c8a97e'
@@ -68,7 +69,7 @@ function BulkBar({ count, onDelete, onActivate, onDeactivate, onClear }) {
         fontSize: 12, fontWeight: 900, padding: '0 7px', flexShrink: 0,
       }}>{count}</span>
       <span className="bulk-label" style={{ fontSize: 12, fontWeight: 700, color: '#fff', marginRight: 2 }}>
-        sélectionnée{count > 1 ? 's' : ''}
+        {t('tables_module.selected_count', { count })}
       </span>
 
       <div style={{ width: 1, height: 20, background: '#3d2d1e', margin: '0 4px', flexShrink: 0 }} />
@@ -83,7 +84,7 @@ function BulkBar({ count, onDelete, onActivate, onDeactivate, onClear }) {
         onMouseLeave={e => { e.currentTarget.style.background = 'rgba(22,163,74,0.12)'; e.currentTarget.style.color = '#4ade80' }}
       >
         <ToggleRight size={13} strokeWidth={2.5} />
-        <span className="bulk-label">Activer</span>
+        <span className="bulk-label">{t('tables_module.activate')}</span>
       </button>
 
       <button onClick={onDeactivate} style={{
@@ -96,7 +97,7 @@ function BulkBar({ count, onDelete, onActivate, onDeactivate, onClear }) {
         onMouseLeave={e => { e.currentTarget.style.background = 'rgba(200,169,126,0.12)'; e.currentTarget.style.color = GOLD }}
       >
         <ToggleLeft size={13} strokeWidth={2.5} />
-        <span className="bulk-label">Désactiver</span>
+        <span className="bulk-label">{t('tables_module.deactivate')}</span>
       </button>
 
       <button onClick={onDelete}
@@ -110,7 +111,7 @@ function BulkBar({ count, onDelete, onActivate, onDeactivate, onClear }) {
           transition: 'all 0.15s', flexShrink: 0, minHeight: 34,
         }}>
         <Trash2 size={13} strokeWidth={2.5} />
-        <span className="bulk-label">Supprimer</span>
+        <span className="bulk-label">{t('tables_module.delete')}</span>
       </button>
 
       <button onClick={onClear} style={{
@@ -123,13 +124,14 @@ function BulkBar({ count, onDelete, onActivate, onDeactivate, onClear }) {
         onMouseLeave={e => e.currentTarget.style.color = '#fff'}
       >
         <span style={{ fontSize: 16, lineHeight: 1 }}>✕</span>
-        <span className="bulk-label">Désélectionner</span>
+        <span className="bulk-label">{t('tables_module.deselect_all')}</span>
       </button>
     </div>
   )
 }
 
 export default function Tables() {
+  const { t } = useTranslation()
   const {
     tables, loading, error,
     editingTbl, setEditingTbl,
@@ -145,9 +147,9 @@ export default function Tables() {
 
   async function handleBulkDelete() {
     const ok = await confirm({
-      title: 'Supprimer la sélection',
-      message: `Voulez-vous supprimer ${selectedTables.length} table${selectedTables.length > 1 ? 's' : ''} ?`,
-      confirmLabel: 'Supprimer', type: 'danger',
+      title: t('tables_module.delete_selection_title'),
+      message: t('tables_module.delete_selection_msg', { count: selectedTables.length, plural: selectedTables.length > 1 ? 's' : '' }),
+      confirmLabel: t('tables_module.delete'), type: 'danger',
     })
     if (!ok) return
     try {
@@ -155,10 +157,10 @@ export default function Tables() {
         fetch(`${API}/${idx}`, { method: 'DELETE', headers: hdrs() })
       ))
       setTables(prev => prev.filter(t => !selectedTables.includes(t.idx)))
-      toast(`${selectedTables.length} table${selectedTables.length > 1 ? 's supprimées' : ' supprimée'}`, 'warning')
+      toast(t('tables_module.tables_deleted', { count: selectedTables.length, plural: selectedTables.length > 1 ? 's' : '' }), 'warning')
       setSelectedTables([])
     } catch {
-      toast('Erreur lors de la suppression', 'error')
+      toast(t('tables_module.error_deleting'), 'error')
       setSelectedTables([])
     }
   }
@@ -171,10 +173,10 @@ export default function Tables() {
           .map(idx => fetch(`${API}/${idx}/toggle`, { method: 'PATCH', headers: hdrs() }))
       )
       setTables(prev => prev.map(t => selectedTables.includes(t.idx) ? { ...t, active: true } : t))
-      toast(`${selectedTables.length} table${selectedTables.length > 1 ? 's activées' : ' activée'}`, 'success')
+      toast(t('tables_module.tables_activated', { count: selectedTables.length, plural: selectedTables.length > 1 ? 's' : '' }), 'success')
       setSelectedTables([])
     } catch {
-      toast("Erreur lors de l'activation", 'error')
+      toast(t('tables_module.error_status_change'), 'error')
       setSelectedTables([])
     }
   }
@@ -187,10 +189,10 @@ export default function Tables() {
           .map(idx => fetch(`${API}/${idx}/toggle`, { method: 'PATCH', headers: hdrs() }))
       )
       setTables(prev => prev.map(t => selectedTables.includes(t.idx) ? { ...t, active: false } : t))
-      toast(`${selectedTables.length} table${selectedTables.length > 1 ? 's désactivées' : ' désactivée'}`, 'warning')
+      toast(t('tables_module.tables_deactivated', { count: selectedTables.length, plural: selectedTables.length > 1 ? 's' : '' }), 'warning')
       setSelectedTables([])
     } catch {
-      toast('Erreur lors de la désactivation', 'error')
+      toast(t('tables_module.error_status_change'), 'error')
       setSelectedTables([])
     }
   }
@@ -209,25 +211,25 @@ export default function Tables() {
       doc.setFillColor(43,33,24); doc.rect(0,0,210,32,'F')
       doc.setFont('helvetica','bold'); doc.setFontSize(18); doc.setTextColor(200,169,126)
       doc.text('TableBooking.ma',20,14)
-      doc.setFontSize(9); doc.setTextColor(255,255,255); doc.text('Tables',20,22)
+      doc.setFontSize(9); doc.setTextColor(255,255,255); doc.text(t('tables_module.title'),20,22)
       doc.setTextColor(200,169,126); doc.setFontSize(8); doc.text(dateStr,190,22,{align:'right'})
-      doc.setTextColor(43,33,24); doc.setFontSize(20); doc.text('Tables',20,48)
+      doc.setTextColor(43,33,24); doc.setFontSize(20); doc.text(t('tables_module.title'),20,48)
       doc.setFontSize(10); doc.setTextColor(200,169,126)
-      doc.text(`${tables.length} table${tables.length!==1?'s':''}`,20,56)
+      doc.text(t('tables_module.table_count', { count: tables.length, plural: tables.length !== 1 ? 's' : '' }),20,56)
       doc.setDrawColor(43,33,24); doc.setLineWidth(0.5); doc.line(20,61,190,61)
       let y = 70
       doc.setFillColor(43,33,24); doc.rect(20,y,170,9,'F')
       doc.setTextColor(200,169,126); doc.setFontSize(8); doc.setFont('helvetica','bold')
-      doc.text('TABLE',24,y+6); doc.text('CAPACITÉ',80,y+6); doc.text('EMPLACEMENT',120,y+6); doc.text('STATUT',170,y+6)
+      doc.text(t('tables_module.header_table'),24,y+6); doc.text(t('tables_module.header_capacity'),80,y+6); doc.text(t('tables_module.header_location'),120,y+6); doc.text(t('tables_module.header_status'),170,y+6)
       y += 9
-      tables.forEach((t,i) => {
+      tables.forEach((t_obj,i) => {
         if (y>270) { doc.addPage(); y=20 }
         doc.setFillColor(i%2===0?255:250,i%2===0?255:248,i%2===0?255:245); doc.rect(20,y,170,9,'F')
         doc.setTextColor(43,33,24); doc.setFontSize(9); doc.setFont('helvetica','normal')
-        doc.text(`Table ${t.number}`,24,y+6)
-        doc.text(`${t.capacity} Personnes`,80,y+6)
-        doc.text(t.location||'—',120,y+6)
-        doc.text(t.active?'Active':'Inactive',170,y+6)
+        doc.text(`${t('tables_module.header_table')} ${t_obj.number}`,24,y+6)
+        doc.text(`${t_obj.capacity} ${t('tables_module.persons')}`,80,y+6)
+        doc.text(t_obj.location||'—',120,y+6)
+        doc.text(t_obj.active ? t('tables_module.active') : t('tables_module.inactive'),170,y+6)
         y+=9
       })
       const pH = doc.internal.pageSize.height
@@ -268,12 +270,12 @@ export default function Tables() {
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, marginBottom: 8, flexWrap: 'wrap' }}>
             <div style={{ minWidth: 0, flex: 1 }}>
               <h1 style={{ margin: 0, fontSize: 'clamp(20px,5vw,36px)', fontWeight: 900, color: DARK, letterSpacing: '-1.5px', lineHeight: 1 }}>
-                Tables
+                {t('tables_module.title')}
               </h1>
             </div>
             <div style={{ display: 'flex', gap: 3, flexShrink: 0 }}>
               <Btn icon={FileDown} primary onClick={handleExport} disabled={exporting}>
-                {exporting ? 'Génération…' : 'Exporter PDF'}
+                {exporting ? t('tables_module.export_generating') : t('tables_module.export_pdf')}
               </Btn>
             </div>
           </div>
@@ -310,7 +312,7 @@ export default function Tables() {
               {/* Table form */}
               <div>
                 <h2 style={{ margin: '0 0 5px', fontSize: 'clamp(15px,2.5vw,22px)', fontWeight: 900, color: DARK, letterSpacing: '-0.8px' }}>
-                  {editingTbl ? 'Modifier la table' : 'Ajouter une table'}
+                  {editingTbl ? t('tables_module.edit_table_title') : t('tables_module.add_table_title')}
                 </h2>
                 <p className="page-subtitle" style={{ margin: '0 0 16px', fontSize: 12, fontWeight: 700, color: GOLD_DK }}>
                   
@@ -346,7 +348,7 @@ export default function Tables() {
               <div className="tbl-mob-divider" style={{ height: 4, background: DARK, margin: '32px 0 28px' }} />
               <div style={{ marginBottom: 16, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
                 <h2 style={{ margin: 0, fontSize: 'clamp(15px,2.5vw,22px)', fontWeight: 900, color: DARK, letterSpacing: '-0.8px' }}>
-                  Tables configurées
+                  {t('tables_module.configured_tables')}
                 </h2>
                 <span style={{ padding: '4px 10px', background: DARK, fontSize: 11, fontWeight: 900, color: GOLD, letterSpacing: '0.05em', flexShrink: 0 }}>
                   {tables.length}
@@ -371,7 +373,7 @@ export default function Tables() {
           <div style={{ margin: '40px 0 0', display: 'flex', alignItems: 'center', gap: 14 }}>
             <div style={{ height: 4, background: DARK, flex: 1 }} />
             <span style={{ fontSize: 9, fontWeight: 900, color: DARK, letterSpacing: '0.2em', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>
-              Occupation des tables
+              {t('tables_module.timeline_title')}
             </span>
             <div style={{ height: 4, background: DARK, flex: 1 }} />
           </div>
