@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
+import { useTranslation } from 'react-i18next'
 import { X, LayoutGrid, Users, MapPin, Check, Loader, AlertTriangle, Clock } from 'lucide-react'
 import { getToken } from '../../utils/auth'
 import { GREEN, RED } from '../../styles/dashboard/tokens'
@@ -19,6 +20,7 @@ const LOC_COLORS = {
 }
 
 export default function AssignTableModal({ reservation, onClose, onAssigned }) {
+  const { t } = useTranslation()
   const [tables,   setTables]   = useState([])
   const [busyIdxs, setBusyIdxs] = useState([])
   const [loading,  setLoading]  = useState(true)
@@ -50,7 +52,7 @@ export default function AssignTableModal({ reservation, onClose, onAssigned }) {
         setTables(Array.isArray(tableData) ? tableData.filter(t => t.active) : [])
         setBusyIdxs(Array.isArray(busyData) ? busyData : [])
       })
-      .catch(() => setError('Impossible de charger les tables.'))
+      .catch(() => setError(t('impossible_load_tables')))
       .finally(() => setLoading(false))
   }, []) // eslint-disable-line
 
@@ -82,7 +84,7 @@ export default function AssignTableModal({ reservation, onClose, onAssigned }) {
       iconBg:        '#ffffff',
       iconColor:     RED,
       textColor:     'rgba(43,33,24,0.45)',
-      badge:         { bg: RED, color: '#fff', text: 'Occupée' },
+      badge:         { bg: RED, color: '#fff', text: t('busy') },
       capacityBg:    '#ffffff',
       capacityColor: RED,
     },
@@ -93,7 +95,7 @@ export default function AssignTableModal({ reservation, onClose, onAssigned }) {
       iconBg:        '#f0f0f0',
       iconColor:     'rgba(43,33,24,0.25)',
       textColor:     'rgba(43,33,24,0.35)',
-      badge:         { bg: '#e5e7eb', color: '#9ca3af', text: 'Insuffisante' },
+      badge:         { bg: '#e5e7eb', color: '#9ca3af', text: t('insufficient') },
       capacityBg:    '#ffffff',
       capacityColor: RED,
     },
@@ -114,7 +116,7 @@ export default function AssignTableModal({ reservation, onClose, onAssigned }) {
       iconBg:        '#dcfce7',
       iconColor:     GREEN,
       textColor:     DARK,
-      badge:         { bg: GREEN, color: '#fff', text: 'Actuelle' },
+      badge:         { bg: GREEN, color: '#fff', text: t('current') },
       capacityBg:    '#dcfce7',
       capacityColor: '#16a34a',
     },
@@ -139,11 +141,11 @@ export default function AssignTableModal({ reservation, onClose, onAssigned }) {
         { method: 'PATCH', headers: hdrs(), body: JSON.stringify({ table_idx: selected }) }
       )
       const data = await res.json()
-      if (!res.ok) { setError(data.message ?? `Erreur ${res.status}`); return }
+      if (!res.ok) { setError(data.message ?? `Error ${res.status}`); return }
       onAssigned(data)
       onClose()
     } catch {
-      setError('Erreur de connexion. Veuillez réessayer.')
+      setError(t('error_connection_retry'))
     } finally {
       setSaving(false)
     }
@@ -178,7 +180,7 @@ export default function AssignTableModal({ reservation, onClose, onAssigned }) {
         }}>
           <div>
             <p style={{ margin: 0, fontSize: 9, fontWeight: 700, color: GOLD, letterSpacing: '0.18em', textTransform: 'uppercase' }}>
-              Assigner une table
+              {t('assign_table')}
             </p>
             <h2 style={{ margin: '3px 0 0', fontSize: 16, fontWeight: 900, color: '#fff', letterSpacing: '-0.4px' }}>
               {reservation?.name ?? '—'}
@@ -192,9 +194,9 @@ export default function AssignTableModal({ reservation, onClose, onAssigned }) {
         {/* Summary */}
         <div style={{ background: CREAM, padding: '10px 22px', borderBottom: `1px solid ${BORDER}`, display: 'flex', gap: 20, flexShrink: 0 }}>
           {[
-            ['Date',     reservation?.date       ?? '—'],
-            ['Heure',    reservation?.start_time ?? '—'],
-            ['Couverts', `${guestCount} pers.`        ],
+            [t('date'),     reservation?.date       ?? '—'],
+            [t('time'),    reservation?.start_time ?? '—'],
+            [t('pers_header'), `${guestCount} ${t(guestCount > 1 ? 'persons' : 'person')}`],
           ].map(([label, val]) => (
             <div key={label}>
               <p style={{ margin: 0, fontSize: 9, fontWeight: 900, color: GOLD, letterSpacing: '0.14em', textTransform: 'uppercase' }}>{label}</p>
@@ -216,11 +218,11 @@ export default function AssignTableModal({ reservation, onClose, onAssigned }) {
 
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
             <p style={{ margin: 0, fontSize: 9, fontWeight: 900, color: DARK, letterSpacing: '0.18em', textTransform: 'uppercase' }}>
-              Tables disponibles
+              {t('available_tables')}
             </p>
             {reservation?.table_idx && (
               <button onClick={() => setSelected(null)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, fontSize: 11, fontWeight: 800, color: RED, textDecoration: 'underline', fontFamily: 'inherit' }}>
-                Retirer la table
+                {t('remove_table')}
               </button>
             )}
           </div>
@@ -228,9 +230,9 @@ export default function AssignTableModal({ reservation, onClose, onAssigned }) {
           {!loading && (
             <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 12, padding: '7px 10px', background: CREAM, border: `1px solid ${BORDER}` }}>
               {[
-                { dot: GREEN,                 label: 'Disponible'    },
-                { dot: RED,                   label: 'Occupée'       },
-                { dot: 'rgba(43,33,24,0.18)', label: 'Capac. insuf.' },
+                { dot: GREEN,                 label: t('available')    },
+                { dot: RED,                   label: t('busy')       },
+                { dot: 'rgba(43,33,24,0.18)', label: t('insufficient_capacity_short') },
               ].map(s => (
                 <span key={s.label} style={{ display: 'inline-flex', alignItems: 'center', gap: 5, fontSize: 10, fontWeight: 700, color: DARK }}>
                   <span style={{ width: 8, height: 8, borderRadius: '50%', background: s.dot, flexShrink: 0 }} />
@@ -246,7 +248,7 @@ export default function AssignTableModal({ reservation, onClose, onAssigned }) {
             </div>
           ) : sortedTables.length === 0 ? (
             <p style={{ fontSize: 13, fontWeight: 700, color: DARK, textAlign: 'center', padding: '32px 0' }}>
-              Aucune table active configurée.
+              {t('no_active_tables_found')}
             </p>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
@@ -288,7 +290,7 @@ export default function AssignTableModal({ reservation, onClose, onAssigned }) {
                       <div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                           <p style={{ margin: 0, fontSize: 13, fontWeight: 900, color: cfg.textColor }}>
-                            Table {table.number}
+                            {t('table_number', { number: table.number })}
                           </p>
                           {cfg.badge && (
                             <span style={{ fontSize: 9, fontWeight: 900, padding: '1px 6px', background: cfg.badge.bg, color: cfg.badge.color }}>
@@ -298,12 +300,12 @@ export default function AssignTableModal({ reservation, onClose, onAssigned }) {
                         </div>
                         {state === 'busy' && (
                           <p style={{ margin: '2px 0 0', fontSize: 10, fontWeight: 700, color: RED }}>
-                            Déjà assignée à cet horaire
+                            {t('assigned_at_time')}
                           </p>
                         )}
                         {state === 'insufficient' && (
                           <p style={{ margin: '2px 0 0', fontSize: 10, fontWeight: 600, color: 'rgba(43,33,24,0.35)' }}>
-                            Max {table.capacity} pers. · besoin de {guestCount}
+                            {t('max_capacity_needed', { max: table.capacity, needed: guestCount })}
                           </p>
                         )}
                       </div>
@@ -347,7 +349,7 @@ export default function AssignTableModal({ reservation, onClose, onAssigned }) {
             onMouseEnter={e => e.currentTarget.style.background = CREAM}
             onMouseLeave={e => e.currentTarget.style.background = '#fff'}
           >
-            Annuler
+            {t('cancel_btn')}
           </button>
           <button
             onClick={handleAssign}
@@ -355,11 +357,11 @@ export default function AssignTableModal({ reservation, onClose, onAssigned }) {
             style={{ flex: 2, padding: '11px', background: DARK, border: 'none', fontSize: 13, fontWeight: 800, color: GOLD, cursor: saving || !hasChanged ? 'not-allowed' : 'pointer', opacity: saving || !hasChanged ? 0.5 : 1, fontFamily: 'inherit', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, transition: 'opacity 0.15s' }}
           >
             {saving ? (
-              <><Loader size={14} style={{ animation: 'spin 1s linear infinite' }} />Enregistrement…</>
+              <><Loader size={14} style={{ animation: 'spin 1s linear infinite' }} />{t('saving')}</>
             ) : selected === null ? (
-              'Retirer la table'
+              t('remove_table')
             ) : (
-              <><Check size={14} strokeWidth={2.5} />Confirmer</>
+              <><Check size={14} strokeWidth={2.5} />{t('confirm_btn')}</>
             )}
           </button>
         </div>
@@ -368,4 +370,4 @@ export default function AssignTableModal({ reservation, onClose, onAssigned }) {
     </div>,
     document.body
   )
-}
+}

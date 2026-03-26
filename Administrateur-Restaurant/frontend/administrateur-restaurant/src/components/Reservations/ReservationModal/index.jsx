@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { createPortal } from 'react-dom'
+import { useTranslation } from 'react-i18next'
 import useModalData   from '../../../hooks/Reservations/useModalData'
 import useTimeSlots   from '../../../hooks/Reservations/useTimeSlots'
 import ModalHeader    from './ModalHeader'
@@ -11,6 +12,7 @@ import StepContact    from './steps/StepContact'
 import { overlayStyle, panelStyle } from '../../../styles/reservations/modal.styles'
 
 export default function ReservationModal({ modalMode, editing, form, setForm, handleSubmit, handleCreate, handleDelete, setModalMode }) {
+  const { t } = useTranslation()
   const [step, setStep] = useState(1)
   const close = () => { setModalMode(null); setStep(1) }
 
@@ -38,20 +40,20 @@ export default function ReservationModal({ modalMode, editing, form, setForm, ha
           )}
           {modalMode==='create' && step===1 && (
             <StepService form={form} setForm={setForm} services={services} selectedSvc={selectedSvc} maxGuests={maxGuests} openDaysLabel={openDaysLabel}
-              onNext={() => { if(!form.service){alert('Veuillez choisir une formule.');return} if(!form.guests){alert('Veuillez choisir le nombre de personnes.');return} setStep(2) }} />
+              onNext={() => { if(!form.service){alert(t('choose_formula_alert'));return} if(!form.guests){alert(t('choose_guests_alert'));return} setStep(2) }} />
           )}
           {modalMode==='create' && step===2 && (
             <StepDateTime form={form} setForm={setForm} blockedDates={blockedDates} disabledDays={disabledDays} timeSlots={timeSlots} selectedSvc={selectedSvc}
               onBack={() => setStep(1)}
-              onNext={() => { if(!form.date){alert('Veuillez choisir une date.');return} if(!form.start_time){alert('Veuillez choisir une heure.');return} setStep(3) }} />
+              onNext={() => { if(!form.date){alert(t('choose_date_alert'));return} if(!form.start_time){alert(t('choose_time_alert'));return} setStep(3) }} />
           )}
           {modalMode==='create' && step===3 && (
             <StepContact form={form} setForm={setForm} onBack={() => setStep(2)}
-              onSubmit={() => { if(!form.name){alert('Le nom est obligatoire.');return} handleCreate(); setStep(1) }} />
+              onSubmit={() => { if(!form.name){alert(t('name_required_alert'));return} handleCreate(); setStep(1) }} />
           )}
         </div>
       </div>
     </div>,
     document.body
   )
-}
+}

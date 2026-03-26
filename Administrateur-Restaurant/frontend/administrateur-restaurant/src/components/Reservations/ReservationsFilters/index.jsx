@@ -1,24 +1,21 @@
 import { useState, useRef, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Search, X, Calendar } from 'lucide-react'
 import CalendarPopup from './CalendarPopup.jsx'
 import { DARK, GOLD, GOLD_DARK } from '../../../styles/reservations/tokens.js'
 import { filterInputBase, dateBtnStyle } from '../../../styles/reservations/filters.styles.js'
 import { getToken } from '../../../utils/auth.js'
 
-const MONTHS_FR = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre']
 const MUTED     = 'rgba(43,33,24,0.35)'
 
-function dateLabel(filterDate) {
-  if (!filterDate) return 'Choisir une date'
-  if (filterDate.length === 7) {
-    const [y, m] = filterDate.split('-')
-    return `${MONTHS_FR[parseInt(m)-1]} ${y}`
-  }
-  if (filterDate.length === 10) {
-    const [y, m, d] = filterDate.split('-')
-    return `${parseInt(d)} ${MONTHS_FR[parseInt(m)-1]} ${y}`
-  }
-  return filterDate
+function dateLabel(filterDate, t, lang) {
+  if (!filterDate) return t('choose_date')
+  const date = filterDate.length === 7 ? new Date(filterDate + '-01') : new Date(filterDate)
+  const options = filterDate.length === 7
+    ? { month: 'long', year: 'numeric' }
+    : { day: 'numeric', month: 'long', year: 'numeric' }
+
+  return new Intl.DateTimeFormat(lang === 'ar' ? 'ar-MA' : lang === 'fr' ? 'fr-FR' : 'en-US', options).format(date)
 }
 
 // Mirrors dateBtnStyle logic but for <select> elements
@@ -44,6 +41,7 @@ export default function ReservationsFilters({
   clearFilters,
   services = [],
 }) {
+  const { t, i18n } = useTranslation()
   const [calOpen, setCalOpen] = useState(false)
   const [tables,  setTables]  = useState([])
   const anchorRef = useRef(null)
@@ -102,7 +100,7 @@ export default function ReservationsFilters({
             style={{ position:'absolute', left:12, top:'50%', transform:'translateY(-50%)', pointerEvents:'none' }}
           />
           <input
-            type="text" placeholder="Rechercher…"
+            type="text" placeholder={t('reservation_search_placeholder')}
             value={search} onChange={e => setSearch(e.target.value)}
             style={{ ...filterInputBase, paddingLeft: 34 }}
           />
@@ -121,10 +119,10 @@ export default function ReservationsFilters({
           onChange={e => setFilterStatus(e.target.value)}
           style={selectActiveStyle(statusActive)}
         >
-          <option value="all">Tous les statuts</option>
-          <option value="Pending">En attente</option>
-          <option value="Confirmed">Confirmées</option>
-          <option value="Cancelled">Annulées</option>
+          <option value="all">{t('all_statuses')}</option>
+          <option value="Pending">{t('pending')}</option>
+          <option value="Confirmed">{t('confirm')}</option>
+          <option value="Cancelled">{t('cancel')}</option>
         </select>
 
         {/* ── Service ── */}
@@ -134,7 +132,7 @@ export default function ReservationsFilters({
           onChange={e => setFilterService(e.target.value)}
           style={selectActiveStyle(serviceActive)}
         >
-          <option value="all">Tous les services</option>
+          <option value="all">{t('all_services')}</option>
           {services.map(s => <option key={s} value={s}>{s}</option>)}
         </select>
 
@@ -145,20 +143,20 @@ export default function ReservationsFilters({
           onChange={e => setFilterTable(e.target.value)}
           style={selectActiveStyle(tableActive)}
         >
-          <option value="all">Toutes les tables</option>
-          {tables.map(t => (
-            <option key={t.idx} value={String(t.idx)}>
-              Table {t.number}{t.location ? ` — ${t.location}` : ''}
+          <option value="all">{t('all_tables')}</option>
+          {tables.map(tData => (
+            <option key={tData.idx} value={String(tData.idx)}>
+              {t('table_number', { number: tData.number })}{tData.location ? ` — ${tData.location}` : ''}
             </option>
           ))}
-          <option value="unassigned">Non assignées</option>
+          <option value="unassigned">{t('unassigned')}</option>
         </select>
 
         {/* ── Date ── */}
         <div className="filters-date" ref={anchorRef}>
           <button onClick={() => setCalOpen(o => !o)} style={dateBtnStyle(!!filterDate)}>
             <span style={{ overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
-              {dateLabel(filterDate)}
+              {dateLabel(filterDate, t, i18n.language)}
             </span>
             <Calendar size={14} strokeWidth={2.2} style={{ flexShrink: 0 }} />
           </button>
@@ -178,7 +176,7 @@ export default function ReservationsFilters({
             <button onClick={clearFilters}
               style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:6, padding:'10px 14px', width:'100%', background:DARK, border:'none', fontSize:12, fontWeight:800, color:GOLD, cursor:'pointer', fontFamily:'inherit', whiteSpace:'nowrap' }}>
               <X size={13} strokeWidth={2.5} />
-              Effacer les filtres
+              {t('clear_filters')}
             </button>
           </div>
         )}
@@ -194,4 +192,4 @@ export default function ReservationsFilters({
       )}
     </>
   )
-}
+}

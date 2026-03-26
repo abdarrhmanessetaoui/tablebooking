@@ -1,13 +1,14 @@
 import { useState, useEffect, useRef } from 'react'
 import { createPortal } from 'react-dom'
+import { useTranslation } from 'react-i18next'
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react'
 import { DARK, GOLD, GOLD_DARK } from '../../../styles/reservations/tokens'
 import { calNavBtnStyle } from '../../../styles/reservations/filters.styles'
 
-const MONTHS_FR = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre']
-const DAYS_FR   = ['Lu','Ma','Me','Je','Ve','Sa','Di']
-
 export default function CalendarPopup({ filterDate, setFilterDate, onClose, anchorRef }) {
+  const { t, i18n } = useTranslation()
+  const lang = i18n.language === 'ar' ? 'ar-MA' : i18n.language === 'fr' ? 'fr-FR' : 'en-US'
+  
   const today    = new Date()
   const initDate = filterDate
     ? (filterDate.length === 7 ? new Date(filterDate+'-01') : new Date(filterDate))
@@ -17,6 +18,13 @@ export default function CalendarPopup({ filterDate, setFilterDate, onClose, anch
   const [mode,      setMode]      = useState('day')
   const [pos,       setPos]       = useState({ top:-9999, left:-9999 })
   const popupRef = useRef(null)
+
+  const MONTHS = Array.from({ length: 12 }, (_, i) => 
+    new Intl.DateTimeFormat(lang, { month: 'long' }).format(new Date(2024, i, 1))
+  )
+  const DAYS = Array.from({ length: 7 }, (_, i) => 
+    new Intl.DateTimeFormat(lang, { weekday: 'short' }).format(new Date(2024, 0, i + 1))
+  )
 
   useEffect(() => {
     function calc() {
@@ -92,7 +100,7 @@ export default function CalendarPopup({ filterDate, setFilterDate, onClose, anch
         <button onClick={() => setViewYear(y=>y-1)} style={calNavBtnStyle}><ChevronsLeft  size={13} strokeWidth={2.5} /></button>
         <button onClick={() => navMonth(-1)}         style={calNavBtnStyle}><ChevronLeft   size={13} strokeWidth={2.5} /></button>
         <span style={{ flex:1, textAlign:'center', fontSize:13, fontWeight:800, color:GOLD, textTransform:'capitalize' }}>
-          {MONTHS_FR[viewMonth]} {viewYear}
+          {MONTHS[viewMonth]} {viewYear}
         </span>
         <button onClick={() => navMonth(1)}          style={calNavBtnStyle}><ChevronRight  size={13} strokeWidth={2.5} /></button>
         <button onClick={() => setViewYear(y=>y+1)}  style={calNavBtnStyle}><ChevronsRight size={13} strokeWidth={2.5} /></button>
@@ -109,7 +117,7 @@ export default function CalendarPopup({ filterDate, setFilterDate, onClose, anch
             borderBottom: mode===m ? `4px solid ${DARK}` : 'none',
             marginBottom: mode===m ? -2 : 0,
           }}>
-            {m==='day' ? 'Jour' : 'Mois'}
+            {m==='day' ? t('day') : t('month')}
           </button>
         ))}
       </div>
@@ -117,7 +125,7 @@ export default function CalendarPopup({ filterDate, setFilterDate, onClose, anch
       {/* Day grid */}
       {mode === 'day' && (
         <div style={{ display:'grid', gridTemplateColumns:'repeat(7,1fr)', padding:'6px 8px 10px' }}>
-          {DAYS_FR.map(d => (
+          {DAYS.map(d => (
             <div key={d} style={{ textAlign:'center', fontSize:10, fontWeight:800, color:GOLD_DARK, padding:'4px 0', letterSpacing:'0.06em' }}>{d}</div>
           ))}
           {cells.map((c,i) => (
@@ -141,7 +149,7 @@ export default function CalendarPopup({ filterDate, setFilterDate, onClose, anch
       {/* Month grid */}
       {mode === 'month' && (
         <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:4, padding:8 }}>
-          {MONTHS_FR.map((m,i) => {
+          {MONTHS.map((m,i) => {
             const isCurrent  = i===today.getMonth() && viewYear===today.getFullYear()
             const isSelected = selMonth && selMon===i && selYear===viewYear
             return (
@@ -157,10 +165,10 @@ export default function CalendarPopup({ filterDate, setFilterDate, onClose, anch
 
       {selFull && (
         <div style={{ padding:'6px 10px', borderTop:`1px solid rgba(43,33,24,0.1)`, fontSize:11, fontWeight:700, color:DARK, background:'#ffffff', textAlign:'center' }}>
-          {String(selDay).padStart(2,'0')} {MONTHS_FR[selMon]} {selYear}
+          {new Intl.DateTimeFormat(lang, { day:'2-digit', month:'long', year:'numeric' }).format(new Date(filterDate))}
         </div>
       )}
     </div>,
     document.body
   )
-}
+}

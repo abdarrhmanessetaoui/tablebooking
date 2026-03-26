@@ -1,10 +1,13 @@
+import { useTranslation } from 'react-i18next'
 import { AlertTriangle } from 'lucide-react'
 import { DARK, GOLD, GOLD_DARK } from '../../../styles/reservations/tokens'
+
 export default function TimeSlotPicker({ value, onChange, slots }) {
+  const { t } = useTranslation()
   if (!slots.length) return (
     <div style={{ padding:'12px 14px', background:'#ffffff', borderLeft:`3px solid ${GOLD}`, fontSize:12, fontWeight:700, color:GOLD_DARK, display:'flex', alignItems:'center', gap:8 }}>
       <AlertTriangle size={13} strokeWidth={2.5} />
-      Aucun créneau disponible pour ce service ce jour-là.
+      {t('no_time_slots_available')}
     </div>
   )
   return (
@@ -17,4 +20,4 @@ export default function TimeSlotPicker({ value, onChange, slots }) {
       ))}
     </div>
   )
-}
+}

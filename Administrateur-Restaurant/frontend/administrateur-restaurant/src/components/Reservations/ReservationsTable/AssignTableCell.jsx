@@ -1,8 +1,10 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { LayoutGrid, Link2, MapPin } from 'lucide-react'
 import { DARK, GOLD, GREEN, BORDER } from '../../../styles/reservations/tokens'
 
 export default function AssignTableCell({ r, onOpenAssign }) {
+  const { t } = useTranslation()
   const [hov, setHov] = useState(false)
   const hasTable = !!r.table_idx
 
@@ -12,7 +14,7 @@ export default function AssignTableCell({ r, onOpenAssign }) {
         onClick={e => { e.stopPropagation(); onOpenAssign(r) }}
         onMouseEnter={() => setHov(true)}
         onMouseLeave={() => setHov(false)}
-        title="Changer la table"
+        title={t('change_table')}
         style={{
           display: 'inline-flex', alignItems: 'center', gap: 4,
           padding: '3px 8px',
@@ -24,7 +26,7 @@ export default function AssignTableCell({ r, onOpenAssign }) {
         }}
       >
         <LayoutGrid size={10} strokeWidth={2.5} />
-        Table {r.table_number ?? r.table_idx}
+        {t('table_header')} {r.table_number ?? r.table_idx}
         {r.table_location && (
           <span style={{
             display: 'inline-flex', alignItems: 'center', gap: 2,
@@ -56,7 +58,7 @@ export default function AssignTableCell({ r, onOpenAssign }) {
       }}
     >
       <Link2 size={10} strokeWidth={2.5} />
-      Assigner
+      {t('assign_btn')}
     </button>
   )
-}
+}

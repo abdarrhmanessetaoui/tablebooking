@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from 'react'
+import { useTranslation } from 'react-i18next'
 import { getToken } from '../../utils/auth'
 import { toast }   from '../../components/ui/Toast'
 import { confirm } from '../../components/ui/ConfirmDialog'
@@ -22,6 +23,7 @@ function isUnassigned(r) {
 }
 
 export default function useReservations(initialFilters = {}) {
+  const { t } = useTranslation()
   const [reservations, setReservations] = useState([])
   const [loading, setLoading]           = useState(true)
   const [error, setError]               = useState('')
@@ -43,7 +45,7 @@ export default function useReservations(initialFilters = {}) {
       const data = await res.json()
       setReservations(Array.isArray(data) ? data : [])
     } catch {
-      if (!silent) setError('Impossible de charger les réservations.')
+      if (!silent) setError(t('error_loading_reservations'))
     } finally {
       if (!silent) setLoading(false)
     }
@@ -95,9 +97,9 @@ export default function useReservations(initialFilters = {}) {
       const data = await res.json()
       setReservations(prev => prev.map(r => r.id === editing.id ? data : r))
       setModalMode(null)
-      toast('Statut mis à jour avec succès', 'success')
+      toast(t('status_updated_toast'), 'success')
     } catch {
-      toast('Impossible de modifier le statut', 'error')
+      toast(t('error_status_update_toast'), 'error')
     }
   }
 
@@ -111,29 +113,30 @@ export default function useReservations(initialFilters = {}) {
       const data = await res.json()
       setReservations(prev => [data, ...prev])
       setModalMode(null)
-      toast(`Réservation créée pour ${form.name}`, 'success')
+      toast(t('reservation_created_toast', { name: form.name }), 'success')
     } catch {
-      toast('Impossible de créer la réservation', 'error')
+      toast(t('error_creating_toast'), 'error')
     }
   }
 
   const handleDelete = async (id) => {
     const r = reservations.find(x => x.id === id)
     const ok = await confirm({
-      title:        'Supprimer la réservation',
-      message:      `Voulez-vous supprimer la réservation de ${r?.name || 'ce client'} ?`,
-      sub:          'Cette action est irréversible.',
-      confirmLabel: 'Supprimer',
+      title:        t('confirm_delete_one_title'),
+      message:      t('confirm_delete_one_msg', { name: r?.name || t('this_client') }),
+      sub:          t('action_irreversible'),
+      confirmLabel: t('delete_btn'),
       type:         'danger',
     })
+
     if (!ok) return
     try {
       await fetch(`${API}/${id}`, { method: 'DELETE', headers: headers() })
       setReservations(prev => prev.filter(r => r.id !== id))
       if (modalMode !== null) setModalMode(null)
-      toast('Réservation supprimée', 'warning')
+      toast(t('reservation_deleted_toast'), 'warning')
     } catch {
-      toast('Impossible de supprimer la réservation', 'error')
+      toast(t('error_deleting_one_toast'), 'error')
     }
   }
 
@@ -160,4 +163,4 @@ export default function useReservations(initialFilters = {}) {
     fetchReservations,
     reservations, setReservations,
   }
-}
+}

@@ -1,18 +1,20 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { DARK, GOLD, GOLD_DARK } from '../../../styles/reservations/tokens'
 
-const MONTHS = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre']
-const DAYS   = ['L','M','M','J','V','S','D']
-
 export default function MiniCalendar({ value, onChange, blockedDates = [], disabledDays = [] }) {
+  const { t, i18n } = useTranslation()
+  const lang = i18n.language === 'ar' ? 'ar-MA' : i18n.language === 'fr' ? 'fr-FR' : 'en-US'
+  const isRtl = i18n.language === 'ar'
+
   const today    = new Date(); today.setHours(0,0,0,0)
   const todayISO = today.toISOString().slice(0,10)
   const init     = value ? new Date(value+'T00:00:00') : today
   const [cur, setCur] = useState({ y:init.getFullYear(), m:init.getMonth() })
 
   const dim   = (y,m) => new Date(y,m+1,0).getDate()
-  const first = (y,m) => { const d = new Date(y,m,1).getDay(); return d===0?6:d-1 }
+  const first = (y,m) => { const d = new Date(y,m,1).getDay(); return d===0?6:d-1 } // Monday-based
   const toISO = (y,m,d) => `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`
 
   const cells = []
@@ -26,19 +28,26 @@ export default function MiniCalendar({ value, onChange, blockedDates = [], disab
     onChange(iso)
   }
 
+  const monthLabel = new Intl.DateTimeFormat(lang, { month: 'long', year: 'numeric' }).format(new Date(cur.y, cur.m, 1))
+  const dayNames = Array.from({ length: 7 }, (_, i) => {
+    // 2024-01-01 was a Monday
+    const d = new Date(2024, 0, i + 1)
+    return new Intl.DateTimeFormat(lang, { weekday: 'narrow' }).format(d)
+  })
+
   return (
-    <div style={{ border:'4px solid #e8e0d8', background:'#fff' }}>
+    <div style={{ border:'4px solid #e8e0d8', background:'#fff', direction: isRtl ? 'rtl' : 'ltr' }}>
       <div style={{ background:DARK, display:'flex', alignItems:'center', justifyContent:'space-between', padding:'10px 14px' }}>
         <button onClick={() => setCur(c=>c.m===0?{y:c.y-1,m:11}:{y:c.y,m:c.m-1})} style={{ background:'none', border:'none', cursor:'pointer', display:'flex', padding:4 }}>
-          <ChevronLeft size={16} color={GOLD} />
+          {isRtl ? <ChevronRight size={16} color={GOLD} /> : <ChevronLeft size={16} color={GOLD} />}
         </button>
-        <span style={{ fontSize:13, fontWeight:900, color:'#fff' }}>{MONTHS[cur.m]} {cur.y}</span>
+        <span style={{ fontSize:13, fontWeight:900, color:'#fff' }}>{monthLabel}</span>
         <button onClick={() => setCur(c=>c.m===11?{y:c.y+1,m:0}:{y:c.y,m:c.m+1})} style={{ background:'none', border:'none', cursor:'pointer', display:'flex', padding:4 }}>
-          <ChevronRight size={16} color={GOLD} />
+          {isRtl ? <ChevronLeft size={16} color={GOLD} /> : <ChevronRight size={16} color={GOLD} />}
         </button>
       </div>
       <div style={{ display:'grid', gridTemplateColumns:'repeat(7,1fr)', background:'#ffffff', borderBottom:'1px solid #e8e0d8' }}>
-        {DAYS.map((d,i) => <div key={i} style={{ padding:'6px 0', textAlign:'center', fontSize:10, fontWeight:900, color:GOLD_DARK }}>{d}</div>)}
+        {dayNames.map((d,i) => <div key={i} style={{ padding:'6px 0', textAlign:'center', fontSize:10, fontWeight:900, color:GOLD_DARK }}>{d}</div>)}
       </div>
       <div style={{ display:'grid', gridTemplateColumns:'repeat(7,1fr)', padding:'6px 4px' }}>
         {cells.map((day,i) => {
@@ -60,7 +69,7 @@ export default function MiniCalendar({ value, onChange, blockedDates = [], disab
         })}
       </div>
       <div style={{ padding:'6px 12px 10px', borderTop:'1px solid #f0ebe4', display:'flex', gap:12 }}>
-        {[{c:'#DC2626',l:'Bloqué / Fermé'},{c:GOLD_DARK,l:"Aujourd'hui"}].map(({c,l}) => (
+        {[{c:'#DC2626',l:t('blocked_closed')},{c:GOLD_DARK,l:t('today')}].map(({c,l}) => (
           <span key={l} style={{ fontSize:10, fontWeight:700, color:c, display:'flex', alignItems:'center', gap:4 }}>
             <span style={{ width:7, height:7, borderRadius:'50%', background:c, display:'inline-block' }} />{l}
           </span>
@@ -68,4 +77,4 @@ export default function MiniCalendar({ value, onChange, blockedDates = [], disab
       </div>
     </div>
   )
-}
+}

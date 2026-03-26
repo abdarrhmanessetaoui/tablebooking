@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { Eye, Pencil, Trash2, CalendarDays, Clock3, Users, Utensils } from 'lucide-react'
 import Checkbox        from './Checkbox'
 import AssignTableCell from './AssignTableCell'
@@ -9,6 +10,7 @@ function trunc(str, max=16) {
 }
 
 export default function MobileCard({ r, selected, highlighted, rowRef, onToggle, openView, openEdit, handleDelete, onOpenAssign }) {
+  const { t } = useTranslation()
   const s = STATUS_CONFIG[r.status] || { bg:'#ffffff', color:DARK, label:r.status||'—', dot:'#c8a97e' }
 
   return (
@@ -20,7 +22,7 @@ export default function MobileCard({ r, selected, highlighted, rowRef, onToggle,
     }}>
       {highlighted && (
         <div style={{ position:'absolute', top:10, right:14, fontSize:9, fontWeight:900, color:GOLD_DARK, letterSpacing:'0.12em', textTransform:'uppercase', background:'#ffffff', padding:'2px 7px', border:`1px solid ${GOLD}55` }}>
-          Sélectionnée
+          {t('selected_single')}
         </div>
       )}
 
@@ -33,7 +35,7 @@ export default function MobileCard({ r, selected, highlighted, rowRef, onToggle,
         </div>
         <span style={{ display:'inline-flex', alignItems:'center', gap:4, padding:'4px 10px', background:s.bg, fontSize:10, fontWeight:800, color:s.color, whiteSpace:'nowrap', flexShrink:0 }}>
           <span style={{ width:5, height:5, borderRadius:'50%', background:s.dot }} />
-          {s.label}
+          {t(s.key || r.status || '—')}
         </span>
       </div>
 
@@ -56,10 +58,10 @@ export default function MobileCard({ r, selected, highlighted, rowRef, onToggle,
       {/* Actions */}
       <div style={{ display:'flex', gap:4 }}>
         <button onClick={() => openView(r)} style={{ flex:1, padding:'8px', background:highlighted?GOLD:'#f5f0eb', border:'none', fontSize:11, fontWeight:700, color:DARK, cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', gap:5, fontFamily:'inherit' }}>
-          <Eye size={12} strokeWidth={2.5} /> Voir
+          <Eye size={12} strokeWidth={2.5} /> {t('view_btn')}
         </button>
         <button onClick={() => openEdit(r)} style={{ flex:1, padding:'8px', background:DARK, border:'none', fontSize:11, fontWeight:700, color:GOLD, cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', gap:5, fontFamily:'inherit' }}>
-          <Pencil size={12} strokeWidth={2.5} /> Modifier
+          <Pencil size={12} strokeWidth={2.5} /> {t('edit_btn')}
         </button>
         <button onClick={() => handleDelete(r.id)} style={{ padding: 8, borderRadius: '50%', background:RED, border:'none', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, transition:'opacity 0.15s' }}
           onMouseEnter={e => e.currentTarget.style.opacity=0.85} onMouseLeave={e => e.currentTarget.style.opacity=1}>
@@ -69,3 +71,4 @@ export default function MobileCard({ r, selected, highlighted, rowRef, onToggle,
     </div>
   )
 }
+

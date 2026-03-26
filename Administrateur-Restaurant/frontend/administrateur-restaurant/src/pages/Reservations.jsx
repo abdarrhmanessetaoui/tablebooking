@@ -1,5 +1,6 @@
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useState, useEffect, useMemo } from 'react'
+import { useTranslation } from 'react-i18next'
 import {
   Plus, FileDown, Trash2, CheckCircle,
   Clock, XCircle, X
@@ -44,6 +45,7 @@ function Btn({ children, onClick, primary, disabled, icon: Icon }) {
 }
 
 function BulkBar({ count, onDelete, onStatus, onClear }) {
+  const { t } = useTranslation()
   const [hovDel, setHovDel] = useState(false)
   return (
     <div style={{
@@ -70,15 +72,15 @@ function BulkBar({ count, onDelete, onStatus, onClear }) {
         fontSize: 12, fontWeight: 900, padding: '0 7px', flexShrink: 0,
       }}>{count}</span>
       <span className="bulk-label" style={{ fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.6)', marginRight: 2 }}>
-        sélectionné{count > 1 ? 's' : ''}
+        {t('selected_count', { count, plural: count > 1 ? 's' : '' })}
       </span>
 
       <div style={{ width: 1, height: 20, background: 'rgba(255,255,255,0.12)', margin: '0 2px', flexShrink: 0 }} />
 
       {[
-        { status: 'Confirmed', label: 'Confirmer',  Icon: CheckCircle, color: '#4ade80' },
-        { status: 'Pending',   label: 'En attente', Icon: Clock,       color: GOLD      },
-        { status: 'Cancelled', label: 'Annuler',    Icon: XCircle,     color: '#f87171' },
+        { status: 'Confirmed', label: t('confirm'),  Icon: CheckCircle, color: '#4ade80' },
+        { status: 'Pending',   label: t('pending'),  Icon: Clock,       color: GOLD      },
+        { status: 'Cancelled', label: t('cancel'),   Icon: XCircle,     color: '#f87171' },
       ].map(({ status, label, Icon, color }) => (
         <button key={status} onClick={() => onStatus(status)}
           style={{
@@ -114,7 +116,7 @@ function BulkBar({ count, onDelete, onStatus, onClear }) {
         }}
       >
         <Trash2 size={13} strokeWidth={2.5} />
-        <span className="btn-label">Supprimer</span>
+        <span className="btn-label">{t('delete')}</span>
       </button>
 
       <button onClick={onClear}
@@ -131,13 +133,13 @@ function BulkBar({ count, onDelete, onStatus, onClear }) {
         onMouseLeave={e => e.currentTarget.style.color = 'rgba(255,255,255,0.45)'}
       >
         <X size={13} strokeWidth={2.5} />
-        <span className="btn-label">Désélectionner</span>
+        <span className="btn-label">{t('deselect')}</span>
       </button>
     </div>
   )
 }
 
-function exportReservationsPDF(reservations) {
+function exportReservationsPDF(reservations, t, lang) {
   const { jsPDF } = window.jspdf
   const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' })
   const W = 210, PAD = 20
@@ -151,7 +153,7 @@ function exportReservationsPDF(reservations) {
   doc.text('TableBooking', PAD, 17)
   doc.setTextColor(255, 255, 255)
   doc.text('.ma', PAD + 39, 17)
-  const now = new Date().toLocaleString('fr-FR')
+  const now = new Date().toLocaleString(lang === 'ar' ? 'ar-MA' : lang === 'fr' ? 'fr-FR' : 'en-US')
   doc.setFontSize(8)
   doc.setTextColor(200, 169, 126)
   doc.text(now, W - PAD, 17, { align: 'right' })
@@ -160,7 +162,7 @@ function exportReservationsPDF(reservations) {
   doc.setFontSize(22)
   doc.setFont('helvetica', 'bold')
   doc.setTextColor(43, 33, 24)
-  doc.text('Réservations', PAD, y)
+  doc.text(t('reservations_list_title'), PAD, y)
   y += 6
   doc.setFillColor(43, 33, 24)
   doc.rect(PAD, y, W - PAD * 2, 0.5, 'F')
@@ -169,10 +171,17 @@ function exportReservationsPDF(reservations) {
   doc.setFontSize(10)
   doc.setFont('helvetica', 'normal')
   doc.setTextColor(120, 100, 80)
-  doc.text(`${reservations.length} réservation${reservations.length !== 1 ? 's' : ''}`, PAD, y)
+  doc.text(`${reservations.length} ${t(reservations.length === 1 ? 'reservation' : 'reservation_plural')}`, PAD, y)
   y += 10
 
-  const cols = [['Nom', 42], ['Téléphone', 32], ['Date', 26], ['Heure', 22], ['Personnes', 22], ['Statut', 26]]
+  const cols = [
+    [t('name'), 42],
+    [t('phone_label'), 32],
+    [t('date'), 26],
+    [t('time'), 22],
+    [t('guests'), 22],
+    [t('status'), 26]
+  ]
   doc.setFillColor(43, 33, 24)
   doc.rect(PAD, y, W - PAD * 2, 8, 'F')
   doc.setFontSize(8)
@@ -201,7 +210,7 @@ function exportReservationsPDF(reservations) {
     const sc = STATUS_COLORS[r.status] || [120,120,120]
     doc.setTextColor(...sc)
     doc.setFont('helvetica', 'bold')
-    doc.text(r.status === 'Confirmed' ? 'Confirmée' : r.status === 'Pending' ? 'En attente' : 'Annulée', rx, y+5.5)
+    doc.text(t(`status_${r.status.toLowerCase()}`), rx, y+5.5)
     y += 8
   })
 
@@ -212,11 +221,12 @@ function exportReservationsPDF(reservations) {
   doc.setFont('helvetica', 'normal')
   doc.setTextColor(200, 169, 126)
   doc.text('TableBooking.ma', PAD, 292)
-  doc.text(`Exporté le ${now}`, W - PAD, 292, { align: 'right' })
+  doc.text(`${t('export_pdf')} ${now}`, W - PAD, 292, { align: 'right' })
   doc.save(`reservations-${new Date().toISOString().slice(0,10)}.pdf`)
 }
 
 export default function Reservations() {
+  const { t, i18n } = useTranslation()
   const location = useLocation()
   const navigate  = useNavigate()
   const [exporting,   setExporting]   = useState(false)
@@ -287,11 +297,11 @@ export default function Reservations() {
           document.head.appendChild(s)
         })
       }
-      exportReservationsPDF(filteredLocal)
-      toast('PDF exporté avec succès', 'success')
+      exportReservationsPDF(filteredLocal, t, i18n.language)
+      toast(t('status_updated_toast'), 'success')
     } catch(e) {
       console.error('PDF error:', e)
-      toast('Impossible d\'exporter le PDF', 'error')
+      toast(t('error_deleting_toast'), 'error')
     } finally {
       setExporting(false)
     }
@@ -299,10 +309,10 @@ export default function Reservations() {
 
   async function handleBulkDelete() {
     const ok = await confirm({
-      title: 'Supprimer la sélection',
-      message: `Voulez-vous supprimer ${selectedIds.length} réservation${selectedIds.length > 1 ? 's' : ''} ?`,
-      sub: 'Cette action est irréversible.',
-      confirmLabel: 'Tout supprimer',
+      title: t('confirm_delete_bulk_title'),
+      message: t('confirm_delete_bulk_msg', { count: selectedIds.length, plural: selectedIds.length > 1 ? 's' : '' }),
+      sub: t('action_irreversible'),
+      confirmLabel: t('delete_all_btn'),
       type: 'danger',
     })
     if (!ok) return
@@ -312,15 +322,19 @@ export default function Reservations() {
         fetch(`http://localhost:8000/api/restaurant/reservations/${id}`, { method: 'DELETE', headers: h })
       ))
       setReservations(prev => prev.filter(r => !selectedIds.includes(r.id)))
-      toast(`${selectedIds.length} réservation${selectedIds.length > 1 ? 's supprimées' : ' supprimée'}`, 'warning')
+      toast(t('reservations_deleted_toast', { count: selectedIds.length, plural: selectedIds.length > 1 ? 's' : '' }), 'warning')
       setSelectedIds([])
     } catch {
-      toast('Erreur lors de la suppression', 'error')
+      toast(t('error_deleting_toast'), 'error')
     }
   }
 
   async function handleBulkStatus(status) {
-    const labels = { Confirmed: 'confirmées', Pending: 'mises en attente', Cancelled: 'annulées' }
+    const labels = {
+      Confirmed: t('confirmed_toast'),
+      Pending: t('pending_toast'),
+      Cancelled: t('cancelled_toast')
+    }
     const h = { 'Content-Type': 'application/json', 'Accept': 'application/json', 'Authorization': `Bearer ${getToken()}` }
     try {
       await Promise.all(selectedIds.map(id =>
@@ -330,10 +344,10 @@ export default function Reservations() {
         })
       ))
       setReservations(prev => prev.map(r => selectedIds.includes(r.id) ? { ...r, status } : r))
-      toast(`${selectedIds.length} réservation${selectedIds.length > 1 ? 's' : ''} ${labels[status]}`, 'success')
+      toast(`${selectedIds.length} ${t(selectedIds.length > 1 ? 'reservation_plural' : 'reservation')} ${labels[status]}`, 'success')
       setSelectedIds([])
     } catch {
-      toast('Erreur lors de la mise à jour', 'error')
+      toast(t('error_updating_toast'), 'error')
     }
   }
 
@@ -365,18 +379,18 @@ export default function Reservations() {
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, marginBottom: 28, flexWrap: 'wrap' }}>
             <div>
               <h1 style={{ margin: 0, fontSize: 'clamp(22px,4vw,36px)', fontWeight: 900, color: DARK, letterSpacing: '-1.5px', lineHeight: 1 }}>
-                Réservations
+                {t('reservations_list_title')}
               </h1>
               <p className="page-subtitle" style={{ margin: '6px 0 0', fontSize: 12, fontWeight: 700, color: GOLD }}>
-                {filteredLocal.length} réservation{filteredLocal.length !== 1 ? 's' : ''}
+                {filteredLocal.length} {t(filteredLocal.length === 1 ? 'reservation' : 'reservation_plural')}
               </p>
             </div>
             <div style={{ display: 'flex', gap: 3, flexShrink: 0 }}>
               <Btn icon={FileDown} primary onClick={handleExportPDF} disabled={exporting}>
-                {exporting ? 'Export…' : 'Exporter PDF'}
+                {exporting ? t('exporting') : t('export_pdf')}
               </Btn>
               <Btn icon={Plus} onClick={openCreate}>
-                Nouvelle réservation
+                {t('new_reservation')}
               </Btn>
             </div>
           </div>
@@ -409,7 +423,7 @@ export default function Reservations() {
 
         <FadeUp delay={50}>
           <p style={{ margin: '0 0 10px', fontSize: 11, fontWeight: 800, color: '#bbb', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
-            {filteredLocal.length} résultat{filteredLocal.length !== 1 ? 's' : ''}
+            {t('results_count', { count: filteredLocal.length, plural: filteredLocal.length !== 1 ? 's' : '' })}
           </p>
         </FadeUp>
 
@@ -451,4 +465,4 @@ export default function Reservations() {
       </div>
     </>
   )
-}
+}
