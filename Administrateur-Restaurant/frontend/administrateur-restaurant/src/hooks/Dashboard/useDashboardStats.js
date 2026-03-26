@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
+import { useTranslation } from 'react-i18next'
 import { getToken } from '../../utils/auth'
 
 const DEFAULTS = {
@@ -17,6 +18,7 @@ function sanitize(data) {
 }
 
 export default function useDashboardStats() {
+  const { t } = useTranslation()
   const [stats,   setStats]   = useState(DEFAULTS)
   const [loading, setLoading] = useState(true)
   const [error,   setError]   = useState(null)
@@ -28,7 +30,7 @@ export default function useDashboardStats() {
       const res = await fetch('http://localhost:8000/api/stats', {
         headers: { Authorization: `Bearer ${getToken()}` },
       })
-      if (!res.ok) throw new Error(`Erreur ${res.status}`)
+      if (!res.ok) throw new Error(`${t('error_prefix')} ${res.status}`)
       const data = await res.json()
       setStats(sanitize(data))
     } catch (e) {
@@ -36,9 +38,9 @@ export default function useDashboardStats() {
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, [t])
 
   useEffect(() => { fetchStats() }, [fetchStats])
 
   return { stats, loading, error, refetch: fetchStats }
-}
+}

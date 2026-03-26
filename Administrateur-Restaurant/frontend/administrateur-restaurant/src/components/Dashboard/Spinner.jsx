@@ -1,6 +1,8 @@
+import { useTranslation } from 'react-i18next'
 import { B } from '../../utils/brand'
 
 export default function Spinner() {
+  const { t } = useTranslation()
   return (
     <div style={{
       display: 'flex', flexDirection: 'column',
@@ -15,7 +17,7 @@ export default function Spinner() {
         animation: 'sp 0.75s linear infinite',
       }} />
       <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: B.inkMute }}>
-        Chargement...
+        {t('loading')}
       </p>
       <style>{`
         @keyframes sp { to { transform: rotate(360deg) } }
@@ -23,4 +25,4 @@ export default function Spinner() {
       `}</style>
     </div>
   )
-}
+}

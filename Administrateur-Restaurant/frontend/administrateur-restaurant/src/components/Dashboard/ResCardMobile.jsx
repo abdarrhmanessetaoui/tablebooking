@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Clock, Users, Utensils, CalendarDays, ChevronRight } from 'lucide-react'
 import Badge from './Badge'
 import {
@@ -7,9 +8,9 @@ import {
 } from '../../styles/dashboard/resCardMobile.styles'
 import { DARK, GOLD_DK, TODAY_DATE, TOMORROW_DATE } from '../../styles/dashboard/tokens'
 
-function fmtDate(iso) {
+function fmtDate(iso, lang) {
   if (!iso) return ''
-  return new Date(iso).toLocaleDateString('fr-FR', {
+  return new Date(iso).toLocaleDateString(lang, {
     weekday: 'short',
     day:     'numeric',
     month:   'short',
@@ -17,18 +18,19 @@ function fmtDate(iso) {
 }
 
 export default function ResCardMobile({ r, i, onRowClick }) {
+  const { t, i18n } = useTranslation()
   const [hov, setHov] = useState(false)
 
   const chips = [
     {
       Icon:  CalendarDays,
       value: r.date && r.date !== TODAY_DATE && r.date !== TOMORROW_DATE
-               ? fmtDate(r.date)
+               ? fmtDate(r.date, i18n.language)
                : null,
       gold: false,
     },
     { Icon: Clock,    value: r.start_time,                         gold: false },
-    { Icon: Users,    value: r.guests ? `${r.guests} personnes` : null, gold: false },
+    { Icon: Users,    value: r.guests ? t('count_persons', { count: r.guests }) : null, gold: false },
     { Icon: Utensils, value: r.service || null,                    gold: true  },
   ].filter(item => item.value)
 
@@ -66,4 +68,4 @@ export default function ResCardMobile({ r, i, onRowClick }) {
       </div>
     </div>
   )
-}
+}

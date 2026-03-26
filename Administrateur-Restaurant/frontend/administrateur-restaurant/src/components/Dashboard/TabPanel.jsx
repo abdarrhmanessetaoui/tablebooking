@@ -1,4 +1,5 @@
 import { CheckCircle, Clock, XCircle, CalendarDays, ArrowRight } from 'lucide-react'
+import { useTranslation }        from 'react-i18next'
 import Ring                       from './Ring'
 import StatBlock                  from './StatBlock'
 import DashboardReservationsTable from './DashboardReservationsTable'
@@ -18,6 +19,7 @@ import {
 } from '../../styles/dashboard/tokens'
 
 export default function TabPanel({ tab, stats, reservations, onViewAll, tabLabel, onRowClick }) {
+  const { t } = useTranslation()
 
   // ── Derive counts per tab ───────────────────────────────────────
   const c = tab === 'today'    ? stats.today_confirmed
@@ -37,9 +39,9 @@ export default function TabPanel({ tab, stats, reservations, onViewAll, tabLabel
              : stats.total
 
   const total       = c + p + a || 1
-  const periodLabel = tab === 'today'    ? "Aujourd'hui"
-                    : tab === 'tomorrow' ? 'Demain'
-                    : 'Ce mois'
+  const periodLabel = tab === 'today'    ? t('today')
+                    : tab === 'tomorrow' ? t('tomorrow')
+                    : t('this_month')
   const showDate    = tab === 'month'
 
   return (
@@ -57,7 +59,7 @@ export default function TabPanel({ tab, stats, reservations, onViewAll, tabLabel
               <div>
                 <p style={heroNumber}>{hero}</p>
                 <p style={heroLabel}>
-                  réservation{hero !== 1 ? 's' : ''}
+                  {t(hero === 1 ? 'reservation' : 'reservation_plural')}
                 </p>
               </div>
               <Ring c={c} p={p} a={a} size={88} />
@@ -68,7 +70,7 @@ export default function TabPanel({ tab, stats, reservations, onViewAll, tabLabel
   <StatBlock
     icon={CheckCircle}
     value={c}
-    label="Confirmées"
+    label={t('confirmed_plural')}
     accent={GREEN}
     bg={GREEN_BG}
     delay={50}
@@ -77,7 +79,7 @@ export default function TabPanel({ tab, stats, reservations, onViewAll, tabLabel
   <StatBlock
     icon={Clock}
     value={p}
-    label="En attente"
+    label={t('pending_plural')}
     accent={AMBER}
     bg={AMBER_BG}
     delay={80}
@@ -86,7 +88,7 @@ export default function TabPanel({ tab, stats, reservations, onViewAll, tabLabel
   <StatBlock
     icon={XCircle}
     value={a}
-    label="Annulées"
+    label={t('cancelled_plural')}
     accent={RED}
     bg={RED_BG}
     delay={110}
@@ -128,7 +130,7 @@ export default function TabPanel({ tab, stats, reservations, onViewAll, tabLabel
                     color="rgba(43,33,24,0.1)"
                     style={{ display: 'block', margin: '0 auto 12px' }}
                   />
-                  <p style={mobileEmptyTitle}>Aucune réservation</p>
+                  <p style={mobileEmptyTitle}>{t('no_reservations')}</p>
                   <p style={mobileEmptySubtitle}>{periodLabel}</p>
                 </div>
               )}
@@ -138,7 +140,7 @@ export default function TabPanel({ tab, stats, reservations, onViewAll, tabLabel
                 onClick={onViewAll}
                 style={mobileViewAllBtn}
               >
-                <span>Toutes les réservations — {periodLabel}</span>
+                <span>{t('view_all_reservations_period', { period: periodLabel })}</span>
                 <ArrowRight size={13} strokeWidth={2.5} />
               </button>
             </div>
@@ -148,4 +150,4 @@ export default function TabPanel({ tab, stats, reservations, onViewAll, tabLabel
       </div>
     </>
   )
-}
+}

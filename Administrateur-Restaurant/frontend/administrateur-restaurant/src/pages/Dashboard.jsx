@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useNavigate }   from 'react-router-dom'
 import { FileDown }      from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 
 import useDashboardStats from '../hooks/Dashboard/useDashboardStats'
 import useRestaurantInfo from '../hooks/useRestaurantInfo'
@@ -23,6 +24,7 @@ import {
 } from '../styles/dashboard/tokens'
 
 export default function Dashboard() {
+  const { t } = useTranslation()
   const { stats, loading, error, refetch } = useDashboardStats()
   const { info }   = useRestaurantInfo()
   const navigate   = useNavigate()
@@ -66,9 +68,9 @@ export default function Dashboard() {
 
   // ── Tab config ──────────────────────────────────────────────────
   const TABS = [
-    { key: 'today',    label: "Aujourd'hui", res: todayRes, date: TODAY_DATE    },
-    { key: 'tomorrow', label: 'Demain',      res: tomRes,   date: TOMORROW_DATE },
-    { key: 'month',    label: 'Ce mois',     res: monthRes, date: null          },
+    { key: 'today',    label: t('today'),      res: todayRes, date: TODAY_DATE    },
+    { key: 'tomorrow', label: t('tomorrow'),   res: tomRes,   date: TOMORROW_DATE },
+    { key: 'month',    label: t('this_month'), res: monthRes, date: null          },
   ]
   const active = TABS.find(t => t.key === tab)
 
@@ -92,7 +94,7 @@ export default function Dashboard() {
           document.head.appendChild(s)
         })
       }
-      exportPDF(stats, active?.res || [], active?.label || "Aujourd'hui")
+      exportPDF(stats, active?.res || [], active?.label || t('today'))
     } catch (e) {
       console.error(e)
     } finally {
@@ -116,14 +118,14 @@ export default function Dashboard() {
         <FadeUp delay={0}>
           <div style={header}>
             <div style={headerLeft}>
-              <h1 style={h1}>Tableau de bord</h1>
+              <h1 style={h1}>{t('dashboard_title')}</h1>
               <p className="page-subtitle" style={subtitle}>
                 <LiveClock />
               </p>
             </div>
             <div style={{ display: 'flex', gap: 3, flexShrink: 0 }}>
               <Btn icon={FileDown} primary onClick={handleExport} disabled={exporting}>
-                {exporting ? 'Export…' : 'Exporter PDF'}
+                {exporting ? t('exporting') : t('export_pdf')}
               </Btn>
             </div>
           </div>
@@ -173,7 +175,7 @@ export default function Dashboard() {
         {error && (
           <FadeUp delay={0}>
             <div style={errorBanner}>
-              Erreur de chargement — {error}
+              {t('error_loading')} — {error}
             </div>
           </FadeUp>
         )}
@@ -181,4 +183,4 @@ export default function Dashboard() {
       </div>
     </>
   )
-}
+}
