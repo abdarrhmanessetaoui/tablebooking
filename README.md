@@ -1,8 +1,8 @@
+![TableBooking Screenshot](https://raw.githubusercontent.com/abdarrhmanessetaoui/tablebooking/main/Administrateur-Restaurant/frontend/administrateur-restaurant/public/images/tablebooking.png)
 
 # TableBooking - Restaurant Table Booking System
 
 **TableBooking** is a full-stack application for managing restaurant reservations.  
-![TableBooking Screenshot](https://raw.githubusercontent.com/abdarrhmanessetaoui/tablebooking/main/Administrateur-Restaurant/frontend/administrateur-restaurant/public/images/tablebooking.png)
 It is built with **React** (frontend) and **Laravel** (backend) and includes features for administrators to handle **reservations, tables, services, reports, and more**.
 
 ---
