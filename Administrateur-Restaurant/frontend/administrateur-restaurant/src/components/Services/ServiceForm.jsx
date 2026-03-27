@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Plus, Check, X, Utensils } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 
 const DARK    = '#2b2118'
 const GOLD    = '#c8a97e'
@@ -50,6 +51,7 @@ function Field({ label, children }) {
 }
 
 function DayPicker({ value = [0,1,2,3,4,5,6], onChange }) {
+  const {t} = useTranslation()
   function toggle(idx) {
     if (value.includes(idx)) {
       if (value.length === 1) return  // keep at least 1
@@ -61,7 +63,7 @@ function DayPicker({ value = [0,1,2,3,4,5,6], onChange }) {
 
   return (
     <div>
-      <Label>Jours disponibles</Label>
+      <Label>{t('service.days')}</Label>
       <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', marginTop: 2 }}>
         {DAYS.map(d => {
           const active = value.includes(d.idx)
@@ -94,8 +96,8 @@ function DayPicker({ value = [0,1,2,3,4,5,6], onChange }) {
       </div>
       <p style={{ margin: '6px 0 0', fontSize: 10, fontWeight: 700, color: GOLD_DK }}>
         {value.length === 7
-          ? 'Disponible tous les jours'
-          : `Disponible ${value.length} jour${value.length > 1 ? 's' : ''} / semaine — ${value.map(i => DAYS[i].full).join(', ')}`
+          ? t('service.available_all_days')
+          : t('service.available_week', {count: value.length,days: value.map(i => DAYS[i].full).join(', ')})
         }
       </p>
     </div>
@@ -103,19 +105,11 @@ function DayPicker({ value = [0,1,2,3,4,5,6], onChange }) {
 }
 
 export default function ServiceForm({ initial = EMPTY, onSave, saving, editingName, onCancel }) {
+  const { t } = useTranslation()
   const [form, setForm] = useState({ ...EMPTY, ...initial })
 
   // Re-sync form whenever the edited service changes (or editing starts/stops)
-  useEffect(() => {
-    setForm({
-      ...EMPTY,
-      ...initial,
-      // Ensure available_days is always a proper array
-      available_days: Array.isArray(initial?.available_days)
-        ? initial.available_days
-        : [0, 1, 2, 3, 4, 5, 6],
-    })
-  }, [initial?.idx, editingName])  // triggers on service switch AND on cancel (editingName → undefined)
+  useEffect(() => { setForm({...EMPTY,...initial,available_days: Array.isArray(initial?.available_days)? initial.available_days: [0, 1, 2, 3, 4, 5, 6],})}, [initial?.idx, editingName])  // triggers on service switch AND on cancel (editingName → undefined)
 
   const set   = k => v => setForm(f => ({ ...f, [k]: v }))
   const fo    = e => e.target.style.borderColor = GOLD
@@ -134,32 +128,32 @@ export default function ServiceForm({ initial = EMPTY, onSave, saving, editingNa
       <div style={{ padding: '12px 16px', background: DARK, display: 'flex', alignItems: 'center', gap: 8 }}>
         <Utensils size={14} strokeWidth={2.5} color={GOLD} />
         <span style={{ fontSize: 11, fontWeight: 900, color: GOLD, letterSpacing: '0.12em', textTransform: 'uppercase' }}>
-          {editingName ? `Modifier — ${editingName}` : 'Nouveau service'}
+          {editingName? t('service.edit_title', { name: editingName }): t('service.new_service')}
         </span>
       </div>
 
       <div style={{ padding: 'clamp(14px,4vw,24px)', display: 'flex', flexDirection: 'column', gap: 14 }}>
 
-        <Field label="Nom du service">
-          <input type="text" value={form.name} placeholder="Ex: Couscous du Vendredi"
+        <Field label={t('service.Name')}>
+          <input type="text" value={form.name} placeholder={t('service.name_placeholder')}
             onChange={e => set('name')(e.target.value)}
             style={inp} onFocus={fo} onBlur={bl}
           />
         </Field>
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-          <Field label="Prix (dh)">
-            <input type="number" value={form.price} placeholder="0"
+          <Field label={t('service.price')}>
+            <input type="number" value={form.price} placeholder={t('service.price_placeholder')}
               onChange={e => set('price')(e.target.value)} style={inp} onFocus={fo} onBlur={bl} />
           </Field>
-          <Field label="Capacité (pers.)">
-            <input type="number" value={form.capacity} placeholder="15"
+          <Field label={t('service.capacity')}>
+            <input type="number" value={form.capacity} placeholder={t('service.capacity_placeholder')}
               onChange={e => set('capacity')(e.target.value)} style={inp} onFocus={fo} onBlur={bl} />
           </Field>
         </div>
 
-        <Field label="Durée (min)">
-          <input type="number" value={form.duration} placeholder="60"
+        <Field label={t('service.duration')}>
+          <input type="number" value={form.duration} placeholder={t('service.duration_placeholder')}
             onChange={e => set('duration')(e.target.value)} style={inp} onFocus={fo} onBlur={bl} />
         </Field>
 
@@ -185,10 +179,10 @@ export default function ServiceForm({ initial = EMPTY, onSave, saving, editingNa
           onMouseEnter={e => { if (valid && !saving) e.currentTarget.style.background = '#3d2d1e' }}
           onMouseLeave={e => { e.currentTarget.style.background = DARK }}
         >
-          {saving ? 'Enregistrement…'
+          {saving ? t('service.saving')
             : editingName
-              ? <><Check size={15} strokeWidth={2.5} /> Enregistrer les modifications</>
-              : <><Plus size={15} strokeWidth={2.5} /> Ajouter le service</>
+              ? <><Check size={15} strokeWidth={2.5} />{t('service.update')}</>
+              : <><Plus size={15} strokeWidth={2.5} />{t('service.add')}</>
           }
         </button>
 
@@ -202,7 +196,7 @@ export default function ServiceForm({ initial = EMPTY, onSave, saving, editingNa
             onMouseEnter={e => { e.currentTarget.style.background = '#fdf6ec'; e.currentTarget.style.color = GOLD_DK; e.currentTarget.style.borderColor = GOLD }}
             onMouseLeave={e => { e.currentTarget.style.background = 'none'; e.currentTarget.style.color = DARK; e.currentTarget.style.borderColor = BORDER }}
           >
-            <X size={13} strokeWidth={2.5} /> Annuler la modification
+            < X size={13} /> {t('service.cancel')}
           </button>
         )}
 

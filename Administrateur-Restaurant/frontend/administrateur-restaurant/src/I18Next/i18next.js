@@ -134,8 +134,41 @@ pdf_error: "Error while exporting PDF",
 delete_error: "Error while deleting",
 Export_pdf: "Export PDF",
 Exporting: "Exporting...",
+service: {
+  edit_title: "Edit — {{name}}",
+  new_service: "New service",
 
-    }
+  name: "Service name",
+  price: "Price (dh)",
+  capacity: "Capacity (people)",
+  duration: "Duration (min)",
+  days: "Available days",
+
+  name_placeholder: "Ex: Friday Couscous",
+  price_placeholder: "0",
+  capacity_placeholder: "15",
+  duration_placeholder: "60",
+
+  available_all_days: "Available every day",
+  available_week: "Available {{count}} day(s) / week — {{days}}",
+
+  saving: "Saving...",
+  update: "Save changes",
+  add: "Add service",
+  cancel: "Cancel edit",
+    currency: "dh",
+  free: "Free",
+  max_people: "people max",
+  minutes: "min",
+  all_days: "All days",
+  edit: "Edit",
+  delete: "Delete",
+  Name: "Service name",
+  actions: "Actions",
+  no_services: "No services configured",
+  use_form: "Use the form to add a service",
+}
+}
   },
   fr: {
     translation: {
@@ -268,7 +301,43 @@ pdf_error: "Erreur lors de l'export PDF",
 delete_error: "Erreur lors de la suppression",
 Export_pdf: "Exporter PDF",
 Exporting: "Export...",
+service: {
+  edit_title: "Modifier — {{name}}",
+  new_service: "Nouveau service",
+
+  name: "Nom du service",
+  price: "Prix (dh)",
+  capacity: "Capacité (pers.)",
+  duration: "Durée (min)",
+  days: "Jours disponibles",
+
+  name_placeholder: "Ex: Couscous du Vendredi",
+  price_placeholder: "0",
+  capacity_placeholder: "15",
+  duration_placeholder: "60",
+
+  available_all_days: "Disponible tous les jours",
+  available_week: "Disponible {{count}} jour(s) / semaine — {{days}}",
+
+  saving: "Enregistrement...",
+  update: "Enregistrer les modifications",
+  add: "Ajouter le service",
+  cancel: "Annuler la modification",
+    currency: "dh",
+  free: "Gratuit",
+  max_people: "personnes max",
+  minutes: "min",
+  all_days: "Tous les jours",
+  edit: "Modifier",
+  delete: "Supprimer",
+  Name: "Nom du service",
+  actions: "Actions",
+  no_services: "Aucun service configuré",
+  use_form: "Utilisez le formulaire pour ajouter un service"
+
     }
+
+}
   },
   ar: {
     translation: {
@@ -404,6 +473,40 @@ pdf_error: "خطأ أثناء تصدير PDF",
 delete_error: "خطأ أثناء الحذف",
 Export_pdf: "تصدير PDF",
 Exporting: "جاري التصدير...",
+service: {
+  edit_title: "تعديل — {{name}}",
+  new_service: "خدمة جديدة",
+
+  name: "اسم الخدمة",
+  price: "السعر (درهم)",
+  capacity: "السعة (أشخاص)",
+  duration: "المدة (دقيقة)",
+  days: "الأيام المتاحة",
+
+  name_placeholder: "مثال: كسكس الجمعة",
+  price_placeholder: "0",
+  capacity_placeholder: "15",
+  duration_placeholder: "60",
+
+  available_all_days: "متاح كل الأيام",
+  available_week: "متاح {{count}} يوم / أسبوع — {{days}}",
+
+  saving: "جاري الحفظ...",
+  update: "حفظ التعديلات",
+  add: "إضافة الخدمة",
+  cancel: "إلغاء التعديل",
+    currency: "درهم",
+  free: "مجاني",
+  max_people: "أشخاص كحد أقصى",
+  minutes: "دقيقة",
+  all_days: "كل الأيام",
+  edit: "تعديل",
+  delete: "حذف",
+  Name: "اسم الخدمة",
+  actions: "الإجراءات",
+  no_services: "لا توجد خدمات",
+  use_form: "استعمل النموذج لإضافة خدمة"
+}
     }
   }
 }
