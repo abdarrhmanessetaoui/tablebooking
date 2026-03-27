@@ -11,6 +11,18 @@ It is built with **React** (frontend) and **Laravel** (backend) and includes fea
 ![TableBooking Screenshot](https://raw.githubusercontent.com/abdarrhmanessetaoui/tablebooking/main/Administrateur-Restaurant/frontend/administrateur-restaurant/public/images/Capture.PNG)
 
 
+
+## Default Admin Login
+
+To access the administrator dashboard, you can use the following credentials:
+
+Email: admin@tablebooking.ma  
+Password: password
+
+After logging in, you will be able to manage reservations, tables, services, and view reports from the dashboard.
+
+
+
 ## Features
 
 ### Frontend (React)
