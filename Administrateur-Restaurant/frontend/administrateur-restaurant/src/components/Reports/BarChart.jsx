@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 
-const DARK    = '#423428'
-const GOLD    = '#c8a97e'
+
+const DARK = '#423428'
+const GOLD = '#c8a97e'
 const GOLD_BG = '#ffffff'
-const CREAM   = '#ffffff'
+const CREAM = '#ffffff'
 
 export default function BarChart({ data = {}, title, subtitle, highlight = false }) {
   const { t, i18n } = useTranslation()
@@ -12,9 +13,9 @@ export default function BarChart({ data = {}, title, subtitle, highlight = false
   useEffect(() => { const id = setTimeout(() => setMounted(true), 80); return () => clearTimeout(id) }, [])
 
   const entries = Object.entries(data)
-  const max     = Math.max(...entries.map(([, v]) => v), 1)
-  const total   = entries.reduce((s, [, v]) => s + v, 0)
-  const topKey  = entries.find(([, v]) => v === max)?.[0] ?? '—'
+  const max = Math.max(...entries.map(([, v]) => v), 1)
+  const total = entries.reduce((s, [, v]) => s + v, 0)
+  const topKey = entries.find(([, v]) => v === max)?.[0] ?? '—'
 
   if (entries.length === 0) return (
     <div style={{ background: '#fff', border: `4px solid ${DARK}`, padding: '28px 24px' }}>
@@ -26,7 +27,7 @@ export default function BarChart({ data = {}, title, subtitle, highlight = false
     </div>
   )
 
-  const gap     = entries.length > 20 ? 2 : entries.length > 12 ? 3 : 6
+  const gap = entries.length > 20 ? 2 : entries.length > 12 ? 3 : 6
   const lblSize = entries.length > 20 ? 7 : entries.length > 12 ? 8 : 10
 
   return (
@@ -48,7 +49,7 @@ export default function BarChart({ data = {}, title, subtitle, highlight = false
       <div style={{ padding: '20px 16px 0' }}>
         <div style={{ display: 'flex', alignItems: 'flex-end', gap, height: 160 }}>
           {entries.map(([label, value]) => {
-            const pct   = (value / max) * 100
+            const pct = (value / max) * 100
             const isTop = value === max
             return (
               <div key={label} title={`${label}: ${value}`}

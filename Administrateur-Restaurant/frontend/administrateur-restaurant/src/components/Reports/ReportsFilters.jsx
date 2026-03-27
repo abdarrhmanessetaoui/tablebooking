@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom'
 import { X, Calendar, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
+
 const DARK = '#423428'
 const GOLD = '#c8a97e'
 
@@ -14,7 +15,7 @@ const navBtnStyle = {
 
 /* ── Calendar Popup (identical to Reservations) ── */
 function CalendarPopup({ filterDate, setFilterDate, onClose, anchorRef }) {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation(); 
   const MONTHS = [
     t('services_module.jan_full', { defaultValue: 'January' }),
     t('services_module.feb_full', { defaultValue: 'February' }),
@@ -39,28 +40,28 @@ function CalendarPopup({ filterDate, setFilterDate, onClose, anchorRef }) {
     t('services_module.sun_short', { defaultValue: 'Su' })
   ]
 
-  const today    = new Date()
+  const today = new Date()
   const initDate = filterDate
     ? (filterDate.length === 7 ? new Date(filterDate + '-01') : new Date(filterDate))
     : today
-  const [viewYear,  setViewYear]  = useState(initDate.getFullYear())
+  const [viewYear, setViewYear] = useState(initDate.getFullYear())
   const [viewMonth, setViewMonth] = useState(initDate.getMonth())
-  const [mode,      setMode]      = useState('day')
-  const [pos,       setPos]       = useState({ top: -9999, left: -9999, width: 280 })
+  const [mode, setMode] = useState('day')
+  const [pos, setPos] = useState({ top: -9999, left: -9999, width: 280 })
   const popupRef = useRef(null)
 
   useEffect(() => {
     function calcPos() {
       if (!anchorRef.current) return
       const rect = anchorRef.current.getBoundingClientRect()
-      const pw   = 280
-      const vw   = window.innerWidth
-      const vh   = window.innerHeight
-      const ph   = popupRef.current ? popupRef.current.offsetHeight : 340
-      let left   = rect.right - pw
+      const pw = 280
+      const vw = window.innerWidth
+      const vh = window.innerHeight
+      const ph = popupRef.current ? popupRef.current.offsetHeight : 340
+      let left = rect.right - pw
       if (left < 8) left = 8
       if (left + pw > vw - 8) left = vw - pw - 8
-      const top  = (vh - rect.bottom > ph + 8 || vh - rect.bottom > rect.top)
+      const top = (vh - rect.bottom > ph + 8 || vh - rect.bottom > rect.top)
         ? rect.bottom + 4
         : rect.top - ph - 4
       setPos({ top, left, width: Math.min(pw, vw - 16) })
@@ -77,7 +78,7 @@ function CalendarPopup({ filterDate, setFilterDate, onClose, anchorRef }) {
   useEffect(() => {
     function handler(e) {
       if (
-        popupRef.current  && !popupRef.current.contains(e.target) &&
+        popupRef.current && !popupRef.current.contains(e.target) &&
         anchorRef.current && !anchorRef.current.contains(e.target)
       ) onClose()
     }
@@ -85,16 +86,16 @@ function CalendarPopup({ filterDate, setFilterDate, onClose, anchorRef }) {
     return () => document.removeEventListener('mousedown', handler)
   }, [onClose, anchorRef])
 
-  const selFull  = filterDate && filterDate.length === 10
+  const selFull = filterDate && filterDate.length === 10
   const selMonth = filterDate && filterDate.length === 7
-  const selYear  = selFull || selMonth ? parseInt(filterDate.slice(0, 4)) : null
-  const selMon   = selFull || selMonth ? parseInt(filterDate.slice(5, 7)) - 1 : null
-  const selDay   = selFull ? parseInt(filterDate.slice(8, 10)) : null
+  const selYear = selFull || selMonth ? parseInt(filterDate.slice(0, 4)) : null
+  const selMon = selFull || selMonth ? parseInt(filterDate.slice(5, 7)) - 1 : null
+  const selDay = selFull ? parseInt(filterDate.slice(8, 10)) : null
 
   function navMonth(d) {
     let m = viewMonth + d, y = viewYear
     if (m > 11) { m = 0; y++ }
-    if (m < 0)  { m = 11; y-- }
+    if (m < 0) { m = 11; y-- }
     setViewMonth(m); setViewYear(y)
   }
 
@@ -111,16 +112,16 @@ function CalendarPopup({ filterDate, setFilterDate, onClose, anchorRef }) {
     onClose()
   }
 
-  const firstDow   = new Date(viewYear, viewMonth, 1).getDay()
-  const offset     = firstDow === 0 ? 6 : firstDow - 1
-  const daysInMon  = new Date(viewYear, viewMonth + 1, 0).getDate()
+  const firstDow = new Date(viewYear, viewMonth, 1).getDay()
+  const offset = firstDow === 0 ? 6 : firstDow - 1
+  const daysInMon = new Date(viewYear, viewMonth + 1, 0).getDate()
   const daysInPrev = new Date(viewYear, viewMonth, 0).getDate()
 
   const dayCells = []
   for (let i = 0; i < offset; i++)
     dayCells.push({ content: daysInPrev - offset + 1 + i, isOther: true })
   for (let d = 1; d <= daysInMon; d++) {
-    const isToday    = d === today.getDate() && viewMonth === today.getMonth() && viewYear === today.getFullYear()
+    const isToday = d === today.getDate() && viewMonth === today.getMonth() && viewYear === today.getFullYear()
     const isSelected = selFull && selDay === d && selMon === viewMonth && selYear === viewYear
     dayCells.push({ content: d, onClick: () => pickDay(d), isToday, isSelected })
   }
@@ -133,8 +134,8 @@ function CalendarPopup({ filterDate, setFilterDate, onClose, anchorRef }) {
       ref={popupRef}
       style={{
         position: 'fixed',
-        top:   pos.top,
-        left:  pos.left,
+        top: pos.top,
+        left: pos.left,
         width: pos.width,
         zIndex: 99999,
         background: '#fff',
@@ -217,7 +218,7 @@ function CalendarPopup({ filterDate, setFilterDate, onClose, anchorRef }) {
       {mode === 'month' && (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 4, padding: 8 }}>
           {MONTHS.map((m, i) => {
-            const isCurrent  = i === today.getMonth() && viewYear === today.getFullYear()
+            const isCurrent = i === today.getMonth() && viewYear === today.getFullYear()
             const isSelected = selMonth && selMon === i && selYear === viewYear
             return (
               <div
@@ -247,7 +248,7 @@ function CalendarPopup({ filterDate, setFilterDate, onClose, anchorRef }) {
           fontSize: 11, fontWeight: 700, color: DARK,
           background: '#ffffff', textAlign: 'center', letterSpacing: '0.04em',
         }}>
-          {String(selDay).padStart(2,'0')} {MONTHS[selMon]} {selYear}
+          {String(selDay).padStart(2, '0')} {MONTHS[selMon]} {selYear}
         </div>
       )}
     </div>
@@ -258,9 +259,9 @@ function CalendarPopup({ filterDate, setFilterDate, onClose, anchorRef }) {
 
 /* ── Main ReportsFilters component ── */
 export default function ReportsFilters({
-  filterStatus,  setFilterStatus,
+  filterStatus, setFilterStatus,
   filterService, setFilterService,
-  filterDate,    setFilterDate,
+  filterDate, setFilterDate,
   clearFilters,
   services = [],
 }) {
