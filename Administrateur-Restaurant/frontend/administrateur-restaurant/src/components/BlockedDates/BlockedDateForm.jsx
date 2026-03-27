@@ -2,9 +2,9 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { CalendarOff, Calendar, RefreshCw } from 'lucide-react'
 
-const DARK   = '#2b2118'
+const DARK   = '#423428'
 const GOLD   = '#c8a97e'
-const BORDER = '#2b2118'
+const BORDER = '#423428'
 
 const inp = {
   padding: '12px 14px',
@@ -179,4 +179,4 @@ export default function BlockedDateForm({ form, setForm, handleBlock, submitting
       </div>
     </>
   )
-}
+}

@@ -51,4 +51,4 @@ export default function Ring({ c, p, a, size = 88 }) {
       </div>
     </div>
   )
-}
+}

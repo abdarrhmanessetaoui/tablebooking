@@ -7,7 +7,7 @@ import CalendarWeek  from '../components/Calendar/Calendarweek'
 import FadeUp        from '../components/Dashboard/FadeUp'
 import Spinner       from '../components/Dashboard/Spinner'
 
-const DARK    = '#2b2118'
+const DARK    = '#423428'
 const GOLD    = '#c8a97e'
 const GOLD_DK = '#a8834e'
 const RED_BG  = '#ffffff'
@@ -113,16 +113,16 @@ export default function Calendar() {
       const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' })
       const dateStr = new Date().toLocaleDateString(lang, { day: 'numeric', month: 'long', year: 'numeric' })
 
-      doc.setFillColor(43,33,24); doc.rect(0,0,210,32,'F')
+      doc.setFillColor(66,52,40); doc.rect(0,0,210,32,'F')
       doc.setFont('helvetica','bold'); doc.setFontSize(18); doc.setTextColor(200,169,126); doc.text('TableBooking.ma',20,14)
       doc.setFontSize(9); doc.setTextColor(255,255,255); doc.text(t('planning') + ' — ' + navLabel(),20,22)
       doc.setTextColor(200,169,126); doc.setFontSize(8); doc.text(dateStr,190,22,{align:'right'})
-      doc.setTextColor(43,33,24); doc.setFontSize(20); doc.text(t('planning_pdf_title'),20,48)
+      doc.setTextColor(66,52,40); doc.setFontSize(20); doc.text(t('planning_pdf_title'),20,48)
       doc.setFontSize(10); doc.setTextColor(200,169,126); doc.text(navLabel(),20,56)
-      doc.setDrawColor(43,33,24); doc.setLineWidth(0.5); doc.line(20,61,190,61)
+      doc.setDrawColor(66,52,40); doc.setLineWidth(0.5); doc.line(20,61,190,61)
 
       let y = 70
-      doc.setFillColor(43,33,24); doc.rect(20,y,170,9,'F')
+      doc.setFillColor(66,52,40); doc.rect(20,y,170,9,'F')
       doc.setTextColor(200,169,126); doc.setFontSize(8)
       doc.text(t('name').toUpperCase(),24,y+6); doc.text(t('date').toUpperCase(),80,y+6); doc.text(t('time').toUpperCase(),120,y+6); doc.text(t('status').toUpperCase(),155,y+6)
       y += 9
@@ -136,11 +136,11 @@ export default function Calendar() {
         doc.setFillColor(i % 2 === 0 ? 255 : 250, i % 2 === 0 ? 255 : 248, i % 2 === 0 ? 255 : 245)
         doc.rect(20, y, 170, 9, 'F')
         doc.setDrawColor(236, 230, 222); doc.line(20, y + 9, 190, y + 9)
-        doc.setTextColor(43, 33, 24); doc.setFontSize(9); doc.setFont('helvetica', 'normal')
+        doc.setTextColor(66, 52, 40); doc.setFontSize(9); doc.setFont('helvetica', 'normal')
         doc.text(r.name || '—', 24, y + 6)
         doc.text(r.date ? new Date(r.date).toLocaleDateString(lang) : '—', 80, y + 6)
         doc.text(r.start_time || '—', 120, y + 6)
-        const sc = { Confirmed: [43, 33, 24], Pending: [168, 131, 78], Cancelled: [43, 33, 24] }[r.status] || [43, 33, 24]
+        const sc = { Confirmed: [66, 52, 40], Pending: [168, 131, 78], Cancelled: [66, 52, 40] }[r.status] || [66, 52, 40]
         doc.setTextColor(...sc); doc.setFont('helvetica', 'bold')
         const statusLabel = r.status === 'Confirmed' ? t('status_confirmed') : r.status === 'Pending' ? t('status_pending') : t('status_cancelled')
         doc.text(statusLabel, 155, y + 6)
@@ -149,7 +149,7 @@ export default function Calendar() {
 
       const pH = doc.internal.pageSize.height
       doc.setFillColor(200,169,126); doc.rect(0,pH-10,210,10,'F')
-      doc.setTextColor(43,33,24); doc.setFontSize(7); doc.setFont('helvetica','bold')
+      doc.setTextColor(66,52,40); doc.setFontSize(7); doc.setFont('helvetica','bold')
       doc.text('TableBooking.ma',20,pH-4); doc.text(dateStr,190,pH-4,{align:'right'})
       doc.save(`planning_${new Date().toISOString().slice(0,10)}.pdf`)
     } catch(e) { console.error(e) } finally { setExporting(false) }

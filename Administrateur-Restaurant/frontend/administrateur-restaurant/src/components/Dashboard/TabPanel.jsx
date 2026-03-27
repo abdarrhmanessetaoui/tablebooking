@@ -127,7 +127,7 @@ export default function TabPanel({ tab, stats, reservations, onViewAll, tabLabel
                 <div style={mobileEmpty}>
                   <CalendarDays
                     size={32}
-                    color="rgba(43,33,24,0.1)"
+                    color="rgba(66,52,40,0.1)"
                     style={{ display: 'block', margin: '0 auto 12px' }}
                   />
                   <p style={mobileEmptyTitle}>{t('no_reservations')}</p>
@@ -150,4 +150,4 @@ export default function TabPanel({ tab, stats, reservations, onViewAll, tabLabel
       </div>
     </>
   )
-}
+}

@@ -6,7 +6,7 @@ import { DARK, GOLD, GOLD_DARK } from '../../../styles/reservations/tokens.js'
 import { filterInputBase, dateBtnStyle } from '../../../styles/reservations/filters.styles.js'
 import { getToken } from '../../../utils/auth.js'
 
-const MUTED     = 'rgba(43,33,24,0.35)'
+const MUTED     = 'rgba(66,52,40,0.35)'
 
 function dateLabel(filterDate, t, lang) {
   if (!filterDate) return t('choose_date')
@@ -86,7 +86,7 @@ export default function ReservationsFilters({
         /* Unified active select: gold options stay readable in dropdown */
         .filter-select option {
           background: #fff;
-          color: #2b2118;
+          color: #423428;
           font-weight: 600;
         }
       `}</style>
@@ -192,4 +192,4 @@ export default function ReservationsFilters({
       )}
     </>
   )
-}
+}

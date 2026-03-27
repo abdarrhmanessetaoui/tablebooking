@@ -68,4 +68,4 @@ export default function ResCardMobile({ r, i, onRowClick }) {
       </div>
     </div>
   )
-}
+}

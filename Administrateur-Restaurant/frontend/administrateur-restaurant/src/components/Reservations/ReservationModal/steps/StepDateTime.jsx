@@ -31,13 +31,13 @@ export default function StepDateTime({ form, setForm, blockedDates, disabledDays
             <>
               <TimeSlotPicker value={form.start_time} onChange={v=>setForm({...form,start_time:v})} slots={timeSlots} />
               {timeSlots.length>0 && (
-                <p style={{ margin:'8px 0 0', fontSize:11, fontWeight:600, color:'rgba(43,33,24,0.4)', display:'flex', alignItems:'center', gap:5 }}>
+                <p style={{ margin:'8px 0 0', fontSize:11, fontWeight:600, color:'rgba(66,52,40,0.4)', display:'flex', alignItems:'center', gap:5 }}>
                   <Clock size={10} strokeWidth={2.5} />{t('time_slots_count', { count: timeSlots.length, duration: selectedSvc?.duration??30 })}
                 </p>
               )}
             </>
           ) : (
-            <div style={{ padding:'10px 14px', background:'#ffffff', fontSize:12, fontWeight:700, color:'rgba(43,33,24,0.4)' }}>
+            <div style={{ padding:'10px 14px', background:'#ffffff', fontSize:12, fontWeight:700, color:'rgba(66,52,40,0.4)' }}>
               {t('choose_formula_first')}
             </div>
           )}
@@ -49,4 +49,4 @@ export default function StepDateTime({ form, setForm, blockedDates, disabledDays
       </div>
     </>
   )
-}
+}

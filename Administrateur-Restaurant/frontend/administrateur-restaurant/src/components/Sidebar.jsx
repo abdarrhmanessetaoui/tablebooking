@@ -5,7 +5,7 @@ import { ChevronLeft, ChevronRight, Globe } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import LanguageSwitcher from './LanguageSwitcher'
 
-const DARK = '#2b2118'
+const DARK = '#423428'
 const GOLD = '#c8a97e'
 
 
@@ -95,7 +95,7 @@ export default function Sidebar({ handleLogout, onNavClick, collapsed, onToggle 
               textDecoration: 'none',
               position: 'relative',
               transition: 'background 0.15s, color 0.15s',
-              background: isActive ? GOLD : hov === i ? 'rgba(200,169,126,0.15)' : 'transparent',
+              background: isActive ? GOLD : hov === i ? 'rgba(200,169,126,0.08)' : 'transparent',
               color: isActive ? DARK : hov === i ? GOLD : 'rgba(255,255,255,0.5)',
               overflow: 'hidden',
             })}

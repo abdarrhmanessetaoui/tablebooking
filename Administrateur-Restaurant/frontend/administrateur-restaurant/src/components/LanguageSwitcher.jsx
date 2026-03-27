@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Globe, Check } from 'lucide-react'
 
-const DARK = '#2b2118'
+const DARK = '#423428'
 const GOLD = '#c8a97e'
 const CREAM = '#ffffff'
 
@@ -63,7 +63,7 @@ export default function LanguageSwitcher({ collapsed = false, position = 'top', 
                 onMouseEnter={() => setHovItem(i)}
                 onMouseLeave={() => setHovItem(null)}
                 style={{
-                  background: hovItem === i ? 'rgba(200,169,126,0.15)' : 'transparent',
+                  background: hovItem === i ? 'rgba(200,169,126,0.08)' : 'transparent',
                   color: currentLang === l.code ? GOLD : 'rgba(255,255,255,0.8)',
                   border: 'none',
                   padding: '10px 14px',
@@ -113,7 +113,7 @@ export default function LanguageSwitcher({ collapsed = false, position = 'top', 
           gap: collapsed ? 0 : 13,
           justifyContent: collapsed ? 'center' : 'flex-start',
           padding: collapsed ? 0 : '10px 12px',
-          background: open ? 'rgba(200,169,126,0.15)' : hovBtn ? hovBgColor : 'transparent',
+          background: open ? 'rgba(200,169,126,0.08)' : hovBtn ? hovBgColor : 'transparent',
           border: 'none',
           color: open || hovBtn ? GOLD : defaultTextColor,
           cursor: 'pointer',

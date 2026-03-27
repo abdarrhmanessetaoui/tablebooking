@@ -28,7 +28,7 @@ export default function StepService({ form, setForm, services, selectedSvc, maxG
           {Array.from({length:maxGuests},(_,i)=>i+1).map(n => <option key={n} value={n}>{n} {t(n>1?'persons':'person')}</option>)}
         </select>
         {selectedSvc?.capacity && (
-          <p style={{ margin:'5px 0 0', fontSize:11, fontWeight:700, color:'rgba(43,33,24,0.4)', display:'flex', alignItems:'center', gap:5 }}>
+          <p style={{ margin:'5px 0 0', fontSize:11, fontWeight:700, color:'rgba(66,52,40,0.4)', display:'flex', alignItems:'center', gap:5 }}>
             <Users size={10} strokeWidth={2.5} />{t('guests_max_service', { count: selectedSvc.capacity, plural: selectedSvc.capacity > 1 ? 's' : '' })}
           </p>
         )}
@@ -39,4 +39,4 @@ export default function StepService({ form, setForm, services, selectedSvc, maxG
       </button>
     </>
   )
-}
+}

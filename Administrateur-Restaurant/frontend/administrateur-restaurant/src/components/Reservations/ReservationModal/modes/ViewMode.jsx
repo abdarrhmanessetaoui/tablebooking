@@ -37,4 +37,4 @@ export default function ViewMode({ editing, setForm, setModalMode, handleDelete 
       </div>
     </>
   )
-}
+}

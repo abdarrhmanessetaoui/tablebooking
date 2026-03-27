@@ -5,7 +5,7 @@ import useDashboard from '../hooks/Dashboard/useDashboard'
 import Sidebar from './Sidebar'
 import { HamburgerIcon, CloseIcon } from '../data/sidebarItems'
 
-const DARK = '#2b2118'
+const DARK = '#423428'
 const GOLD = '#c8a97e'
 const SW_OPEN      = 220
 const SW_COLLAPSED = 64
@@ -107,7 +107,7 @@ export default function Layout({ children }) {
             <button
               onClick={() => setOpen(o => !o)}
               aria-label="Menu"
-              style={{ width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(200,169,126,0.15)', border: 'none', color: GOLD, cursor: 'pointer', flexShrink: 0 }}>
+              style={{ width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(200,169,126,0.08)', border: 'none', color: GOLD, cursor: 'pointer', flexShrink: 0 }}>
               {open ? <CloseIcon /> : <HamburgerIcon />}
             </button>
 

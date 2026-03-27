@@ -20,4 +20,4 @@ export default function TimeSlotPicker({ value, onChange, slots }) {
       ))}
     </div>
   )
-}
+}

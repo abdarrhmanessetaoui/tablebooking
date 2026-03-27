@@ -16,4 +16,4 @@ export default function Badge({ status }) {
       {t(labelKey)}
     </span>
   )
-}
+}

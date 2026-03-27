@@ -13,6 +13,7 @@ import ToastContainer from './components/ui/Toast'
 import ConfirmDialog  from './components/ui/ConfirmDialog'
 import Services from './pages/Services'
 import Tables from './pages/Tables'
+import ResetPassword from './pages/ResetPassword'
 
 import { useEffect } from 'react'
 
@@ -31,6 +32,7 @@ function App() {
         <ConfirmDialog />
         <Routes>
           <Route path="/" element={<Login />} />
+          <Route path="/password-reset/:token" element={<ResetPassword />} />
           <Route path="/dashboard"     element={<ProtectedRoute><Layout><Dashboard    /></Layout></ProtectedRoute>} />
           <Route path="/reservations"  element={<ProtectedRoute><Layout><Reservations /></Layout></ProtectedRoute>} />
           <Route path="/blocked-dates" element={<ProtectedRoute><Layout><BlockedDates /></Layout></ProtectedRoute>} />

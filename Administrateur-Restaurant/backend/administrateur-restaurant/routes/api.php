@@ -10,8 +10,10 @@ use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\TableController;
 
 // ── Auth ──────────────────────────────────────────────────────────
-Route::post('/login',  [AuthenticatedSessionController::class, 'store']);
-Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->middleware('auth:sanctum');
+Route::post('/login',           [AuthenticatedSessionController::class, 'store']);
+Route::post('/auth/forgot-password', [App\Http\Controllers\Auth\PasswordResetLinkController::class, 'store']);
+Route::post('/auth/reset-password',  [App\Http\Controllers\Auth\NewPasswordController::class, 'store']);
+Route::post('/logout',          [AuthenticatedSessionController::class, 'destroy'])->middleware('auth:sanctum');
 
 // ── Public ────────────────────────────────────────────────────────
 Route::get('/blocked-dates', [BlockedDateController::class, 'index']);

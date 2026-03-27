@@ -22,4 +22,4 @@ export default function ModalHeader({ modalMode, step, editing, onClose }) {
       </button>
     </div>
   )
-}
+}

@@ -52,7 +52,7 @@ export default function AssignTableCell({ r, onOpenAssign }) {
         padding: '3px 8px', background: 'none',
         border: `1.5px dashed ${hov ? DARK : BORDER}`,
         fontSize: 11, fontWeight: 800,
-        color: hov ? DARK : 'rgba(43,33,24,0.4)',
+        color: hov ? DARK : 'rgba(66,52,40,0.4)',
         cursor: 'pointer', fontFamily: 'inherit',
         transition: 'all 0.12s', whiteSpace: 'nowrap',
       }}
@@ -61,4 +61,4 @@ export default function AssignTableCell({ r, onOpenAssign }) {
       {t('assign_btn')}
     </button>
   )
-}
+}

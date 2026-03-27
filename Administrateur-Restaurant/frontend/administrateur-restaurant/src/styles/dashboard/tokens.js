@@ -3,7 +3,7 @@
 // ─────────────────────────────────────────────────────────────────
 
 // ── Core palette ─────────────────────────────────────────────────
-export const DARK     = '#2b2118'
+export const DARK     = '#423428'
 export const GOLD     = '#C8A97E'
 export const GOLD_DK  = '#a8834e'
 export const WHITE    = '#ffffff'

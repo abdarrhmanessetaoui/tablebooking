@@ -163,4 +163,4 @@ export default function useReservations(initialFilters = {}) {
     fetchReservations,
     reservations, setReservations,
   }
-}
+}

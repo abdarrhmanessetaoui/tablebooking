@@ -1,7 +1,7 @@
 export const tabPanelCSS = `
   .db-card {
     background: #fff;
-    border: 4px solid #2b2118;
+    border: 4px solid #423428;
     overflow: hidden;
   }
   .db-body {
@@ -11,7 +11,7 @@ export const tabPanelCSS = `
     min-height: 600px;
   }
   .db-left {
-    border-right: 4px solid #2b2118;
+    border-right: 4px solid #423428;
     display: flex;
     flex-direction: column;
   }
@@ -34,7 +34,7 @@ export const tabPanelCSS = `
   }
   @media (max-width: 860px) {
     .db-body         { grid-template-columns: 1fr; min-height: auto; }
-    .db-left         { border-right: none; border-bottom: 4px solid #2b2118; }
+    .db-left         { border-right: none; border-bottom: 4px solid #423428; }
     .db-stats-sticky { position: static; }
     .db-stat-blocks  { flex-direction: row; }
   }
@@ -54,7 +54,7 @@ export const heroSection = {
   display:      'flex',
   alignItems:   'center',
   gap:          20,
-  borderBottom: `4px solid #2b2118`,
+  borderBottom: `4px solid #423428`,
   background:   '#fff',
   flexShrink:   0,
 }
@@ -63,7 +63,7 @@ export const heroNumber = {
   margin:             0,
   fontSize:           'clamp(52px,8vw,80px)',
   fontWeight:         900,
-  color:              '#2b2118',
+  color:              '#423428',
   lineHeight:         0.9,
   letterSpacing:      '-4px',
   fontVariantNumeric: 'tabular-nums',
@@ -73,7 +73,7 @@ export const heroLabel = {
   margin:     '10px 0 0',
   fontSize:   11,
   fontWeight: 700,
-  color:      '#2b2118',
+  color:      '#423428',
 }
 
 export const statsList = {
@@ -91,7 +91,7 @@ export const mobileEmptyTitle = {
   margin:     0,
   fontSize:   13,
   fontWeight: 900,
-  color:      'rgba(43,33,24,0.25)',
+  color:      'rgba(66,52,40,0.25)',
 }
 
 export const mobileEmptySubtitle = {
@@ -104,7 +104,7 @@ export const mobileEmptySubtitle = {
 export const mobileViewAllBtn = {
   width:          '100%',
   padding:        '13px 16px',
-  background:     '#2b2118',
+  background:     '#423428',
   border:         'none',
   color:          '#fff',
   fontSize:       11,

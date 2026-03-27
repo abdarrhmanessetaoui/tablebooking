@@ -2,9 +2,9 @@ import { useState } from 'react'
 import { Plus, Trash2, Pencil, Check, X, MapPin } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
-const DARK   = '#2b2118'
+const DARK   = '#423428'
 const GOLD   = '#c8a97e'
-const BORDER = '#2b2118'
+const BORDER = '#423428'
 
 const PRESET_COLORS = [
   '#4f6ef7', '#16a34a', '#a8834e', '#DC2626',
@@ -91,7 +91,7 @@ export default function TableLocationsManager({ locations = [], loading, saving,
       <div style={{ padding: 16 }}>
 
         {/* Add new */}
-        <div style={{ marginBottom: 16, padding: 14, background: '#ffffff', border: `1px solid rgba(43,33,24,0.1)` }}>
+        <div style={{ marginBottom: 16, padding: 14, background: '#ffffff', border: `1px solid rgba(66,52,40,0.1)` }}>
           <p style={{ margin: '0 0 10px', fontSize: 9, fontWeight: 900, color: DARK, letterSpacing: '0.16em', textTransform: 'uppercase' }}>
             {t('tables_module.new_location')}
           </p>
@@ -125,7 +125,7 @@ export default function TableLocationsManager({ locations = [], loading, saving,
         {loading ? (
           <p style={{ fontSize: 12, fontWeight: 700, color: DARK, textAlign: 'center', padding: '20px 0' }}>{t('tables_module.loading_tables')}</p>
         ) : locations.length === 0 ? (
-          <p style={{ fontSize: 12, fontWeight: 700, color: 'rgba(43,33,24,0.4)', textAlign: 'center', padding: '20px 0' }}>
+          <p style={{ fontSize: 12, fontWeight: 700, color: 'rgba(66,52,40,0.4)', textAlign: 'center', padding: '20px 0' }}>
             {t('tables_module.no_locations')}
           </p>
         ) : (
@@ -133,7 +133,7 @@ export default function TableLocationsManager({ locations = [], loading, saving,
             {locations.map(loc => (
               <div key={loc.id} style={{
                 display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px',
-                border: `4px solid rgba(43,33,24,0.1)`,
+                border: `4px solid rgba(66,52,40,0.1)`,
                 background: editingId === loc.id ? '#ffffff' : '#fff',
               }}>
                 {editingId === loc.id ? (

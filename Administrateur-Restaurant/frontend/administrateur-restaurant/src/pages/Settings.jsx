@@ -5,11 +5,11 @@ import FadeUp  from '../components/Dashboard/FadeUp'
 import Spinner from '../components/Dashboard/Spinner'
 import { useTranslation } from 'react-i18next'
 
-const DARK    = '#2b2118'
+const DARK    = '#423428'
 const GOLD    = '#c8a97e'
 const GOLD_DK = '#a8834e'
 const CREAM   = '#ffffff'
-const BORDER  = '#2b2118'
+const BORDER  = '#423428'
 
 const FR_DAYS      = ['Dim','Lun','Mar','Mer','Jeu','Ven','Sam']
 const FR_DAYS_FULL = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi']

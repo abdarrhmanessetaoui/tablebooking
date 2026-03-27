@@ -2,9 +2,9 @@ import { useState } from 'react'
 import { Plus, Check, X, LayoutGrid } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
-const DARK   = '#2b2118'
+const DARK   = '#423428'
 const GOLD   = '#c8a97e'
-const BORDER = '#2b2118'
+const BORDER = '#423428'
 
 const EMPTY = { number: '', capacity: '', location: '' }
 
@@ -88,7 +88,7 @@ export default function TableForm({ initial = EMPTY, onSave, saving, editingNumb
 
         <Field label={t('tables_module.location_label')}>
           {locations.length === 0 ? (
-            <div style={{ ...inp, color: 'rgba(43,33,24,0.4)', fontSize: 12, display: 'flex', alignItems: 'center', pointerEvents: 'none' }}>
+            <div style={{ ...inp, color: 'rgba(66,52,40,0.4)', fontSize: 12, display: 'flex', alignItems: 'center', pointerEvents: 'none' }}>
               {t('tables_module.location_empty')}
             </div>
           ) : (

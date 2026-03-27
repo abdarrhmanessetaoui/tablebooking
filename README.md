@@ -1,4 +1,5 @@
 
+```
 tablebooking                                                                      //
 ├─ Administrateur-Restaurant                                                      //
 │  ├─ backend                                                                     //
@@ -65,14 +66,14 @@ tablebooking                                                                    
 │  │     │  │  ├─ 0001_01_01_000000_create_users_table.php                        //
 │  │     │  │  ├─ 0001_01_01_000001_create_cache_table.php                        //
 │  │     │  │  ├─ 0001_01_01_000002_create_jobs_table.php                         //
+│  │     │  │  ├─ 2023_01_01_000000_create_wpjn_cpappbk_forms_table.php           //
 │  │     │  │  ├─ 2024_01_01_000000_add_table_idx_to_wpjn_messages.php            //
 │  │     │  │  ├─ 2026_03_03_222536_create_personal_access_tokens_table.php       //
 │  │     │  │  ├─ 2026_03_05_004651_add_restaurant_form_id_to_users_table.php     //
 │  │     │  │  ├─ 2026_03_06_120637_create_blocked_dates_table.php                //
 │  │     │  │  └─ 2026_03_08_063612_drop_blocked_dates_table.php                  //
 │  │     │  └─ seeders                                                            //
-│  │     │     ├─ DatabaseSeeder.php                                              //
-│  │     │     └─ ReservationSeeder.php                                           //
+│  │     │     └─ DatabaseSeeder.php                                              //
 │  │     ├─ package-lock.json                                                     //
 │  │     ├─ package.json                                                          //
 │  │     ├─ phpunit.xml                                                           //
@@ -115,14 +116,13 @@ tablebooking                                                                    
 │        ├─ README.md                                                             //
 │        ├─ src                                                                   //
 │        │  ├─ App.jsx                                                            //
-│        │  ├─ assets                                                             //
 │        │  ├─ components                                                         //
 │        │  │  ├─ BlockedDates                                                    //
 │        │  │  │  ├─ BlockedDateForm.jsx                                          //
 │        │  │  │  └─ BlockedDateList.jsx                                          //
 │        │  │  ├─ Calendar                                                        //
 │        │  │  │  ├─ CalendarNav.jsx                                              //
-│        │  │  │  └─ CalendarWeek.jsx                                             //
+│        │  │  │  └─ Calendarweek.jsx                                             //
 │        │  │  ├─ Dashboard                                                       //
 │        │  │  │  ├─ Badge.jsx                                                    //
 │        │  │  │  ├─ Btn.jsx                                                      //
@@ -137,6 +137,7 @@ tablebooking                                                                    
 │        │  │  │  ├─ Spinner.jsx                                                  //
 │        │  │  │  ├─ StatBlock.jsx                                                //
 │        │  │  │  └─ TabPanel.jsx                                                 //
+│        │  │  ├─ LanguageSwitcher.jsx                                            //
 │        │  │  ├─ Layout.jsx                                                      //
 │        │  │  ├─ ProtectedRoute.jsx                                              //
 │        │  │  ├─ Reports                                                         //
@@ -157,10 +158,9 @@ tablebooking                                                                    
 │        │  │  │  │  │  ├─ StepDateTime.jsx                                       //
 │        │  │  │  │  │  └─ StepService.jsx                                        //
 │        │  │  │  │  └─ TimeSlotPicker.jsx                                        //
-│        │  │  │  ├─ ReservationModal.jsx                                         //
 │        │  │  │  ├─ ReservationsFilters                                          //
+│        │  │  │  │  ├─ CalendarPopup.jsx                                         //
 │        │  │  │  │  └─ index.jsx                                                 //
-│        │  │  │  ├─ ReservationsFilters.jsx                                      //
 │        │  │  │  ├─ ReservationsTable                                            //
 │        │  │  │  │  ├─ ActionBtn.jsx                                             //
 │        │  │  │  │  ├─ AssignTableCell.jsx                                       //
@@ -171,7 +171,6 @@ tablebooking                                                                    
 │        │  │  │  │  ├─ MobileCards.jsx                                           //
 │        │  │  │  │  ├─ Pagination.jsx                                            //
 │        │  │  │  │  └─ TableRow.jsx                                              //
-│        │  │  │  ├─ ReservationsTable.jsx                                        //
 │        │  │  │  └─ shared                                                       //
 │        │  │  │     ├─ InfoRow.jsx                                               //
 │        │  │  │     ├─ Label.jsx                                                 //
@@ -184,6 +183,7 @@ tablebooking                                                                    
 │        │  │  ├─ Tables                                                          //
 │        │  │  │  ├─ TableForm.jsx                                                //
 │        │  │  │  ├─ TableList.jsx                                                //
+│        │  │  │  ├─ TableLocationsManager.jsx                                    //
 │        │  │  │  └─ TableTimeline.jsx                                            //
 │        │  │  └─ ui                                                              //
 │        │  │     ├─ ConfirmDialog.jsx                                            //
@@ -209,20 +209,23 @@ tablebooking                                                                    
 │        │  │  ├─ Services                                                        //
 │        │  │  │  └─ useServices.js                                               //
 │        │  │  ├─ Tables                                                          //
+│        │  │  │  ├─ useTableLocations.js                                         //
 │        │  │  │  ├─ useTables.js                                                 //
 │        │  │  │  └─ useTablesTimeline.js                                         //
 │        │  │  ├─ useLogin.js                                                     //
 │        │  │  ├─ useRestaurantInfo.js                                            //
 │        │  │  └─ useRestaurantSettings.js                                        //
+│        │  ├─ i18n.js                                                            //
 │        │  ├─ index.css                                                          //
 │        │  ├─ main.jsx                                                           //
 │        │  ├─ pages                                                              //
 │        │  │  ├─ BlockedDates.jsx                                                //
 │        │  │  ├─ Calendar.jsx                                                    //
 │        │  │  ├─ Dashboard.jsx                                                   //
-│        │  │  ├─ Login.jsx                                                       //
+│        │  │  ├─ login.jsx                                                       //
 │        │  │  ├─ Reports.jsx                                                     //
 │        │  │  ├─ Reservations.jsx                                                //
+│        │  │  ├─ ResetPassword.jsx                                               //
 │        │  │  ├─ Services.jsx                                                    //
 │        │  │  ├─ Settings.jsx                                                    //
 │        │  │  └─ Tables.jsx                                                      //
@@ -247,6 +250,7 @@ tablebooking                                                                    
 │        │     ├─ brand.js                                                        //
 │        │     └─ Exportpdf.js                                                    //
 │        ├─ tailwind.config.js                                                    //
+│        ├─ tmp_replace.py                                                        //
 │        └─ vite.config.js                                                        //
 └─ README.md                                                                      //
 

@@ -13,7 +13,7 @@ import { toast }             from '../components/ui/Toast'
 import { getToken }          from '../utils/auth'
 import { useTranslation } from 'react-i18next'
 
-const DARK    = '#2b2118'
+const DARK    = '#423428'
 const GOLD    = '#c8a97e'
 const GOLD_DK = '#a8834e'
 const RED     = '#DC2626'
@@ -55,7 +55,7 @@ function BulkBar({ count, onDelete, onActivate, onDeactivate, onClear }) {
       position: 'sticky', top: 8, zIndex: 30,
       display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap',
       padding: '10px 12px', background: DARK,
-      boxShadow: '0 4px 24px rgba(43,33,24,0.28)',
+      boxShadow: '0 4px 24px rgba(66,52,40,0.28)',
       marginBottom: 12, animation: 'slideDown 0.18s ease',
     }}>
       <style>{`
@@ -208,24 +208,24 @@ export default function Tables() {
       const { jsPDF } = window.jspdf
       const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' })
       const dateStr = new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
-      doc.setFillColor(43,33,24); doc.rect(0,0,210,32,'F')
+      doc.setFillColor(66,52,40); doc.rect(0,0,210,32,'F')
       doc.setFont('helvetica','bold'); doc.setFontSize(18); doc.setTextColor(200,169,126)
       doc.text('TableBooking.ma',20,14)
       doc.setFontSize(9); doc.setTextColor(255,255,255); doc.text(t('tables_module.title'),20,22)
       doc.setTextColor(200,169,126); doc.setFontSize(8); doc.text(dateStr,190,22,{align:'right'})
-      doc.setTextColor(43,33,24); doc.setFontSize(20); doc.text(t('tables_module.title'),20,48)
+      doc.setTextColor(66,52,40); doc.setFontSize(20); doc.text(t('tables_module.title'),20,48)
       doc.setFontSize(10); doc.setTextColor(200,169,126)
       doc.text(t('tables_module.table_count', { count: tables.length, plural: tables.length !== 1 ? 's' : '' }),20,56)
-      doc.setDrawColor(43,33,24); doc.setLineWidth(0.5); doc.line(20,61,190,61)
+      doc.setDrawColor(66,52,40); doc.setLineWidth(0.5); doc.line(20,61,190,61)
       let y = 70
-      doc.setFillColor(43,33,24); doc.rect(20,y,170,9,'F')
+      doc.setFillColor(66,52,40); doc.rect(20,y,170,9,'F')
       doc.setTextColor(200,169,126); doc.setFontSize(8); doc.setFont('helvetica','bold')
       doc.text(t('tables_module.header_table'),24,y+6); doc.text(t('tables_module.header_capacity'),80,y+6); doc.text(t('tables_module.header_location'),120,y+6); doc.text(t('tables_module.header_status'),170,y+6)
       y += 9
       tables.forEach((t_obj,i) => {
         if (y>270) { doc.addPage(); y=20 }
         doc.setFillColor(i%2===0?255:250,i%2===0?255:248,i%2===0?255:245); doc.rect(20,y,170,9,'F')
-        doc.setTextColor(43,33,24); doc.setFontSize(9); doc.setFont('helvetica','normal')
+        doc.setTextColor(66,52,40); doc.setFontSize(9); doc.setFont('helvetica','normal')
         doc.text(`${t('tables_module.header_table')} ${t_obj.number}`,24,y+6)
         doc.text(`${t_obj.capacity} ${t('tables_module.persons')}`,80,y+6)
         doc.text(t_obj.location||'—',120,y+6)
@@ -234,7 +234,7 @@ export default function Tables() {
       })
       const pH = doc.internal.pageSize.height
       doc.setFillColor(200,169,126); doc.rect(0,pH-10,210,10,'F')
-      doc.setTextColor(43,33,24); doc.setFontSize(7); doc.setFont('helvetica','bold')
+      doc.setTextColor(66,52,40); doc.setFontSize(7); doc.setFont('helvetica','bold')
       doc.text('TableBooking.ma',20,pH-4); doc.text(dateStr,190,pH-4,{align:'right'})
       doc.save(`tables_${new Date().toISOString().slice(0,10)}.pdf`)
     } catch(e) { console.error(e) } finally { setExporting(false) }

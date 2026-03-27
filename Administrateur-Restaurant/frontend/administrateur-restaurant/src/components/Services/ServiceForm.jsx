@@ -2,10 +2,10 @@ import { useState, useEffect } from 'react'
 import { Plus, Check, X, Utensils } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
-const DARK    = '#2b2118'
+const DARK    = '#423428'
 const GOLD    = '#c8a97e'
 const GOLD_DK = '#a8834e'
-const BORDER  = '#2b2118'
+const BORDER  = '#423428'
 
 const EMPTY = { name: '', price: '', capacity: '', duration: '', available_days: [0,1,2,3,4,5,6] }
 

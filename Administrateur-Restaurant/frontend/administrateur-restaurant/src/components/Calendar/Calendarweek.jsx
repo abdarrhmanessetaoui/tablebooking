@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Clock, Users, CalendarOff } from 'lucide-react'
 
-const DARK    = '#2b2118'
+const DARK    = '#423428'
 const GOLD    = '#c8a97e'
 const CREAM   = '#ffffff'
 const GOLD_BG = '#ffffff'
@@ -41,7 +41,7 @@ function ResRow({ r, last }) {
   const s = styles[r.status] || styles.Pending
 
   return (
-    <div style={{ display:'grid', gridTemplateColumns:'3px 1fr auto', borderBottom: last ? 'none' : '1px solid rgba(43,33,24,0.07)' }}>
+    <div style={{ display:'grid', gridTemplateColumns:'3px 1fr auto', borderBottom: last ? 'none' : '1px solid rgba(66,52,40,0.07)' }}>
       <div style={{ background: s.dot }} />
       <div style={{ padding:'18px 20px', background:'#fff' }}>
         <div style={{ marginBottom:10 }}><Badge status={r.status} /></div>
@@ -53,7 +53,7 @@ function ResRow({ r, last }) {
               {t('count_persons', { count: r.guests })}
             </span>
           </div>
-          {r.phone && <span style={{ fontSize:12, fontWeight:600, color:'rgba(43,33,24,0.4)' }}>{r.phone}</span>}
+          {r.phone && <span style={{ fontSize:12, fontWeight:600, color:'rgba(66,52,40,0.4)' }}>{r.phone}</span>}
         </div>
       </div>
       <div style={{ padding:'18px 20px', background:'#fff', display:'flex', alignItems:'flex-start', justifyContent:'flex-end', gap:6, flexShrink:0 }}>
@@ -84,8 +84,8 @@ function Empty() {
   const { t } = useTranslation()
   return (
     <div style={{ padding:'56px 0', textAlign:'center' }}>
-      <CalendarOff size={38} color='rgba(43,33,24,0.12)' strokeWidth={1.5} style={{ display:'block', margin:'0 auto 14px' }} />
-      <p style={{ margin:0, fontSize:14, fontWeight:900, color:'rgba(43,33,24,0.2)' }}>{t('no_reservations_found')}</p>
+      <CalendarOff size={38} color='rgba(66,52,40,0.12)' strokeWidth={1.5} style={{ display:'block', margin:'0 auto 14px' }} />
+      <p style={{ margin:0, fontSize:14, fontWeight:900, color:'rgba(66,52,40,0.2)' }}>{t('no_reservations_found')}</p>
     </div>
   )
 }
@@ -127,10 +127,10 @@ function DayView({ date, getByDate }) {
       </div>
       {reservations.length === 0 ? <Empty /> : hours.map((h, hi) => (
         <div key={h}>
-          <div style={{ display:'flex', alignItems:'center', gap:16, padding:'12px 24px', background:'#fff', borderTop: hi>0 ? `4px solid ${DARK}` : '1px solid rgba(43,33,24,0.08)' }}>
+          <div style={{ display:'flex', alignItems:'center', gap:16, padding:'12px 24px', background:'#fff', borderTop: hi>0 ? `4px solid ${DARK}` : '1px solid rgba(66,52,40,0.08)' }}>
             <span style={{ fontSize:13, fontWeight:900, color:GOLD, minWidth:44 }}>{h}:00</span>
-            <div style={{ flex:1, height:1, background:'rgba(43,33,24,0.07)' }} />
-            <span style={{ fontSize:11, fontWeight:800, color:'rgba(43,33,24,0.3)' }}>
+            <div style={{ flex:1, height:1, background:'rgba(66,52,40,0.07)' }} />
+            <span style={{ fontSize:11, fontWeight:800, color:'rgba(66,52,40,0.3)' }}>
               {groups[h].length} {t(groups[h].length === 1 ? 'reservation' : 'reservation_plural')}
             </span>
           </div>
@@ -178,8 +178,8 @@ function WeekView({ weekDays, getByDate, onDayChange }) {
             const count   = getByDate(day).length
             return (
               <button key={i} onClick={() => selectDay(i)}
-                style={{ flexShrink:0, display:'flex', flexDirection:'column', alignItems:'center', padding:'10px 14px', gap:3, background: active ? DARK : '#fff', border:`4px solid ${active ? DARK : isToday ? GOLD : 'rgba(43,33,24,0.15)'}`, color: active ? '#fff' : DARK, cursor:'pointer', transition:'all 0.13s', fontFamily:'inherit' }}>
-                <span style={{ fontSize:8, fontWeight:900, letterSpacing:'0.2em', color: active ? GOLD : isToday ? GOLD : 'rgba(43,33,24,0.4)', textTransform:'uppercase' }}>{daysShort[i]}</span>
+                style={{ flexShrink:0, display:'flex', flexDirection:'column', alignItems:'center', padding:'10px 14px', gap:3, background: active ? DARK : '#fff', border:`4px solid ${active ? DARK : isToday ? GOLD : 'rgba(66,52,40,0.15)'}`, color: active ? '#fff' : DARK, cursor:'pointer', transition:'all 0.13s', fontFamily:'inherit' }}>
+                <span style={{ fontSize:8, fontWeight:900, letterSpacing:'0.2em', color: active ? GOLD : isToday ? GOLD : 'rgba(66,52,40,0.4)', textTransform:'uppercase' }}>{daysShort[i]}</span>
                 <span style={{ fontSize:20, fontWeight:900, lineHeight:1 }}>{day.getDate()}</span>
                 {count > 0 && <span style={{ fontSize:10, fontWeight:900, color:GOLD }}>{count}</span>}
               </button>
@@ -207,7 +207,7 @@ function WeekView({ weekDays, getByDate, onDayChange }) {
           const isToday = day.toDateString() === today
           const res     = getByDate(day)
           return (
-            <div key={i} style={{ border:`${isToday?2:1}px solid ${isToday?GOLD:'rgba(43,33,24,0.12)'}` }}>
+            <div key={i} style={{ border:`${isToday?2:1}px solid ${isToday?GOLD:'rgba(66,52,40,0.12)'}` }}>
               <div style={{ padding:'12px 10px', background: isToday ? GOLD : DARK }}>
                 <div style={{ fontSize:8, fontWeight:900, letterSpacing:'0.2em', color: isToday ? DARK : GOLD, marginBottom:5, textTransform:'uppercase' }}>{daysShort[i]}</div>
                 <div style={{ fontSize:22, fontWeight:900, color: isToday ? DARK : '#fff', lineHeight:1, letterSpacing:'-1px' }}>{day.getDate()}</div>
@@ -215,7 +215,7 @@ function WeekView({ weekDays, getByDate, onDayChange }) {
               </div>
               <div style={{ padding:6, display:'flex', flexDirection:'column', gap:3, minHeight:140, background:'#fff' }}>
                 {res.length === 0
-                  ? <div style={{ display:'flex', alignItems:'center', justifyContent:'center', flex:1, fontSize:18, fontWeight:900, color:'rgba(43,33,24,0.08)' }}>—</div>
+                  ? <div style={{ display:'flex', alignItems:'center', justifyContent:'center', flex:1, fontSize:18, fontWeight:900, color:'rgba(66,52,40,0.08)' }}>—</div>
                   : res.map(r => <CompactCard key={r.id} r={r} />)}
               </div>
             </div>
@@ -253,7 +253,7 @@ function MonthView({ monthDays, currentDate, getByDate, setCurrentDate, setView 
             <div key={i}
               onClick={() => { setCurrentDate(date); setView('day') }}
               onMouseEnter={() => setHovIdx(i)} onMouseLeave={() => setHovIdx(null)}
-              style={{ borderBottom:'1px solid rgba(43,33,24,0.07)', borderRight:'1px solid rgba(43,33,24,0.07)', padding:6, minHeight:88, cursor:'pointer', opacity: current ? 1 : 0.3, background: isToday ? GOLD_BG : hov ? CREAM : '#fff', transition:'background 0.12s' }}>
+              style={{ borderBottom:'1px solid rgba(66,52,40,0.07)', borderRight:'1px solid rgba(66,52,40,0.07)', padding:6, minHeight:88, cursor:'pointer', opacity: current ? 1 : 0.3, background: isToday ? GOLD_BG : hov ? CREAM : '#fff', transition:'background 0.12s' }}>
               <div style={{ width:26, height:26, borderRadius:'50%', marginBottom:5, display:'flex', alignItems:'center', justifyContent:'center', background: isToday ? GOLD : 'transparent', fontSize:12, fontWeight:900, color: isToday ? '#fff' : DARK }}>
                 {date.getDate()}
               </div>

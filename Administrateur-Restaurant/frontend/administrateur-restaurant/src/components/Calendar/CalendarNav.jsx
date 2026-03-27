@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { ChevronLeft, ChevronRight, CalendarDays } from 'lucide-react'
 
-const DARK = '#2b2118'
+const DARK = '#423428'
 const GOLD = '#c8a97e'
 const VIEWS = ['day', 'week', 'month', 'year']
 
@@ -14,7 +14,7 @@ function ArrowBtn({ onClick, children }) {
       style={{
         width: 40, height: 60, display: 'flex', alignItems: 'center', justifyContent: 'center',
         background: h ? DARK : '#fff',
-        border: `4px solid ${h ? DARK : 'rgba(43,33,24,0.18)'}`,
+        border: `4px solid ${h ? DARK : 'rgba(66,52,40,0.18)'}`,
         color: h ? '#fff' : DARK,
         cursor: 'pointer', transition: 'all 0.13s', flexShrink: 0,
       }}>
@@ -63,7 +63,7 @@ export default function CalendarNav({ view, setView, navLabel, navigate, goToday
           {!isToday && (
             <button onClick={goToday}
               onMouseEnter={() => setHToday(true)} onMouseLeave={() => setHToday(false)}
-              style={{ padding: '10px 16px', background: hToday ? GOLD : '#fff', border: `4px solid ${hToday ? GOLD : 'rgba(43,33,24,0.18)'}`, color: DARK, fontSize: 11, fontWeight: 900, cursor: 'pointer', transition: 'all 0.13s', fontFamily: 'inherit', letterSpacing: '0.04em', whiteSpace: 'nowrap' }}>
+              style={{ padding: '10px 16px', background: hToday ? GOLD : '#fff', border: `4px solid ${hToday ? GOLD : 'rgba(66,52,40,0.18)'}`, color: DARK, fontSize: 11, fontWeight: 900, cursor: 'pointer', transition: 'all 0.13s', fontFamily: 'inherit', letterSpacing: '0.04em', whiteSpace: 'nowrap' }}>
               {t('today')}
             </button>
           )}
@@ -73,7 +73,7 @@ export default function CalendarNav({ view, setView, navLabel, navigate, goToday
           {VIEWS.map((v, i) => (
             <button key={v} onClick={() => setView(v)}
               style={{
-                borderLeft: i > 0 ? `1px solid ${view === v ? 'rgba(255,255,255,0.15)' : 'rgba(43,33,24,0.12)'}` : 'none',
+                borderLeft: i > 0 ? `1px solid ${view === v ? 'rgba(255,255,255,0.15)' : 'rgba(66,52,40,0.12)'}` : 'none',
                 background: view === v ? DARK : '#fff',
                 color: view === v ? '#fff' : DARK,
               }}>
@@ -84,4 +84,4 @@ export default function CalendarNav({ view, setView, navLabel, navigate, goToday
       </div>
     </>
   )
-}
+}

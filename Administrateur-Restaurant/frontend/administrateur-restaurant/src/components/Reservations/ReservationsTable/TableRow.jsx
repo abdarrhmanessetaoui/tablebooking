@@ -96,4 +96,4 @@ export default function TableRow({ r, i, selected, highlighted, highlightRef, to
       </td>
     </tr>
   )
-}
+}

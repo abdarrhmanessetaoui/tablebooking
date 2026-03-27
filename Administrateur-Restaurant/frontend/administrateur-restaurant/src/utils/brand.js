@@ -7,7 +7,7 @@ export const B = {
 
   black:      '#0A0A0A',
   blackSoft:  '#3A3A3A',
-  inkMute:    '#2b2118',
+  inkMute:    '#423428',
 
   surface:    '#FFFFFF',
   pageBg:     '#FFFFFF',

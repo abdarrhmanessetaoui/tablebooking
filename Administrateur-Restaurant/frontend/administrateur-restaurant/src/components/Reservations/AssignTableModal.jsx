@@ -5,10 +5,10 @@ import { X, LayoutGrid, Users, MapPin, Check, Loader, AlertTriangle, Clock } fro
 import { getToken } from '../../utils/auth'
 import { GREEN, RED } from '../../styles/dashboard/tokens'
 
-const DARK      = '#2b2118'
+const DARK      = '#423428'
 const GOLD      = '#c8a97e'
 const GOLD_DARK = '#a8834e'
-const BORDER    = 'rgba(43,33,24,0.12)'
+const BORDER    = 'rgba(66,52,40,0.12)'
 const CREAM     = '#ffffff'
 const BASE      = 'http://localhost:8000/api'
 
@@ -83,18 +83,18 @@ export default function AssignTableModal({ reservation, onClose, onAssigned }) {
       cursor:        'not-allowed',
       iconBg:        '#ffffff',
       iconColor:     RED,
-      textColor:     'rgba(43,33,24,0.45)',
+      textColor:     'rgba(66,52,40,0.45)',
       badge:         { bg: RED, color: '#fff', text: t('busy') },
       capacityBg:    '#ffffff',
       capacityColor: RED,
     },
     insufficient: {
-      border:        'rgba(43,33,24,0.1)',
+      border:        'rgba(66,52,40,0.1)',
       background:    '#fafafa',
       cursor:        'not-allowed',
       iconBg:        '#f0f0f0',
-      iconColor:     'rgba(43,33,24,0.25)',
-      textColor:     'rgba(43,33,24,0.35)',
+      iconColor:     'rgba(66,52,40,0.25)',
+      textColor:     'rgba(66,52,40,0.35)',
       badge:         { bg: '#e5e7eb', color: '#9ca3af', text: t('insufficient') },
       capacityBg:    '#ffffff',
       capacityColor: RED,
@@ -103,10 +103,10 @@ export default function AssignTableModal({ reservation, onClose, onAssigned }) {
       border:        GOLD,
       background:    DARK,
       cursor:        'pointer',
-      iconBg:        'rgba(200,169,126,0.15)',
+      iconBg:        'rgba(200,169,126,0.08)',
       iconColor:     GOLD,
       textColor:     '#fff',
-      capacityBg:    'rgba(200,169,126,0.15)',
+      capacityBg:    'rgba(200,169,126,0.08)',
       capacityColor: GOLD,
     },
     current: {
@@ -157,7 +157,7 @@ export default function AssignTableModal({ reservation, onClose, onAssigned }) {
     <div
       style={{
         position: 'fixed', inset: 0, zIndex: 9999,
-        background: 'rgba(43,33,24,0.65)',
+        background: 'rgba(66,52,40,0.65)',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         padding: 16,
         fontFamily: "'Inter',system-ui,-apple-system,sans-serif",
@@ -170,7 +170,7 @@ export default function AssignTableModal({ reservation, onClose, onAssigned }) {
         background: '#fff', width: '100%', maxWidth: 420,
         maxHeight: '88vh', overflow: 'auto',
         display: 'flex', flexDirection: 'column',
-        boxShadow: '0 24px 64px rgba(43,33,24,0.35)',
+        boxShadow: '0 24px 64px rgba(66,52,40,0.35)',
       }}>
 
         {/* Header */}
@@ -232,7 +232,7 @@ export default function AssignTableModal({ reservation, onClose, onAssigned }) {
               {[
                 { dot: GREEN,                 label: t('available')    },
                 { dot: RED,                   label: t('busy')       },
-                { dot: 'rgba(43,33,24,0.18)', label: t('insufficient_capacity_short') },
+                { dot: 'rgba(66,52,40,0.18)', label: t('insufficient_capacity_short') },
               ].map(s => (
                 <span key={s.label} style={{ display: 'inline-flex', alignItems: 'center', gap: 5, fontSize: 10, fontWeight: 700, color: DARK }}>
                   <span style={{ width: 8, height: 8, borderRadius: '50%', background: s.dot, flexShrink: 0 }} />
@@ -304,7 +304,7 @@ export default function AssignTableModal({ reservation, onClose, onAssigned }) {
                           </p>
                         )}
                         {state === 'insufficient' && (
-                          <p style={{ margin: '2px 0 0', fontSize: 10, fontWeight: 600, color: 'rgba(43,33,24,0.35)' }}>
+                          <p style={{ margin: '2px 0 0', fontSize: 10, fontWeight: 600, color: 'rgba(66,52,40,0.35)' }}>
                             {t('max_capacity_needed', { max: table.capacity, needed: guestCount })}
                           </p>
                         )}
@@ -370,4 +370,4 @@ export default function AssignTableModal({ reservation, onClose, onAssigned }) {
     </div>,
     document.body
   )
-}
+}

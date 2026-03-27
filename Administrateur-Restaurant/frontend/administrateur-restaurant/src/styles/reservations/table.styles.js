@@ -29,7 +29,7 @@ export const pageBtnStyle = (active, hov, disabled) => ({
   display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
   background: active ? DARK : hov && !disabled ? '#f0ebe4' : '#fff',
   border: `4px solid ${active ? DARK : BORDER}`,
-  color: active ? GOLD : disabled ? 'rgba(43,33,24,0.25)' : DARK,
+  color: active ? GOLD : disabled ? 'rgba(66,52,40,0.25)' : DARK,
   fontSize: 12, fontWeight: active ? 900 : 700,
   cursor: disabled ? 'not-allowed' : 'pointer',
   transition: 'all 0.15s', flexShrink: 0,
@@ -38,7 +38,7 @@ export const pageBtnStyle = (active, hov, disabled) => ({
 export const checkboxStyle = (checked) => ({
   width: 17, height: 17, flexShrink: 0,
   background: checked ? DARK : '#fff',
-  border: `4px solid ${checked ? DARK : 'rgba(43,33,24,0.2)'}`,
+  border: `4px solid ${checked ? DARK : 'rgba(66,52,40,0.2)'}`,
   display: 'flex', alignItems: 'center', justifyContent: 'center',
   cursor: 'pointer', transition: 'all 0.15s',
 })

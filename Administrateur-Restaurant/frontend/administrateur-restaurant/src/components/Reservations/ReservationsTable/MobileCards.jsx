@@ -38,4 +38,4 @@ export default function MobileCards({ pageItems, selectedIds, highlightId, toggl
       ))}
     </div>
   )
-}
+}

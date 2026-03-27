@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 
-const DARK    = '#2b2118'
+const DARK    = '#423428'
 const GOLD    = '#c8a97e'
 const GOLD_BG = '#ffffff'
 const CREAM   = '#ffffff'
@@ -19,8 +19,8 @@ export default function BarChart({ data = {}, title, subtitle, highlight = false
   if (entries.length === 0) return (
     <div style={{ background: '#fff', border: `4px solid ${DARK}`, padding: '28px 24px' }}>
       <div style={{ fontSize: 9, fontWeight: 900, color: GOLD, letterSpacing: '0.18em', textTransform: 'uppercase', marginBottom: 4 }}>{title}</div>
-      {subtitle && <div style={{ fontSize: 12, fontWeight: 700, color: 'rgba(43,33,24,0.4)', marginBottom: 20 }}>{subtitle}</div>}
-      <div style={{ height: 120, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, fontWeight: 900, color: 'rgba(43,33,24,0.15)' }}>
+      {subtitle && <div style={{ fontSize: 12, fontWeight: 700, color: 'rgba(66,52,40,0.4)', marginBottom: 20 }}>{subtitle}</div>}
+      <div style={{ height: 120, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, fontWeight: 900, color: 'rgba(66,52,40,0.15)' }}>
         {t('reports_module.no_data')}
       </div>
     </div>
@@ -79,7 +79,7 @@ export default function BarChart({ data = {}, title, subtitle, highlight = false
       </div>
 
       {/* ── Footer ── */}
-      <div style={{ marginTop: 'auto', borderTop: `1px solid rgba(43,33,24,0.1)`, padding: '12px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: CREAM }}>
+      <div style={{ marginTop: 'auto', borderTop: `1px solid rgba(66,52,40,0.1)`, padding: '12px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: CREAM }}>
         <span style={{ fontSize: 11, fontWeight: 800, color: DARK, textTransform: 'uppercase', letterSpacing: '0.08em' }}>{t('reports_module.total')}</span>
         <span style={{ fontSize: 20, fontWeight: 900, color: DARK, letterSpacing: '-1px' }}>{total}</span>
       </div>

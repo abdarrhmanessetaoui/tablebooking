@@ -2,10 +2,10 @@ import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Trash2, CalendarOff, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react'
 
-const DARK = '#2b2118'
+const DARK = '#423428'
 const GOLD = '#c8a97e'
 const GOLD_DARK = '#a8834e'
-const BORDER = '#2b2118'
+const BORDER = '#423428'
 const CREAM = '#ffffff'
 
 const PAGE_SIZE = 10

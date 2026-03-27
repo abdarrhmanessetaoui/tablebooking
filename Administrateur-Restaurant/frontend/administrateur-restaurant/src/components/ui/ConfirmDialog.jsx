@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { AlertCircle, Trash2, X } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
-const DARK = '#2b2118'
+const DARK = '#423428'
 const GOLD = '#c8a97e'
 
 let _show = null
@@ -31,7 +31,7 @@ export default function ConfirmDialog() {
   return (
     <div style={{
       position: 'fixed', inset: 0, zIndex: 9998,
-      background: 'rgba(43,33,24,0.55)',
+      background: 'rgba(66,52,40,0.55)',
       display: 'flex', alignItems: 'center', justifyContent: 'center',
       padding: 16,
       animation: 'fadeIn 0.15s ease',
@@ -44,7 +44,7 @@ export default function ConfirmDialog() {
 
       <div style={{
         background: '#fff', width: '100%', maxWidth: 400,
-        boxShadow: '0 20px 60px rgba(43,33,24,0.2)',
+        boxShadow: '0 20px 60px rgba(66,52,40,0.2)',
         animation: 'popIn 0.18s ease',
         overflow: 'hidden',
       }}>

@@ -8,11 +8,11 @@ import { RED } from '../../styles/dashboard/tokens'
 import { useTranslation } from 'react-i18next'
 
 // ─── Design tokens ───────────────────────────────────────────────
-const DARK      = '#2b2118'
+const DARK      = '#423428'
 const GOLD      = '#c8a97e'
 const GOLD_DARK = '#a8834e'
 const CREAM     = '#ffffff'
-const BORDER    = 'rgba(43,33,24,0.10)'
+const BORDER    = 'rgba(66,52,40,0.10)'
 const GREEN     = '#16A34A'
 
 // We'll update STATUS labels inside the component now, because we need `t`
@@ -347,8 +347,8 @@ function TimelineRow({ row, isLast, hS, hE, hours, totalH, services, isToday, la
   return (
     <div style={{ display: 'grid', gridTemplateColumns: `${labelW}px 1fr`, borderBottom: isLast ? 'none' : `1px solid ${BORDER}`, minHeight: rowH }}>
       {/* Label cell */}
-      <div style={{ padding: '0 10px', borderRight: `1px solid rgba(43,33,24,0.09)`, display: 'flex', alignItems: 'center', gap: 7, background: hasRes ? '#fdfaf7' : '#fff', overflow: 'hidden', flexShrink: 0 }}>
-        <div style={{ width: 7, height: 7, borderRadius: '50%', flexShrink: 0, background: hasRes ? GREEN : 'rgba(43,33,24,0.15)', boxShadow: hasRes ? `0 0 0 3px ${GREEN}22` : 'none' }} />
+      <div style={{ padding: '0 10px', borderRight: `1px solid rgba(66,52,40,0.09)`, display: 'flex', alignItems: 'center', gap: 7, background: hasRes ? '#fdfaf7' : '#fff', overflow: 'hidden', flexShrink: 0 }}>
+        <div style={{ width: 7, height: 7, borderRadius: '50%', flexShrink: 0, background: hasRes ? GREEN : 'rgba(66,52,40,0.15)', boxShadow: hasRes ? `0 0 0 3px ${GREEN}22` : 'none' }} />
         <span style={{ fontSize: 12, fontWeight: 900, color: DARK, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1, minWidth: 0 }}>
           {row.table_name}
         </span>
@@ -363,15 +363,15 @@ function TimelineRow({ row, isLast, hS, hE, hours, totalH, services, isToday, la
       <div ref={trackRef} style={{ position: 'relative', overflow: 'visible', background: hasRes ? '#fff' : '#fafaf8', minHeight: rowH }}>
         {/* Hour bands */}
         {hours.map((h, i) => (
-          <div key={`bg${h}`} style={{ position: 'absolute', left: `${(i / totalH) * 100}%`, width: `${(1 / totalH) * 100}%`, top: 0, bottom: 0, background: i % 2 === 0 ? 'transparent' : 'rgba(43,33,24,0.013)', pointerEvents: 'none' }} />
+          <div key={`bg${h}`} style={{ position: 'absolute', left: `${(i / totalH) * 100}%`, width: `${(1 / totalH) * 100}%`, top: 0, bottom: 0, background: i % 2 === 0 ? 'transparent' : 'rgba(66,52,40,0.013)', pointerEvents: 'none' }} />
         ))}
         {/* Hour dividers */}
         {hours.map((h, i) => i > 0 && (
-          <div key={`hl${h}`} style={{ position: 'absolute', left: `${(i / totalH) * 100}%`, top: 0, bottom: 0, width: 1, background: 'rgba(43,33,24,0.07)', pointerEvents: 'none' }} />
+          <div key={`hl${h}`} style={{ position: 'absolute', left: `${(i / totalH) * 100}%`, top: 0, bottom: 0, width: 1, background: 'rgba(66,52,40,0.07)', pointerEvents: 'none' }} />
         ))}
         {/* Half-hour ticks */}
         {hours.map((h, i) => (
-          <div key={`hh${h}`} style={{ position: 'absolute', left: `${((i + 0.5) / totalH) * 100}%`, top: '55%', bottom: 0, width: 1, background: 'rgba(43,33,24,0.035)', pointerEvents: 'none' }} />
+          <div key={`hh${h}`} style={{ position: 'absolute', left: `${((i + 0.5) / totalH) * 100}%`, top: '55%', bottom: 0, width: 1, background: 'rgba(66,52,40,0.035)', pointerEvents: 'none' }} />
         ))}
         {/* Now indicator */}
         {isToday && (() => {
@@ -384,7 +384,7 @@ function TimelineRow({ row, isLast, hS, hE, hours, totalH, services, isToday, la
         })()}
         {/* Empty label */}
         {!hasRes && (
-          <span style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', fontSize: 8, fontWeight: 900, color: 'rgba(43,33,24,0.07)', letterSpacing: '0.35em', textTransform: 'uppercase', pointerEvents: 'none', userSelect: 'none' }}>
+          <span style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', fontSize: 8, fontWeight: 900, color: 'rgba(66,52,40,0.07)', letterSpacing: '0.35em', textTransform: 'uppercase', pointerEvents: 'none', userSelect: 'none' }}>
             {t('tables_module.free')}
           </span>
         )}
@@ -462,8 +462,8 @@ function TableCard({ row, services }) {
         onClick={() => hasRes && setOpen(o => !o)}
         style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 10, padding: '12px 14px', background: hasRes ? DARK : '#f0ece8', border: 'none', cursor: hasRes ? 'pointer' : 'default', fontFamily: 'inherit', textAlign: i18n.language === 'ar' ? 'right' : 'left' }}
       >
-        <div style={{ width: 9, height: 9, borderRadius: '50%', flexShrink: 0, background: hasRes ? GREEN : 'rgba(43,33,24,0.22)', boxShadow: hasRes ? `0 0 0 3px ${GREEN}44` : 'none' }} />
-        <span style={{ flex: 1, fontSize: 15, fontWeight: 900, color: hasRes ? '#fff' : 'rgba(43,33,24,0.4)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+        <div style={{ width: 9, height: 9, borderRadius: '50%', flexShrink: 0, background: hasRes ? GREEN : 'rgba(66,52,40,0.22)', boxShadow: hasRes ? `0 0 0 3px ${GREEN}44` : 'none' }} />
+        <span style={{ flex: 1, fontSize: 15, fontWeight: 900, color: hasRes ? '#fff' : 'rgba(66,52,40,0.4)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
           {row.table_name}
         </span>
         {hasRes ? (
@@ -477,7 +477,7 @@ function TableCard({ row, services }) {
             />
           </>
         ) : (
-          <span style={{ fontSize: 11, fontWeight: 700, color: 'rgba(43,33,24,0.35)', fontStyle: 'italic' }}>{t('tables_module.free')}</span>
+          <span style={{ fontSize: 11, fontWeight: 700, color: 'rgba(66,52,40,0.35)', fontStyle: 'italic' }}>{t('tables_module.free')}</span>
         )}
       </button>
 
@@ -583,7 +583,7 @@ export default function TableTimeline({ controlledDate = null }) {
           {loading && (
             <div style={{ padding: '40px 0', textAlign: 'center' }}>
               <div className="circular-spinner" style={{ width: 28, height: 28, borderRadius: '50%', border: `4px solid ${BORDER}`, borderTopColor: GOLD, animation: 'tl-spin 0.8s linear infinite', margin: '0 auto 10px' }} />
-              <p style={{ margin: 0, fontSize: 12, fontWeight: 700, color: 'rgba(43,33,24,0.3)' }}>{t('tables_module.loading')}</p>
+              <p style={{ margin: 0, fontSize: 12, fontWeight: 700, color: 'rgba(66,52,40,0.3)' }}>{t('tables_module.loading')}</p>
             </div>
           )}
 
@@ -592,7 +592,7 @@ export default function TableTimeline({ controlledDate = null }) {
             <div style={{ padding: '40px 20px', textAlign: 'center', background: '#fff', border: `4px solid ${DARK}` }}>
               <LayoutGrid size={28} color={DARK} strokeWidth={1.2} style={{ display: 'block', margin: '0 auto 10px', opacity: 0.12 }} />
               <p style={{ margin: '0 0 4px', fontSize: 13, fontWeight: 900, color: DARK }}>{t('tables_module.no_tables_found')}</p>
-              <p style={{ margin: 0, fontSize: 11, fontWeight: 600, color: 'rgba(43,33,24,0.35)' }}>{t('tables_module.timeline_no_tables')}</p>
+              <p style={{ margin: 0, fontSize: 11, fontWeight: 600, color: 'rgba(66,52,40,0.35)' }}>{t('tables_module.timeline_no_tables')}</p>
             </div>
           )}
 
@@ -644,7 +644,7 @@ export default function TableTimeline({ controlledDate = null }) {
             {loading && (
               <div style={{ padding: '40px 0', textAlign: 'center' }}>
                 <div className="circular-spinner" style={{ width: 28, height: 28, borderRadius: '50%', border: `4px solid ${BORDER}`, borderTopColor: GOLD, animation: 'tl-spin 0.8s linear infinite', margin: '0 auto 10px' }} />
-                <p style={{ margin: 0, fontSize: 12, fontWeight: 700, color: 'rgba(43,33,24,0.3)' }}>{t('tables_module.loading')}</p>
+                <p style={{ margin: 0, fontSize: 12, fontWeight: 700, color: 'rgba(66,52,40,0.3)' }}>{t('tables_module.loading')}</p>
               </div>
             )}
 
@@ -652,7 +652,7 @@ export default function TableTimeline({ controlledDate = null }) {
               <div style={{ padding: '40px 24px', textAlign: 'center', background: '#fff', border: `4px solid ${DARK}` }}>
                 <LayoutGrid size={28} color={DARK} strokeWidth={1.2} style={{ display: 'block', margin: '0 auto 10px', opacity: 0.12 }} />
                 <p style={{ margin: '0 0 4px', fontSize: 13, fontWeight: 900, color: DARK }}>{t('tables_module.no_tables_found')}</p>
-                <p style={{ margin: 0, fontSize: 11, fontWeight: 600, color: 'rgba(43,33,24,0.35)' }}>{t('tables_module.timeline_no_tables')}</p>
+                <p style={{ margin: 0, fontSize: 11, fontWeight: 600, color: 'rgba(66,52,40,0.35)' }}>{t('tables_module.timeline_no_tables')}</p>
               </div>
             )}
 
@@ -673,7 +673,7 @@ export default function TableTimeline({ controlledDate = null }) {
                 <div className="tl-inner">
                   {/* Sticky hour header */}
                   <div className="tl-hrow" style={{ display: 'grid', gridTemplateColumns: `${labelW}px 1fr`, background: DARK }}>
-                    <div style={{ padding: '7px 10px', borderRight: `1px solid rgba(200,169,126,0.15)`, display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <div style={{ padding: '7px 10px', borderRight: `1px solid rgba(200,169,126,0.08)`, display: 'flex', alignItems: 'center', gap: 6 }}>
                       <LayoutGrid size={10} color={GOLD} strokeWidth={2.5} />
                       <span style={{ fontSize: 9, fontWeight: 900, color: GOLD, letterSpacing: '0.14em', textTransform: 'uppercase' }}>{t('tables_module.header_table', { defaultValue: 'Table' })}</span>
                     </div>

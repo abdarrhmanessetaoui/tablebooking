@@ -93,7 +93,7 @@ export default function CalendarPopup({ filterDate, setFilterDate, onClose, anch
     <div ref={popupRef} style={{
       position:'fixed', top:pos.top, left:pos.left, width:pos.width??280,
       zIndex:99999, background:'#fff', border:`4px solid ${DARK}`,
-      boxShadow:'0 8px 32px rgba(43,33,24,0.22)',
+      boxShadow:'0 8px 32px rgba(66,52,40,0.22)',
       fontFamily:"'Inter',system-ui,-apple-system,sans-serif",
     }}>
       {/* Header */}
@@ -108,7 +108,7 @@ export default function CalendarPopup({ filterDate, setFilterDate, onClose, anch
       </div>
 
       {/* Mode tabs */}
-      <div style={{ display:'flex', borderBottom:`4px solid rgba(43,33,24,0.12)` }}>
+      <div style={{ display:'flex', borderBottom:`4px solid rgba(66,52,40,0.12)` }}>
         {['day','month'].map(m => (
           <button key={m} onClick={() => setMode(m)} style={{
             flex:1, padding:'7px', fontSize:11, fontWeight:800,
@@ -136,7 +136,7 @@ export default function CalendarPopup({ filterDate, setFilterDate, onClose, anch
               style={{
                 textAlign:'center', fontSize:12, borderRadius:2,
                 fontWeight: c.isSelected?800 : c.isToday?900 : 600,
-                color: c.isSelected?GOLD : c.isToday?GOLD_DARK : c.isOther?'rgba(43,33,24,0.2)' : DARK,
+                color: c.isSelected?GOLD : c.isToday?GOLD_DARK : c.isOther?'rgba(66,52,40,0.2)' : DARK,
                 background: c.isSelected?DARK : 'transparent',
                 padding:'5px 2px',
                 cursor: c.isOther?'default':'pointer',
@@ -165,11 +165,11 @@ export default function CalendarPopup({ filterDate, setFilterDate, onClose, anch
       )}
 
       {selFull && (
-        <div style={{ padding:'6px 10px', borderTop:`1px solid rgba(43,33,24,0.1)`, fontSize:11, fontWeight:700, color:DARK, background:'#ffffff', textAlign:'center' }}>
+        <div style={{ padding:'6px 10px', borderTop:`1px solid rgba(66,52,40,0.1)`, fontSize:11, fontWeight:700, color:DARK, background:'#ffffff', textAlign:'center' }}>
           {new Intl.DateTimeFormat(lang, { day:'2-digit', month:'long', year:'numeric' }).format(new Date(filterDate))}
         </div>
       )}
     </div>,
     document.body
   )
-}
+}

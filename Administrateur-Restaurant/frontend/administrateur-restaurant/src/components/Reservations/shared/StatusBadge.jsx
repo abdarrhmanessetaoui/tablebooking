@@ -9,4 +9,4 @@ export default function StatusBadge({ status }) {
       <span style={{ fontSize:12, fontWeight:900, color:s.color }}>{t(s.key || status)}</span>
     </div>
   )
-}
+}

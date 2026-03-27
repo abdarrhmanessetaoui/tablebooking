@@ -16,7 +16,7 @@ export const selectStyle = {
 
 export const overlayStyle = {
   position: 'fixed', inset: 0, zIndex: 9999,
-  background: 'rgba(43,33,24,0.6)',
+  background: 'rgba(66,52,40,0.6)',
   display: 'flex', alignItems: 'center',
   justifyContent: 'center', padding: 16,
   fontFamily: "'Inter',system-ui,-apple-system,sans-serif",
@@ -26,7 +26,7 @@ export const panelStyle = {
   background: '#fff', width: '100%', maxWidth: 480,
   maxHeight: '92vh', overflow: 'auto',
   display: 'flex', flexDirection: 'column',
-  boxShadow: '0 24px 64px rgba(43,33,24,0.35)',
+  boxShadow: '0 24px 64px rgba(66,52,40,0.35)',
 }
 
 export const headerStyle = {

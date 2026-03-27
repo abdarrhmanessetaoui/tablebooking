@@ -8,7 +8,7 @@ import useCountUp    from '../hooks/Dashboard/useCountUp'
 import ReportsFilters from '../components/Reports/ReportsFilters'
 import { useTranslation } from 'react-i18next'
 
-const DARK     = '#2b2118'
+const DARK     = '#423428'
 const GOLD     = '#c8a97e'
 const GOLD_DK  = '#a8834e'
 const CREAM    = '#ffffff'
@@ -19,8 +19,8 @@ const RED      = '#DC2626'
 const RED_BG   = '#ffffff'
 const AMBER    = '#C8A97E'
 const AMBER_BG = '#ffffff'
-const BORDER   = '#2b2118'
-const MUTED    = '#2b2118'
+const BORDER   = '#423428'
+const MUTED    = '#423428'
 
 /* ════ PDF ════ */
 async function doPDF(summary, pLabel, sLabel, t, lang) {
@@ -32,25 +32,25 @@ async function doPDF(summary, pLabel, sLabel, t, lang) {
   const {jsPDF}=window.jspdf
   const doc=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'})
   const ds=new Date().toLocaleDateString(lang === 'ar' ? 'ar-MA' : (lang === 'fr' ? 'fr-FR' : 'en-US'),{day:'numeric',month:'long',year:'numeric'})
-  doc.setFillColor(43,33,24); doc.rect(0,0,210,32,'F')
+  doc.setFillColor(66,52,40); doc.rect(0,0,210,32,'F')
   doc.setFont('helvetica','bold'); doc.setFontSize(18); doc.setTextColor(200,169,126)
   doc.text('TableBooking.ma',20,14)
   doc.setFontSize(9); doc.setTextColor(255,255,255); doc.text(t('reports_module.pdf_report_subtitle'),20,22)
   doc.setTextColor(200,169,126); doc.setFontSize(8); doc.text(ds,190,22,{align:'right'})
-  doc.setTextColor(43,33,24); doc.setFontSize(20); doc.text(t('reports_module.pdf_report_title'),20,48)
+  doc.setTextColor(66,52,40); doc.setFontSize(20); doc.text(t('reports_module.pdf_report_title'),20,48)
   doc.setFontSize(10); doc.setTextColor(200,169,126); doc.text(`${t('reports_module.period')} : ${pLabel}  ·  ${t('reports_module.status_label')} : ${sLabel}`,20,56)
-  doc.setDrawColor(43,33,24); doc.setLineWidth(0.5); doc.line(20,61,190,61)
+  doc.setDrawColor(66,52,40); doc.setLineWidth(0.5); doc.line(20,61,190,61)
   let y=70
-  doc.setFont('helvetica','bold'); doc.setFontSize(12); doc.setTextColor(43,33,24); doc.text(t('reports_module.pdf_summary'),20,y); y+=8
+  doc.setFont('helvetica','bold'); doc.setFontSize(12); doc.setTextColor(66,52,40); doc.text(t('reports_module.pdf_summary'),20,y); y+=8
   ;[[t('reports_module.total'),summary.total??0],[t('reports_module.confirmed'),summary.confirmed??0],[t('reports_module.pending'),summary.pending??0],[t('reports_module.cancelled'),summary.cancelled??0]]
     .forEach(([l,v],i)=>{
       doc.setFillColor(i%2?250:255,i%2?248:255,i%2?245:255); doc.rect(20,y,170,8,'F')
-      doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(43,33,24)
+      doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(66,52,40)
       doc.text(l,24,y+5.5); doc.setFont('helvetica','bold'); doc.text(String(v),185,y+5.5,{align:'right'}); y+=8
     })
   const pH=doc.internal.pageSize.height
   doc.setFillColor(200,169,126); doc.rect(0,pH-10,210,10,'F')
-  doc.setTextColor(43,33,24); doc.setFontSize(7); doc.setFont('helvetica','bold')
+  doc.setTextColor(66,52,40); doc.setFontSize(7); doc.setFont('helvetica','bold')
   doc.text(t('reports_module.pdf_footer'),20,pH-4); doc.text(ds,190,pH-4,{align:'right'})
   doc.save(`rapport_${new Date().toISOString().slice(0,10)}.pdf`)
 }
@@ -121,7 +121,7 @@ function BarChart({ data={}, title, subtitle, highlight=false, barColor=GOLD }) 
   const lblSize = entries.length > 20 ? 6 : entries.length > 12 ? 7 : 9
 
   const headerBg    = highlight ? DARK : WHITE
-  const headerColor = highlight ? '#2b2118' : DARK
+  const headerColor = highlight ? '#423428' : DARK
   const { t } = useTranslation()
 
   if (!entries.length) return (
@@ -130,7 +130,7 @@ function BarChart({ data={}, title, subtitle, highlight=false, barColor=GOLD }) 
         <div style={{fontSize:9,fontWeight:900,color:GOLD,letterSpacing:'0.18em',textTransform:'uppercase',marginBottom:4}}>{title}</div>
         {subtitle&&<div style={{fontSize:13,fontWeight:800,color:headerColor}}>{subtitle}</div>}
       </div>
-      <div style={{height:160,display:'flex',alignItems:'center',justifyContent:'center',fontSize:13,fontWeight:900,color: '#2b2118'}}>
+      <div style={{height:160,display:'flex',alignItems:'center',justifyContent:'center',fontSize:13,fontWeight:900,color: '#423428'}}>
         {t('reports_module.no_data')}
       </div>
     </div>
@@ -202,7 +202,7 @@ function ServiceChart({ data={} }) {
         <div style={{fontSize:9,fontWeight:900,color:GOLD,letterSpacing:'0.18em',textTransform:'uppercase',marginBottom:4}}>{t('reports_module.by_service')}</div>
         <div style={{fontSize:13,fontWeight:800,color:DARK}}>{t('reports_module.by_service_sub')}</div>
       </div>
-      <div style={{flex:1,display:'flex',alignItems:'center',justifyContent:'center',fontSize:13,fontWeight:900,color: '#2b2118'}}>
+      <div style={{flex:1,display:'flex',alignItems:'center',justifyContent:'center',fontSize:13,fontWeight:900,color: '#423428'}}>
         {t('reports_module.no_data')}
       </div>
     </div>

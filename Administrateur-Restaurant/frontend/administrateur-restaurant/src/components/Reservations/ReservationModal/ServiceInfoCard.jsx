@@ -24,4 +24,4 @@ export default function ServiceInfoCard({ svc, openDaysLabel }) {
       )}
     </div>
   )
-}
+}

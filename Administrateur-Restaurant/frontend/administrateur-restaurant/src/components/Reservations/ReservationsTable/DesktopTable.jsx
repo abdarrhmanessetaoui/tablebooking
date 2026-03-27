@@ -49,4 +49,4 @@ export default function DesktopTable({ pageItems, selectedIds, highlightId, togg
       </table>
     </div>
   )
-}
+}

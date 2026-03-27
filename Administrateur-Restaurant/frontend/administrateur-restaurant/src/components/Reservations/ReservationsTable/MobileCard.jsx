@@ -71,4 +71,4 @@ export default function MobileCard({ r, selected, highlighted, rowRef, onToggle,
     </div>
   )
 }
-
+

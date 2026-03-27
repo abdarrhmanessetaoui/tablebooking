@@ -70,4 +70,4 @@ export default function ResRow({ r, i, tpl, showDate, onRowClick }) {
       <ChevronRight size={14} strokeWidth={2.5} style={chevron(hov)} />
     </div>
   )
-}
+}

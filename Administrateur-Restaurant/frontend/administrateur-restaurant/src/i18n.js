@@ -513,9 +513,31 @@ const resources = {
         "logging_in": "Logging in...",
         "log_in": "Log In",
         "logo_alt": "TableBooking Logo",
-        "error_empty": "Please enter your email and password.",
-        "error_failed": "Login failed.",
-        "error_connection": "Cannot connect to server. Please try again."
+        "error_empty": "Please enter both username and password.",
+        "error_failed": "Incorrect password or email.",
+        "error_connection": "Unable to connect to server. Check your connection.",
+        "forgot_password": "Forgot Password?",
+        "forgot_password_title": "Reset Password",
+        "email_label": "Email",
+        "email_placeholder": "Enter your email",
+        "reset_button": "Send Reset Link",
+        "back_to_login": "Back to login",
+        "reset_link_sent": "If this email exists, a reset link will be sent.",
+        "error_sending_reset": "Error sending reset link.",
+        "error_invalid_email": "Please enter a valid email."
+      },
+      "password_reset_module": {
+        "title": "Reset Password",
+        "email_label": "Email address",
+        "password_label": "New Password",
+        "confirm_password_label": "Confirm New Password",
+        "submit_button": "Update Password",
+        "updating": "Updating...",
+        "success_title": "Password Reset",
+        "success_message": "Your password has been successfully reset. You can now log in with your new credentials.",
+        "back_to_login": "Return to Login",
+        "error_mismatch": "Passwords do not match.",
+        "error_failed": "Unable to reset password. The link may be expired or invalid."
       }
     }
   },
@@ -663,9 +685,31 @@ const resources = {
         "logging_in": "Connexion…",
         "log_in": "Se connecter",
         "logo_alt": "Logo TableBooking",
-        "error_empty": "Veuillez entrer votre email et votre mot de passe.",
-        "error_failed": "Échec de la connexion.",
-        "error_connection": "Impossible de se connecter au serveur. Veuillez réessayer."
+        "error_empty": "Veuillez entrer le nom d'utilisateur et le mot de passe",
+        "error_failed": "Identifiants incorrects",
+        "error_connection": "Erreur de connexion",
+        "forgot_password": "Mot de passe oublié ?",
+        "forgot_password_title": "Réinitialiser",
+        "email_label": "E-mail",
+        "email_placeholder": "Entrez votre e-mail",
+        "reset_button": "Envoyer le lien",
+        "back_to_login": "Retour",
+        "reset_link_sent": "Si cet e-mail existe, un lien sera envoyé.",
+        "error_sending_reset": "Erreur lors de l'envoi",
+        "error_invalid_email": "Veuillez entrer un e-mail valide"
+      },
+      "password_reset_module": {
+        "title": "Réinitialisation",
+        "email_label": "Adresse e-mail",
+        "password_label": "Nouveau mot de passe",
+        "confirm_password_label": "Confirmez le mot de passe",
+        "submit_button": "Réinitialiser le mot de passe",
+        "updating": "Mise à jour…",
+        "success_title": "Mot de passe réinitialisé",
+        "success_message": "Votre mot de passe a été réinitialisé avec succès. Vous pouvez maintenant vous connecter.",
+        "back_to_login": "Retour à la connexion",
+        "error_mismatch": "Les mots de passe ne correspondent pas.",
+        "error_failed": "Impossible de réinitialiser. Le lien est peut-être expiré ou invalide."
       },
       "confirmed_plural": "Confirmées",
       "pending_plural": "En attente",
@@ -1549,7 +1593,29 @@ const resources = {
         "logo_alt": "شعار TableBooking",
         "error_empty": "يرجى إدخال البريد الإلكتروني وكلمة المرور.",
         "error_failed": "فشل تسجيل الدخول.",
-        "error_connection": "تعذر الاتصال بالخادم. يرجى المحاولة مرة أخرى."
+        "error_connection": "تعذر الاتصال بالخادم. يرجى المحاولة مرة أخرى.",
+        "forgot_password": "نسيت كلمة المرور؟",
+        "forgot_password_title": "إعادة تعيين كلمة المرور",
+        "email_label": "البريد الإلكتروني",
+        "email_placeholder": "أدخل بريدك الإلكتروني",
+        "reset_button": "إرسال رابط إعادة التعيين",
+        "back_to_login": "العودة لتسجيل الدخول",
+        "reset_link_sent": "إذا كان هذا البريد الإلكتروني موجودًا، فسيتم إرسال رابط إعادة التعيين.",
+        "error_sending_reset": "حدث خطأ أثناء إرسال الرابط.",
+        "error_invalid_email": "يرجى إدخال بريد إلكتروني صحيح."
+      },
+      "password_reset_module": {
+        "title": "إعادة تعيين",
+        "email_label": "البريد الإلكتروني",
+        "password_label": "كلمة المرور الجديدة",
+        "confirm_password_label": "تأكيد كلمة المرور",
+        "submit_button": "تحديث كلمة المرور",
+        "updating": "جارٍ التحديث...",
+        "success_title": "تمت إعادة التعيين",
+        "success_message": "تمت إعادة تعيين كلمة المرور بنجاح. يمكنك الآن تسجيل الدخول باستخدام بياناتك الجديدة.",
+        "back_to_login": "العودة لتسجيل الدخول",
+        "error_mismatch": "كلمتا المرور غير متطابقتين.",
+        "error_failed": "تعذر إعادة التعيين. ربما الرابط منتهي الصلاحية."
       }
     }
   }

@@ -6,10 +6,10 @@ import {
 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
-const DARK     = '#2b2118'
+const DARK     = '#423428'
 const GOLD     = '#c8a97e'
 const GOLD_DK  = '#a8834e'
-const BORDER   = '#2b2118'
+const BORDER   = '#423428'
 const CREAM    = '#ffffff'
 const RED      = '#DC2626'
 const RED_BG   = '#ffffff'

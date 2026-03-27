@@ -16,7 +16,7 @@ import { getToken } from '../utils/auth'
 import { toast }   from '../components/ui/Toast'
 import { confirm } from '../components/ui/ConfirmDialog'
 
-const DARK      = '#2b2118'
+const DARK      = '#423428'
 const GOLD      = '#c8a97e'
 const GOLD_DARK = '#a8834e'
 
@@ -53,7 +53,7 @@ function BulkBar({ count, onDelete, onStatus, onClear }) {
       display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap',
       padding: '10px 16px',
       background: DARK,
-      boxShadow: '0 4px 24px rgba(43,33,24,0.28)',
+      boxShadow: '0 4px 24px rgba(66,52,40,0.28)',
       marginBottom: 12,
       animation: 'slideDown 0.18s ease',
     }}>
@@ -145,7 +145,7 @@ function exportReservationsPDF(reservations, t, lang) {
   const W = 210, PAD = 20
   let y = 0
 
-  doc.setFillColor(43, 33, 24)
+  doc.setFillColor(66, 52, 40)
   doc.rect(0, 0, W, 26, 'F')
   doc.setFont('helvetica', 'bold')
   doc.setFontSize(14)
@@ -161,10 +161,10 @@ function exportReservationsPDF(reservations, t, lang) {
 
   doc.setFontSize(22)
   doc.setFont('helvetica', 'bold')
-  doc.setTextColor(43, 33, 24)
+  doc.setTextColor(66, 52, 40)
   doc.text(t('reservations_list_title'), PAD, y)
   y += 6
-  doc.setFillColor(43, 33, 24)
+  doc.setFillColor(66, 52, 40)
   doc.rect(PAD, y, W - PAD * 2, 0.5, 'F')
   y += 10
 
@@ -182,7 +182,7 @@ function exportReservationsPDF(reservations, t, lang) {
     [t('guests'), 22],
     [t('status'), 26]
   ]
-  doc.setFillColor(43, 33, 24)
+  doc.setFillColor(66, 52, 40)
   doc.rect(PAD, y, W - PAD * 2, 8, 'F')
   doc.setFontSize(8)
   doc.setFont('helvetica', 'bold')
@@ -202,7 +202,7 @@ function exportReservationsPDF(reservations, t, lang) {
     doc.rect(PAD, y, W - PAD * 2, 8, 'F')
     doc.setFontSize(8.5)
     doc.setFont('helvetica', 'normal')
-    doc.setTextColor(43, 33, 24)
+    doc.setTextColor(66, 52, 40)
     let rx = PAD + 3
     const vals   = [r.name||'—', r.phone||'—', r.date||'—', r.start_time||'—', r.guests||'—']
     const widths = [42, 32, 26, 22, 22]
@@ -465,4 +465,4 @@ export default function Reservations() {
       </div>
     </>
   )
-}
+}

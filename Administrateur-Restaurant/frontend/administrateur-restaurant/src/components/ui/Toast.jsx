@@ -48,7 +48,7 @@ export default function ToastContainer() {
             background: cfg.bg,
             border: `4px solid ${cfg.border}`,
             borderLeft: `6px solid ${cfg.dot}`,
-            boxShadow: '0 4px 20px rgba(43,33,24,0.12)',
+            boxShadow: '0 4px 20px rgba(66,52,40,0.12)',
             minWidth: 280, maxWidth: 380,
             animation: 'toastIn 0.22s ease',
             fontFamily: "'Inter',system-ui,-apple-system,sans-serif",
