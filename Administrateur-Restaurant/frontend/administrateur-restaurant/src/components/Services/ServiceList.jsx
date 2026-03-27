@@ -1,6 +1,5 @@
 import { useTranslation } from 'react-i18next'
 import { Pencil, Trash2, Utensils, Users, Clock, DollarSign } from 'lucide-react'
-import { useState } from 'react'
 
 const DARK    = '#2b2118'
 const GOLD    = '#c8a97e'
@@ -9,16 +8,13 @@ const BORDER  = '#2b2118'
 const CREAM   = '#faf8f5'
 const RED     = '#b94040'
 const RED_BG  = '#fdf0f0'
-
-const DAYS_SHORT = ['Dim','Lun','Mar','Mer','Jeu','Ven','Sam']
-
 function ServiceRow({ svc, isEditing, onEdit, onDelete, idx }) {
   const { t } = useTranslation()
 
   const bg        = isEditing ? '#fdf6ec' : idx % 2 === 0 ? '#fff' : CREAM
   const availDays  = svc.available_days ?? [0,1,2,3,4,5,6]
   const allDays    = availDays.length === 7
-
+  const DAYS_SHORT = t('service.days_short', { returnObjects: true })
   return (
     <div className="svc-row" style={{
       display: 'grid', gridTemplateColumns: '1fr auto',
@@ -71,6 +67,7 @@ function ServiceRow({ svc, isEditing, onEdit, onDelete, idx }) {
               {t('service.all_days')}
             </span>
           ) : (
+            
             DAYS_SHORT.map((day, i) => {
               const on = availDays.includes(i)
               return (

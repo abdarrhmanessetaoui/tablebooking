@@ -135,19 +135,47 @@ delete_error: "Error while deleting",
 Export_pdf: "Export PDF",
 Exporting: "Exporting...",
 service: {
+  title: "Services",
+  days_short: ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"],
+exporting: "Exporting...",
+export_pdf: "Export PDF",
+editing: "Edit Service",
+edit_desc: "Update service information",
+add_title: "Add Service",
+add_desc: "Create a new service",
+configured: "Configured Services",
   edit_title: "Edit — {{name}}",
   new_service: "New service",
-
+  delete: "Delete",
+Days: [
+  { short: "Sun", full: "Sunday" },
+  { short: "Mon", full: "Monday" },
+  { short: "Tue", full: "Tuesday" },
+  { short: "Wed", full: "Wednesday" },
+  { short: "Thu", full: "Thursday" },
+  { short: "Fri", full: "Friday" },
+  { short: "Sat", full: "Saturday" }
+],
   name: "Service name",
   price: "Price (dh)",
   capacity: "Capacity (people)",
   duration: "Duration (min)",
   days: "Available days",
-
   name_placeholder: "Ex: Friday Couscous",
   price_placeholder: "0",
   capacity_placeholder: "15",
   duration_placeholder: "60",
+    load_error: "Failed to load services",
+  added: "Service \"{{name}}\" added successfully",
+  updated: "Service \"{{name}}\" updated successfully",
+  deleted: "Service \"{{name}}\" deleted successfully",
+  add_error: "Error while adding service",
+  update_error: "Error while updating service",
+  delete_error: "Error while deleting service",
+  delete_title: "Delete service",
+  delete_message: "Do you want to delete \"{{name}}\"?",
+  delete_sub: "This action cannot be undone.",
+  delete_confirm: "Delete",
 
   available_all_days: "Available every day",
   available_week: "Available {{count}} day(s) / week — {{days}}",
@@ -162,11 +190,18 @@ service: {
   minutes: "min",
   all_days: "All days",
   edit: "Edit",
-  delete: "Delete",
   Name: "Service name",
   actions: "Actions",
   no_services: "No services configured",
   use_form: "Use the form to add a service",
+persons: "persons",
+
+pdf: {
+  name: "NAME",
+  price: "PRICE",
+  capacity: "CAPACITY",
+  duration: "DURATION"
+}
 }
 }
   },
@@ -193,8 +228,8 @@ time: "Heure",
 guests: "Personnes",
 service: "Service",
 status: "Statut",
-      no_service: "—",
-      cancel: "Annuler",
+no_service: "—",
+cancel: "Annuler",
 save: "Enregistrer",
 phone: "Tél",
 notes: "Notes",
@@ -303,14 +338,30 @@ Export_pdf: "Exporter PDF",
 Exporting: "Export...",
 service: {
   edit_title: "Modifier — {{name}}",
+  days_short: ["Dim","Lun","Mar","Mer","Jeu","Ven","Sam"],
   new_service: "Nouveau service",
-
+  title: "Services",
+exporting: "Export...",
+export_pdf: "Exporter PDF",
+editing: "Modifier le service",
+edit_desc: "Mettre à jour les informations du service",
+add_title: "Ajouter un service",
+add_desc: "Créer un nouveau service",
+configured: "Services configurés",
   name: "Nom du service",
   price: "Prix (dh)",
   capacity: "Capacité (pers.)",
   duration: "Durée (min)",
   days: "Jours disponibles",
-
+Days: [
+  { short: "Dim", full: "Dimanche" },
+  { short: "Lun", full: "Lundi" },
+  { short: "Mar", full: "Mardi" },
+  { short: "Mer", full: "Mercredi" },
+  { short: "Jeu", full: "Jeudi" },
+  { short: "Ven", full: "Vendredi" },
+  { short: "Sam", full: "Samedi" }
+],
   name_placeholder: "Ex: Couscous du Vendredi",
   price_placeholder: "0",
   capacity_placeholder: "15",
@@ -333,8 +384,28 @@ service: {
   Name: "Nom du service",
   actions: "Actions",
   no_services: "Aucun service configuré",
-  use_form: "Utilisez le formulaire pour ajouter un service"
+  use_form: "Utilisez le formulaire pour ajouter un service",
+  load_error: "Impossible de charger les services",
+    added: "Service \"{{name}}\" ajouté avec succès",
+  updated: "Service \"{{name}}\" modifié avec succès",
+  deleted: "Service \"{{name}}\" supprimé avec succès",
 
+  add_error: "Erreur lors de l'ajout du service",
+  update_error: "Erreur lors de la modification du service",
+  delete_error: "Erreur lors de la suppression du service",
+
+  delete_title: "Supprimer le service",
+  delete_message: "Voulez-vous supprimer \"{{name}}\" ?",
+  delete_sub: "Cette action est irréversible.",
+  delete_confirm: "Supprimer",
+persons: "pers.",
+
+pdf: {
+  name: "NOM",
+  price: "PRIX",
+  capacity: "CAPACITÉ",
+  duration: "DURÉE"
+}
     }
 
 }
@@ -362,7 +433,7 @@ time: "الوقت",
 guests: "الأشخاص",
 service: "الخدمة",
 status: "الحالة",
-      no_service: "—",
+no_service: "—",
       cancel: "إلغاء",
 save: "حفظ",
 phone: "الهاتف",
@@ -476,7 +547,28 @@ Exporting: "جاري التصدير...",
 service: {
   edit_title: "تعديل — {{name}}",
   new_service: "خدمة جديدة",
-
+  load_error: "فشل في تحميل الخدمات",
+  days_short: ["ح","ن","ث","ر","خ","ج","س"],
+  added: "تمت إضافة \"{{name}}\" بنجاح",
+  updated: "تم تحديث \"{{name}}\" بنجاح",
+  deleted: "تم حذف \"{{name}}\" بنجاح",
+  
+  add_error: "خطأ أثناء إضافة الخدمة",
+  update_error: "خطأ أثناء تحديث الخدمة",
+  delete_error: "خطأ أثناء حذف الخدمة",
+   Days: [
+  { short: "ح", full: "الأحد" },
+  { short: "ن", full: "الإثنين" },
+  { short: "ث", full: "الثلاثاء" },
+  { short: "ر", full: "الأربعاء" },
+  { short: "خ", full: "الخميس" },
+  { short: "ج", full: "الجمعة" },
+  { short: "س", full: "السبت" }
+],
+  delete_title: "حذف الخدمة",
+  delete_message: "هل تريد حذف \"{{name}}\"؟",
+  delete_sub: "لا يمكن التراجع عن هذا الإجراء.",
+  delete_confirm: "حذف",
   name: "اسم الخدمة",
   price: "السعر (درهم)",
   capacity: "السعة (أشخاص)",
@@ -505,11 +597,25 @@ service: {
   Name: "اسم الخدمة",
   actions: "الإجراءات",
   no_services: "لا توجد خدمات",
-  use_form: "استعمل النموذج لإضافة خدمة"
+  use_form: "استعمل النموذج لإضافة خدمة",
+  export_pdf: "تصدير PDF",
+  exporting: "جارٍ الإنشاء...",
+  title: "الخدمات",
+editing: "تعديل الخدمة",
+edit_desc: "تحديث معلومات الخدمة",
+add_title: "إضافة خدمة",
+add_desc: "إنشاء خدمة جديدة",
+configured: "الخدمات المهيأة",
+persons: "شخص",
+pdf: {
+  name: "الاسم",
+  price: "السعر",
+  capacity: "السعة",
+  duration: "المدة"
+},
 }
-    }
+}
   }
 }
-
 i18n.use(initReactI18next).init({resources,lng: localStorage.getItem("lang") || "fr",fallbackLng: "fr",interpolation: {escapeValue: false}})
 export default i18n

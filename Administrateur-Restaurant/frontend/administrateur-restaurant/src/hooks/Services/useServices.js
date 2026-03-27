@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { getToken }  from '../../utils/auth'
 import { toast }     from '../../components/ui/Toast'
 import { confirm }   from '../../components/ui/ConfirmDialog'
+import { useTranslation } from "react-i18next"
 
 const API = 'http://localhost:8000/api/services'
 
@@ -12,6 +13,8 @@ const hdrs = () => ({
 })
 
 export default function useServices() {
+  const { t } = useTranslation()
+
   const [services,   setServices]   = useState([])
   const [loading,    setLoading]    = useState(true)
   const [error,      setError]      = useState('')
@@ -27,7 +30,7 @@ export default function useServices() {
       const data = await res.json()
       setServices(Array.isArray(data) ? data : [])
     } catch {
-      setError('Impossible de charger les services.')
+      setError(t('service.load_error'))
     } finally {
       setLoading(false)
     }
@@ -50,17 +53,17 @@ export default function useServices() {
         setServices(prev => prev.map(s =>
           s.idx === editingSvc.idx ? { ...s, ...body } : s
         ))
-        toast(`Service "${form.name}" modifié`, 'success')
+        toast(t('service.updated', { name: form.name }), 'success')
         setEditingSvc(null)
       } else {
         const res  = await fetch(API, { method: 'POST', headers: hdrs(), body: JSON.stringify(body) })
         const data = await res.json()
         setServices(prev => [...prev, data])
-        toast(`Service "${form.name}" ajouté`, 'success')
+        toast(t('service.added', { name: form.name }), 'success')
         if (resetForm) resetForm()
       }
     } catch {
-      toast(editingSvc ? 'Impossible de modifier' : "Impossible d'ajouter", 'error')
+      toast(editingSvc ? t('service.update_error') : t('service.add_error'), 'error')
     } finally {
       setSaving(false)
     }
@@ -68,18 +71,20 @@ export default function useServices() {
 
   async function handleDelete(svc) {
     const ok = await confirm({
-      title: 'Supprimer le service', message: `Voulez-vous supprimer "${svc.name}" ?`,
-      sub: 'Les réservations existantes ne seront pas affectées.',
-      confirmLabel: 'Supprimer', type: 'danger',
+      title: t('service.delete_title'),
+      message: t('service.delete_message', { name: svc.name }),
+      sub: t('service.delete_sub'),
+      confirmLabel: t('service.delete_confirm'),
+      type: 'danger',
     })
     if (!ok) return
     try {
       await fetch(`${API}/${svc.idx}`, { method: 'DELETE', headers: hdrs() })
       setServices(prev => prev.filter(s => s.idx !== svc.idx))
       if (editingSvc?.idx === svc.idx) setEditingSvc(null)
-      toast(`Service "${svc.name}" supprimé`, 'warning')
+      toast(t('service.deleted', { name: svc.name }), 'warning')
     } catch {
-      toast('Impossible de supprimer', 'error')
+      toast(t('service.delete_error'), 'error')
     }
   }
 

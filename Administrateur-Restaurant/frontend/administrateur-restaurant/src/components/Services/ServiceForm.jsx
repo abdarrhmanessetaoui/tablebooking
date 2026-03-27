@@ -9,15 +9,7 @@ const BORDER  = '#2b2118'
 
 const EMPTY = { name: '', price: '', capacity: '', duration: '', available_days: [0,1,2,3,4,5,6] }
 
-const DAYS = [
-  { idx: 0, short: 'Dim', full: 'Dimanche' },
-  { idx: 1, short: 'Lun', full: 'Lundi' },
-  { idx: 2, short: 'Mar', full: 'Mardi' },
-  { idx: 3, short: 'Mer', full: 'Mercredi' },
-  { idx: 4, short: 'Jeu', full: 'Jeudi' },
-  { idx: 5, short: 'Ven', full: 'Vendredi' },
-  { idx: 6, short: 'Sam', full: 'Samedi' },
-]
+
 
 const inp = {
   padding: '12px 14px',
@@ -52,6 +44,7 @@ function Field({ label, children }) {
 
 function DayPicker({ value = [0,1,2,3,4,5,6], onChange }) {
   const {t} = useTranslation()
+  const DAYS = t('service.Days', { returnObjects: true }) || []
   function toggle(idx) {
     if (value.includes(idx)) {
       if (value.length === 1) return  // keep at least 1
@@ -64,36 +57,51 @@ function DayPicker({ value = [0,1,2,3,4,5,6], onChange }) {
   return (
     <div>
       <Label>{t('service.days')}</Label>
-      <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', marginTop: 2 }}>
-        {DAYS.map(d => {
-          const active = value.includes(d.idx)
-          return (
-            <button key={d.idx} type="button"
-              onClick={() => toggle(d.idx)}
-              title={d.full}
-              style={{
-                display: 'flex', flexDirection: 'column', alignItems: 'center',
-                padding: '8px 10px', minWidth: 42, gap: 2,
-                background: active ? DARK : '#f5f0eb',
-                border: `2px solid ${active ? DARK : '#e8e0d8'}`,
-                color: active ? GOLD : '#bbb',
-                cursor: 'pointer', transition: 'all 0.15s', fontFamily: 'inherit',
-              }}
-              onMouseEnter={e => {
-                if (!active) { e.currentTarget.style.background = '#e8e0d8'; e.currentTarget.style.color = DARK }
-              }}
-              onMouseLeave={e => {
-                if (!active) { e.currentTarget.style.background = '#f5f0eb'; e.currentTarget.style.color = '#bbb' }
-              }}
-            >
-              <span style={{ fontSize: 10, fontWeight: 900, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
-                {d.short}
-              </span>
-              {active && <div style={{ width: 4, height: 4, background: GOLD, borderRadius: '50%' }} />}
-            </button>
-          )
-        })}
-      </div>
+<div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', marginTop: 2 }}>
+  {(Array.isArray(DAYS) ? DAYS : []).map((d, i) => {
+
+    // FIX: safe index (i18n may not provide idx)
+    const idx = d.idx ?? i
+
+    // FIX: safe value check
+    const active = Array.isArray(value) && value.includes(idx)
+
+    return (
+      <button key={idx} type="button"
+        onClick={() => toggle(idx)}
+        title={d.full}
+        style={{
+          display: 'flex', flexDirection: 'column', alignItems: 'center',
+          padding: '8px 10px', minWidth: 42, gap: 2,
+          background: active ? DARK : '#f5f0eb',
+          border: `2px solid ${active ? DARK : '#e8e0d8'}`,
+          color: active ? GOLD : '#bbb',
+          cursor: 'pointer', transition: 'all 0.15s', fontFamily: 'inherit',
+        }}
+        onMouseEnter={e => {
+          if (!active) {
+            e.currentTarget.style.background = '#e8e0d8'
+            e.currentTarget.style.color = DARK
+          }
+        }}
+        onMouseLeave={e => {
+          if (!active) {
+            e.currentTarget.style.background = '#f5f0eb'
+            e.currentTarget.style.color = '#bbb'
+          }
+        }}
+      >
+        <span style={{ fontSize: 10, fontWeight: 900, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+          {d.short}
+        </span>
+
+        {active && (
+          <div style={{ width: 4, height: 4, background: GOLD, borderRadius: '50%' }} />
+        )}
+      </button>
+    )
+  })}
+</div>
       <p style={{ margin: '6px 0 0', fontSize: 10, fontWeight: 700, color: GOLD_DK }}>
         {value.length === 7
           ? t('service.available_all_days')

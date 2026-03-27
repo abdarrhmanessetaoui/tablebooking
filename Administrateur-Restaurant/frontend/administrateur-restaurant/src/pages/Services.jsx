@@ -5,6 +5,7 @@ import Spinner  from '../components/Dashboard/Spinner'
 import ServiceForm from '../components/Services/ServiceForm'
 import ServiceList from '../components/Services/ServiceList'
 import useServices  from '../hooks/Services/useServices'
+import { useTranslation} from 'react-i18next'
 
 const DARK    = '#2b2118'
 const GOLD    = '#c8a97e'
@@ -36,6 +37,7 @@ function Btn({ children, onClick, primary, disabled, icon: Icon }) {
 }
 
 export default function Services() {
+  const {t}= useTranslation()
   const {
     services, loading, error,
     editingSvc, setEditingSvc,
@@ -45,6 +47,7 @@ export default function Services() {
   const [exporting, setExporting] = useState(false)
 
   async function handleExport() {
+    
     setExporting(true)
     try {
       if (!window.jspdf) await new Promise((res, rej) => {
@@ -86,7 +89,6 @@ export default function Services() {
       doc.save(`services_${new Date().toISOString().slice(0,10)}.pdf`)
     } catch(e) { console.error(e) } finally { setExporting(false) }
   }
-
   if (loading) return <Spinner />
 
   return (
@@ -117,7 +119,7 @@ export default function Services() {
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, marginBottom: 8, flexWrap: 'wrap' }}>
             <div style={{ minWidth: 0, flex: 1 }}>
               <h1 style={{ margin: 0, fontSize: 'clamp(20px,5vw,36px)', fontWeight: 900, color: DARK, letterSpacing: '-1.5px', lineHeight: 1 }}>
-                Services
+                {t('service.title')}
               </h1>
               <p className="page-subtitle" style={{ margin: '6px 0 0', fontSize: 12, fontWeight: 700, color: GOLD_DK }}>
               
@@ -125,7 +127,7 @@ export default function Services() {
             </div>
             <div style={{ display: 'flex', gap: 3, flexShrink: 0 }}>
               <Btn icon={FileDown} primary onClick={handleExport} disabled={exporting}>
-                {exporting ? 'Génération…' : 'Exporter PDF'}
+                {exporting ? t('service.exporting') : t('service.export_pdf')}
               </Btn>
             </div>
           </div>
@@ -149,10 +151,10 @@ export default function Services() {
             {/* LEFT — form */}
             <div className="svc-form-sticky" style={{ minWidth: 0 }}>
               <h2 style={{ margin: '0 0 5px', fontSize: 'clamp(15px,2.5vw,22px)', fontWeight: 900, color: DARK, letterSpacing: '-0.8px' }}>
-                {editingSvc ? 'Modifier le service' : 'Ajouter un service'}
+                {editingSvc ? t('service.editing') : t('service.add_title')}
               </h2>
               <p className="page-subtitle" style={{ margin: '0 0 16px', fontSize: 12, fontWeight: 700, color: GOLD_DK }}>
-            
+                  {editingSvc ? t('service.edit_desc') : t('service.add_desc')}
               </p>
 
               <ServiceForm
@@ -180,7 +182,7 @@ export default function Services() {
 
               <div style={{ marginBottom: 16, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
                 <h2 style={{ margin: 0, fontSize: 'clamp(15px,2.5vw,22px)', fontWeight: 900, color: DARK, letterSpacing: '-0.8px' }}>
-                  Services configurés
+                  {t('service.configured')}
                 </h2>
                 <span style={{ padding: '4px 10px', background: DARK, fontSize: 11, fontWeight: 900, color: GOLD, letterSpacing: '0.05em', flexShrink: 0 }}>
                   {services.length}
