@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Store, MapPin, Mail, Users, Phone, Clock, Bell, Save, ChevronDown, ChevronUp, Globe, X, Check } from 'lucide-react'
-import useRestaurantSettings from '../hooks/useRestaurantSettings'
+import useRestaurantSettings from '../hooks/settings/useRestaurantSettings.js'
 import FadeUp  from '../components/Dashboard/FadeUp'
 import Spinner from '../components/Dashboard/Spinner'
 import { useTranslation } from 'react-i18next'

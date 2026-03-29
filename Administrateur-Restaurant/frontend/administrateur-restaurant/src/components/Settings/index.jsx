@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next'
-import useRestaurantSettings from '../../../hooks/settings/useRestaurantSettings'
+import useRestaurantSettings from '../../hooks/settings/useRestaurantSettings.js'
 import FadeUp from '../../Dashboard/FadeUp'
 import Spinner from '../../Dashboard/Spinner'
 import RestaurantInfoSection  from './RestaurantInfoSection'
