@@ -4,7 +4,7 @@ import { FileDown }      from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
 import useDashboardStats from '../hooks/Dashboard/useDashboardStats'
-import useRestaurantInfo from '../hooks/useRestaurantInfo'
+import useRestaurantInfo from '../hooks/settings/useRestaurantInfo.js'
 import FadeUp            from '../components/Dashboard/FadeUp'
 import Spinner           from '../components/Dashboard/Spinner'
 import Btn               from '../components/Dashboard/Btn'
