@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import { ToggleRight, ToggleLeft, Trash2 } from 'lucide-react'
-import '../../styles/tables/Shared.css'
+import '../../../styles/tables/Shared.css'
 
 // ─── Btn ─────────────────────────────────────────────────────────
 export function Btn({ children, onClick, primary, disabled, icon: Icon }) {

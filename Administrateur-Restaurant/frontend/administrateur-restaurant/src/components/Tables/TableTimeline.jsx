@@ -4,10 +4,10 @@ import {
   Users, ChevronLeft, ChevronRight, ChevronDown,
 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-import useTablesTimeline from '../../../hooks/Tables/useTablesTimeline'
-import { RED } from '../../../styles/dashboard/tokens'
-import '../../../styles/tables/TableTimeline.css'
-import { GOLD, GOLD_DK, DARK, GREEN, BORDER_SOFT } from '../../../styles/tables/tokens'
+import useTablesTimeline from '../../hooks/Tables/useTablesTimeline'
+import { RED }          from '../../styles/dashboard/tokens'
+import '../../styles/tables/TableTimeline.css'
+import { GOLD, GOLD_DK, DARK, GREEN, BORDER_SOFT } from '../../styles/tables/tokens'
 
 // ─── Date helpers ─────────────────────────────────────────────────
 function localToday() {

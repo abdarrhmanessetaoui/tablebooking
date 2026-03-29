@@ -5,8 +5,8 @@ import {
   ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight,
 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-import '../../../styles/tables/TableList.css'
-import { DARK, GOLD, GOLD_DK, LOC_COLORS } from '../../../styles/tables/tokens'
+import '../../styles/tables/TableList.css'
+import { DARK, GOLD, GOLD_DK, LOC_COLORS } from '../../styles/tables/tokens'
 
 const PAGE_SIZE = 10
 

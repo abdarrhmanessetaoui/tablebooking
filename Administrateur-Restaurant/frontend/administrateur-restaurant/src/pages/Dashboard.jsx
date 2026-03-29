@@ -94,7 +94,7 @@ export default function Dashboard() {
           document.head.appendChild(s)
         })
       }
-      exportPDF(stats, active?.res || [], active?.label || t('today'))
+      exportPDF(stats, active?.res || [], active?.label || t('today'), t)
     } catch (e) {
       console.error(e)
     } finally {

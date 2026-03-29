@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { Plus, Trash2, Pencil, Check, X, MapPin } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-import '../../../styles/tables/TableLocationsManager.css'
-import { PRESET_COLORS } from '../../../styles/tables/tokens'
+import '../../styles/tables/TableLocationsManager.css'
+import { PRESET_COLORS } from '../../styles/tables/tokens'
 
 // ─── ColorDot ────────────────────────────────────────────────────
 function ColorDot({ color, selected, onClick }) {

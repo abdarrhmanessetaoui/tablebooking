@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { Plus, Check, X, LayoutGrid } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-import '../../../styles/tables/TableForm.css'
-import { GOLD, BORDER } from '../../../styles/tables/tokens'
+import '../../styles/tables/TableForm.css'
+import { GOLD, BORDER } from '../../styles/tables/tokens'
 
 const EMPTY = { number: '', capacity: '', location: '' }
 
