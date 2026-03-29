@@ -13,6 +13,7 @@ import ReservationModal    from '../components/Reservations/ReservationModal/ind
 import FadeUp   from '../components/Dashboard/FadeUp'
 import Spinner  from '../components/Dashboard/Spinner'
 import { getToken } from '../utils/auth'
+import { exportPDF } from '../utils/export'
 import { toast }   from '../components/ui/Toast'
 import { confirm } from '../components/ui/ConfirmDialog'
 
@@ -139,91 +140,7 @@ function BulkBar({ count, onDelete, onStatus, onClear }) {
   )
 }
 
-function exportReservationsPDF(reservations, t, lang) {
-  const { jsPDF } = window.jspdf
-  const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' })
-  const W = 210, PAD = 20
-  let y = 0
 
-  doc.setFillColor(66, 52, 40)
-  doc.rect(0, 0, W, 26, 'F')
-  doc.setFont('helvetica', 'bold')
-  doc.setFontSize(14)
-  doc.setTextColor(200, 169, 126)
-  doc.text('TableBooking', PAD, 17)
-  doc.setTextColor(255, 255, 255)
-  doc.text('.ma', PAD + 39, 17)
-  const now = new Date().toLocaleString(lang === 'ar' ? 'ar-MA' : lang === 'fr' ? 'fr-FR' : 'en-US')
-  doc.setFontSize(8)
-  doc.setTextColor(200, 169, 126)
-  doc.text(now, W - PAD, 17, { align: 'right' })
-  y = 38
-
-  doc.setFontSize(22)
-  doc.setFont('helvetica', 'bold')
-  doc.setTextColor(66, 52, 40)
-  doc.text(t('reservations_list_title'), PAD, y)
-  y += 6
-  doc.setFillColor(66, 52, 40)
-  doc.rect(PAD, y, W - PAD * 2, 0.5, 'F')
-  y += 10
-
-  doc.setFontSize(10)
-  doc.setFont('helvetica', 'normal')
-  doc.setTextColor(120, 100, 80)
-  doc.text(`${reservations.length} ${t(reservations.length === 1 ? 'reservation' : 'reservation_plural')}`, PAD, y)
-  y += 10
-
-  const cols = [
-    [t('name'), 42],
-    [t('phone_label'), 32],
-    [t('date'), 26],
-    [t('time'), 22],
-    [t('guests'), 22],
-    [t('status'), 26]
-  ]
-  doc.setFillColor(66, 52, 40)
-  doc.rect(PAD, y, W - PAD * 2, 8, 'F')
-  doc.setFontSize(8)
-  doc.setFont('helvetica', 'bold')
-  doc.setTextColor(200, 169, 126)
-  let x = PAD + 3
-  cols.forEach(([label]) => {
-    doc.text(label.toUpperCase(), x, y + 5.5)
-    x += cols.find(c => c[0] === label)[1]
-  })
-  y += 8
-
-  const STATUS_COLORS = { Confirmed: [45,106,45], Pending: [168,131,78], Cancelled: [185,64,64] }
-  reservations.forEach((r, i) => {
-    if (y > 270) { doc.addPage(); y = 20 }
-    const rowBg = i % 2 === 0 ? [255,255,255] : [250,248,245]
-    doc.setFillColor(...rowBg)
-    doc.rect(PAD, y, W - PAD * 2, 8, 'F')
-    doc.setFontSize(8.5)
-    doc.setFont('helvetica', 'normal')
-    doc.setTextColor(66, 52, 40)
-    let rx = PAD + 3
-    const vals   = [r.name||'—', r.phone||'—', r.date||'—', r.start_time||'—', r.guests||'—']
-    const widths = [42, 32, 26, 22, 22]
-    vals.forEach((v, vi) => { doc.text(String(v).substring(0,18), rx, y+5.5); rx += widths[vi] })
-    const sc = STATUS_COLORS[r.status] || [120,120,120]
-    doc.setTextColor(...sc)
-    doc.setFont('helvetica', 'bold')
-    doc.text(t(`status_${r.status.toLowerCase()}`), rx, y+5.5)
-    y += 8
-  })
-
-  doc.setDrawColor(200, 169, 126)
-  doc.setLineWidth(0.5)
-  doc.line(PAD, 287, W - PAD, 287)
-  doc.setFontSize(8)
-  doc.setFont('helvetica', 'normal')
-  doc.setTextColor(200, 169, 126)
-  doc.text('TableBooking.ma', PAD, 292)
-  doc.text(`${t('export_pdf')} ${now}`, W - PAD, 292, { align: 'right' })
-  doc.save(`reservations-${new Date().toISOString().slice(0,10)}.pdf`)
-}
 
 export default function Reservations() {
   const { t, i18n } = useTranslation()
@@ -297,7 +214,7 @@ export default function Reservations() {
           document.head.appendChild(s)
         })
       }
-      exportReservationsPDF(filteredLocal, t, i18n.language)
+      exportPDF(null, filteredLocal, t('reservations_list_title'), t)
       toast(t('status_updated_toast'), 'success')
     } catch(e) {
       console.error('PDF error:', e)

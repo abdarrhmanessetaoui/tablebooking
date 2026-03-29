@@ -10,7 +10,7 @@ import SumCard from '../components/Reports/SumCard'
 import SectionTitle from '../components/Reports/SectionTitle'
 import ServiceChart from '../components/Reports/ServiceChart'
 import ExportButton from '../components/Reports/ExportButton'
-import { doPDF } from '../utils/reportsPDF'
+import { exportPDF } from '../utils/export'
 import { useTranslation } from 'react-i18next'
 import '../styles/Reports/Reports.css'
 
@@ -58,7 +58,17 @@ export default function Reports() {
       ]
       const pL = PERIOD_OPTS.find(p => p.key === period)?.label ?? t('reports_module.all')
       const sL = STATUS_OPTS.find(s => s.key === status)?.label ?? t('reports_module.all')
-      await doPDF(data?.summary || {}, pL, sL, t, i18n.language)
+      const summary = data?.summary || {}
+      const statsMap = {
+        today:           summary.total     || 0,
+        today_confirmed: summary.confirmed || 0,
+        today_pending:   summary.pending   || 0,
+        today_cancelled: summary.cancelled || 0,
+        tomorrow:        '—',
+        total:           summary.total     || 0,
+        avg:             summary.avg_guests || 0
+      }
+      exportPDF(statsMap, [], t('reports_module.title'), t)
     } catch (e) { console.error(e) } finally { setExporting(false) }
   }
 

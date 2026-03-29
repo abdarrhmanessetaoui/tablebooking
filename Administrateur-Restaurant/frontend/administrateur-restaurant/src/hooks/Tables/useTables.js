@@ -1,14 +1,13 @@
 import { useState, useEffect } from 'react'
-import { getToken }  from '../../utils/auth'
-import { toast }     from '../../components/ui/Toast'
-import { confirm }   from '../../components/ui/ConfirmDialog'
-import { useTranslation } from 'react-i18next'
+import { useTranslation }     from 'react-i18next'
+import { getToken }           from '../../utils/auth'
+import { toast }              from '../../components/ui/Toast'
+import { confirm }            from '../../components/ui/ConfirmDialog'
 
-const API = 'http://localhost:8000/api/tables'
-
+const API  = 'http://localhost:8000/api/tables'
 const hdrs = () => ({
-  'Content-Type': 'application/json',
-  'Accept':       'application/json',
+  'Content-Type':  'application/json',
+  'Accept':        'application/json',
   'Authorization': `Bearer ${getToken()}`,
 })
 
@@ -40,7 +39,8 @@ export default function useTables() {
     try {
       if (editingTbl) {
         await fetch(`${API}/${editingTbl.idx}`, {
-          method: 'PUT', headers: hdrs(),
+          method: 'PUT',
+          headers: hdrs(),
           body: JSON.stringify({
             number:   form.number,
             capacity: parseInt(form.capacity) || 1,
@@ -57,7 +57,8 @@ export default function useTables() {
         setEditingTbl(null)
       } else {
         const res  = await fetch(API, {
-          method: 'POST', headers: hdrs(),
+          method: 'POST',
+          headers: hdrs(),
           body: JSON.stringify({
             number:   form.number,
             capacity: parseInt(form.capacity) || 1,
@@ -68,7 +69,7 @@ export default function useTables() {
         const data = await res.json()
         setTables(prev => [...prev, data])
         toast(t('tables_module.table_added', { number: form.number }), 'success')
-        if (resetForm) resetForm()
+        resetForm?.()
       }
     } catch {
       toast(editingTbl ? t('tables_module.error_modifying') : t('tables_module.error_adding'), 'error')
@@ -80,7 +81,7 @@ export default function useTables() {
   async function handleDelete(tbl) {
     const ok = await confirm({
       title:        t('tables_module.delete_table_title'),
-      message:      t('tables_module.delete_table_msg', { number: tbl.number }),
+      message:      t('tables_module.delete_table_msg',  { number: tbl.number }),
       sub:          t('tables_module.delete_table_sub'),
       confirmLabel: t('tables_module.delete'),
       type:         'danger',
@@ -102,7 +103,15 @@ export default function useTables() {
       setTables(prev => prev.map(t =>
         t.idx === tbl.idx ? { ...t, active: !t.active } : t
       ))
-      toast(t('tables_module.table_status_changed', { number: tbl.number, status: tbl.active ? t('tables_module.deactivated_status') : t('tables_module.activated_status') }), 'success')
+      toast(
+        t('tables_module.table_status_changed', {
+          number: tbl.number,
+          status: tbl.active
+            ? t('tables_module.deactivated_status')
+            : t('tables_module.activated_status'),
+        }),
+        'success',
+      )
     } catch {
       toast(t('tables_module.error_status_change'), 'error')
     }
@@ -112,7 +121,6 @@ export default function useTables() {
     tables, loading, error,
     editingTbl, setEditingTbl,
     saving, handleSave, handleDelete, handleToggle,
-    // ✅ FIX 1: export setTables — required by Tables.jsx bulk handlers
     setTables,
   }
 }

@@ -1,11 +1,10 @@
 import { useState, useEffect } from 'react'
-import { getToken } from '../../utils/auth'
-import { toast }    from '../../components/ui/Toast'
-import { confirm }  from '../../components/ui/ConfirmDialog'
-import { useTranslation } from 'react-i18next'
+import { useTranslation }     from 'react-i18next'
+import { getToken }           from '../../utils/auth'
+import { toast }              from '../../components/ui/Toast'
+import { confirm }            from '../../components/ui/ConfirmDialog'
 
-const API = 'http://localhost:8000/api/table-locations'
-
+const API  = 'http://localhost:8000/api/table-locations'
 const hdrs = () => ({
   'Content-Type':  'application/json',
   'Accept':        'application/json',
@@ -38,7 +37,8 @@ export default function useTableLocations() {
     setSaving(true)
     try {
       const res = await fetch(API, {
-        method: 'POST', headers: hdrs(),
+        method: 'POST',
+        headers: hdrs(),
         body: JSON.stringify({ name: name.trim(), color }),
       })
       if (!res.ok) {
@@ -49,7 +49,7 @@ export default function useTableLocations() {
       const data = await res.json()
       setLocations(prev => [...prev, data])
       toast(t('tables_module.location_added', { name: data.name }), 'success')
-      if (resetForm) resetForm()
+      resetForm?.()
     } catch {
       toast(t('tables_module.error_adding_location'), 'error')
     } finally {
@@ -61,7 +61,8 @@ export default function useTableLocations() {
     setSaving(true)
     try {
       const res  = await fetch(`${API}/${id}`, {
-        method: 'PUT', headers: hdrs(),
+        method: 'PUT',
+        headers: hdrs(),
         body: JSON.stringify({ name: name.trim(), color }),
       })
       const data = await res.json()
@@ -92,8 +93,5 @@ export default function useTableLocations() {
     }
   }
 
-  return {
-    locations, loading, saving,
-    handleAdd, handleUpdate, handleDelete,
-  }
+  return { locations, loading, saving, handleAdd, handleUpdate, handleDelete }
 }

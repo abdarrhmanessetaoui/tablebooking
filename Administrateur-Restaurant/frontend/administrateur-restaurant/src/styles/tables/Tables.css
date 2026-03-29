@@ -1,0 +1,148 @@
+/* ─── Tables Page ──────────────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
+.tables-page {
+  background: #ffffff;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  padding: clamp(14px, 3vw, 40px) clamp(12px, 4vw, 36px);
+  box-sizing: border-box;
+  width: 100%;
+  overflow-x: hidden;
+}
+
+/* ── Header ── */
+.tables-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+
+.tables-title {
+  margin: 0;
+  font-size: clamp(20px, 5vw, 36px);
+  font-weight: 900;
+  color: #423428;
+  letter-spacing: -1.5px;
+  line-height: 1;
+}
+
+.tables-header-actions {
+  display: flex;
+  gap: 3px;
+  flex-shrink: 0;
+}
+
+/* ── Divider ── */
+.tables-divider {
+  height: 4px;
+  background: #423428;
+  margin: 16px 0 28px;
+}
+
+/* ── Error banner ── */
+.tables-error {
+  margin-bottom: 20px;
+  padding: 11px 16px;
+  background: #ffffff;
+  border-left: 3px solid #DC2626;
+  font-size: 12px;
+  font-weight: 700;
+  color: #DC2626;
+}
+
+/* ── Two-column layout ── */
+.tbl-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0;
+}
+
+.tbl-left {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.tbl-section-title {
+  margin: 0 0 5px;
+  font-size: clamp(15px, 2.5vw, 22px);
+  font-weight: 900;
+  color: #423428;
+  letter-spacing: -0.8px;
+}
+
+.tbl-right-header {
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.tbl-count-badge {
+  padding: 4px 10px;
+  background: #423428;
+  font-size: 11px;
+  font-weight: 900;
+  color: #c8a97e;
+  letter-spacing: 0.05em;
+  flex-shrink: 0;
+}
+
+/* ── Timeline section ── */
+.tbl-timeline-separator {
+  margin: 40px 0 0;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.tbl-timeline-separator-line {
+  height: 4px;
+  background: #423428;
+  flex: 1;
+}
+
+.tbl-timeline-separator-label {
+  font-size: 9px;
+  font-weight: 900;
+  color: #423428;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* ── Responsive ── */
+@media (min-width: 960px) {
+  .tbl-layout {
+    grid-template-columns: 380px 1fr;
+    gap: 48px;
+    align-items: start;
+  }
+
+  .tbl-form-sticky {
+    position: sticky;
+    top: 24px;
+  }
+
+  .tbl-mob-divider {
+    display: none !important;
+  }
+}
+
+@media (max-width: 600px) {
+  button {
+    min-height: 60px;
+  }
+}
+
+@media (max-width: 480px) {
+  .btn-label,
+  .page-subtitle {
+    display: none !important;
+  }
+}

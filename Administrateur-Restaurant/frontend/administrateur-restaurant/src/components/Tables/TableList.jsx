@@ -5,28 +5,15 @@ import {
   ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight,
 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-
-const DARK     = '#423428'
-const GOLD     = '#c8a97e'
-const GOLD_DK  = '#a8834e'
-const BORDER   = '#423428'
-const CREAM    = '#ffffff'
-const RED      = '#DC2626'
-const RED_BG   = '#ffffff'
-const GREEN    = '#16a34a'
-const GREEN_BG = '#ffffff'
+import '../../../styles/tables/TableList.css'
+import { DARK, GOLD, GOLD_DK, LOC_COLORS } from '../../../styles/tables/tokens'
 
 const PAGE_SIZE = 10
 
-const LOC_COLORS = {
-  'Intérieur':   { bg: '#f0f4ff', color: '#3b5bdb' },
-  'Terrasse':    { bg: '#f0fdf4', color: '#16a34a' },
-  'Bar':         { bg: '#ffffff', color: '#a8834e' },
-  'Salon privé': { bg: '#ffffff', color: '#DC2626' },
-}
-
 function useIsMobile(bp = 600) {
-  const [v, setV] = useState(() => typeof window !== 'undefined' ? window.innerWidth < bp : false)
+  const [v, setV] = useState(() =>
+    typeof window !== 'undefined' ? window.innerWidth < bp : false
+  )
   useEffect(() => {
     const h = () => setV(window.innerWidth < bp)
     window.addEventListener('resize', h)
@@ -35,192 +22,124 @@ function useIsMobile(bp = 600) {
   return v
 }
 
+// ─── Checkbox ────────────────────────────────────────────────────
 function Checkbox({ checked, indeterminate, onChange }) {
   return (
     <div
       onClick={e => { e.stopPropagation(); onChange() }}
-      style={{
-        width: 18, height: 18, flexShrink: 0,
-        background: checked || indeterminate ? DARK : '#fff',
-        border: `4px solid ${DARK}`,
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        cursor: 'pointer', transition: 'all 0.15s',
-      }}
+      className="tbl-checkbox"
+      style={{ background: checked || indeterminate ? DARK : '#fff' }}
     >
       {checked && (
         <svg width="9" height="7" viewBox="0 0 10 8" fill="none">
           <path d="M1 4L3.5 6.5L9 1" stroke={GOLD} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
       )}
-      {indeterminate && !checked && <div style={{ width: 7, height: 4, background: GOLD }} />}
+      {indeterminate && !checked && (
+        <div style={{ width: 7, height: 4, background: GOLD }} />
+      )}
     </div>
   )
 }
 
+// ─── PageBtn ─────────────────────────────────────────────────────
 function PageBtn({ onClick, disabled, active, children }) {
-  const [hov, setHov] = useState(false)
   return (
     <button
-      onClick={onClick} disabled={disabled}
-      onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
-      style={{
-        minWidth: 36, height: 36, padding: '0 6px',
-        display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-        background: active ? DARK : hov && !disabled ? '#FBF5EA' : '#fff',
-        border: `4px solid ${DARK}`,
-        color: active ? GOLD : DARK,
-        fontSize: 12, fontWeight: active ? 900 : 700,
-        cursor: disabled ? 'not-allowed' : 'pointer',
-        opacity: disabled ? 0.35 : 1,
-        transition: 'all 0.15s', flexShrink: 0,
-      }}
+      onClick={onClick}
+      disabled={disabled}
+      className={`tbl-page-btn ${active ? 'tbl-page-btn--active' : ''}`}
     >
       {children}
     </button>
   )
 }
 
-/* ── Single table row — mirrors ServiceRow exactly ── */
+// ─── TableRow ────────────────────────────────────────────────────
 function TableRow({ tbl, isEditing, isSelected, onEdit, onDelete, onToggle, onSelect, idx }) {
   const { t } = useTranslation()
   const locStyle = LOC_COLORS[tbl.location] || { bg: '#f5f5f5', color: '#666' }
-  const bg = isSelected ? '#ffffff' : isEditing ? '#ffffff' : idx % 2 === 0 ? '#fff' : CREAM
+  const bg = isSelected ? '#ffffff' : isEditing ? '#ffffff' : idx % 2 === 0 ? '#fff' : '#ffffff'
 
   return (
     <div
-      className="tbl-row"
+      className={`tbl-row ${!tbl.active ? 'tbl-row--inactive' : ''}`}
       style={{
-        display: 'grid',
-        gridTemplateColumns: '40px minmax(auto, 1fr) auto',
         background: bg,
-        borderBottom: `1px solid #e8e0d8`,
         borderLeft: `3px solid ${isSelected || isEditing ? GOLD : 'transparent'}`,
-        transition: 'background 0.12s',
-        opacity: tbl.active ? 1 : 0.6,
       }}
     >
-      {/* Checkbox cell */}
-      <div
-        onClick={e => { e.stopPropagation(); onSelect() }}
-        style={{
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          cursor: 'pointer', borderRight: `1px solid #e8e0d8`,
-        }}
-      >
+      {/* Checkbox */}
+      <div className="tbl-row__check-cell" onClick={e => { e.stopPropagation(); onSelect() }}>
         <Checkbox checked={isSelected} onChange={onSelect} />
       </div>
 
-      {/* Content cell */}
-      <div style={{ padding: '14px 16px' }}>
-        {/* Name + inactive badge */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8, flexWrap: 'wrap' }}>
-          <p style={{ margin: 0, fontSize: 15, fontWeight: 900, color: DARK, letterSpacing: '-0.4px' }}>
-            {t('tables_module.header_table', { defaultValue: 'Table' }).charAt(0).toUpperCase() + t('tables_module.header_table', { defaultValue: 'Table' }).slice(1).toLowerCase()} {tbl.number}
+      {/* Content */}
+      <div className="tbl-row__content">
+        <div className="tbl-row__name-row">
+          <p className="tbl-row__name">
+            {t('tables_module.header_table', { defaultValue: 'Table' })} {tbl.number}
           </p>
           {!tbl.active && (
-            <span style={{
-              padding: '2px 8px', background: '#f0f0f0',
-              fontSize: 9, fontWeight: 900, color: '#999',
-              letterSpacing: '0.12em', textTransform: 'uppercase',
-            }}>
-              {t('tables_module.inactive')}
-            </span>
+            <span className="tbl-row__inactive-badge">{t('tables_module.inactive')}</span>
           )}
         </div>
-
-        {/* Tags — capacity + location */}
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-          <span style={{
-            display: 'inline-flex', alignItems: 'center', gap: 5,
-            padding: '3px 9px', background: '#ffffff',
-            fontSize: 11, fontWeight: 800, color: GOLD_DK,
-            whiteSpace: 'nowrap',
-          }}>
+        <div className="tbl-row__tags">
+          <span className="tbl-row__tag" style={{ background: '#ffffff', color: GOLD_DK }}>
             <Users size={10} strokeWidth={2.5} color={GOLD} />
             {tbl.capacity} {t('tables_module.persons_max')}
           </span>
-          <span style={{
-            display: 'inline-flex', alignItems: 'center', gap: 5,
-            padding: '3px 9px', background: locStyle.bg,
-            fontSize: 11, fontWeight: 700, color: locStyle.color,
-            whiteSpace: 'nowrap',
-          }}>
+          <span className="tbl-row__tag" style={{ background: locStyle.bg, color: locStyle.color }}>
             <MapPin size={10} strokeWidth={2.5} color={locStyle.color} />
             {tbl.location}
           </span>
         </div>
       </div>
 
-      {/* Actions cell */}
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '8px 12px', borderLeft: `1px solid #e8e0d8` }}>
-
+      {/* Actions */}
+      <div className="tbl-row__actions">
         {/* Toggle */}
-        <ToggleActionBtn tbl={tbl} onToggle={onToggle} />
+        <button
+          onClick={() => onToggle(tbl)}
+          title={tbl.active ? t('tables_module.deactivate') : t('tables_module.activate')}
+          className={`tbl-icon-btn ${tbl.active ? 'tbl-icon-btn--green' : 'tbl-icon-btn--grey'}`}
+        >
+          {tbl.active
+            ? <ToggleRight size={14} strokeWidth={2.5} />
+            : <ToggleLeft  size={14} strokeWidth={2.5} />
+          }
+        </button>
 
-        {/* Edit */}
         <button
           onClick={() => onEdit(tbl)}
           title={t('tables_module.edit')}
-          style={{
-            display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-            padding: 6, borderRadius: '50%',
-            background: GOLD, border: 'none', color: '#fff',
-            cursor: 'pointer', transition: 'opacity 0.15s',
-          }}
-          onMouseEnter={e => e.currentTarget.style.opacity = 0.85}
-          onMouseLeave={e => e.currentTarget.style.opacity = 1}
+          className="tbl-icon-btn tbl-icon-btn--gold"
         >
           <Pencil size={14} strokeWidth={2.5} />
         </button>
 
-        {/* Delete */}
         <button
           onClick={() => onDelete(tbl)}
           title={t('tables_module.delete')}
-          style={{
-            display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-            padding: 6, borderRadius: '50%',
-            background: RED, border: 'none', color: '#fff',
-            cursor: 'pointer', transition: 'opacity 0.15s',
-          }}
-          onMouseEnter={e => e.currentTarget.style.opacity = 0.85}
-          onMouseLeave={e => e.currentTarget.style.opacity = 1}
+          className="tbl-icon-btn tbl-icon-btn--red"
         >
           <Trash2 size={14} strokeWidth={2.5} />
         </button>
-
       </div>
     </div>
   )
 }
 
-/* Toggle button — top slot of the actions column */
-function ToggleActionBtn({ tbl, onToggle }) {
-  const { t } = useTranslation()
-  const isActive = tbl.active
-  return (
-    <button
-      onClick={() => onToggle(tbl)}
-      title={isActive ? t('tables_module.deactivate') : t('tables_module.activate')}
-      style={{
-        display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-        padding: 6, borderRadius: '50%',
-        background: isActive ? GREEN : '#aaa', // green if active, grey if inactive
-        border: 'none', color: '#fff',
-        cursor: 'pointer', transition: 'opacity 0.15s',
-      }}
-      onMouseEnter={e => e.currentTarget.style.opacity = 0.85}
-      onMouseLeave={e => e.currentTarget.style.opacity = 1}
-    >
-      {isActive
-        ? <ToggleRight size={14} strokeWidth={2.5} />
-        : <ToggleLeft  size={14} strokeWidth={2.5} />
-      }
-    </button>
-  )
-}
-
-export default function TableList({ tables, editingTbl, onEdit, onDelete, onToggle, selectedTables, setSelectedTables }) {
+// ─── TableList ────────────────────────────────────────────────────
+export default function TableList({
+  tables,
+  editingTbl,
+  onEdit,
+  onDelete,
+  onToggle,
+  selectedTables,
+  setSelectedTables,
+}) {
   const { t } = useTranslation()
   const [page, setPage] = useState(1)
   const isXs = useIsMobile(400)
@@ -229,12 +148,10 @@ export default function TableList({ tables, editingTbl, onEdit, onDelete, onTogg
 
   if (!tables || tables.length === 0) {
     return (
-      <div style={{ padding: '56px 16px', textAlign: 'center', background: '#fff', border: `4px solid ${BORDER}` }}>
-        <LayoutGrid size={40} color={DARK} strokeWidth={1.5} style={{ display: 'block', margin: '0 auto 14px' }} />
-        <p style={{ margin: 0, fontSize: 15, fontWeight: 900, color: DARK }}>{t('tables_module.no_tables_found')}</p>
-        <p style={{ margin: '6px 0 0', fontSize: 12, fontWeight: 600, color: DARK }}>
-          {t('tables_module.use_form_to_add')}
-        </p>
+      <div className="tbl-list__empty">
+        <LayoutGrid size={40} color={DARK} strokeWidth={1.5} style={{ display: 'block', margin: '0 auto' }} />
+        <p className="tbl-list__empty-title">{t('tables_module.no_tables_found')}</p>
+        <p className="tbl-list__empty-sub">{t('tables_module.use_form_to_add')}</p>
       </div>
     )
   }
@@ -272,39 +189,30 @@ export default function TableList({ tables, editingTbl, onEdit, onDelete, onTogg
 
   return (
     <>
-      <style>{`@media (hover: hover) { .tbl-row:hover { background: #ffffff !important; } }`}</style>
-
       {/* Stats bar */}
-      <div style={{ display: 'flex', gap: 0, marginBottom: 12 }}>
+      <div className="tbl-stats">
         {[
-          { label: t('tables_module.total'),    val: tables.length },
-          { label: t('tables_module.actives'),  val: activeCnt },
-          { label: t('tables_module.capacity'), val: `${totalCap} ${t('tables_module.persons')}` },
+          { label: t('tables_module.total'),    val: tables.length,    bg: '#423428' },
+          { label: t('tables_module.actives'),  val: activeCnt,        bg: '#3d2d1e' },
+          { label: t('tables_module.capacity'), val: `${totalCap} ${t('tables_module.persons')}`, bg: '#4a3525' },
         ].map((s, i) => (
-          <div key={i} style={{
-            flex: 1,
-            padding: '10px 18px',
-            background: i === 0 ? DARK : i === 1 ? '#3d2d1e' : '#4a3525',
-            borderRight: i < 2 ? `1px solid #4a3525` : 'none',
-            overflow: 'visible',
-          }}>
-            <p style={{ margin: 0, fontSize: 9, fontWeight: 900, color: GOLD, letterSpacing: '0.18em', textTransform: 'uppercase' }}>{s.label}</p>
-            <p style={{ margin: '2px 0 0', fontSize: 20, fontWeight: 900, color: '#fff', whiteSpace: 'nowrap' }}>{s.val}</p>
+          <div key={i} className="tbl-stats__item" style={{ background: s.bg }}>
+            <p className="tbl-stats__label">{s.label}</p>
+            <p className="tbl-stats__value">{s.val}</p>
           </div>
         ))}
       </div>
 
-      <div style={{ border: `1px solid ${BORDER}`, overflow: 'hidden' }}>
-
+      <div className="tbl-list">
         {/* Partial selection banner */}
         {selectedTables.length > 0 && !allSel && (
-          <div style={{ padding: '9px 14px', background: '#ffffff', borderBottom: `1px solid #e8e0d6`, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, flexWrap: 'wrap' }}>
-            <span style={{ fontSize: 12, fontWeight: 700, color: GOLD_DK }}>
+          <div className="tbl-list__banner" style={{ background: '#ffffff' }}>
+            <span className="tbl-list__banner-text">
               {t('tables_module.selected_count', { count: selectedTables.length })}
             </span>
             <button
               onClick={() => setSelectedTables(tables.map(t => t.idx))}
-              style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 800, color: DARK, textDecoration: 'underline', fontFamily: 'inherit', padding: 0 }}
+              className="tbl-list__banner-action"
             >
               {t('tables_module.select_all', { count: tables.length })}
             </button>
@@ -313,11 +221,13 @@ export default function TableList({ tables, editingTbl, onEdit, onDelete, onTogg
 
         {/* All selected banner */}
         {allSel && tables.length > PAGE_SIZE && (
-          <div style={{ padding: '9px 14px', background: GREEN_BG, borderBottom: `1px solid #b8ddb8`, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, flexWrap: 'wrap' }}>
-            <span style={{ fontSize: 12, fontWeight: 700, color: GREEN }}>{t('tables_module.tables_selected_count', { count: tables.length })}</span>
+          <div className="tbl-list__banner tbl-list__banner--green" style={{ background: '#ffffff', borderBottom: '1px solid #b8ddb8' }}>
+            <span className="tbl-list__banner-text">
+              {t('tables_module.tables_selected_count', { count: tables.length })}
+            </span>
             <button
               onClick={() => setSelectedTables([])}
-              style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 800, color: GREEN, textDecoration: 'underline', fontFamily: 'inherit', padding: 0 }}
+              className="tbl-list__banner-action"
             >
               {t('tables_module.deselect_all')}
             </button>
@@ -325,17 +235,12 @@ export default function TableList({ tables, editingTbl, onEdit, onDelete, onTogg
         )}
 
         {/* Header */}
-        <div style={{
-          display: 'grid', gridTemplateColumns: '40px minmax(auto, 1fr) auto',
-          padding: '10px 16px', background: DARK, alignItems: 'center',
-        }}>
+        <div className="tbl-list__header">
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <Checkbox checked={pageAllSel} indeterminate={pageSomeSel} onChange={togglePage} />
           </div>
-          <span style={{ fontSize: 9, fontWeight: 900, color: GOLD, letterSpacing: '0.2em', textTransform: 'uppercase' }}>
-            {t('tables_module.table_name_col')}
-          </span>
-          <span style={{ fontSize: 9, fontWeight: 900, color: GOLD, letterSpacing: '0.2em', textTransform: 'uppercase', paddingRight: 4 }}>
+          <span className="tbl-list__col-label">{t('tables_module.table_name_col')}</span>
+          <span className="tbl-list__col-label" style={{ paddingRight: 4 }}>
             {t('tables_module.actions_col')}
           </span>
         </div>
@@ -357,28 +262,35 @@ export default function TableList({ tables, editingTbl, onEdit, onDelete, onTogg
 
         {/* Pagination */}
         {total > 1 && (
-          <div style={{
-            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-            flexWrap: 'wrap', gap: 8, padding: '12px 14px',
-            borderTop: `4px solid ${BORDER}`, background: CREAM,
-          }}>
-            <span style={{ fontSize: 11, fontWeight: 700, color: DARK, flexShrink: 0 }}>
+          <div className="tbl-pagination">
+            <span className="tbl-pagination__info">
               {(safe - 1) * PAGE_SIZE + 1}–{Math.min(safe * PAGE_SIZE, tables.length)} / {tables.length}
             </span>
-            <div style={{ display: 'flex', gap: 3, flexWrap: 'wrap' }}>
-              {!isXs && <PageBtn onClick={() => setPage(1)} disabled={safe === 1}><ChevronsLeft size={12} strokeWidth={2.5} /></PageBtn>}
-              <PageBtn onClick={() => setPage(p => Math.max(1, p - 1))} disabled={safe === 1}><ChevronLeft size={12} strokeWidth={2.5} /></PageBtn>
+            <div className="tbl-pagination__pages">
+              {!isXs && (
+                <PageBtn onClick={() => setPage(1)} disabled={safe === 1}>
+                  <ChevronsLeft size={12} strokeWidth={2.5} />
+                </PageBtn>
+              )}
+              <PageBtn onClick={() => setPage(p => Math.max(1, p - 1))} disabled={safe === 1}>
+                <ChevronLeft size={12} strokeWidth={2.5} />
+              </PageBtn>
               {getPages().map((p, i) =>
                 p === '…'
                   ? <span key={`d${i}`} style={{ padding: '0 2px', fontSize: 12, color: DARK, lineHeight: '36px' }}>…</span>
                   : <PageBtn key={p} active={p === safe} onClick={() => setPage(p)}>{p}</PageBtn>
               )}
-              <PageBtn onClick={() => setPage(p => Math.min(total, p + 1))} disabled={safe === total}><ChevronRight size={12} strokeWidth={2.5} /></PageBtn>
-              {!isXs && <PageBtn onClick={() => setPage(total)} disabled={safe === total}><ChevronsRight size={12} strokeWidth={2.5} /></PageBtn>}
+              <PageBtn onClick={() => setPage(p => Math.min(total, p + 1))} disabled={safe === total}>
+                <ChevronRight size={12} strokeWidth={2.5} />
+              </PageBtn>
+              {!isXs && (
+                <PageBtn onClick={() => setPage(total)} disabled={safe === total}>
+                  <ChevronsRight size={12} strokeWidth={2.5} />
+                </PageBtn>
+              )}
             </div>
           </div>
         )}
-
       </div>
     </>
   )

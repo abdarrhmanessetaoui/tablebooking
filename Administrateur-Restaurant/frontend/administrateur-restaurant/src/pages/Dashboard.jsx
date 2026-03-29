@@ -10,7 +10,7 @@ import Spinner           from '../components/Dashboard/Spinner'
 import Btn               from '../components/Dashboard/Btn'
 import LiveClock         from '../components/Dashboard/LiveClock'
 import TabPanel          from '../components/Dashboard/TabPanel'
-import { exportPDF }     from '../utils/exportPDF'
+import { exportPDF }     from '../utils/export'
 import { getToken }      from '../utils/auth'
 
 import {
