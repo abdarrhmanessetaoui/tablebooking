@@ -1,0 +1,70 @@
+/* ─── Settings module styles ─────────────────────────────────── */
+
+* {
+    box-sizing: border-box;
+  }
+  
+  /* Save button label: hidden on small screens */
+  .save-btn-label {
+    display: inline;
+  }
+  @media (max-width: 600px) {
+    .save-btn-label {
+      display: none;
+    }
+  }
+  
+  /* Toggle open/closed button text */
+  .toggle-btn-text {
+    display: inline;
+  }
+  @media (max-width: 600px) {
+    .toggle-btn-text {
+      display: none;
+    }
+  }
+  
+  /* Day pill sub-label (e.g. "2 svc" or "closed") */
+  .day-pill-sub {
+    display: block;
+  }
+  @media (max-width: 480px) {
+    .day-pill-sub {
+      display: none;
+    }
+  }
+  
+  /* Day pill button padding */
+  .day-pill-pad {
+    padding: 10px 14px !important;
+    min-width: 58px !important;
+  }
+  @media (max-width: 480px) {
+    .day-pill-pad {
+      padding: 8px 6px !important;
+      min-width: 36px !important;
+    }
+  }
+  
+  /* Time editor row gap */
+  .time-editor {
+    gap: 20px;
+  }
+  @media (max-width: 480px) {
+    .time-editor {
+      gap: 10px;
+    }
+  }
+  
+  /* Responsive 2-col grid */
+  .settings-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+  }
+  @media (max-width: 500px) {
+    .settings-grid {
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+  }
