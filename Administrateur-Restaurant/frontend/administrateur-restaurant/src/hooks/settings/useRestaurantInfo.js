@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react'
-import { getToken } from '../utils/auth'
+import { getToken } from '../../utils/auth'
 
 export default function useRestaurantInfo() {
-  const [info, setInfo]       = useState(null)
+  const [info,    setInfo]    = useState(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -10,7 +10,7 @@ export default function useRestaurantInfo() {
       headers: {
         'Authorization': `Bearer ${getToken()}`,
         'Accept': 'application/json',
-      }
+      },
     })
       .then(r => r.json())
       .then(d => setInfo(d))

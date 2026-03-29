@@ -1,0 +1,5 @@
+export const DARK    = '#423428'
+export const GOLD    = '#c8a97e'
+export const GOLD_DK = '#a8834e'
+export const CREAM   = '#ffffff'
+export const BORDER  = '#423428'

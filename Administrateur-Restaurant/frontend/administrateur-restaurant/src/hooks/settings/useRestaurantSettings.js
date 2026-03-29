@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
-import { getToken } from '../utils/auth'
-import { toast } from '../components/ui/Toast'
-import i18n from '../i18n'
+import { getToken } from '../../utils/auth'
+import { toast } from '../../components/ui/Toast'
+import i18n from '../../i18n'
 
 const BASE  = 'http://localhost:8000/api'
 const hGet  = () => ({ 'Accept': 'application/json', 'Authorization': `Bearer ${getToken()}` })
@@ -12,14 +12,13 @@ function normalizeDaySlots(oh) {
   if (oh.openhours?.length === 7) return oh
   return {
     ...oh,
-    openhours: Array.from({ length: 7 }, (_, d) => ({
-      ...base, type: 'day', d: String(d),
-    })),
+    openhours: Array.from({ length: 7 }, (_, d) => ({ ...base, type: 'day', d: String(d) })),
   }
 }
 
 export default function useRestaurantSettings() {
 
+  // ── Info ─────────────────────────────────────────────────────
   const [info, setInfo] = useState({
     form_name: '', capacity: '', address: '',
     google_maps_link: '', website: '', phone: '',
@@ -28,15 +27,18 @@ export default function useRestaurantSettings() {
   const [infoLoading, setInfoLoading] = useState(true)
   const [savingInfo,  setSavingInfo]  = useState(false)
 
-  const [hours,            setHours]            = useState({ allOH: [], working_dates: [] })
-  const [activeService,    setActiveServiceIdx] = useState(0)
-  const [activeDay,        setActiveDay]        = useState(1)
-  const [hoursLoading,     setHoursLoading]     = useState(true)
-  const [savingHours,      setSavingHours]      = useState(false)
+  // ── Hours ────────────────────────────────────────────────────
+  const [hours,        setHours]        = useState({ allOH: [], working_dates: [] })
+  const [activeService,setActiveServiceIdx] = useState(0)
+  const [activeDay,    setActiveDay]    = useState(1)
+  const [hoursLoading, setHoursLoading] = useState(true)
+  const [savingHours,  setSavingHours]  = useState(false)
 
-  const [services,         setServices]         = useState([])
-  const [servicesLoading,  setServicesLoading]  = useState(true)
+  // ── Services ─────────────────────────────────────────────────
+  const [services,        setServices]        = useState([])
+  const [servicesLoading, setServicesLoading] = useState(true)
 
+  // ── Notifications ─────────────────────────────────────────────
   const [notifications, setNotifications] = useState({
     fp_from_name: '', fp_from_email: '',
     fp_destination_emails: '', defaultstatus: 'Pending',
@@ -72,41 +74,36 @@ export default function useRestaurantSettings() {
 
   useEffect(() => {
     Promise.all([
-      fetch(`${BASE}/time-slots`,         { headers: hGet() }).then(r => r.json()),
-      fetch(`${BASE}/restaurant/services`,{ headers: hGet() }).then(r => r.json()),
-    ]).then(([d, svcs]) => {
-      const normalized = (d.allOH ?? []).map(normalizeDaySlots)
-      const svcList    = Array.isArray(svcs) ? svcs : []
-
-      setHours({
-        allOH:         normalized,
-        working_dates: d.working_dates ?? [false,true,true,true,true,true,true],
+      fetch(`${BASE}/time-slots`,          { headers: hGet() }).then(r => r.json()),
+      fetch(`${BASE}/restaurant/services`, { headers: hGet() }).then(r => r.json()),
+    ])
+      .then(([d, svcs]) => {
+        const normalized = (d.allOH ?? []).map(normalizeDaySlots)
+        const svcList    = Array.isArray(svcs) ? svcs : []
+        setHours({ allOH: normalized, working_dates: d.working_dates ?? [false,true,true,true,true,true,true] })
+        setServices(svcList)
+        const firstOpen = (d.working_dates ?? [false,true,true,true,true,true,true]).findIndex(Boolean)
+        if (firstOpen >= 0) setActiveDay(firstOpen)
       })
-      setServices(svcList)
-
-      const firstOpen = (d.working_dates ?? [false,true,true,true,true,true,true]).findIndex(Boolean)
-      if (firstOpen >= 0) setActiveDay(firstOpen)
-    })
-    .catch(() => toast(i18n.t('settings_module.error_loading_hours'), 'error'))
-    .finally(() => { setHoursLoading(false); setServicesLoading(false) })
+      .catch(() => toast(i18n.t('settings_module.error_loading_hours'), 'error'))
+      .finally(() => { setHoursLoading(false); setServicesLoading(false) })
   }, [])
 
   // ── Derived ──────────────────────────────────────────────────
 
-  // Only services available on the currently selected day
   const servicesOnActiveDay = services.filter(svc =>
     (svc.available_days ?? [0,1,2,3,4,5,6]).includes(activeDay)
   )
 
-  // ── Actions ──────────────────────────────────────────────────
+  // ── Setters ──────────────────────────────────────────────────
 
   const setInfoField  = (key, val) => setInfo(p => ({ ...p, [key]: val }))
   const setNotifField = (key, val) => setNotifications(p => ({ ...p, [key]: val }))
 
-  const toggleWorkingDay = (dayIdx) =>
+  const toggleWorkingDay = dayIdx =>
     setHours(p => ({ ...p, working_dates: p.working_dates.map((v, i) => i === dayIdx ? !v : v) }))
 
-  const updateDayOH = (ohindex, dayIdx, field, value) => {
+  const updateDayOH = (ohindex, dayIdx, field, value) =>
     setHours(p => ({
       ...p,
       allOH: p.allOH.map((oh, i) =>
@@ -115,14 +112,13 @@ export default function useRestaurantSettings() {
           : oh
       ),
     }))
-  }
+
+  // ── Saves ────────────────────────────────────────────────────
 
   async function saveInfo() {
     setSavingInfo(true)
     try {
-      const res = await fetch(`${BASE}/restaurant/info`, {
-        method: 'PUT', headers: hJson(), body: JSON.stringify(info),
-      })
+      const res = await fetch(`${BASE}/restaurant/info`, { method: 'PUT', headers: hJson(), body: JSON.stringify(info) })
       if (!res.ok) throw new Error(res.status)
       toast(i18n.t('settings_module.info_saved'), 'success')
     } catch { toast(i18n.t('settings_module.error_saving_info'), 'error') }
@@ -134,10 +130,7 @@ export default function useRestaurantSettings() {
     try {
       const res = await fetch(`${BASE}/time-slots`, {
         method: 'PUT', headers: hJson(),
-        body: JSON.stringify({
-          allOH:         hours.allOH,
-          working_dates: hours.working_dates,
-        }),
+        body: JSON.stringify({ allOH: hours.allOH, working_dates: hours.working_dates }),
       })
       if (!res.ok) throw new Error(res.status)
       toast(i18n.t('settings_module.hours_saved'), 'success')
@@ -148,9 +141,7 @@ export default function useRestaurantSettings() {
   async function saveNotif() {
     setSavingNotif(true)
     try {
-      const res = await fetch(`${BASE}/restaurant/notifications`, {
-        method: 'PUT', headers: hJson(), body: JSON.stringify(notifications),
-      })
+      const res = await fetch(`${BASE}/restaurant/notifications`, { method: 'PUT', headers: hJson(), body: JSON.stringify(notifications) })
       if (!res.ok) throw new Error(res.status)
       toast(i18n.t('settings_module.notif_saved'), 'success')
     } catch { toast(i18n.t('settings_module.error_saving_notif'), 'error') }
