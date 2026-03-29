@@ -1,0 +1,143 @@
+/* styles/Reports/BarChart.css */
+
+.barchart {
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .barchart--empty {
+    padding: 28px 24px;
+  }
+  
+  .barchart__header {
+    padding: 18px 20px 16px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  
+  .barchart__label {
+    font-size: 9px;
+    font-weight: 900;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #c8a97e;
+    margin-bottom: 5px;
+  }
+  
+  .barchart__subtitle {
+    font-size: 13px;
+    font-weight: 800;
+  }
+  
+  .barchart__subtitle--muted {
+    font-size: 12px;
+    font-weight: 700;
+    color: rgba(66, 52, 40, 0.4);
+    margin-bottom: 20px;
+  }
+  
+  .barchart__max-val {
+    font-size: 28px;
+    font-weight: 900;
+    letter-spacing: -1.5px;
+    line-height: 1;
+  }
+  
+  .barchart__max-label {
+    font-size: 9px;
+    font-weight: 900;
+    color: #c8a97e;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-top: 3px;
+  }
+  
+  .barchart__empty-msg {
+    height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 900;
+    color: rgba(66, 52, 40, 0.15);
+  }
+  
+  /* Bars area */
+  .barchart__bars-wrap {
+    padding: 20px 16px 0;
+  }
+  
+  .barchart__bars {
+    display: flex;
+    align-items: flex-end;
+  }
+  
+  .barchart__bar-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    height: 100%;
+    gap: 0;
+    min-width: 0;
+  }
+  
+  .barchart__bar-top-val {
+    font-size: 9px;
+    font-weight: 900;
+    height: 14px;
+    line-height: 14px;
+    margin-bottom: 3px;
+    font-variant-numeric: tabular-nums;
+  }
+  
+  .barchart__bar {
+    width: 100%;
+    transition: height 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  
+  /* X labels row */
+  .barchart__xlabels {
+    display: flex;
+    margin-top: 6px;
+    padding-bottom: 16px;
+  }
+  
+  .barchart__xlabel {
+    flex: 1;
+    text-align: center;
+    font-weight: 800;
+    color: #423428;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+  }
+  
+  /* Footer */
+  .barchart__footer {
+    margin-top: auto;
+    padding: 12px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .barchart__footer-label {
+    font-size: 11px;
+    font-weight: 800;
+    color: #423428;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+  
+  .barchart__footer-val {
+    font-size: 20px;
+    font-weight: 900;
+    color: #423428;
+    letter-spacing: -1px;
+  }

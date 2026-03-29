@@ -2,12 +2,14 @@ import { useState, useEffect, useCallback, useMemo } from 'react'
 import { getToken } from '../../utils/auth'
 import i18n from '../../i18n'
 
+/* ════ Week number ════ */
 function getWeekNum(d) {
   const t = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()))
   t.setUTCDate(t.getUTCDate() + 4 - (t.getUTCDay() || 7))
   const y0 = new Date(Date.UTC(t.getUTCFullYear(), 0, 1))
   return Math.ceil((((t - y0) / 86400000) + 1) / 7)
 }
+
 function inc(obj, key) { obj[key] = (obj[key] || 0) + 1 }
 
 const getDayKey = (d) => {
@@ -20,6 +22,7 @@ const getMonthKey = (m, y) => {
   return `${i18n.t(`services_module.${keys[m]}_short`)} ${y}`
 }
 
+/* ════ Filters ════ */
 function filterByPeriod(rows, period) {
   if (period === 'all') return rows
   const now   = new Date()
@@ -47,6 +50,7 @@ function filterByDate(rows, filterDate) {
   return rows
 }
 
+/* ════ Aggregation ════ */
 function aggregate(rows) {
   const by_hour    = {}
   const by_day     = {}
@@ -58,44 +62,50 @@ function aggregate(rows) {
   let confirmed = 0, pending = 0, cancelled = 0, guests_sum = 0, guests_n = 0
 
   for (const r of rows) {
-    if (r.status === 'Confirmed') confirmed++
-    else if (r.status === 'Cancelled') cancelled++
-    else pending++
+    if (r.status === 'Confirmed')       confirmed++
+    else if (r.status === 'Cancelled')  cancelled++
+    else                                pending++
+
     if (r.guests) { guests_sum += parseInt(r.guests); guests_n++ }
-    if (r.start_time) inc(by_hour, r.start_time.slice(0, 5))
+    if (r.start_time) inc(by_hour,    r.start_time.slice(0, 5))
     if (r.service)    inc(by_service, r.service)
-    if (r.guests)     inc(by_guests, i18n.t('reports_module.persons_count', { count: parseInt(r.guests) }))
+    if (r.guests)     inc(by_guests,  i18n.t('reports_module.persons_count', { count: parseInt(r.guests) }))
+
     if (r.date) {
       const d  = new Date(r.date)
-      const yr = d.getFullYear(), mo = d.getMonth()
-      inc(by_day, getDayKey(d))
+      const yr = d.getFullYear()
+      const mo = d.getMonth()
+      inc(by_day,   getDayKey(d))
       const wn = getWeekNum(d)
-      inc(by_week,  `${i18n.t('reports_module.week_prefix')}${String(wn).padStart(2,'0')} '${String(yr).slice(2)}`)
+      inc(by_week,  `${i18n.t('reports_module.week_prefix')}${String(wn).padStart(2, '0')} '${String(yr).slice(2)}`)
       inc(by_month, getMonthKey(mo, yr))
       inc(by_year,  String(yr))
     }
   }
+
   return {
     by_hour:    Object.fromEntries(Object.entries(by_hour).sort()),
     by_day,
     by_week:    Object.fromEntries(Object.entries(by_week).sort()),
-    by_month:   Object.fromEntries(Object.entries(by_month).sort((a,b)=>{
-      // attempt year sort, then month sort
-      const [m1,y1]=a[0].split(' ')
-      const [m2,y2]=b[0].split(' ')
-      if (y1!==y2) return y1-y2
-      return 0 // key sort is tricky here due to localized names, but the backend usually sends them in order or we can improve this if needed
+    by_month:   Object.fromEntries(Object.entries(by_month).sort((a, b) => {
+      const [, y1] = a[0].split(' ')
+      const [, y2] = b[0].split(' ')
+      return y1 !== y2 ? y1 - y2 : 0
     })),
     by_year:    Object.fromEntries(Object.entries(by_year).sort()),
-    by_guests:  Object.fromEntries(Object.entries(by_guests).sort((a,b) => parseInt(a[0]) - parseInt(b[0]))),
-    by_service: Object.fromEntries(Object.entries(by_service).sort((a,b) => b[1] - a[1])),
+    by_guests:  Object.fromEntries(Object.entries(by_guests).sort((a, b) => parseInt(a[0]) - parseInt(b[0]))),
+    by_service: Object.fromEntries(Object.entries(by_service).sort((a, b) => b[1] - a[1])),
     summary: {
-      total: rows.length, confirmed, pending, cancelled,
+      total: rows.length,
+      confirmed,
+      pending,
+      cancelled,
       avg_guests: guests_n > 0 ? Math.round((guests_sum / guests_n) * 10) / 10 : 0,
     },
   }
 }
 
+/* ════ Hook ════ */
 export default function useReports() {
   const [rows,          setRows]          = useState([])
   const [loading,       setLoading]       = useState(true)
@@ -106,17 +116,23 @@ export default function useReports() {
   const [filterDate,    setFilterDate]    = useState('')
 
   const fetchAll = useCallback(async () => {
-    setLoading(true); setError('')
+    setLoading(true)
+    setError('')
     try {
       const res = await fetch('http://localhost:8000/api/restaurant/reservations', {
-        headers: { 'Accept': 'application/json', 'Authorization': `Bearer ${getToken()}` }
+        headers: {
+          'Accept':        'application/json',
+          'Authorization': `Bearer ${getToken()}`,
+        },
       })
       if (!res.ok) throw new Error(`${i18n.t('dashboard.error_prefix', { defaultValue: 'Error' })} ${res.status}`)
       const json = await res.json()
       setRows(Array.isArray(json) ? json : [])
     } catch (e) {
       setError(e.message || i18n.t('reports_module.error_loading'))
-    } finally { setLoading(false) }
+    } finally {
+      setLoading(false)
+    }
   }, [])
 
   useEffect(() => { fetchAll() }, [fetchAll])
@@ -128,17 +144,18 @@ export default function useReports() {
 
   const data = useMemo(() => {
     let filtered = filterByPeriod(rows, period)
+
     if (status !== 'all') {
       const s = status.charAt(0).toUpperCase() + status.slice(1)
       filtered = filtered.filter(r => r.status === s)
     }
     if (filterService && filterService !== 'all')
       filtered = filtered.filter(r => r.service === filterService)
+
     filtered = filterByDate(filtered, filterDate)
     return aggregate(filtered)
   }, [rows, period, status, filterService, filterDate])
 
-  // ✅ No setSearch — it doesn't exist in this hook
   function clearFilters() {
     setPeriod('all')
     setStatus('all')

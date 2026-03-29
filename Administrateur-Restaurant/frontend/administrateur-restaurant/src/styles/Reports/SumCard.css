@@ -1,0 +1,28 @@
+/* styles/Reports/SumCard.css */
+
+.sumcard {
+    padding: 18px 20px;
+  }
+  
+  .sumcard__header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 10px;
+  }
+  
+  .sumcard__label {
+    font-size: 9px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+  }
+  
+  .sumcard__value {
+    margin: 0;
+    font-size: clamp(26px, 4vw, 42px);
+    font-weight: 900;
+    letter-spacing: -2px;
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+  }

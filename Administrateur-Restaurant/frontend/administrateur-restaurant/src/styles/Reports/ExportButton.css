@@ -1,0 +1,28 @@
+/* styles/Reports/ExportButton.css */
+
+.export-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 11px 20px;
+    background: #c8a97e;
+    border: none;
+    color: #423428;
+    font-size: 13px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+    font-family: inherit;
+    white-space: nowrap;
+  }
+  
+  .export-btn--hov {
+    background: #423428;
+    color: #c8a97e;
+  }
+  
+  .export-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }

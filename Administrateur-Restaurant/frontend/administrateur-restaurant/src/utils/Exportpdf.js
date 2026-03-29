@@ -1,4 +1,5 @@
 import { DARK, GOLD, GREEN, RED, AMBER } from '../styles/dashboard/tokens'
+import i18n from '../i18n'
 
 function hexToRgb(hex) {
   const r = parseInt(hex.slice(1,3),16)
@@ -7,10 +8,10 @@ function hexToRgb(hex) {
   return [r,g,b]
 }
 
-function statusMeta(status) {
-  if (status === 'Confirmed') return { label: 'Confirmée',  rgb: hexToRgb(GREEN) }
-  if (status === 'Cancelled') return { label: 'Annulée',    rgb: hexToRgb(RED)   }
-  return                             { label: 'En attente', rgb: hexToRgb(AMBER) }
+function statusMeta(status, t) {
+  if (status === 'Confirmed') return { label: t('status_confirmed'),  rgb: hexToRgb(GREEN) }
+  if (status === 'Cancelled') return { label: t('status_cancelled'),    rgb: hexToRgb(RED)   }
+  return                             { label: t('status_pending'), rgb: hexToRgb(AMBER) }
 }
 
 function trunc(doc, text, maxW) {
@@ -20,7 +21,7 @@ function trunc(doc, text, maxW) {
   return t.length < String(text).length ? t.slice(0,-1) + '…' : t
 }
 
-export function exportPDF(stats, reservations = [], tabLabel = "Aujourd'hui") {
+export function exportPDF(stats, reservations = [], tabLabel = i18n.t('dashboard_today'), t = i18n.t) {
   const { jsPDF } = window.jspdf
   const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' })
 
@@ -30,9 +31,10 @@ export function exportPDF(stats, reservations = [], tabLabel = "Aujourd'hui") {
   const PAGE_H = 297
   const FOOT_Y = PAGE_H - 12
 
-  const today    = new Date().toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'long', year:'numeric' })
-  const now      = new Date().toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit' })
-  const filename = `dashboard_${new Date().toISOString().slice(0,10)}.pdf`
+  const lang     = i18n.language || 'en'
+  const today    = new Date().toLocaleDateString(lang, { weekday:'long', day:'numeric', month:'long', year:'numeric' })
+  const now      = new Date().toLocaleTimeString(lang, { hour:'2-digit', minute:'2-digit' })
+  const filename = `${t('dashboard_pdf_filename_prefix')}_${new Date().toISOString().slice(0,10)}.pdf`
 
   const setD = () => doc.setTextColor(...hexToRgb(DARK))
   const setG = () => doc.setTextColor(...hexToRgb(GOLD))
@@ -44,7 +46,7 @@ export function exportPDF(stats, reservations = [], tabLabel = "Aujourd'hui") {
     doc.setLineWidth(0.4)
     doc.line(PAD, FOOT_Y - 2, PW - PAD, FOOT_Y - 2)
     doc.setFont('helvetica','bold'); doc.setFontSize(7); setG()
-    doc.text('TableBooking.ma', PAD, FOOT_Y + 3)
+    doc.text(`${t('brand_name')}.ma`, PAD, FOOT_Y + 3)
     doc.setFont('helvetica','normal'); setD()
     doc.text(`${today} · ${now}`, PW - PAD, FOOT_Y + 3, { align:'right' })
   }
@@ -55,8 +57,8 @@ export function exportPDF(stats, reservations = [], tabLabel = "Aujourd'hui") {
     doc.rect(0, 0, PW, 26, 'F')
 
     doc.setFont('helvetica','bold'); doc.setFontSize(14); setG()
-    doc.text('TableBooking', PAD, 16)
-    const lw = doc.getTextWidth('TableBooking')
+    doc.text(t('brand_name'), PAD, 16)
+    const lw = doc.getTextWidth(t('brand_name'))
     setW(); doc.text('.ma', PAD + lw, 16)
 
     doc.setFontSize(7); setG()
@@ -89,12 +91,12 @@ export function exportPDF(stats, reservations = [], tabLabel = "Aujourd'hui") {
 
   // ── 6 stat cards in one row ───────────────────────────────────────
   const statItems = [
-    { v: stats.today,           l: "Aujourd'hui", accent: DARK  },
-    { v: stats.today_confirmed, l: 'Confirmées',  accent: GREEN },
-    { v: stats.today_pending,   l: 'En attente',  accent: AMBER },
-    { v: stats.today_cancelled, l: 'Annulées',    accent: RED   },
-    { v: stats.tomorrow,        l: 'Demain',      accent: GOLD  },
-    { v: stats.total,           l: 'Ce mois',     accent: DARK  },
+    { v: stats.today,           l: t('dashboard_today'),      accent: DARK  },
+    { v: stats.today_confirmed, l: t('dashboard_confirmed'),  accent: GREEN },
+    { v: stats.today_pending,   l: t('dashboard_pending'),    accent: AMBER },
+    { v: stats.today_cancelled, l: t('dashboard_cancelled'),  accent: RED   },
+    { v: stats.tomorrow,        l: t('dashboard_tomorrow'),   accent: GOLD  },
+    { v: stats.total,           l: t('dashboard_this_month'), accent: DARK  },
   ]
 
   const sw = COL / statItems.length
@@ -130,16 +132,16 @@ export function exportPDF(stats, reservations = [], tabLabel = "Aujourd'hui") {
 
   // ── Section label ─────────────────────────────────────────────────
   doc.setFont('helvetica','bold'); doc.setFontSize(9); setD()
-  doc.text(`Réservations · ${tabLabel}`, PAD, y)
+  doc.text(`${t('reservations')} · ${tabLabel}`, PAD, y)
   doc.setFont('helvetica','normal'); doc.setFontSize(7); setG()
-  doc.text(`${reservations.length} réservation(s)`, PW - PAD, y, { align:'right' })
+  doc.text(t('reservations_count', { count: reservations.length, plural: reservations.length !== 1 ? 's' : '' }), PW - PAD, y, { align:'right' })
 
   y += 6
 
   // ── No reservations ───────────────────────────────────────────────
   if (!reservations.length) {
     doc.setFont('helvetica','normal'); doc.setFontSize(10); setD()
-    doc.text('Aucune réservation pour cette période.', PAD, y + 10)
+    doc.text(t('no_reservations_period'), PAD, y + 10)
     footer()
     doc.save(filename)
     return
@@ -148,11 +150,11 @@ export function exportPDF(stats, reservations = [], tabLabel = "Aujourd'hui") {
   // ── Table columns ─────────────────────────────────────────────────
   const ROW_H = 10
   const cols = {
-    name:    { x: PAD,      w: 50, label: 'NOM'      },
-    time:    { x: PAD+50,   w: 20, label: 'HEURE'    },
-    guests:  { x: PAD+70,   w: 18, label: 'COUVERTS' },
-    service: { x: PAD+88,   w: 46, label: 'SERVICE'  },
-    status:  { x: PAD+134,  w: 48, label: 'STATUT'   },
+    name:    { x: PAD,      w: 50, label: t('table_name')    },
+    time:    { x: PAD+50,   w: 20, label: t('table_time')    },
+    guests:  { x: PAD+70,   w: 18, label: t('table_guests')  },
+    service: { x: PAD+88,   w: 46, label: t('table_service') },
+    status:  { x: PAD+134,  w: 48, label: t('table_status')  },
   }
 
   y = tableHeader(cols, y)
@@ -167,7 +169,7 @@ export function exportPDF(stats, reservations = [], tabLabel = "Aujourd'hui") {
       y = tableHeader(cols, 36)
     }
 
-    const sm     = statusMeta(r.status)
+    const sm     = statusMeta(r.status, t)
     const isEven = idx % 2 === 0
 
     // Row background
@@ -219,7 +221,7 @@ export function exportPDF(stats, reservations = [], tabLabel = "Aujourd'hui") {
   doc.rect(PAD, y, 3, 10, 'F')
 
   doc.setFont('helvetica','bold'); doc.setFontSize(7.5); setG()
-  doc.text(`${reservations.length} réservation(s)`, PAD + 7, y + 6.5)
+  doc.text(t('reservations_count', { count: reservations.length, plural: reservations.length !== 1 ? 's' : '' }), PAD + 7, y + 6.5)
 
   const conf = reservations.filter(r => r.status === 'Confirmed').length
   const pend = reservations.filter(r => r.status === 'Pending').length
@@ -227,7 +229,7 @@ export function exportPDF(stats, reservations = [], tabLabel = "Aujourd'hui") {
 
   setW(); doc.setFont('helvetica','normal')
   doc.text(
-    `${conf} conf. · ${pend} att. · ${canc} ann.`,
+    `${conf} ${t('totals_confirmed_short')} · ${pend} ${t('totals_pending_short')} · ${canc} ${t('totals_cancelled_short')}`,
     PW - PAD - 5, y + 6.5, { align:'right' }
   )
 
