@@ -1,164 +1,121 @@
-# Restaurant Admin Use Case Model
+# Modèle de Cas d'Utilisation - Restaurant Admin
 
-This file captures the main actors and use cases for the Restaurant Admin project.
+Ce document présente les acteurs et le modèle de cas d'utilisation pour l'application d'administration du restaurant.
 
-## Actors
+## Acteurs
 
-* Administrator
-* Anonymous User
-* Public Guest
-* System
+* Administrateur
+* Utilisateur anonyme
+* Client public
+* Système
 
-## Use Cases
+## Cas d'utilisation
 
-### Administrator
+### Administrateur
 
-* Login
-* Logout
-* View Dashboard
-* Export Dashboard Data
-* Manage Reservations
-* View Reservation Details
-* Create Reservation
-* Update Reservation Status
-* Assign Table to Reservation
-* Delete Reservation
-* Bulk Delete Reservations
-* Export Reservations
-* Manage Tables
-* Add Table
-* Edit Table
-* Delete Table
-* Activate / Deactivate Table
-* Manage Table Locations
-* Add Table Location
-* Edit Table Location
-* Delete Table Location
-* Manage Services
-* View Services
-* Add Service
-* Edit Service
-* Delete Service
-* Export Services
-* Manage Blocked Dates
-* View Blocked Dates
-* Block Date
-* Bulk Block Dates
-* Unblock Date
-* Bulk Unblock Dates
-* Export Blocked Dates
-* Manage Calendar Planning
-* View Calendar
-* Navigate Calendar
-* View Reservation Timeline
-* Export Calendar Schedule
-* Manage Reports
-* View Reports
-* Filter Reports
-* Export Reports
-* Manage Restaurant Settings
-* View Restaurant Info
-* Update Restaurant Info
-* View Notification Settings
-* Update Notification Settings
-* View Working Hours
-* Update Working Hours
-* Save Settings
-* Retrieve Current Profile
-* Maintain Reservation Status
+* Se connecter
+* Se déconnecter
+* Consulter le tableau de bord
+* Gérer les réservations
+* Gérer les tables et emplacements
+* Gérer les services
+* Gérer les dates bloquées
+* Gérer le planning / calendrier
+* Gérer les rapports
+* Gérer les paramètres du restaurant
+* Vérifier le profil actuel
+* Maintenir le statut des réservations
 
-### Anonymous User
+### Utilisateur anonyme
 
-* Register
-* Request Password Reset
-* Reset Password
-* Verify Email
-* Resend Verification Email
+* S'inscrire
+* Demander la réinitialisation du mot de passe
+* Réinitialiser le mot de passe
+* Vérifier l'adresse e-mail
+* Renvoyer l'e-mail de vérification
 
-### Public Guest
+### Client public
 
-* Check Blocked Dates
-* Check Available Time Slots
-* Check Booking Availability
+* Consulter les dates bloquées
+* Consulter les créneaux disponibles
+* Vérifier la disponibilité de réservation
 
-## Mermaid Use Case Diagram
+## Diagramme de cas d'utilisation (Mermaid simplifié)
 
 ```mermaid
 %%{init: { 'theme': 'base', 'themeVariables': { 'primaryColor': '#f8f0e3', 'edgeLabelBackground':'#ffffff', 'actorBorder':'#9c6644', 'actorTextColor':'#423428', 'textColor':'#423428' }}}%%
 usecaseDiagram
 
-actor Administrator as Admin
-actor "Anonymous User" as Anonymous
-actor "Public Guest" as Guest
-actor System
+actor Administrateur as Admin
+actor "Utilisateur anonyme" as Anonymous
+actor "Client public" as Guest
+actor Système as System
 
-Admin --> (Login)
-Admin --> (Logout)
-Admin --> (View Dashboard)
-Admin --> (Export Dashboard Data)
-Admin --> (Manage Reservations)
-Admin --> (Manage Tables)
-Admin --> (Manage Services)
-Admin --> (Manage Blocked Dates)
-Admin --> (Manage Calendar Planning)
-Admin --> (Manage Reports)
-Admin --> (Manage Restaurant Settings)
-Admin --> (Retrieve Current Profile)
-Admin --> (Maintain Reservation Status)
+Admin --> (Se connecter)
+Admin --> (Se déconnecter)
+Admin --> (Consulter le tableau de bord)
+Admin --> (Gérer les réservations)
+Admin --> (Gérer les tables et emplacements)
+Admin --> (Gérer les services)
+Admin --> (Gérer les dates bloquées)
+Admin --> (Gérer le planning / calendrier)
+Admin --> (Gérer les rapports)
+Admin --> (Gérer les paramètres du restaurant)
+Admin --> (Vérifier le profil actuel)
+Admin --> (Maintenir le statut des réservations)
 
-Anonymous --> (Register)
-Anonymous --> (Request Password Reset)
-Anonymous --> (Reset Password)
-Anonymous --> (Verify Email)
-Anonymous --> (Resend Verification Email)
+Anonymous --> (S'inscrire)
+Anonymous --> (Demander la réinitialisation du mot de passe)
+Anonymous --> (Réinitialiser le mot de passe)
+Anonymous --> (Vérifier l'adresse e-mail)
+Anonymous --> (Renvoyer l'e-mail de vérification)
 
-Guest --> (Check Blocked Dates)
-Guest --> (Check Available Time Slots)
-Guest --> (Check Booking Availability)
+Guest --> (Consulter les dates bloquées)
+Guest --> (Consulter les créneaux disponibles)
+Guest --> (Vérifier la disponibilité de réservation)
 
-(View Dashboard) ..> (View Reservation Details) : includes
-(Manage Reservations) ..> (View Reservation Details) : includes
-(Manage Reservations) ..> (Create Reservation) : includes
-(Manage Reservations) ..> (Update Reservation Status) : includes
-(Manage Reservations) ..> (Assign Table to Reservation) : includes
-(Manage Reservations) ..> (Delete Reservation) : includes
-(Manage Reservations) ..> (Bulk Delete Reservations) : includes
-(Manage Reservations) ..> (Export Reservations) : includes
-(Manage Tables) ..> (Add Table) : includes
-(Manage Tables) ..> (Edit Table) : includes
-(Manage Tables) ..> (Delete Table) : includes
-(Manage Tables) ..> (Activate / Deactivate Table) : includes
-(Manage Tables) ..> (Manage Table Locations) : includes
-(Manage Table Locations) ..> (Add Table Location) : includes
-(Manage Table Locations) ..> (Edit Table Location) : includes
-(Manage Table Locations) ..> (Delete Table Location) : includes
-(Manage Services) ..> (View Services) : includes
-(Manage Services) ..> (Add Service) : includes
-(Manage Services) ..> (Edit Service) : includes
-(Manage Services) ..> (Delete Service) : includes
-(Manage Services) ..> (Export Services) : includes
-(Manage Blocked Dates) ..> (View Blocked Dates) : includes
-(Manage Blocked Dates) ..> (Block Date) : includes
-(Manage Blocked Dates) ..> (Bulk Block Dates) : includes
-(Manage Blocked Dates) ..> (Unblock Date) : includes
-(Manage Blocked Dates) ..> (Bulk Unblock Dates) : includes
-(Manage Blocked Dates) ..> (Export Blocked Dates) : includes
-(Manage Calendar Planning) ..> (View Calendar) : includes
-(Manage Calendar Planning) ..> (Navigate Calendar) : includes
-(Manage Calendar Planning) ..> (View Reservation Timeline) : includes
-(Manage Calendar Planning) ..> (Export Calendar Schedule) : includes
-(Manage Reports) ..> (View Reports) : includes
-(Manage Reports) ..> (Filter Reports) : includes
-(Manage Reports) ..> (Export Reports) : includes
-(Manage Restaurant Settings) ..> (View Restaurant Info) : includes
-(Manage Restaurant Settings) ..> (Update Restaurant Info) : includes
-(Manage Restaurant Settings) ..> (View Notification Settings) : includes
-(Manage Restaurant Settings) ..> (Update Notification Settings) : includes
-(Manage Restaurant Settings) ..> (View Working Hours) : includes
-(Manage Restaurant Settings) ..> (Update Working Hours) : includes
+(Consulter le tableau de bord) ..> (Consulter les réservations récentes) : inclut
+(Gérer les réservations) ..> (Voir le détail d'une réservation) : inclut
+(Gérer les réservations) ..> (Créer une réservation) : inclut
+(Gérer les réservations) ..> (Modifier le statut de réservation) : inclut
+(Gérer les réservations) ..> (Affecter une table) : inclut
+(Gérer les réservations) ..> (Supprimer une réservation) : inclut
+(Gérer les réservations) ..> (Supprimer plusieurs réservations) : inclut
+(Gérer les réservations) ..> (Exporter les réservations) : inclut
+
+(Gérer les tables et emplacements) ..> (Ajouter une table) : inclut
+(Gérer les tables et emplacements) ..> (Modifier une table) : inclut
+(Gérer les tables et emplacements) ..> (Activer / désactiver une table) : inclut
+(Gérer les tables et emplacements) ..> (Gérer les emplacements de table) : inclut
+(Gérer les emplacements de table) ..> (Ajouter un emplacement) : inclut
+(Gérer les emplacements de table) ..> (Modifier un emplacement) : inclut
+(Gérer les emplacements de table) ..> (Supprimer un emplacement) : inclut
+
+(Gérer les services) ..> (Ajouter un service) : inclut
+(Gérer les services) ..> (Modifier un service) : inclut
+(Gérer les services) ..> (Supprimer un service) : inclut
+(Gérer les services) ..> (Exporter les services) : inclut
+
+(Gérer les dates bloquées) ..> (Bloquer une date) : inclut
+(Gérer les dates bloquées) ..> (Débloquer une date) : inclut
+(Gérer les dates bloquées) ..> (Exporter les dates bloquées) : inclut
+
+(Gérer le planning / calendrier) ..> (Voir le calendrier) : inclut
+(Gérer le planning / calendrier) ..> (Naviguer dans le calendrier) : inclut
+(Gérer le planning / calendrier) ..> (Voir la chronologie des réservations) : inclut
+(Gérer le planning / calendrier) ..> (Exporter le planning) : inclut
+
+(Gérer les rapports) ..> (Voir les rapports) : inclut
+(Gérer les rapports) ..> (Filtrer les rapports) : inclut
+(Gérer les rapports) ..> (Exporter les rapports) : inclut
+
+(Gérer les paramètres du restaurant) ..> (Voir les informations du restaurant) : inclut
+(Gérer les paramètres du restaurant) ..> (Modifier les informations du restaurant) : inclut
+(Gérer les paramètres du restaurant) ..> (Modifier les notifications) : inclut
+(Gérer les paramètres du restaurant) ..> (Modifier les horaires) : inclut
 ```
 
-## Notes
+## Remarques
 
-- This diagram is designed to be easy to render in Mermaid-compatible editors.
-- Use a Mermaid live editor or markdown preview to visualize it.
+- Ce modèle est simplifié pour faciliter le dessin et la lecture.
+- Utilisez un visualiseur Mermaid ou un éditeur Markdown compatible pour afficher le diagramme.
