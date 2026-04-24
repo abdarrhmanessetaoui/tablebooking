@@ -206,15 +206,7 @@ export default function Reservations() {
   async function handleExportPDF() {
     setExporting(true)
     try {
-      if (!window.jspdf) {
-        await new Promise((resolve, reject) => {
-          const s = document.createElement('script')
-          s.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js'
-          s.onload = resolve; s.onerror = reject
-          document.head.appendChild(s)
-        })
-      }
-      exportPDF(null, filteredLocal, t('reservations_list_title'), t)
+      await exportPDF(null, filteredLocal, t('reservations_list_title'))
       toast(t('status_updated_toast'), 'success')
     } catch(e) {
       console.error('PDF error:', e)

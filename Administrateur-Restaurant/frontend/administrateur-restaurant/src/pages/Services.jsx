@@ -50,13 +50,7 @@ export default function Services() {
   async function handleExport() {
     setExporting(true)
     try {
-      if (!window.jspdf) {
-        await new Promise((res, rej) => {
-          const s = document.createElement('script'); s.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js'
-          s.onload = res; s.onerror = rej; document.head.appendChild(s)
-        })
-      }
-      exportPDF(null, services, t('services_module.title'), t)
+      await exportPDF(null, services, t('services_module.title'))
     } catch(e) { console.error(e) } finally { setExporting(false) }
   }
 

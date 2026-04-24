@@ -131,13 +131,7 @@ export default function BlockedDates() {
   async function handleExport() {
     setExporting(true)
     try {
-      if (!window.jspdf) {
-        await new Promise((res, rej) => {
-          const s = document.createElement('script'); s.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js'
-          s.onload = res; s.onerror = rej; document.head.appendChild(s)
-        })
-      }
-      exportPDF(null, blockedDates, t('calendar.blocked_dates_list'), t)
+      await exportPDF(null, blockedDates, t('calendar.blocked_dates_list'))
     } catch(e) { console.error(e) } finally { setExporting(false) }
   }
 

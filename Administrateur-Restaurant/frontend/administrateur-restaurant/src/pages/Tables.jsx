@@ -101,15 +101,7 @@ export default function Tables() {
   async function handleExport() {
     setExporting(true)
     try {
-      if (!window.jspdf) {
-        await new Promise((res, rej) => {
-          const s = document.createElement('script')
-          s.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js'
-          s.onload = res; s.onerror = rej
-          document.head.appendChild(s)
-        })
-      }
-      exportPDF(null, tables, t('tables_module.title'), t)
+      await exportPDF(null, tables, t('tables_module.title'))
     } catch (e) {
       console.error(e)
     } finally {

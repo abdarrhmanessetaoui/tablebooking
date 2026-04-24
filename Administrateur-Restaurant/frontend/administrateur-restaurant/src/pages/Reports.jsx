@@ -68,7 +68,7 @@ export default function Reports() {
         total:           summary.total     || 0,
         avg:             summary.avg_guests || 0
       }
-      exportPDF(statsMap, [], t('reports_module.title'), t)
+      await exportPDF(statsMap, [], t('reports_module.title'))
     } catch (e) { console.error(e) } finally { setExporting(false) }
   }
 

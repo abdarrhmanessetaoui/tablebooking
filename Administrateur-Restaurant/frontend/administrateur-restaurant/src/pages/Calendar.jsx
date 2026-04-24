@@ -105,17 +105,11 @@ export default function Calendar() {
   async function handleExport() {
     setExporting(true)
     try {
-      if (!window.jspdf) {
-        await new Promise((res, rej) => {
-          const s = document.createElement('script'); s.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js'
-          s.onload = res; s.onerror = rej; document.head.appendChild(s)
-        })
-      }
       const allRes = view === 'day' ? getByDate(currentDate)
         : view === 'week' ? weekDays.flatMap(d => getByDate(d))
         : reservations || []
       
-      exportPDF(null, allRes, t('planning') + ' — ' + navLabel(), t)
+      await exportPDF(null, allRes, t('planning') + ' — ' + navLabel())
     } catch(e) { console.error(e) } finally { setExporting(false) }
   }
 
