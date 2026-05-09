@@ -36,6 +36,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::patch ('/restaurant/reservations/{id}/status',           [RestaurantReservationController::class, 'updateStatus']);
     Route::patch ('/restaurant/reservations/{id}/assign-table',     [RestaurantReservationController::class, 'assignTable']);
     Route::delete('/restaurant/reservations/{id}',                  [RestaurantReservationController::class, 'destroy']);
+    Route::post  ('/restaurant/reservations/bulk-status',           [RestaurantReservationController::class, 'bulkUpdateStatus']);
+    Route::post  ('/restaurant/reservations/bulk-delete',           [RestaurantReservationController::class, 'bulkDestroy']);
 
     // ── Restaurant settings ───────────────────────────────────
     Route::get('/restaurant/info',          [RestaurantReservationController::class, 'info']);

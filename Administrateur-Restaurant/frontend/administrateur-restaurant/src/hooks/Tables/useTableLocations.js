@@ -1,15 +1,10 @@
 import { useState, useEffect } from 'react'
-import { useTranslation }     from 'react-i18next'
-import { getToken }           from '../../utils/auth'
+import { useTranslation } from 'react-i18next'
+import { apiPath, getHeaders } from '../../utils/api'
 import { toast }              from '../../components/ui/Toast'
 import { confirm }            from '../../components/ui/ConfirmDialog'
 
-const API  = 'http://localhost:8000/api/table-locations'
-const hdrs = () => ({
-  'Content-Type':  'application/json',
-  'Accept':        'application/json',
-  'Authorization': `Bearer ${getToken()}`,
-})
+const API = apiPath('table-locations')
 
 export default function useTableLocations() {
   const { t } = useTranslation()
@@ -22,7 +17,7 @@ export default function useTableLocations() {
   async function fetchLocations() {
     setLoading(true)
     try {
-      const res  = await fetch(API, { headers: hdrs() })
+      const res  = await fetch(API, { headers: getHeaders() })
       const data = await res.json()
       setLocations(Array.isArray(data) ? data : [])
     } catch {
@@ -38,7 +33,7 @@ export default function useTableLocations() {
     try {
       const res = await fetch(API, {
         method: 'POST',
-        headers: hdrs(),
+        headers: getHeaders(),
         body: JSON.stringify({ name: name.trim(), color }),
       })
       if (!res.ok) {
@@ -62,7 +57,7 @@ export default function useTableLocations() {
     try {
       const res  = await fetch(`${API}/${id}`, {
         method: 'PUT',
-        headers: hdrs(),
+        headers: getHeaders(),
         body: JSON.stringify({ name: name.trim(), color }),
       })
       const data = await res.json()
@@ -85,7 +80,7 @@ export default function useTableLocations() {
     })
     if (!ok) return
     try {
-      await fetch(`${API}/${loc.id}`, { method: 'DELETE', headers: hdrs() })
+      await fetch(`${API}/${loc.id}`, { method: 'DELETE', headers: getHeaders() })
       setLocations(prev => prev.filter(l => l.id !== loc.id))
       toast(t('tables_module.location_deleted', { name: loc.name }), 'warning')
     } catch {

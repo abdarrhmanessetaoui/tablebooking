@@ -1,4 +1,4 @@
-import { useTranslation } from 'react-i18next'
+﻿import { useTranslation } from 'react-i18next'
 import { STATUS_MAP, badge, dot } from '../../styles/dashboard/badge.styles'
 
 export default function Badge({ status }) {
@@ -11,8 +11,7 @@ export default function Badge({ status }) {
                  : 'status_pending'
 
   return (
-    <span style={badge(s.color)}>
-      <span style={dot(s.color)} />
+    <span style={badge(s.color, s.bg)}>
       {t(labelKey)}
     </span>
   )

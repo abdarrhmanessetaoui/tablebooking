@@ -1,11 +1,11 @@
-import { useState, useRef } from 'react'
+﻿import { useState, useRef } from 'react'
 import { X, Calendar } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import CalendarPopup from './CalendarPopup'
 import '../../styles/Reports/ReportsFilters.css'
 
-const DARK = '#423428'
-const GOLD = '#c8a97e'
+const DARK = '#2D2926'
+const LIGHT_BROWN = '#C19A6B'
 
 export default function ReportsFilters({
   filterStatus,   setFilterStatus,
@@ -81,12 +81,12 @@ export default function ReportsFilters({
             className="rp-date-btn"
             style={{
               background: filterDate ? DARK : '#fff',
-              border:     filterDate ? 'none' : '4px solid #e8e0d8',
-              color:      filterDate ? GOLD   : '#423428',
+              border:     filterDate ? 'none' : '1px solid #E5E0DA',
+              color:      filterDate ? '#fff' : DARK,
             }}
           >
             <span className="rp-date-btn__label">{dateLabel()}</span>
-            <Calendar size={14} strokeWidth={2.2} style={{ flexShrink: 0 }} />
+            <Calendar size={14} strokeWidth={2.5} style={{ flexShrink: 0 }} />
           </button>
 
           {filterDate && (

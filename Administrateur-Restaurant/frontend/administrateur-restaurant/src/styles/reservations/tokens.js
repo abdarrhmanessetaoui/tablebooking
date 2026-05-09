@@ -1,13 +1,20 @@
-export const DARK      = '#423428'
-export const GOLD      = '#C8A97E'
-export const GOLD_DARK = '#a8834e'
-export const CREAM     = '#ffffff'
-export const BORDER    = 'rgba(66,52,40,0.12)'
-export const GREEN     = '#16A34A'
-export const RED       = '#DC2626'
+export const DARK             = '#2D2926'
+export const DARK_LIGHT       = '#4A4A4A'
+export const LIGHT_BROWN      = '#C19A6B'
+export const LIGHT_BROWN_DARK = '#A8834E'
+export const CREAM            = '#FDF8F3'
+export const WHITE            = '#ffffff'
+export const BORDER           = '#E5E0DA'
+export const GREEN            = '#22C55E'
+export const RED              = '#EF4444'
+export const AMBER            = '#F59E0B'
+export const RADIUS           = '12px'
+
+export const BLUE             = '#3B82F6'
 
 export const STATUS_CONFIG = {
-  Confirmed: { bg: '#ffffff', color: '#16A34A', label: 'Confirmée',  dot: '#16A34A', key: 'status_confirmed' },
-  Pending:   { bg: '#ffffff', color: '#C8A97E', label: 'En attente', dot: '#C8A97E', key: 'status_pending' },
-  Cancelled: { bg: '#ffffff', color: '#DC2626', label: 'Annulée',    dot: '#DC2626', key: 'status_cancelled' },
+  Confirmed: { bg: GREEN, color: WHITE, label: 'Confirmée',  key: 'status_confirmed' },
+  Pending:   { bg: AMBER, color: WHITE, label: 'En attente', key: 'status_pending' },
+  Cancelled: { bg: RED,   color: WHITE, label: 'Annulée',    key: 'status_cancelled' },
+  Arrived:   { bg: BLUE,  color: WHITE, label: 'Arrivée',    key: 'status_arrived' },
 }

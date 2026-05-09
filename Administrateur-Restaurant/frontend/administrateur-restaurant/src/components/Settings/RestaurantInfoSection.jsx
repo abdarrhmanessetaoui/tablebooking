@@ -1,6 +1,6 @@
-import { Store, MapPin, Mail, Users, Phone, Globe } from 'lucide-react'
+﻿import { Store, MapPin, Mail, Users, Phone, Globe } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-import { DARK, BORDER, GOLD } from './constants'
+import { DARK, BORDER, LIGHT_BROWN } from './constants'
 import Section    from './Section'
 import Grid       from './Grid'
 import Field      from './Field'
@@ -92,7 +92,7 @@ export default function RestaurantInfoSection({ info, setInfoField, saveInfo, sa
             onChange={e => setInfoField('description', e.target.value)}
             placeholder={t('settings_module.description_placeholder')}
             rows={3}
-            onFocus={e => (e.target.style.borderColor = GOLD)}
+            onFocus={e => (e.target.style.borderColor = LIGHT_BROWN)}
             onBlur={e => (e.target.style.borderColor = BORDER)}
             style={{
               width: '100%',

@@ -1,16 +1,10 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
-import { getToken } from '../../utils/auth'
+import { apiPath, getHeaders } from '../../utils/api'
 import { toast }   from '../../components/ui/Toast'
 import { confirm } from '../../components/ui/ConfirmDialog'
 
-const API = 'http://localhost:8000/api/restaurant/reservations'
-
-const headers = () => ({
-  'Content-Type': 'application/json',
-  'Accept': 'application/json',
-  'Authorization': `Bearer ${getToken()}`,
-})
+const API = apiPath('restaurant/reservations')
 
 const EMPTY_FORM = {
   name: '', email: '', phone: '', date: '', start_time: '',
@@ -22,10 +16,12 @@ function isUnassigned(r) {
   return r.table_idx === null || r.table_idx === undefined || r.table_idx === 0 || r.table_idx === ''
 }
 
+let cachedReservations = null
+
 export default function useReservations(initialFilters = {}) {
   const { t } = useTranslation()
-  const [reservations, setReservations] = useState([])
-  const [loading, setLoading]           = useState(true)
+  const [reservations, setReservations] = useState(cachedReservations || [])
+  const [loading, setLoading]           = useState(!cachedReservations)
   const [error, setError]               = useState('')
 
   const [modalMode, setModalMode] = useState(null)
@@ -41,9 +37,11 @@ export default function useReservations(initialFilters = {}) {
   const fetchReservations = async (silent = false) => {
     if (!silent) setLoading(true)
     try {
-      const res  = await fetch(API, { headers: headers() })
+      const res  = await fetch(API, { headers: getHeaders() })
       const data = await res.json()
-      setReservations(Array.isArray(data) ? data : [])
+      const arr = Array.isArray(data) ? data : []
+      setReservations(arr)
+      cachedReservations = arr
     } catch {
       if (!silent) setError(t('error_loading_reservations'))
     } finally {
@@ -58,7 +56,7 @@ export default function useReservations(initialFilters = {}) {
     return () => clearInterval(id)
   }, [])
 
-  // Only search + status + service + table — date filtering handled in Reservations.jsx
+  // Only search + status + service + table   date filtering handled in Reservations.jsx
   const filtered = useMemo(() => {
     if (!Array.isArray(reservations)) return []
     return reservations
@@ -91,7 +89,7 @@ export default function useReservations(initialFilters = {}) {
     if (!editing) return
     try {
       const res  = await fetch(`${API}/${editing.id}/status`, {
-        method: 'PATCH', headers: headers(),
+        method: 'PATCH', headers: getHeaders(),
         body: JSON.stringify({ status: form.status }),
       })
       const data = await res.json()
@@ -106,7 +104,7 @@ export default function useReservations(initialFilters = {}) {
   const handleCreate = async () => {
     try {
       const res  = await fetch(API, {
-        method: 'POST', headers: headers(),
+        method: 'POST', headers: getHeaders(),
         body: JSON.stringify({ ...form, guests: parseInt(form.guests) || 1 }),
       })
       if (!res.ok) throw new Error()
@@ -131,7 +129,7 @@ export default function useReservations(initialFilters = {}) {
 
     if (!ok) return
     try {
-      await fetch(`${API}/${id}`, { method: 'DELETE', headers: headers() })
+      await fetch(`${API}/${id}`, { method: 'DELETE', headers: getHeaders() })
       setReservations(prev => prev.filter(r => r.id !== id))
       if (modalMode !== null) setModalMode(null)
       toast(t('reservation_deleted_toast'), 'warning')

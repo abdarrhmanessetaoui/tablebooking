@@ -2,18 +2,15 @@ import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Trash2, CalendarOff, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react'
 
-const DARK = '#423428'
-const GOLD = '#c8a97e'
-const GOLD_DARK = '#a8834e'
-const BORDER = '#423428'
-const CREAM = '#ffffff'
+const DARK    = '#2D2926'
+const LIGHT_BROWN    = '#C19A6B'
+const BORDER  = '#E5E0DA'
+const RED     = '#EF4444'
 
 const PAGE_SIZE = 10
 
 function useIsMobile(breakpoint = 600) {
-  const [isMobile, setIsMobile] = useState(
-    () => typeof window !== 'undefined' ? window.innerWidth < breakpoint : false
-  )
+  const [isMobile, setIsMobile] = useState(() => typeof window !== 'undefined' ? window.innerWidth < breakpoint : false)
   useEffect(() => {
     const handler = () => setIsMobile(window.innerWidth < breakpoint)
     window.addEventListener('resize', handler)
@@ -24,41 +21,44 @@ function useIsMobile(breakpoint = 600) {
 
 function Checkbox({ checked, indeterminate, onChange }) {
   return (
-    <div onClick={e => { e.stopPropagation(); onChange() }} style={{
-      width: 18, height: 18, flexShrink: 0,
-      background: checked || indeterminate ? DARK : '#fff',
-      border: `4px solid ${DARK}`,
-      display: 'flex', alignItems: 'center', justifyContent: 'center',
-      cursor: 'pointer', transition: 'all 0.15s', padding: 2, margin: -2,
-    }}>
+    <div
+      onClick={e => { e.stopPropagation(); onChange() }}
+      style={{ 
+        width: 18, height: 18, flexShrink: 0,
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        cursor: 'pointer',
+        borderRadius: 4,
+        background: checked || indeterminate ? LIGHT_BROWN : '#fff',
+        border: `1.5px solid ${checked || indeterminate ? LIGHT_BROWN : BORDER}`
+      }}
+    >
       {checked && (
-        <svg width="9" height="7" viewBox="0 0 10 8" fill="none">
-          <path d="M1 4L3.5 6.5L9 1" stroke={GOLD} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+        <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
+          <path d="M1.5 4L4 6.5L8.5 1.5" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
       )}
       {indeterminate && !checked && (
-        <div style={{ width: 7, height: 4, background: GOLD }} />
+        <div style={{ width: 8, height: 2, background: '#fff', borderRadius: 1 }} />
       )}
     </div>
   )
 }
 
 function PageBtn({ onClick, disabled, active, children }) {
-  const [hov, setHov] = useState(false)
   return (
     <button onClick={onClick} disabled={disabled}
-      onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
       style={{
-        minWidth: 36, height: 36, padding: '0 6px',
+        minWidth: 34, height: 34,
         display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-        background: active ? DARK : hov && !disabled ? '#FBF5EA' : '#fff',
-        border: `4px solid ${DARK}`,
-        color: active ? GOLD : DARK,
-        fontSize: 12, fontWeight: active ? 900 : 700,
+        background: active ? LIGHT_BROWN : '#fff',
+        border: `1px solid ${active ? LIGHT_BROWN : BORDER}`,
+        borderRadius: '4px',
+        color: active ? '#fff' : DARK,
+        fontSize: '13px', fontWeight: '800',
         cursor: disabled ? 'not-allowed' : 'pointer',
-        opacity: disabled ? 0.35 : 1,
-        transition: 'all 0.15s', flexShrink: 0,
-        WebkitTapHighlightColor: 'transparent',
+        opacity: disabled ? 0.4 : 1,
+        transition: 'none', flexShrink: 0,
+        fontFamily: 'inherit',
       }}>
       {children}
     </button>
@@ -75,7 +75,7 @@ export default function BlockedDateList({ blockedDates, handleUnblock, selectedD
   useEffect(() => { setPage(1) }, [blockedDates?.length])
 
   function fmt(d) {
-    if (!d) return '—'
+    if (!d) return ' '
     const dt = new Date(d + 'T00:00:00')
     if (isNaN(dt)) return d
     const s = dt.toLocaleDateString(lang, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
@@ -83,7 +83,7 @@ export default function BlockedDateList({ blockedDates, handleUnblock, selectedD
   }
 
   function fmtShort(d) {
-    if (!d) return '—'
+    if (!d) return ' '
     const dt = new Date(d + 'T00:00:00')
     if (isNaN(dt)) return d
     const s = dt.toLocaleDateString(lang, { day: 'numeric', month: 'short', year: 'numeric' })
@@ -97,10 +97,10 @@ export default function BlockedDateList({ blockedDates, handleUnblock, selectedD
 
   if (!blockedDates || blockedDates.length === 0) {
     return (
-      <div style={{ padding: '56px 16px', textAlign: 'center', background: '#fff', border: `4px solid ${BORDER}` }}>
-        <CalendarOff size={40} color={DARK} strokeWidth={1.5} style={{ display: 'block', margin: '0 auto 14px' }} />
-        <p style={{ margin: 0, fontSize: 15, fontWeight: 900, color: DARK }}>{t('calendar.no_blocked_dates')}</p>
-        <p style={{ margin: '6px 0 0', fontSize: 12, fontWeight: 600, color: DARK }}>
+      <div style={{ padding: '64px 20px', textAlign: 'center', background: '#fff', borderRadius: '4px', border: `1px solid ${BORDER}` }}>
+        <CalendarOff size={40} color={BORDER} strokeWidth={1.5} style={{ display: 'block', margin: '0 auto 16px' }} />
+        <p style={{ margin: 0, fontSize: '15px', fontWeight: '800', color: DARK }}>{t('calendar.no_blocked_dates')}</p>
+        <p style={{ margin: '6px 0 0', fontSize: '13px', color: DARK, fontWeight: '600' }}>
           {t('calendar.use_form_to_block')}
         </p>
       </div>
@@ -146,7 +146,6 @@ export default function BlockedDateList({ blockedDates, handleUnblock, selectedD
       s.forEach((n, i) => { if (i > 0 && n - s[i - 1] > 1) result.push('…'); result.push(n) })
       return result
     }
-    if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1)
     const p = [1]
     if (safe > 3) p.push('…')
     for (let i = Math.max(2, safe - 1); i <= Math.min(total - 1, safe + 1); i++) p.push(i)
@@ -156,170 +155,120 @@ export default function BlockedDateList({ blockedDates, handleUnblock, selectedD
   }
 
   return (
-    <>
-      <style>{`
-        .unblock-label { display: inline; }
-        @media (max-width: 599px) { .unblock-label { display: none !important; } }
-        @media (hover: hover) { .bd-row:hover { background: #faf5ee !important; } }
-      `}</style>
-
-      <div style={{ background: '#fff', border: `1px solid ${BORDER}`, overflow: 'hidden' }}>
-
-        {/* Partial selection banner */}
-        {selectedDates.length > 0 && !allSelected && (
-          <div style={{ padding: '9px 14px', background: '#ffffff', borderBottom: `1px solid #e8e0d6`, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, flexWrap: 'wrap' }}>
-            <span style={{ fontSize: 12, fontWeight: 700, color: GOLD_DARK }}>
-              {t('calendar.selected_count', { count: selectedDates.length, plural: selectedDates.length > 1 ? 's' : '' })}
-            </span>
-            <button onClick={() => setSelectedDates(blockedDates.map(d => d.date))} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 800, color: DARK, textDecoration: 'underline', fontFamily: 'inherit', padding: 0 }}>
-              {t('calendar.select_all_with_count', { count: blockedDates.length })}
-            </button>
-          </div>
-        )}
-
-        {/* All selected banner */}
-        {allSelected && blockedDates.length > PAGE_SIZE && (
-          <div style={{ padding: '9px 14px', background: '#ffffff', borderBottom: `1px solid #b8ddb8`, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, flexWrap: 'wrap' }}>
-            <span style={{ fontSize: 12, fontWeight: 700, color: '#2d6a2d' }}>
-              {t('calendar.dates_success_blocked', { count: blockedDates.length })}
-            </span>
-            <button onClick={() => setSelectedDates([])} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 800, color: '#2d6a2d', textDecoration: 'underline', fontFamily: 'inherit', padding: 0 }}>
-              {t('calendar.deselect_all')}
-            </button>
-          </div>
-        )}
-
-        {/* Header */}
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: isMobile ? `44px 1fr 44px` : `44px 1fr 1fr 120px`,
-          padding: '10px 12px', background: DARK, alignItems: 'center', gap: 8
-        }}>
-          <Checkbox checked={pageAllSel} indeterminate={pageSomeSel} onChange={togglePage} />
-          <span style={{ fontSize: 9, fontWeight: 900, color: GOLD, letterSpacing: '0.2em', textTransform: 'uppercase' }}>{t('calendar.blocked_date')}</span>
-          {!isMobile && <span style={{ fontSize: 9, fontWeight: 900, color: GOLD, letterSpacing: '0.2em', textTransform: 'uppercase' }}>{t('calendar.block_reason')}</span>}
-          {!isMobile && <span style={{ fontSize: 9, fontWeight: 900, color: GOLD, letterSpacing: '0.2em', textTransform: 'uppercase' }}>Action</span>}
+    <div style={{ background: '#ffffff', borderRadius: '4px', border: `1px solid ${BORDER}`, overflow: 'hidden', boxShadow: 'none' }}>
+      
+      {/* Partial selection banner */}
+      {selectedDates.length > 0 && !allSelected && (
+        <div style={{ padding: '10px 20px', background: LIGHT_BROWN, borderBottom: `1px solid ${LIGHT_BROWN}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
+          <span style={{ fontSize: '13px', fontWeight: '900', color: '#fff' }}>
+            {t('calendar.selected_count', { count: selectedDates.length, plural: selectedDates.length > 1 ? 's' : '' })}
+          </span>
+          <button onClick={() => setSelectedDates(blockedDates.map(d => d.date))} 
+            style={{ 
+              background: '#ffffff', border: 'none', color: LIGHT_BROWN,
+              padding: '6px 14px', borderRadius: '4px', fontSize: '11px',
+              fontWeight: '900', cursor: 'pointer', textTransform: 'uppercase',
+              fontFamily: 'inherit', display: 'inline-flex', alignItems: 'center', justifyContent: 'center'
+            }}>
+            {t('calendar.select_all')}
+          </button>
         </div>
+      )}
 
-        {/* Rows */}
-        {items.map((d, i) => {
-          const past = isPast(d.date)
-          const selected = selectedDates.includes(d.date)
-          const idx = (safe - 1) * PAGE_SIZE + i
-          const bg = selected ? '#ffffff' : idx % 2 === 0 ? '#fff' : CREAM
-          const reason = d.reason || d.notes || d.label || ''   // fallback field names
+      {/* Header */}
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: isMobile ? `44px 1fr 44px` : `44px 1fr 1fr 100px`,
+        padding: '12px 20px', background: '#ffffff', alignItems: 'center', gap: 12, borderBottom: `1.5px solid ${BORDER}`
+      }}>
+        <div />
+        <span style={{ fontSize: '11px', fontWeight: '900', color: DARK, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{t('calendar.blocked_date')}</span>
+        {!isMobile && <span style={{ fontSize: '11px', fontWeight: '900', color: DARK, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{t('calendar.block_reason')}</span>}
+        {!isMobile && <span style={{ fontSize: '11px', fontWeight: '900', color: DARK, textTransform: 'uppercase', letterSpacing: '0.05em', textAlign: 'right' }}>Action</span>}
+      </div>
 
-          return (
-            <div key={d.date ?? i} className="bd-row" onClick={() => toggleOne(d.date)}
-              style={{
-                display: 'grid',
-                gridTemplateColumns: isMobile ? `44px 1fr 44px` : `44px 1fr 1fr 120px`,
-                padding: isMobile ? '13px 12px' : '14px 16px',
-                background: bg,
-                borderBottom: `1px solid ${BORDER}`,
-                borderLeft: `3px solid ${selected ? GOLD : 'transparent'}`,
-                alignItems: 'center', gap: 8, cursor: 'pointer', transition: 'background 0.12s',
-                opacity: past ? 0.6 : 1, userSelect: 'none',
-              }}>
+      {/* Rows */}
+      {items.map((d, i) => {
+        const past = isPast(d.date)
+        const selected = selectedDates.includes(d.date)
+        const reason = d.reason || d.notes || d.label || ''
 
-              {/* Checkbox */}
-              <div onClick={e => e.stopPropagation()} style={{ display: 'flex', alignItems: 'center' }}>
-                <Checkbox checked={selected} onChange={() => toggleOne(d.date)} />
-              </div>
+        return (
+          <div key={d.date ?? i} onClick={() => toggleOne(d.date)}
+            style={{
+              display: 'grid',
+              gridTemplateColumns: isMobile ? `44px 1fr 44px` : `44px 1fr 1fr 100px`,
+              padding: '14px 20px',
+              background: selected ? '#FAF7F4' : '#ffffff',
+              borderBottom: `1px solid ${BORDER}`,
+              alignItems: 'center', gap: 12, cursor: 'pointer', transition: 'none',
+              opacity: past ? 0.6 : 1,
+            }}>
 
-              {/* Date + mobile reason */}
-              <div style={{ minWidth: 0 }}>
-                <p style={{
-                  margin: 0, fontWeight: 800, color: DARK, lineHeight: 1.35,
-                  fontSize: isMobile ? 13 : 14,
-                  whiteSpace: isMobile ? 'normal' : 'nowrap',
-                  overflow: 'hidden',
-                  textOverflow: isMobile ? 'unset' : 'ellipsis',
-                }}>
-                  {isMobile ? fmtShort(d.date) : fmt(d.date)}
-                </p>
-                {/* On mobile: show reason below date */}
-                {isMobile && reason && (
-                  <p style={{
-                    margin: '4px 0 0', fontSize: 11, fontWeight: 700,
-                    color: GOLD_DARK,
-                    overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-                  }}>
-                    {reason}
-                  </p>
-                )}
-                {past && (
-                  <span style={{
-                    display: 'inline-block', marginTop: 4,
-                    fontSize: 9, fontWeight: 900, color: '#DC2626',
-                    letterSpacing: '0.12em', textTransform: 'uppercase',
-                    background: '#ffffff', padding: '1px 6px',
-                  }}>
-                    {t('calendar.past')}
-                  </span>
-                )}
-              </div>
-
-              {/* Desktop reason column */}
-              {!isMobile && (
-                <div style={{ minWidth: 0 }}>
-                  {reason ? (
-                    <p style={{
-                      margin: 0, fontSize: 13, fontWeight: 700,
-                      color: GOLD_DARK,
-                      overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-                    }}>
-                      {reason}
-                    </p>
-                  ) : (
-                    <p style={{ margin: 0, fontSize: 12, fontWeight: 600, color: DARK, opacity: 0.25 }}>—</p>
-                  )}
-                </div>
-              )}
-
-              {/* Unblock button */}
-              <div style={{ padding: '0 12px', display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
-                <button onClick={e => { e.stopPropagation(); handleUnblock(d.date) }}
-                  style={{
-                    display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                    padding: 6, borderRadius: '50%',
-                    background: '#DC2626', border: 'none', color: '#fff',
-                    cursor: 'pointer', transition: 'opacity 0.15s',
-                  }}
-                  onMouseEnter={e => e.currentTarget.style.opacity = 0.85}
-                  onMouseLeave={e => e.currentTarget.style.opacity = 1}
-                  title={t('calendar.unblock_date')}>
-                  <Trash2 size={14} strokeWidth={2.5} />
-                </button>
-              </div>
+            <div onClick={e => e.stopPropagation()} style={{ display: 'flex', alignItems: 'center' }}>
+              <Checkbox checked={selected} onChange={() => toggleOne(d.date)} />
             </div>
-          )
-        })}
 
-        {/* Pagination */}
-        {total > 1 && (
-          <div style={{
-            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-            flexWrap: 'wrap', gap: 8, padding: '12px 14px',
-            borderTop: `4px solid ${BORDER}`, background: CREAM,
-          }}>
-            <span style={{ fontSize: 11, fontWeight: 700, color: DARK, flexShrink: 0 }}>
-              {(safe - 1) * PAGE_SIZE + 1}–{Math.min(safe * PAGE_SIZE, sorted.length)} / {sorted.length}
-            </span>
-            <div style={{ display: 'flex', gap: 3, flexWrap: 'wrap' }}>
-              {!isXs && <PageBtn onClick={() => setPage(1)} disabled={safe === 1}><ChevronsLeft size={12} strokeWidth={2.5} /></PageBtn>}
-              <PageBtn onClick={() => setPage(p => Math.max(1, p - 1))} disabled={safe === 1}><ChevronLeft size={12} strokeWidth={2.5} /></PageBtn>
-              {getPages().map((p, i) =>
-                p === '…'
-                  ? <span key={`d${i}`} style={{ padding: '0 2px', fontSize: 12, color: DARK, lineHeight: '36px' }}>…</span>
-                  : <PageBtn key={p} active={p === safe} onClick={() => setPage(p)}>{p}</PageBtn>
+            <div style={{ minWidth: 0 }}>
+              <p style={{
+                margin: 0, fontWeight: '900', color: DARK,
+                fontSize: isMobile ? '13px' : '14px',
+                overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+              }}>
+                {isMobile ? fmtShort(d.date) : fmt(d.date)}
+              </p>
+              {isMobile && reason && (
+                <p style={{ margin: '2px 0 0', fontSize: '11px', color: DARK, fontWeight: '600', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{reason}</p>
               )}
-              <PageBtn onClick={() => setPage(p => Math.min(total, p + 1))} disabled={safe === total}><ChevronRight size={12} strokeWidth={2.5} /></PageBtn>
-              {!isXs && <PageBtn onClick={() => setPage(total)} disabled={safe === total}><ChevronsRight size={12} strokeWidth={2.5} /></PageBtn>}
+              {past && (
+                <span style={{ fontSize: '9px', fontWeight: '900', color: RED, textTransform: 'uppercase', marginTop: 4, display: 'block' }}>{t('calendar.past')}</span>
+              )}
+            </div>
+
+            {!isMobile && (
+              <div style={{ minWidth: 0 }}>
+                <p style={{ margin: 0, fontSize: '13px', color: DARK, fontWeight: '600', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  {reason || ' '}
+                </p>
+              </div>
+            )}
+
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
+              <button onClick={e => { e.stopPropagation(); handleUnblock(d.date) }}
+                style={{
+                  display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                  width: '32px', height: '32px', borderRadius: '4px',
+                  background: RED, border: 'none', color: '#fff',
+                  cursor: 'pointer', transition: 'none',
+                }}
+                title={t('calendar.unblock_date')}>
+                <Trash2 size={14} strokeWidth={2.5} />
+              </button>
             </div>
           </div>
-        )}
-      </div>
-    </>
+        )
+      })}
+
+      {/* Pagination */}
+      {total > 1 && (
+        <div style={{
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          padding: '16px 20px', background: '#ffffff', borderTop: `1px solid ${BORDER}`
+        }}>
+          <span style={{ fontSize: '12px', fontWeight: '800', color: DARK }}>
+            {(safe - 1) * PAGE_SIZE + 1}–{Math.min(safe * PAGE_SIZE, sorted.length)} / {sorted.length}
+          </span>
+          <div style={{ display: 'flex', gap: 6 }}>
+            <PageBtn onClick={() => setPage(1)} disabled={safe === 1}><ChevronsLeft size={14} strokeWidth={2.5} /></PageBtn>
+            <PageBtn onClick={() => setPage(p => Math.max(1, p - 1))} disabled={safe === 1}><ChevronLeft size={14} strokeWidth={2.5} /></PageBtn>
+            {!isMobile && getPages().map((p, i) =>
+              p === '…' ? <span key={i} style={{ padding: '0 4px', color: DARK }}>…</span> : <PageBtn key={i} active={p === safe} onClick={() => setPage(p)}>{p}</PageBtn>
+            )}
+            <PageBtn onClick={() => setPage(p => Math.min(total, p + 1))} disabled={safe === total}><ChevronRight size={14} strokeWidth={2.5} /></PageBtn>
+            <PageBtn onClick={() => setPage(total)} disabled={safe === total}><ChevronsRight size={14} strokeWidth={2.5} /></PageBtn>
+          </div>
+        </div>
+      )}
+    </div>
   )
 }

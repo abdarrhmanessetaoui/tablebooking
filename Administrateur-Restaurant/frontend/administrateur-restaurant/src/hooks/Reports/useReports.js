@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useMemo } from 'react'
-import { getToken } from '../../utils/auth'
+import { apiPath, getHeaders } from '../../utils/api'
 import i18n from '../../i18n'
 
 /* ════ Week number ════ */
@@ -119,11 +119,8 @@ export default function useReports() {
     setLoading(true)
     setError('')
     try {
-      const res = await fetch('http://localhost:8000/api/restaurant/reservations', {
-        headers: {
-          'Accept':        'application/json',
-          'Authorization': `Bearer ${getToken()}`,
-        },
+      const res = await fetch(apiPath('restaurant/reservations'), {
+        headers: getHeaders(),
       })
       if (!res.ok) throw new Error(`${i18n.t('dashboard.error_prefix', { defaultValue: 'Error' })} ${res.status}`)
       const json = await res.json()

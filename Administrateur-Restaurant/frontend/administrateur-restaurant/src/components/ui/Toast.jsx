@@ -1,11 +1,14 @@
 import { useState, useEffect, useCallback } from 'react'
-import { CheckCircle, XCircle, AlertCircle, X } from 'lucide-react'
+import { CheckCircle, XCircle, AlertCircle, X, Info } from 'lucide-react'
+import {
+  DARK, LIGHT_BROWN, WHITE, BORDER, RADIUS, DARK_LIGHT, AMBER, GREEN, RED
+} from '../../styles/dashboard/tokens'
 
 const TYPES = {
-  success: { bg: '#ffffff', border: '#16A34A', color: '#16A34A', icon: CheckCircle, dot: '#16A34A' },
-  error:   { bg: '#ffffff', border: '#DC2626', color: '#DC2626', icon: XCircle,     dot: '#DC2626' },
-  warning: { bg: '#ffffff', border: '#C8A97E', color: '#a8834e', icon: AlertCircle, dot: '#C8A97E' },
-  info:    { bg: '#ffffff', border: '#C8A97E', color: '#a8834e', icon: AlertCircle, dot: '#C8A97E' },
+  success: { bg: GREEN, color: WHITE },
+  error:   { bg: RED,   color: WHITE },
+  warning: { bg: AMBER, color: WHITE },
+  info:    { bg: DARK,  color: WHITE },
 }
 
 let _addToast = null
@@ -34,26 +37,24 @@ export default function ToastContainer() {
       pointerEvents: 'none',
     }}>
       <style>{`
-        @keyframes toastIn { from { opacity:0; transform:translateX(24px) } to { opacity:1; transform:translateX(0) } }
+        @keyframes toastIn { from { opacity:0; transform:translateY(12px) } to { opacity:1; transform:translateY(0) } }
         @media (max-width: 600px) { .toast-item { width: calc(100vw - 48px) !important; } }
       `}</style>
       {toasts.map(t => {
-        const cfg  = TYPES[t.type] || TYPES.info
-        const Icon = cfg.icon
+        const cfg = TYPES[t.type] || TYPES.info
         return (
           <div key={t.id} className="toast-item" style={{
             pointerEvents: 'all',
-            display: 'flex', alignItems: 'center', gap: 10,
+            display: 'flex', alignItems: 'center', gap: 12,
             padding: '12px 16px',
             background: cfg.bg,
-            border: `4px solid ${cfg.border}`,
-            borderLeft: `6px solid ${cfg.dot}`,
-            boxShadow: '0 4px 20px rgba(66,52,40,0.12)',
-            minWidth: 280, maxWidth: 380,
+            border: 'none',
+            borderRadius: RADIUS.sm,
+            minWidth: 240, maxWidth: 380,
             animation: 'toastIn 0.22s ease',
-            fontFamily: "'Inter',system-ui,-apple-system,sans-serif",
+            fontFamily: "'Inter', sans-serif",
+            boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
           }}>
-            <Icon size={15} color={cfg.dot} strokeWidth={2.5} style={{ flexShrink: 0 }} />
             <span style={{ flex: 1, fontSize: 13, fontWeight: 700, color: cfg.color, lineHeight: 1.4 }}>
               {t.message}
             </span>
@@ -62,10 +63,10 @@ export default function ToastContainer() {
               style={{
                 background: 'none', border: 'none', cursor: 'pointer',
                 padding: 2, display: 'flex', flexShrink: 0,
-                color: cfg.color, opacity: 0.5,
+                color: cfg.color, opacity: 0.8,
               }}
             >
-              <X size={13} strokeWidth={2.5} />
+              <X size={14} strokeWidth={3} />
             </button>
           </div>
         )

@@ -1,4 +1,4 @@
-import { Navigate } from 'react-router-dom'
+﻿import { Navigate } from 'react-router-dom'
 import { isAuthenticated } from '../utils/auth'
 
 const ProtectedRoute = ({ children }) => {

@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react'
-import { DARK, GOLD, CREAM, BORDER } from '../../../styles/reservations/tokens'
+import { DARK, LIGHT_BROWN, CREAM, BORDER } from '../../../styles/reservations/tokens'
 import { pageBtnStyle } from '../../../styles/reservations/table.styles'
 
 const PAGE_SIZES = [10, 25, 50, 100]
@@ -40,13 +40,6 @@ export default function Pagination({ total, page, pageSize, setPage, setPageSize
         <span style={{ fontSize:12, fontWeight:700, color:DARK }}>
           {start + 1}–{Math.min(start + pageSize, total)} / {total}
         </span>
-        <select
-          value={pageSize}
-          onChange={e => { setPageSize(Number(e.target.value)); setPage(1) }}
-          style={{ padding:'4px 8px', border:`4px solid ${BORDER}`, fontSize:12, fontWeight:700, color:DARK, background:'#fff', cursor:'pointer', outline:'none', fontFamily:'inherit' }}
-        >
-          {PAGE_SIZES.map(s => <option key={s} value={s}>{s} {t('per_page')}</option>)}
-        </select>
       </div>
       <div style={{ display:'flex', alignItems:'center', gap:3 }}>
         <PageBtn onClick={() => setPage(1)} disabled={safePage===1}><ChevronsLeft size={12} strokeWidth={2.5} /></PageBtn>

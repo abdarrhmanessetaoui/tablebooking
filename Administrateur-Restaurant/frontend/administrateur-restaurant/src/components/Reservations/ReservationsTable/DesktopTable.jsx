@@ -2,7 +2,7 @@ import { useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import TableRow from './TableRow'
 import Checkbox from './Checkbox'
-import { DARK, GOLD, BORDER } from '../../../styles/reservations/tokens'
+import { DARK, LIGHT_BROWN, BORDER } from '../../../styles/reservations/tokens'
 import { headerCellStyle } from '../../../styles/reservations/table.styles'
 
 export default function DesktopTable({ pageItems, selectedIds, highlightId, toggleOne, pageAllSel, pageSomeSel, togglePage, openView, openEdit, handleDelete, onOpenAssign, highlightRef }) {
@@ -17,9 +17,8 @@ export default function DesktopTable({ pageItems, selectedIds, highlightId, togg
     <div style={{ width:'100%', overflowX:'auto' }}>
       <table style={{ width:'100%', borderCollapse:'collapse', minWidth:800 }}>
         <thead>
-          <tr style={{ background:DARK }}>
+          <tr style={{ background:'#ffffff', borderBottom:`1.5px solid ${BORDER}` }}>
             <th style={{ padding:'11px 10px', width:36 }}>
-              <Checkbox checked={pageAllSel} indeterminate={pageSomeSel} onChange={togglePage} />
             </th>
             {HEADERS.map(label => (
               <th key={label} style={headerCellStyle}>{label}</th>

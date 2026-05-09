@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
-import { getToken } from '../../utils/auth'
+import { apiPath, getHeaders } from '../../utils/api'
 
 const DEFAULTS = {
   today: 0, today_confirmed: 0, today_pending: 0, today_cancelled: 0,
@@ -17,22 +17,26 @@ function sanitize(data) {
   return result
 }
 
+let cachedStats = null
+
 export default function useDashboardStats() {
   const { t } = useTranslation()
-  const [stats,   setStats]   = useState(DEFAULTS)
-  const [loading, setLoading] = useState(true)
+  const [stats,   setStats]   = useState(cachedStats || DEFAULTS)
+  const [loading, setLoading] = useState(!cachedStats)
   const [error,   setError]   = useState(null)
 
   const fetchStats = useCallback(async () => {
     setLoading(true)
     setError(null)
     try {
-      const res = await fetch('http://localhost:8000/api/stats', {
-        headers: { Authorization: `Bearer ${getToken()}` },
+      const res = await fetch(apiPath('stats'), {
+        headers: getHeaders(),
       })
       if (!res.ok) throw new Error(`${t('error_prefix')} ${res.status}`)
       const data = await res.json()
-      setStats(sanitize(data))
+      const sanitized = sanitize(data)
+      setStats(sanitized)
+      cachedStats = sanitized
     } catch (e) {
       setError(e.message)
     } finally {

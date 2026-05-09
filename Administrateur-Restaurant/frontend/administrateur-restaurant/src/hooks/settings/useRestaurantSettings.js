@@ -1,11 +1,7 @@
 import { useState, useEffect } from 'react'
-import { getToken } from '../../utils/auth'
+import { apiPath, getHeaders } from '../../utils/api'
 import { toast } from '../../components/ui/Toast'
 import i18n from '../../i18n'
-
-const BASE  = 'http://localhost:8000/api'
-const hGet  = () => ({ 'Accept': 'application/json', 'Authorization': `Bearer ${getToken()}` })
-const hJson = () => ({ 'Content-Type': 'application/json', 'Accept': 'application/json', 'Authorization': `Bearer ${getToken()}` })
 
 function normalizeDaySlots(oh) {
   const base = oh.openhours?.[0] ?? { type: 'all', h1: '12', m1: '0', h2: '23', m2: '0' }
@@ -48,7 +44,7 @@ export default function useRestaurantSettings() {
   // ── Fetches ──────────────────────────────────────────────────
 
   useEffect(() => {
-    fetch(`${BASE}/restaurant/info`, { headers: hGet() })
+    fetch(apiPath('restaurant/info'), { headers: getHeaders() })
       .then(r => r.json())
       .then(d => {
         setInfo({
@@ -74,8 +70,8 @@ export default function useRestaurantSettings() {
 
   useEffect(() => {
     Promise.all([
-      fetch(`${BASE}/time-slots`,          { headers: hGet() }).then(r => r.json()),
-      fetch(`${BASE}/restaurant/services`, { headers: hGet() }).then(r => r.json()),
+      fetch(apiPath('time-slots'),          { headers: getHeaders() }).then(r => r.json()),
+      fetch(apiPath('restaurant/services'), { headers: getHeaders() }).then(r => r.json()),
     ])
       .then(([d, svcs]) => {
         const normalized = (d.allOH ?? []).map(normalizeDaySlots)
@@ -118,7 +114,7 @@ export default function useRestaurantSettings() {
   async function saveInfo() {
     setSavingInfo(true)
     try {
-      const res = await fetch(`${BASE}/restaurant/info`, { method: 'PUT', headers: hJson(), body: JSON.stringify(info) })
+      const res = await fetch(apiPath('restaurant/info'), { method: 'PUT', headers: getHeaders(), body: JSON.stringify(info) })
       if (!res.ok) throw new Error(res.status)
       toast(i18n.t('settings_module.info_saved'), 'success')
     } catch { toast(i18n.t('settings_module.error_saving_info'), 'error') }
@@ -128,8 +124,8 @@ export default function useRestaurantSettings() {
   async function saveHours() {
     setSavingHours(true)
     try {
-      const res = await fetch(`${BASE}/time-slots`, {
-        method: 'PUT', headers: hJson(),
+      const res = await fetch(apiPath('time-slots'), {
+        method: 'PUT', headers: getHeaders(),
         body: JSON.stringify({ allOH: hours.allOH, working_dates: hours.working_dates }),
       })
       if (!res.ok) throw new Error(res.status)
@@ -141,7 +137,7 @@ export default function useRestaurantSettings() {
   async function saveNotif() {
     setSavingNotif(true)
     try {
-      const res = await fetch(`${BASE}/restaurant/notifications`, { method: 'PUT', headers: hJson(), body: JSON.stringify(notifications) })
+      const res = await fetch(apiPath('restaurant/notifications'), { method: 'PUT', headers: getHeaders(), body: JSON.stringify(notifications) })
       if (!res.ok) throw new Error(res.status)
       toast(i18n.t('settings_module.notif_saved'), 'success')
     } catch { toast(i18n.t('settings_module.error_saving_notif'), 'error') }

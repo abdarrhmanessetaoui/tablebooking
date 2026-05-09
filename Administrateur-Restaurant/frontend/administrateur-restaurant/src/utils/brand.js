@@ -1,4 +1,4 @@
-// ── 3 colors only: black · white · brown ──────────────────────────────────
+﻿// ── 3 colors only: black · white · brown ──────────────────────────────────
 export const B = {
   brown:      '#9A6F2E',
   brownDark:  '#6B4C1A',

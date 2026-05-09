@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+﻿import { useState, useEffect } from 'react'
 import useCountUp from '../../hooks/Dashboard/useCountUp'
 import {
   wrapper, labelRow, labelText,
@@ -7,7 +7,7 @@ import {
   progressFill, progressPct,
 } from '../../styles/dashboard/statBlock.styles'
 
-export default function StatBlock({ icon: Icon, value, label, accent, bg, delay = 0, total = 0 }) {
+export default function StatBlock({ value, label, accent, bg, delay = 0, total = 0 }) {
   const n   = useCountUp(value, 700, delay)
   const pct = total > 0 ? Math.round((value / total) * 100) : null
   const [w, setW] = useState(0)
@@ -22,13 +22,12 @@ export default function StatBlock({ icon: Icon, value, label, accent, bg, delay 
 
       {/* Label */}
       <div style={labelRow}>
-        <Icon size={10} strokeWidth={2.5} color={accent} />
-        <span style={labelText(accent)}>{label}</span>
+        <span style={{ ...labelText(accent), fontSize: '13px', fontWeight: '800' }}>{label}</span>
       </div>
 
       {/* Number */}
       <div style={valueRow}>
-        <span style={valueNumber}>{n}</span>
+        <span style={{ ...valueNumber, fontSize: '32px' }}>{n}</span>
       </div>
 
       {/* Progress bar + pct */}

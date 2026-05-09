@@ -1,16 +1,15 @@
 import { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
-import { X, LayoutGrid, Users, MapPin, Check, Loader, AlertTriangle, Clock } from 'lucide-react'
-import { getToken } from '../../utils/auth'
+import { X, LayoutGrid, Users, MapPin, Check, AlertTriangle, Clock } from 'lucide-react'
+import { ThreeDot } from 'react-loading-indicators'
+import { apiPath, getHeaders } from '../../utils/api'
 import { GREEN, RED } from '../../styles/dashboard/tokens'
 
-const DARK      = '#423428'
-const GOLD      = '#c8a97e'
-const GOLD_DARK = '#a8834e'
-const BORDER    = 'rgba(66,52,40,0.12)'
+const DARK      = '#2D2926'
+const LIGHT_BROWN      = '#C19A6B'
+const BORDER    = '#E5E0DA'
 const CREAM     = '#ffffff'
-const BASE      = 'http://localhost:8000/api'
 
 const LOC_COLORS = {
   'Intérieur':   { bg: '#eef2ff', color: '#4f6ef7' },
@@ -30,11 +29,6 @@ export default function AssignTableModal({ reservation, onClose, onAssigned }) {
 
   const guestCount = parseInt(reservation?.guests ?? 1)
 
-  const hdrs = () => ({
-    'Content-Type':  'application/json',
-    'Accept':        'application/json',
-    'Authorization': `Bearer ${getToken()}`,
-  })
 
   useEffect(() => {
     const params = new URLSearchParams({
@@ -45,8 +39,8 @@ export default function AssignTableModal({ reservation, onClose, onAssigned }) {
     })
 
     Promise.all([
-      fetch(`${BASE}/tables`,               { headers: hdrs() }).then(r => r.json()),
-      fetch(`${BASE}/tables/busy?${params}`, { headers: hdrs() }).then(r => r.json()),
+      fetch(apiPath('tables'),               { headers: getHeaders() }).then(r => r.json()),
+      fetch(apiPath(`tables/busy?${params}`), { headers: getHeaders() }).then(r => r.json()),
     ])
       .then(([tableData, busyData]) => {
         setTables(Array.isArray(tableData) ? tableData.filter(t => t.active) : [])
@@ -100,14 +94,14 @@ export default function AssignTableModal({ reservation, onClose, onAssigned }) {
       capacityColor: RED,
     },
     selected: {
-      border:        GOLD,
-      background:    DARK,
+      border:        LIGHT_BROWN,
+      background:    LIGHT_BROWN,
       cursor:        'pointer',
       iconBg:        'rgba(200,169,126,0.08)',
-      iconColor:     GOLD,
+      iconColor:     LIGHT_BROWN,
       textColor:     '#fff',
       capacityBg:    'rgba(200,169,126,0.08)',
-      capacityColor: GOLD,
+      capacityColor: LIGHT_BROWN,
     },
     current: {
       border:        GREEN,
@@ -137,8 +131,8 @@ export default function AssignTableModal({ reservation, onClose, onAssigned }) {
     setError(null)
     try {
       const res  = await fetch(
-        `${BASE}/restaurant/reservations/${reservation.id}/assign-table`,
-        { method: 'PATCH', headers: hdrs(), body: JSON.stringify({ table_idx: selected }) }
+        apiPath(`restaurant/reservations/${reservation.id}/assign-table`),
+        { method: 'PATCH', headers: getHeaders(), body: JSON.stringify({ table_idx: selected }) }
       )
       const data = await res.json()
       if (!res.ok) { setError(data.message ?? `Error ${res.status}`); return }
@@ -164,26 +158,23 @@ export default function AssignTableModal({ reservation, onClose, onAssigned }) {
       }}
       onClick={e => { if (e.target === e.currentTarget) onClose() }}
     >
-      <style>{`@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}`}</style>
-
+      
       <div style={{
         background: '#fff', width: '100%', maxWidth: 420,
         maxHeight: '88vh', overflow: 'auto',
         display: 'flex', flexDirection: 'column',
         boxShadow: '0 24px 64px rgba(66,52,40,0.35)',
+        borderRadius: 12, overflow: 'hidden',
       }}>
 
         {/* Header */}
         <div style={{
-          background: DARK, padding: '18px 22px', flexShrink: 0,
+          background: LIGHT_BROWN, padding: '18px 22px', flexShrink: 0,
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         }}>
           <div>
-            <p style={{ margin: 0, fontSize: 9, fontWeight: 700, color: GOLD, letterSpacing: '0.18em', textTransform: 'uppercase' }}>
-              {t('assign_table')}
-            </p>
             <h2 style={{ margin: '3px 0 0', fontSize: 16, fontWeight: 900, color: '#fff', letterSpacing: '-0.4px' }}>
-              {reservation?.name ?? '—'}
+              {reservation?.name ?? ' '}
             </h2>
           </div>
           <button onClick={onClose} style={{ background: 'rgba(255,255,255,0.1)', border: 'none', width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
@@ -191,24 +182,10 @@ export default function AssignTableModal({ reservation, onClose, onAssigned }) {
           </button>
         </div>
 
-        {/* Summary */}
-        <div style={{ background: CREAM, padding: '10px 22px', borderBottom: `1px solid ${BORDER}`, display: 'flex', gap: 20, flexShrink: 0 }}>
-          {[
-            [t('date'),     reservation?.date       ?? '—'],
-            [t('time'),    reservation?.start_time ?? '—'],
-            [t('pers_header'), `${guestCount} ${t(guestCount > 1 ? 'persons' : 'person')}`],
-          ].map(([label, val]) => (
-            <div key={label}>
-              <p style={{ margin: 0, fontSize: 9, fontWeight: 900, color: GOLD, letterSpacing: '0.14em', textTransform: 'uppercase' }}>{label}</p>
-              <p style={{ margin: '2px 0 0', fontSize: 13, fontWeight: 900, color: DARK }}>{val}</p>
-            </div>
-          ))}
-        </div>
 
         {/* Error */}
         {error && (
           <div style={{ margin: '10px 22px 0', padding: '10px 12px', background: '#ffffff', borderLeft: `3px solid ${RED}`, fontSize: 12, fontWeight: 700, color: RED, display: 'flex', alignItems: 'center', gap: 8 }}>
-            <AlertTriangle size={14} strokeWidth={2.5} />
             {error}
           </div>
         )}
@@ -216,35 +193,24 @@ export default function AssignTableModal({ reservation, onClose, onAssigned }) {
         {/* Table list */}
         <div style={{ padding: '14px 22px', flex: 1 }}>
 
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
-            <p style={{ margin: 0, fontSize: 9, fontWeight: 900, color: DARK, letterSpacing: '0.18em', textTransform: 'uppercase' }}>
-              {t('available_tables')}
-            </p>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', marginBottom: 10 }}>
             {reservation?.table_idx && (
-              <button onClick={() => setSelected(null)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, fontSize: 11, fontWeight: 800, color: RED, textDecoration: 'underline', fontFamily: 'inherit' }}>
+              <button onClick={() => setSelected(null)} style={{ 
+                background: 'rgba(239, 68, 68, 0.08)', border: 'none', 
+                cursor: 'pointer', padding: '6px 10px', 
+                fontSize: 10, fontWeight: 900, color: RED, 
+                textTransform: 'uppercase', letterSpacing: '0.05em', 
+                borderRadius: 8, fontFamily: 'inherit' 
+              }}>
                 {t('remove_table')}
               </button>
             )}
           </div>
 
-          {!loading && (
-            <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 12, padding: '7px 10px', background: CREAM, border: `1px solid ${BORDER}` }}>
-              {[
-                { dot: GREEN,                 label: t('available')    },
-                { dot: RED,                   label: t('busy')       },
-                { dot: 'rgba(66,52,40,0.18)', label: t('insufficient_capacity_short') },
-              ].map(s => (
-                <span key={s.label} style={{ display: 'inline-flex', alignItems: 'center', gap: 5, fontSize: 10, fontWeight: 700, color: DARK }}>
-                  <span style={{ width: 8, height: 8, borderRadius: '50%', background: s.dot, flexShrink: 0 }} />
-                  {s.label}
-                </span>
-              ))}
-            </div>
-          )}
 
           {loading ? (
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '32px 0' }}>
-              <Loader size={22} color={GOLD} style={{ animation: 'spin 1s linear infinite' }} />
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '48px 0', fontSize: 10, fontWeight: 900, color: 'rgba(66,52,40,0.4)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+              {t('calendar.loading_tables')}
             </div>
           ) : sortedTables.length === 0 ? (
             <p style={{ fontSize: 13, fontWeight: 700, color: DARK, textAlign: 'center', padding: '32px 0' }}>
@@ -269,10 +235,9 @@ export default function AssignTableModal({ reservation, onClose, onAssigned }) {
                     }}
                     style={{
                       position: 'relative', display: 'flex', alignItems: 'center',
-                      justifyContent: 'space-between', padding: '10px 14px',
+                      justifyContent: 'space-between', padding: '12px 14px',
                       cursor: cfg.cursor, background: cfg.background,
-                      border: `4px solid ${cfg.border}`,
-                      borderLeft: `6px solid ${cfg.border}`,
+                      borderBottom: `1px solid ${BORDER}`,
                       transition: 'all 0.12s',
                       filter: isDisabled ? 'grayscale(0.2)' : 'none',
                     }}
@@ -281,12 +246,6 @@ export default function AssignTableModal({ reservation, onClose, onAssigned }) {
                   >
                     {/* Left */}
                     <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                      <div style={{ width: 30, height: 30, flexShrink: 0, background: cfg.iconBg, display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: isDisabled ? 0.7 : 1 }}>
-                        {state === 'busy'
-                          ? <Clock size={14} color={RED} strokeWidth={2.5} />
-                          : <LayoutGrid size={14} color={cfg.iconColor} strokeWidth={2.5} />
-                        }
-                      </div>
                       <div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                           <p style={{ margin: 0, fontSize: 13, fontWeight: 900, color: cfg.textColor }}>
@@ -298,34 +257,11 @@ export default function AssignTableModal({ reservation, onClose, onAssigned }) {
                             </span>
                           )}
                         </div>
-                        {state === 'busy' && (
-                          <p style={{ margin: '2px 0 0', fontSize: 10, fontWeight: 700, color: RED }}>
-                            {t('assigned_at_time')}
-                          </p>
-                        )}
-                        {state === 'insufficient' && (
-                          <p style={{ margin: '2px 0 0', fontSize: 10, fontWeight: 600, color: 'rgba(66,52,40,0.35)' }}>
-                            {t('max_capacity_needed', { max: table.capacity, needed: guestCount })}
-                          </p>
-                        )}
                       </div>
                     </div>
 
                     {/* Right */}
                     <div style={{ display: 'flex', alignItems: 'center', gap: 5, flexShrink: 0, opacity: isDisabled ? 0.5 : 1 }}>
-                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 3, padding: '2px 7px', background: cfg.capacityBg, fontSize: 10, fontWeight: 800, color: cfg.capacityColor }}>
-                        <Users size={9} strokeWidth={2.5} />
-                        {table.capacity}
-                      </span>
-                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 3, padding: '2px 7px', background: state === 'selected' ? 'rgba(200,169,126,0.1)' : locStyle.bg, fontSize: 10, fontWeight: 700, color: state === 'selected' ? 'rgba(200,169,126,0.8)' : locStyle.color }}>
-                        <MapPin size={9} strokeWidth={2.5} />
-                        {table.location}
-                      </span>
-                      {state === 'selected' && (
-                        <div style={{ width: 20, height: 20, background: GOLD, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                          <Check size={11} color={DARK} strokeWidth={3} />
-                        </div>
-                      )}
                     </div>
 
                     {/* Stripe overlays */}
@@ -343,25 +279,38 @@ export default function AssignTableModal({ reservation, onClose, onAssigned }) {
         </div>
 
         {/* Footer */}
-        <div style={{ padding: '12px 22px', borderTop: `4px solid ${BORDER}`, background: CREAM, display: 'flex', gap: 8, flexShrink: 0 }}>
+        <div style={{ padding: '16px 22px', background: CREAM, display: 'flex', gap: 10, flexShrink: 0 }}>
           <button onClick={onClose}
-            style={{ flex: 1, padding: '11px', background: '#fff', border: `4px solid ${DARK}`, fontSize: 13, fontWeight: 800, color: DARK, cursor: 'pointer', fontFamily: 'inherit' }}
-            onMouseEnter={e => e.currentTarget.style.background = CREAM}
-            onMouseLeave={e => e.currentTarget.style.background = '#fff'}
+            style={{ 
+              flex: 1, padding: '14px', background: '#f5f0eb', border: 'none', 
+              fontSize: 12, fontWeight: 900, color: '#888', 
+              cursor: 'pointer', borderRadius: 8, textTransform: 'uppercase', letterSpacing: '0.05em' 
+            }}
           >
             {t('cancel_btn')}
           </button>
           <button
             onClick={handleAssign}
             disabled={saving || !hasChanged}
-            style={{ flex: 2, padding: '11px', background: DARK, border: 'none', fontSize: 13, fontWeight: 800, color: GOLD, cursor: saving || !hasChanged ? 'not-allowed' : 'pointer', opacity: saving || !hasChanged ? 0.5 : 1, fontFamily: 'inherit', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, transition: 'opacity 0.15s' }}
+            style={{ 
+              flex: 2, padding: '14px', 
+              background: saving || !hasChanged 
+                ? '#D1D5DB' 
+                : (selected === null ? RED : LIGHT_BROWN), 
+              border: 'none', 
+              fontSize: 12, fontWeight: 900, color: '#ffffff', 
+              cursor: saving || !hasChanged ? 'not-allowed' : 'pointer', 
+              borderRadius: 12,
+              textTransform: 'uppercase', letterSpacing: '0.05em',
+              transition: 'none' 
+            }}
           >
             {saving ? (
-              <><Loader size={14} style={{ animation: 'spin 1s linear infinite' }} />{t('saving')}</>
+              t('calendar.registering')
             ) : selected === null ? (
               t('remove_table')
             ) : (
-              <><Check size={14} strokeWidth={2.5} />{t('confirm_btn')}</>
+              t('confirm_btn')
             )}
           </button>
         </div>

@@ -12,6 +12,7 @@ import LiveClock from '../components/Dashboard/LiveClock'
 import TabPanel from '../components/Dashboard/TabPanel'
 import { exportPDF } from '../utils/export'
 import { getToken } from '../utils/auth'
+import { apiPath } from '../utils/api'
 
 import {
   page, header, headerLeft,
@@ -19,8 +20,8 @@ import {
   errorBanner, tabsCSS,
 } from '../styles/dashboard/dashboard.styles'
 import {
-  DARK, GOLD, WHITE, AMBER, AMBER_BG,
-  TODAY_DATE, TOMORROW_DATE,
+  DARK, LIGHT_BROWN, WHITE, AMBER, AMBER_BG,
+  TODAY_DATE, TOMORROW_DATE
 } from '../styles/dashboard/tokens'
 
 export default function Dashboard() {
@@ -42,23 +43,26 @@ export default function Dashboard() {
     const yr = now.getFullYear()
     const mo = String(now.getMonth() + 1).padStart(2, '0')
 
-    fetch(`http://localhost:8000/api/restaurant/reservations?date=${TODAY_DATE}`, { headers: h })
+    fetch(apiPath(`restaurant/reservations?date=${TODAY_DATE}`), { headers: h })
       .then(r => r.json())
       .then(d => setTodayRes(Array.isArray(d) ? d : []))
       .catch(() => { })
 
-    fetch(`http://localhost:8000/api/restaurant/reservations?date=${TOMORROW_DATE}`, { headers: h })
+    fetch(apiPath(`restaurant/reservations?date=${TOMORROW_DATE}`), { headers: h })
       .then(r => r.json())
       .then(d => setTomRes(Array.isArray(d) ? d : []))
       .catch(() => { })
 
-    fetch(`http://localhost:8000/api/restaurant/reservations?month=${yr}-${mo}`, { headers: h })
+    fetch(apiPath(`restaurant/reservations?month=${yr}-${mo}`), { headers: h })
       .then(r => r.json())
-      .then(d => setMonthRes(Array.isArray(d) ? d : []))
+      .then(d => {
+        setMonthRes(Array.isArray(d) ? d : [])
+      })
       .catch(() => { })
 
     refetch()
   }, [refetch])
+
 
   useEffect(() => {
     loadAll()
@@ -82,8 +86,6 @@ export default function Dashboard() {
   }
 
   // ── PDF export ──────────────────────────────────────────────────
-  // NOTE: do NOT load jsPDF from CDN — it is already bundled via npm
-  // in export.js. Loading it from CDN causes conflicts.
   async function handleExport() {
     setExporting(true)
     try {
@@ -95,15 +97,17 @@ export default function Dashboard() {
     }
   }
 
-  if (loading) return <Spinner />
+  useEffect(() => {
+    if (!loading && stats) {
+      window.dispatchEvent(new CustomEvent('app-ready'))
+    }
+  }, [loading, stats])
+
+  if (loading) return <Spinner fullPage />
 
   return (
     <>
       <style>{tabsCSS}</style>
-      <link
-        href="https://fonts.googleapis.com/css2?family=Amiri&family=Inter:wght@400;500;600;700;800;900&display=swap"
-        rel="stylesheet"
-      />
 
       <div style={page}>
 
@@ -116,21 +120,13 @@ export default function Dashboard() {
                 <LiveClock />
               </p>
             </div>
-            <div style={{ display: 'flex', gap: 3, flexShrink: 0 }}>
-              <Btn icon={FileDown} primary onClick={handleExport} disabled={exporting}>
-                {exporting ? t('exporting') : t('export_pdf')}
-              </Btn>
-            </div>
           </div>
         </FadeUp>
 
-        {/* ── Divider ────────────────────────────────────────── */}
-        <FadeUp delay={10}>
-          <div style={divider} />
-        </FadeUp>
+        <div style={divider} />
 
         {/* ── Tabs ───────────────────────────────────────────── */}
-        <FadeUp delay={20}>
+        <FadeUp delay={40}>
           <div className="db-tabs">
             {TABS.map(tb => (
               <button
@@ -151,7 +147,7 @@ export default function Dashboard() {
         </FadeUp>
 
         {/* ── Tab content ────────────────────────────────────── */}
-        <FadeUp delay={30} key={tab}>
+        <FadeUp delay={80} key={tab}>
           <TabPanel
             tab={tab}
             stats={stats}
@@ -167,9 +163,7 @@ export default function Dashboard() {
         {/* ── Error ──────────────────────────────────────────── */}
         {error && (
           <FadeUp delay={0}>
-            <div style={errorBanner}>
-              {t('error_loading')} — {error}
-            </div>
+              {t('error_loading')} {error}
           </FadeUp>
         )}
 

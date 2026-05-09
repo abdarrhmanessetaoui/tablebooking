@@ -1,4 +1,4 @@
-import { DARK, GOLD_DK, BORDER } from './tokens'
+﻿import { DARK, LIGHT_BROWN_DK, BORDER } from './tokens'
 
 // ── SVG ring wrapper ──────────────────────────────────────────────
 export const ringWrapper = (size) => ({
@@ -17,15 +17,16 @@ export const svg = (size) => ({
 // ── Background track circle ───────────────────────────────────────
 export const trackCircle = {
   fill:        'none',
-  stroke:      BORDER,
-  strokeWidth: '8',
+  stroke:      '#F0EBE5',
+  strokeWidth: '7',
 }
 
 // ── Animated segment ──────────────────────────────────────────────
 export const segment = (arc, circ, offset, color, index) => ({
   fill:              'none',
   stroke:            color,
-  strokeWidth:       '8',
+  strokeWidth:       '7',
+  strokeLinecap:     'round',
   strokeDasharray:   `${arc} ${circ}`,
   strokeDashoffset:  -offset,
   transition:        `stroke-dasharray 0.9s ease ${index * 0.12}s`,
@@ -42,18 +43,19 @@ export const centerOverlay = {
 }
 
 export const centerPct = {
-  fontSize:           16,
-  fontWeight:         900,
+  fontSize:           17,
+  fontWeight:         700,
   color:              DARK,
   lineHeight:         1,
   fontVariantNumeric: 'tabular-nums',
+  fontFamily:         "'Poppins','Inter',system-ui,sans-serif",
 }
 
 export const centerLabel = {
-  fontSize:      7,
-  fontWeight:    900,
-  color:         GOLD_DK,
+  fontSize:      8,
+  fontWeight:    600,
+  color:         '#000000',
   textTransform: 'uppercase',
-  letterSpacing: '0.1em',
-  marginTop:     2,
+  letterSpacing: '0.08em',
+  marginTop:     3,
 }

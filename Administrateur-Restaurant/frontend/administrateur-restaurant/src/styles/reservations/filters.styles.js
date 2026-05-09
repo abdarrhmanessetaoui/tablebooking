@@ -1,26 +1,86 @@
-import { DARK, GOLD, GOLD_DARK, BORDER } from './tokens'
+﻿import { DARK, BORDER, LIGHT_BROWN, RADIUS, WHITE } from '../dashboard/tokens'
 
+// ── Base input style ──────────────────────────────────────────────
 export const filterInputBase = {
-  background: '#fff', border: `4px solid ${DARK}`,
-  padding: '10px 14px', fontSize: 13, fontWeight: 600,
-  color: DARK, fontFamily: 'inherit',
-  outline: 'none', boxSizing: 'border-box',
-  width: '100%', borderRadius: 0,
+  width: '100%',
+  padding: '10px 14px',
+  background: WHITE,
+  border: `1px solid ${BORDER}`,
+  borderRadius: RADIUS.sm,
+  fontSize: '13px',
+  fontWeight: '800',
+  color: DARK,
+  outline: 'none',
+  transition: 'none',
+  fontFamily: 'inherit',
+  boxSizing: 'border-box',
 }
 
-export const dateBtnStyle = (hasDate) => ({
-  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-  gap: 8, width: '100%', padding: '10px 14px',
-  background: hasDate ? DARK : '#fff',
-  border: hasDate ? 'none' : `4px solid ${DARK}`,
-  fontSize: 13, fontWeight: 800,
-  color: hasDate ? GOLD : DARK,
-  cursor: 'pointer', fontFamily: 'inherit',
-  transition: 'all 0.15s',
+// ── Date button style ─────────────────────────────────────────────
+export const dateBtnStyle = (isActive) => ({
+  ...filterInputBase,
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  cursor: 'pointer',
+  gap: '8px',
+  ...(isActive ? {
+    background: LIGHT_BROWN,
+    color: WHITE,
+    borderColor: LIGHT_BROWN,
+    fontWeight: '800',
+  } : {}),
 })
 
+// ── Calendar Nav Button (for the popup) ───────────────────────────
 export const calNavBtnStyle = {
-  background: 'none', border: 'none', cursor: 'pointer',
-  color: 'rgba(200,169,126,0.7)', padding: '4px 6px',
-  fontFamily: 'inherit', display: 'flex', alignItems: 'center',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  width: '32px',
+  height: '32px',
+  borderRadius: RADIUS.sm,
+  border: `1px solid ${BORDER}`,
+  background: WHITE,
+  color: DARK,
+  cursor: 'pointer',
+  transition: 'none',
+}
+
+// ── Legacy exports/aliases ────────────────────────────────────────
+export const filterBar = {
+  display: 'flex',
+  flexWrap: 'wrap',
+  gap: '12px',
+  marginBottom: '24px',
+  alignItems: 'center',
+}
+
+export const searchWrapper = {
+  position: 'relative',
+  flex: '1',
+  minWidth: '240px',
+}
+
+export const inputStyle = { ...filterInputBase, paddingInlineStart: '40px' }
+export const selectStyle = { ...filterInputBase, cursor: 'pointer', WebkitAppearance: 'none', appearance: 'none' }
+
+export const activeFilter = {
+  borderColor: LIGHT_BROWN,
+  background: 'transparent',
+  color: DARK,
+}
+
+export const clearBtn = {
+  padding: '8px 12px',
+  background: 'transparent',
+  border: 'none',
+  color: DARK,
+  fontSize: '13px',
+  fontWeight: '800',
+  cursor: 'pointer',
+  display: 'flex',
+  alignItems: 'center',
+  gap: '6px',
+  transition: 'none',
 }

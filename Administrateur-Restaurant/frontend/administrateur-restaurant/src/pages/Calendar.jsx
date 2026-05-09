@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { FileDown } from 'lucide-react'
 import useCalendar   from '../hooks/Calendar/useCalendar'
@@ -6,39 +6,20 @@ import CalendarNav   from '../components/Calendar/CalendarNav'
 import CalendarWeek  from '../components/Calendar/Calendarweek'
 import FadeUp        from '../components/Dashboard/FadeUp'
 import Spinner       from '../components/Dashboard/Spinner'
+import Btn           from '../components/Dashboard/Btn'
 import { exportPDF } from '../utils/export'
 
-const DARK    = '#423428'
-const GOLD    = '#c8a97e'
-const GOLD_DK = '#a8834e'
-const RED_BG  = '#ffffff'
-const RED     = '#DC2626'
-
-function Btn({ children, onClick, primary, disabled, icon: Icon }) {
-  const [hov, setHov] = useState(false)
-  const bg    = primary ? (hov ? DARK : GOLD) : (hov ? GOLD : DARK)
-  const color = primary ? (hov ? GOLD : DARK) : '#fff'
-  return (
-    <button onClick={onClick} disabled={disabled}
-      onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
-      style={{
-        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-        padding: '11px 20px', background: bg, border: 'none', color,
-        fontSize: 13, fontWeight: 800,
-        cursor: disabled ? 'not-allowed' : 'pointer',
-        opacity: disabled ? 0.5 : 1,
-        transition: 'background 0.15s, color 0.15s',
-        fontFamily: 'inherit', whiteSpace: 'nowrap',
-      }}>
-      {Icon && <Icon size={15} strokeWidth={2.2} />}
-      <span className="btn-label">{children}</span>
-    </button>
-  )
-}
+import {
+  page, header, headerLeft,
+  h1 as h1Style, divider,
+  errorBanner, tabsCSS,
+} from '../styles/dashboard/dashboard.styles'
+import {
+  DARK, LIGHT_BROWN, FONT_URL,
+} from '../styles/dashboard/tokens'
 
 export default function Calendar() {
-  const { t, i18n } = useTranslation()
-  const lang = i18n.language === 'ar' ? 'ar-MA' : i18n.language === 'fr' ? 'fr-FR' : 'en-US'
+  const { t } = useTranslation()
   const {
     view, setView, currentDate, setCurrentDate,
     weekDays, monthDays, loading, error,
@@ -47,12 +28,15 @@ export default function Calendar() {
   } = useCalendar()
 
   const [exporting, setExporting] = useState(false)
-
-  // ── NEW: track which day is selected inside week view
   const [weekSelectedDay, setWeekSelectedDay] = useState(null)
 
-  // Reset selected day when view or week changes
-  // so it always defaults to today or Monday
+  useEffect(() => {
+    // Notify the app that data is ready
+    if (!loading) {
+      window.dispatchEvent(new CustomEvent('app-ready'))
+    }
+  }, [loading])
+
   function handleNavigate(dir) {
     setWeekSelectedDay(null)
     navigate(dir)
@@ -66,42 +50,6 @@ export default function Calendar() {
     setView(v)
   }
 
-  // ── Compute the correct ISO date for the timeline ──────────────
-  function getTimelineDate() {
-    if (view === 'day') {
-      return currentDate.toISOString().slice(0, 10)
-    }
-    if (view === 'week') {
-      // Use the day the user clicked in week view
-      // Fall back to today if in current week, else Monday
-      if (weekSelectedDay) return weekSelectedDay.toISOString().slice(0, 10)
-      const today     = new Date()
-      const todayInWeek = weekDays.find(d => d.toDateString() === today.toDateString())
-      if (todayInWeek) return todayInWeek.toISOString().slice(0, 10)
-      return weekDays[0]?.toISOString().slice(0, 10)
-    }
-    if (view === 'month') {
-      // Use today if in this month, else first day of month
-      const today = new Date()
-      const sameMonth = today.getMonth() === currentDate.getMonth() &&
-                        today.getFullYear() === currentDate.getFullYear()
-      if (sameMonth) return today.toISOString().slice(0, 10)
-      return new Date(currentDate.getFullYear(), currentDate.getMonth(), 1)
-        .toISOString().slice(0, 10)
-    }
-    if (view === 'year') {
-      // Use today if in this year, else Jan 1
-      const today = new Date()
-      if (today.getFullYear() === currentDate.getFullYear()) {
-        return today.toISOString().slice(0, 10)
-      }
-      return `${currentDate.getFullYear()}-01-01`
-    }
-    return currentDate.toISOString().slice(0, 10)
-  }
-
-  const timelineDate = getTimelineDate()
-
   async function handleExport() {
     setExporting(true)
     try {
@@ -109,53 +57,34 @@ export default function Calendar() {
         : view === 'week' ? weekDays.flatMap(d => getByDate(d))
         : reservations || []
       
-      await exportPDF(null, allRes, t('planning') + ' — ' + navLabel())
+      await exportPDF(null, allRes, t('planning') + ' ' + navLabel())
     } catch(e) { console.error(e) } finally { setExporting(false) }
   }
 
+  if (loading) return <Spinner fullPage />
+
   return (
     <>
-      <style>{`
-        @media (max-width: 600px) {
-          .btn-label     { display: none !important; }
-          .page-subtitle { display: none !important; }
-        }
-      `}</style>
+      <style>{tabsCSS}</style>
+      <link href={FONT_URL} rel="stylesheet" />
 
-      <div style={{
-        minHeight: '100vh', background: '#ffffff',
-        fontFamily: "'Inter',system-ui,-apple-system,sans-serif",
-        padding: 'clamp(16px,3vw,40px) clamp(12px,3vw,36px)',
-      }}>
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
-        <style>{`* { box-sizing: border-box; }`}</style>
-
+      <div style={page}>
+        
         <FadeUp delay={0}>
-          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12, marginBottom: 8, flexWrap: 'wrap' }}>
-            <div>
-              <h1 style={{ margin: 0, fontSize: 'clamp(22px,4vw,36px)', fontWeight: 900, color: DARK, letterSpacing: '-1.5px', lineHeight: 1 }}>
-                {t('planning')}
-              </h1>
-              <p className="page-subtitle" style={{ margin: '6px 0 0', fontSize: 12, fontWeight: 700, color: GOLD_DK }}>
-                
-              </p>
-            </div>
-            <div style={{ display: 'flex', gap: 3, flexShrink: 0 }}>
-              <Btn icon={FileDown} primary onClick={handleExport} disabled={exporting}>
-                {exporting ? t('exporting') : t('export_pdf')}
-              </Btn>
+          <div style={header}>
+            <div style={headerLeft}>
+              <h1 style={h1Style}>{t('planning')}</h1>
             </div>
           </div>
         </FadeUp>
 
-
         <FadeUp delay={10}>
-          <div style={{ height: 4, background: DARK, margin: '16px 0 24px' }} />
+          <div style={divider} />
         </FadeUp>
 
         {error && (
           <FadeUp delay={15}>
-            <div style={{ marginBottom: 16, padding: '11px 16px', background: RED_BG, borderLeft: `3px solid ${RED}`, fontSize: 12, fontWeight: 700, color: RED }}>
+            <div style={errorBanner}>
               {error}
             </div>
           </FadeUp>
@@ -173,23 +102,18 @@ export default function Calendar() {
         </FadeUp>
 
         <FadeUp delay={40}>
-          {loading ? <Spinner /> : (
-            <CalendarWeek
-              view={view}
-              setView={handleSetView}
-              weekDays={weekDays}
-              monthDays={monthDays}
-              currentDate={currentDate}
-              setCurrentDate={setCurrentDate}
-              getByDate={getByDate}
-              getByMonth={getByMonth}
-              onDayChange={setWeekSelectedDay}
-            />
-          )}
+          <CalendarWeek
+            view={view}
+            setView={handleSetView}
+            weekDays={weekDays}
+            monthDays={monthDays}
+            currentDate={currentDate}
+            setCurrentDate={setCurrentDate}
+            getByDate={getByDate}
+            getByMonth={getByMonth}
+            onDayChange={setWeekSelectedDay}
+          />
         </FadeUp>
-
-
-
       </div>
     </>
   )

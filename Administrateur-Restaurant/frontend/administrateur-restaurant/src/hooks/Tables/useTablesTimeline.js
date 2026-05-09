@@ -1,12 +1,10 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useTranslation }                   from 'react-i18next'
-import { getToken }                         from '../../utils/auth'
-
-const BASE = 'http://localhost:8000/api'
+import { apiPath, getHeaders } from '../../utils/api'
 
 /**
  * Returns today's date as YYYY-MM-DD in LOCAL timezone.
- * new Date().toISOString() is UTC — in timezones ahead of UTC
+ * new Date().toISOString() is UTC   in timezones ahead of UTC
  * it returns "yesterday" after midnight local time.
  */
 export function localToday() {
@@ -35,8 +33,8 @@ export default function useTablesTimeline(initialDate = null) {
   // Fetch static data once (open hours + services)
   useEffect(() => {
     Promise.all([
-      fetch(`${BASE}/time-slots`,          { headers: hdrs() }).then(r => r.json()),
-      fetch(`${BASE}/restaurant/services`, { headers: hdrs() }).then(r => r.json()),
+      fetch(apiPath('time-slots'),          { headers: getHeaders() }).then(r => r.json()),
+      fetch(apiPath('restaurant/services'), { headers: getHeaders() }).then(r => r.json()),
     ]).then(([slots, svcs]) => {
       setAllOH(Array.isArray(slots?.allOH) ? slots.allOH : [])
       setServices(Array.isArray(svcs) ? svcs : [])
@@ -47,7 +45,7 @@ export default function useTablesTimeline(initialDate = null) {
     setLoading(true)
     setError(null)
     try {
-      const res = await fetch(`${BASE}/tables/timeline?date=${d}`, { headers: hdrs() })
+      const res = await fetch(apiPath(`tables/timeline?date=${d}`), { headers: getHeaders() })
       if (!res.ok) throw new Error(`HTTP ${res.status}`)
       const data = await res.json()
       setTimeline(Array.isArray(data) ? data : [])

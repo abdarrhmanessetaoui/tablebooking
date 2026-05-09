@@ -1,6 +1,6 @@
-import { useState } from 'react'
+﻿import { useState } from 'react'
 import { ChevronDown, ChevronUp } from 'lucide-react'
-import { DARK, GOLD } from './constants'
+import { DARK, LIGHT_BROWN } from './constants'
 
 export default function Section({ icon: Icon, title, action, children, defaultOpen = true }) {
   const [open, setOpen] = useState(defaultOpen)
@@ -21,11 +21,11 @@ export default function Section({ icon: Icon, title, action, children, defaultOp
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0, flex: 1 }}>
-          {Icon && <Icon size={14} strokeWidth={2.5} color={GOLD} style={{ flexShrink: 0 }} />}
+          {Icon && <Icon size={14} strokeWidth={2.5} color={LIGHT_BROWN} style={{ flexShrink: 0 }} />}
           <span style={{
             fontSize: 11,
             fontWeight: 900,
-            color: GOLD,
+            color: LIGHT_BROWN,
             letterSpacing: '0.12em',
             textTransform: 'uppercase',
             overflow: 'hidden',
@@ -38,8 +38,8 @@ export default function Section({ icon: Icon, title, action, children, defaultOp
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
           {action && <div onClick={e => e.stopPropagation()}>{action}</div>}
           {open
-            ? <ChevronUp size={14} strokeWidth={2.5} color={GOLD} />
-            : <ChevronDown size={14} strokeWidth={2.5} color={GOLD} />
+            ? <ChevronUp size={14} strokeWidth={2.5} color={LIGHT_BROWN} />
+            : <ChevronDown size={14} strokeWidth={2.5} color={LIGHT_BROWN} />
           }
         </div>
       </div>

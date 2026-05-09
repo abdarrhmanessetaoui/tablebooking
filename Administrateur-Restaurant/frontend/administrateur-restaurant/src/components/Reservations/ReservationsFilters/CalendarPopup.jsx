@@ -1,8 +1,8 @@
-import { useState, useEffect, useRef } from 'react'
+﻿import { useState, useEffect, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react'
-import { DARK, GOLD, GOLD_DARK } from '../../../styles/reservations/tokens'
+import { DARK, LIGHT_BROWN, LIGHT_BROWN_DARK } from '../../../styles/reservations/tokens'
 import { calNavBtnStyle } from '../../../styles/reservations/filters.styles'
 
 export default function CalendarPopup({ filterDate, setFilterDate, onClose, anchorRef }) {
@@ -100,7 +100,7 @@ export default function CalendarPopup({ filterDate, setFilterDate, onClose, anch
       <div style={{ display:'flex', alignItems:'center', background:DARK, padding:'8px 6px', gap:2 }}>
         <button onClick={() => setViewYear(y=>y-1)} style={calNavBtnStyle}>{isRtl ? <ChevronsRight size={13} strokeWidth={2.5} /> : <ChevronsLeft  size={13} strokeWidth={2.5} />}</button>
         <button onClick={() => navMonth(-1)}         style={calNavBtnStyle}>{isRtl ? <ChevronRight  size={13} strokeWidth={2.5} /> : <ChevronLeft   size={13} strokeWidth={2.5} />}</button>
-        <span style={{ flex:1, textAlign:'center', fontSize:13, fontWeight:800, color:GOLD, textTransform:'capitalize' }}>
+        <span style={{ flex:1, textAlign:'center', fontSize:13, fontWeight:800, color:LIGHT_BROWN, textTransform:'capitalize' }}>
           {MONTHS[viewMonth]} {viewYear}
         </span>
         <button onClick={() => navMonth(1)}          style={calNavBtnStyle}>{isRtl ? <ChevronLeft   size={13} strokeWidth={2.5} /> : <ChevronRight  size={13} strokeWidth={2.5} />}</button>
@@ -127,7 +127,7 @@ export default function CalendarPopup({ filterDate, setFilterDate, onClose, anch
       {mode === 'day' && (
         <div style={{ display:'grid', gridTemplateColumns:'repeat(7,1fr)', padding:'6px 8px 10px' }}>
           {DAYS.map(d => (
-            <div key={d} style={{ textAlign:'center', fontSize:10, fontWeight:800, color:GOLD_DARK, padding:'4px 0', letterSpacing:'0.06em' }}>{d}</div>
+            <div key={d} style={{ textAlign:'center', fontSize:10, fontWeight:800, color:LIGHT_BROWN_DARK, padding:'4px 0', letterSpacing:'0.06em' }}>{d}</div>
           ))}
           {cells.map((c,i) => (
             <div key={i} onClick={c.onClick}
@@ -136,7 +136,7 @@ export default function CalendarPopup({ filterDate, setFilterDate, onClose, anch
               style={{
                 textAlign:'center', fontSize:12, borderRadius:2,
                 fontWeight: c.isSelected?800 : c.isToday?900 : 600,
-                color: c.isSelected?GOLD : c.isToday?GOLD_DARK : c.isOther?'rgba(66,52,40,0.2)' : DARK,
+                color: c.isSelected?LIGHT_BROWN : c.isToday?LIGHT_BROWN_DARK : c.isOther?'rgba(66,52,40,0.2)' : DARK,
                 background: c.isSelected?DARK : 'transparent',
                 padding:'5px 2px',
                 cursor: c.isOther?'default':'pointer',
@@ -157,7 +157,7 @@ export default function CalendarPopup({ filterDate, setFilterDate, onClose, anch
               <div key={m} onClick={() => pickMonth(i)}
                 onMouseEnter={e => { if(!isSelected) e.currentTarget.style.background='#f5f0eb' }}
                 onMouseLeave={e => { e.currentTarget.style.background = isSelected?DARK:'transparent' }}
-                style={{ padding:'8px 4px', textAlign:'center', fontSize:12, cursor:'pointer', fontWeight:isSelected?800:isCurrent?900:700, color:isSelected?GOLD:isCurrent?GOLD_DARK:DARK, background:isSelected?DARK:'transparent', transition:'background 0.1s' }}
+                style={{ padding:'8px 4px', textAlign:'center', fontSize:12, cursor:'pointer', fontWeight:isSelected?800:isCurrent?900:700, color:isSelected?LIGHT_BROWN:isCurrent?LIGHT_BROWN_DARK:DARK, background:isSelected?DARK:'transparent', transition:'background 0.1s' }}
               >{m.slice(0,4)}</div>
             )
           })}

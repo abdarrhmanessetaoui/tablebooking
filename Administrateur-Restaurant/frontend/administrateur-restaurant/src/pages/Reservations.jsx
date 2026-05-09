@@ -12,138 +12,83 @@ import ReservationsTable   from '../components/Reservations/ReservationsTable/in
 import ReservationModal    from '../components/Reservations/ReservationModal/index'
 import FadeUp   from '../components/Dashboard/FadeUp'
 import Spinner  from '../components/Dashboard/Spinner'
+import Btn      from '../components/Dashboard/Btn'
 import { getToken } from '../utils/auth'
 import { exportPDF } from '../utils/export'
 import { toast }   from '../components/ui/Toast'
 import { confirm } from '../components/ui/ConfirmDialog'
-
-const DARK      = '#423428'
-const GOLD      = '#c8a97e'
-const GOLD_DARK = '#a8834e'
-
-function Btn({ children, onClick, primary, disabled, icon: Icon }) {
-  const [hov, setHov] = useState(false)
-  const bg    = primary ? (hov ? DARK : GOLD) : (hov ? GOLD : DARK)
-  const color = primary ? (hov ? GOLD : DARK) : '#fff'
-  return (
-    <button onClick={onClick} disabled={disabled}
-      onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
-      style={{
-        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-        padding: '11px 20px',
-        background: bg, border: 'none', color,
-        fontSize: 13, fontWeight: 800,
-        cursor: disabled ? 'not-allowed' : 'pointer',
-        opacity: disabled ? 0.5 : 1,
-        transition: 'background 0.15s, color 0.15s',
-        fontFamily: 'inherit', whiteSpace: 'nowrap',
-      }}
-    >
-      {Icon && <Icon size={15} strokeWidth={2.2} />}
-      <span className="btn-label">{children}</span>
-    </button>
-  )
-}
+import { apiPath } from '../utils/api'
+import {
+  page, header, headerLeft, h1, subtitle, divider, errorBanner
+} from '../styles/dashboard/dashboard.styles'
+import {
+  DARK, DARK_LIGHT, LIGHT_BROWN, BROWN_LT, WHITE, BORDER, RADIUS
+} from '../styles/dashboard/tokens'
 
 function BulkBar({ count, onDelete, onStatus, onClear }) {
-  const { t } = useTranslation()
-  const [hovDel, setHovDel] = useState(false)
+  const { t, i18n } = useTranslation()
+  const isAr = i18n.language === 'ar'
+  
   return (
     <div style={{
-      position: 'sticky', top: 8, zIndex: 30,
-      display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap',
-      padding: '10px 16px',
-      background: DARK,
-      boxShadow: '0 4px 24px rgba(66,52,40,0.28)',
-      marginBottom: 12,
-      animation: 'slideDown 0.18s ease',
+      display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap',
+      padding: '12px 16px',
+      background: LIGHT_BROWN,
+      marginBottom: 16,
+      borderRadius: RADIUS.sm,
+      color: WHITE,
+      direction: isAr ? 'rtl' : 'ltr'
     }}>
-      <style>{`
-        @keyframes slideDown { from{opacity:0;transform:translateY(-8px)} to{opacity:1;transform:translateY(0)} }
-        @media (max-width: 600px) {
-          .btn-label  { display: none !important; }
-          .bulk-label { display: none !important; }
-        }
-      `}</style>
-
-      <span style={{
-        display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-        minWidth: 26, height: 26,
-        background: GOLD, color: DARK,
-        fontSize: 12, fontWeight: 900, padding: '0 7px', flexShrink: 0,
-      }}>{count}</span>
-      <span className="bulk-label" style={{ fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.6)', marginRight: 2 }}>
-        {t('selected_count', { count, plural: count > 1 ? 's' : '' })}
-      </span>
-
-      <div style={{ width: 1, height: 20, background: 'rgba(255,255,255,0.12)', margin: '0 2px', flexShrink: 0 }} />
 
       {[
-        { status: 'Confirmed', label: t('confirm'),  Icon: CheckCircle, color: '#4ade80' },
-        { status: 'Pending',   label: t('pending'),  Icon: Clock,       color: GOLD      },
-        { status: 'Cancelled', label: t('cancel'),   Icon: XCircle,     color: '#f87171' },
-      ].map(({ status, label, Icon, color }) => (
+        { status: 'Confirmed', label: t('confirmed_label'), bg: WHITE, color: LIGHT_BROWN },
+        { status: 'Pending',   label: t('pending_label'),   bg: WHITE, color: LIGHT_BROWN },
+        { status: 'Cancelled', label: t('cancelled_label'), bg: WHITE, color: LIGHT_BROWN },
+      ].map(({ status, label, bg, color }) => (
         <button key={status} onClick={() => onStatus(status)}
           style={{
-            display: 'flex', alignItems: 'center', gap: 5,
-            padding: '6px 12px',
-            background: 'rgba(255,255,255,0.07)',
-            border: '1px solid rgba(255,255,255,0.1)',
-            color, fontSize: 12, fontWeight: 700,
-            cursor: 'pointer', fontFamily: 'inherit',
-            transition: 'background 0.15s', flexShrink: 0,
+            padding: '6px 12px', background: bg, border: 'none',
+            color: color, fontSize: 11, fontWeight: 900,
+            cursor: 'pointer', borderRadius: RADIUS.sm, fontFamily: 'inherit',
+            transition: 'opacity 0.2s', textTransform: 'uppercase'
           }}
-          onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.15)'}
-          onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,255,255,0.07)'}
+          onMouseOver={e => e.currentTarget.style.opacity = '0.9'}
+          onMouseOut={e => e.currentTarget.style.opacity = '1'}
         >
-          <Icon size={13} strokeWidth={2.5} />
-          <span className="btn-label">{label}</span>
+          {label}
         </button>
       ))}
 
-      <div style={{ width: 1, height: 20, background: 'rgba(255,255,255,0.12)', margin: '0 2px', flexShrink: 0 }} />
-
       <button onClick={onDelete}
-        onMouseEnter={() => setHovDel(true)} onMouseLeave={() => setHovDel(false)}
         style={{
-          display: 'flex', alignItems: 'center', gap: 5,
-          padding: '6px 12px',
-          background: hovDel ? '#ef4444' : 'rgba(239,68,68,0.12)',
-          border: '1px solid rgba(239,68,68,0.25)',
-          color: hovDel ? '#fff' : '#f87171',
-          fontSize: 12, fontWeight: 700,
-          cursor: 'pointer', fontFamily: 'inherit',
-          transition: 'all 0.15s', flexShrink: 0,
+          padding: '6px 12px', background: '#EF4444', border: '1px solid #EF4444',
+          color: WHITE, fontSize: 11, fontWeight: 900,
+          cursor: 'pointer', borderRadius: RADIUS.sm, fontFamily: 'inherit',
+          textTransform: 'uppercase', transition: 'all 0.2s'
         }}
       >
-        <Trash2 size={13} strokeWidth={2.5} />
-        <span className="btn-label">{t('delete')}</span>
+        {t('delete_btn')}
       </button>
 
       <button onClick={onClear}
+        className="tbl-list__banner-action"
         style={{
-          marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 5,
-          padding: '6px 10px',
-          background: 'none', border: '1px solid rgba(255,255,255,0.12)',
-          color: 'rgba(255,255,255,0.45)',
-          fontSize: 12, fontWeight: 700,
-          cursor: 'pointer', fontFamily: 'inherit',
-          transition: 'all 0.15s', flexShrink: 0,
+          marginLeft: isAr ? '0' : 'auto', 
+          marginRight: isAr ? 'auto' : '0',
+          padding: '4px 12px',
+          background: WHITE, color: LIGHT_BROWN, border: 'none',
+          fontSize: 11, fontWeight: 900, borderRadius: RADIUS.sm,
+          cursor: 'pointer', textTransform: 'uppercase', fontFamily: 'inherit'
         }}
-        onMouseEnter={e => e.currentTarget.style.color = '#fff'}
-        onMouseLeave={e => e.currentTarget.style.color = 'rgba(255,255,255,0.45)'}
       >
-        <X size={13} strokeWidth={2.5} />
-        <span className="btn-label">{t('deselect')}</span>
+        {t('deselect_all_btn')}
       </button>
     </div>
   )
 }
 
-
-
 export default function Reservations() {
-  const { t, i18n } = useTranslation()
+  const { t } = useTranslation()
   const location = useLocation()
   const navigate  = useNavigate()
   const [exporting,   setExporting]   = useState(false)
@@ -160,7 +105,7 @@ export default function Reservations() {
     filterStatus,  setFilterStatus,
     filterService, setFilterService,
     filterDate,    setFilterDate,
-    filterTable,   setFilterTable,   // ← added
+    filterTable,   setFilterTable,
     clearFilters: _clearFilters,
     openView, openEdit, openCreate,
     handleSubmit, handleCreate, handleDelete,
@@ -203,6 +148,12 @@ export default function Reservations() {
     if (target) openView(target)
   }, [location.state?.openId, loading, filteredLocal.length]) // eslint-disable-line
 
+  useEffect(() => {
+    if (!loading) {
+      window.dispatchEvent(new CustomEvent('app-ready'))
+    }
+  }, [loading])
+
   async function handleExportPDF() {
     setExporting(true)
     try {
@@ -227,9 +178,13 @@ export default function Reservations() {
     if (!ok) return
     const h = { 'Content-Type': 'application/json', 'Accept': 'application/json', 'Authorization': `Bearer ${getToken()}` }
     try {
-      await Promise.all(selectedIds.map(id =>
-        fetch(`http://localhost:8000/api/restaurant/reservations/${id}`, { method: 'DELETE', headers: h })
-      ))
+      const response = await fetch(apiPath('restaurant/reservations/bulk-delete'), {
+        method: 'POST',
+        headers: h,
+        body: JSON.stringify({ ids: selectedIds }),
+      })
+      if (!response.ok) throw new Error()
+      
       setReservations(prev => prev.filter(r => !selectedIds.includes(r.id)))
       toast(t('reservations_deleted_toast', { count: selectedIds.length, plural: selectedIds.length > 1 ? 's' : '' }), 'warning')
       setSelectedIds([])
@@ -246,12 +201,13 @@ export default function Reservations() {
     }
     const h = { 'Content-Type': 'application/json', 'Accept': 'application/json', 'Authorization': `Bearer ${getToken()}` }
     try {
-      await Promise.all(selectedIds.map(id =>
-        fetch(`http://localhost:8000/api/restaurant/reservations/${id}/status`, {
-          method: 'PATCH', headers: h,
-          body: JSON.stringify({ status }),
-        })
-      ))
+      const response = await fetch(apiPath('restaurant/reservations/bulk-status'), {
+        method: 'POST',
+        headers: h,
+        body: JSON.stringify({ ids: selectedIds, status }),
+      })
+      if (!response.ok) throw new Error()
+
       setReservations(prev => prev.map(r => selectedIds.includes(r.id) ? { ...r, status } : r))
       toast(`${selectedIds.length} ${t(selectedIds.length > 1 ? 'reservation_plural' : 'reservation')} ${labels[status]}`, 'success')
       setSelectedIds([])
@@ -266,59 +222,40 @@ export default function Reservations() {
     )
   }
 
-  if (loading) return <Spinner />
+  if (loading) return <Spinner fullPage />
 
-  return (
+    return (
     <>
-      <style>{`
-        @media (max-width: 600px) {
-          .btn-label     { display: none !important; }
-          .page-subtitle { display: none !important; }
-        }
-      `}</style>
 
-      <div style={{
-        minHeight: '100vh', background: '#ffffff',
-        fontFamily: "'Inter',system-ui,-apple-system,sans-serif",
-        padding: 'clamp(16px,3vw,40px) clamp(12px,3vw,36px)',
-      }}>
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
-
+      <div style={page}>
         <FadeUp delay={0}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, marginBottom: 28, flexWrap: 'wrap' }}>
-            <div>
-              <h1 style={{ margin: 0, fontSize: 'clamp(22px,4vw,36px)', fontWeight: 900, color: DARK, letterSpacing: '-1.5px', lineHeight: 1 }}>
-                {t('reservations_list_title')}
-              </h1>
-              <p className="page-subtitle" style={{ margin: '6px 0 0', fontSize: 12, fontWeight: 700, color: GOLD }}>
-                {filteredLocal.length} {t(filteredLocal.length === 1 ? 'reservation' : 'reservation_plural')}
-              </p>
+          <div style={header}>
+            <div style={headerLeft}>
+              <h1 style={h1}>{t('reservations_list_title')}</h1>
+
             </div>
-            <div style={{ display: 'flex', gap: 3, flexShrink: 0 }}>
-              <Btn icon={FileDown} primary onClick={handleExportPDF} disabled={exporting}>
+            <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
+              <Btn icon={FileDown} onClick={handleExportPDF} disabled={exporting}>
                 {exporting ? t('exporting') : t('export_pdf')}
               </Btn>
-              <Btn icon={Plus} onClick={openCreate}>
+              <Btn icon={Plus} primary onClick={openCreate}>
                 {t('new_reservation')}
               </Btn>
             </div>
           </div>
         </FadeUp>
 
-        <FadeUp delay={10}>
-          <div style={{ height: 4, background: DARK, marginBottom: 24 }} />
-        </FadeUp>
+        <div style={divider} />
 
         {error && (
-          <FadeUp delay={20}>
-            <div style={{ marginBottom: 16, padding: '11px 16px', background: '#ffffff', borderLeft: '3px solid #DC2626', fontSize: 12, fontWeight: 700, color: '#DC2626', display: 'flex', alignItems: 'center', gap: 8 }}>
-              <XCircle size={14} strokeWidth={2.5} />
+          <FadeUp delay={0}>
+            <div style={errorBanner}>
               {error}
             </div>
           </FadeUp>
         )}
 
-        <FadeUp delay={30}>
+        <FadeUp delay={20}>
           <ReservationsFilters
             search={search}               setSearch={setSearch}
             filterStatus={filterStatus}   setFilterStatus={setFilterStatus}
@@ -330,22 +267,18 @@ export default function Reservations() {
           />
         </FadeUp>
 
-        <FadeUp delay={50}>
-          <p style={{ margin: '0 0 10px', fontSize: 11, fontWeight: 800, color: '#bbb', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
-            {t('results_count', { count: filteredLocal.length, plural: filteredLocal.length !== 1 ? 's' : '' })}
-          </p>
-        </FadeUp>
-
         {selectedIds.length > 0 && (
-          <BulkBar
-            count={selectedIds.length}
-            onDelete={handleBulkDelete}
-            onStatus={handleBulkStatus}
-            onClear={() => setSelectedIds([])}
-          />
+          <FadeUp delay={0}>
+            <BulkBar
+              count={selectedIds.length}
+              onDelete={handleBulkDelete}
+              onStatus={handleBulkStatus}
+              onClear={() => setSelectedIds([])}
+            />
+          </FadeUp>
         )}
 
-        <FadeUp delay={70}>
+        <FadeUp delay={40}>
           <ReservationsTable
             reservations={filteredLocal}
             openView={openView}

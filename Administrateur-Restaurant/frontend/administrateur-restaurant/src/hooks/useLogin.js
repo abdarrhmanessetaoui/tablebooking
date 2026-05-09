@@ -1,9 +1,11 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { saveToken } from '../utils/auth'
-import i18n from '../i18n'
+import { useTranslation } from 'react-i18next'
+import { apiPath } from '../utils/api'
 
 export default function useLogin() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const [showPassword, setShowPassword] = useState(false)
   const [rememberMe, setRememberMe]     = useState(false)
@@ -14,7 +16,7 @@ export default function useLogin() {
 
   const handleLogin = async () => {
     if (!email || !password) {
-      setError(i18n.t('login_module.error_empty'))
+      setError('login_module.error_empty')
       return
     }
 
@@ -22,7 +24,7 @@ export default function useLogin() {
     setLoading(true)
 
     try {
-      const response = await fetch('http://localhost:8000/api/login', {
+      const response = await fetch(apiPath('login'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
         body: JSON.stringify({ email, password, remember_me: rememberMe }),
@@ -31,7 +33,7 @@ export default function useLogin() {
       const data = await response.json()
 
       if (!response.ok) {
-        setError(data.message || i18n.t('login_module.error_failed'))
+        setError('login_module.error_login_failed')
         return
       }
 
@@ -39,7 +41,7 @@ export default function useLogin() {
       navigate('/dashboard')
 
     } catch (err) {
-      setError(i18n.t('login_module.error_connection'))
+      setError('login_module.error_connection')
     } finally {
       setLoading(false)
     }

@@ -1,10 +1,10 @@
-import { useState } from 'react'
+﻿import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Clock } from 'lucide-react'
 import Label          from '../../shared/Label'
 import MiniCalendar   from '../MiniCalendar'
 import TimeSlotPicker from '../TimeSlotPicker'
-import { DARK, GOLD, GOLD_DARK } from '../../../../styles/reservations/tokens'
+import { DARK, LIGHT_BROWN, LIGHT_BROWN_DARK } from '../../../../styles/reservations/tokens'
 import { footerBtnPrimary, footerBtnSecondary } from '../../../../styles/reservations/modal.styles'
 
 export default function StepDateTime({ form, setForm, blockedDates, disabledDays, timeSlots, selectedSvc, onBack, onNext }) {
@@ -19,7 +19,7 @@ export default function StepDateTime({ form, setForm, blockedDates, disabledDays
   return (
     <>
       {!form.service && (
-        <div style={{ padding:'10px 14px', background:'#ffffff', borderLeft:`3px solid ${GOLD}`, fontSize:12, fontWeight:700, color:GOLD_DARK }}>
+        <div style={{ padding:'10px 14px', background:'#ffffff', borderLeft:`3px solid ${LIGHT_BROWN}`, fontSize:12, fontWeight:700, color:LIGHT_BROWN_DARK }}>
           {t('select_formula_first')}
         </div>
       )}
@@ -30,11 +30,7 @@ export default function StepDateTime({ form, setForm, blockedDates, disabledDays
           {form.service ? (
             <>
               <TimeSlotPicker value={form.start_time} onChange={v=>setForm({...form,start_time:v})} slots={timeSlots} />
-              {timeSlots.length>0 && (
-                <p style={{ margin:'8px 0 0', fontSize:11, fontWeight:600, color:'rgba(66,52,40,0.4)', display:'flex', alignItems:'center', gap:5 }}>
-                  <Clock size={10} strokeWidth={2.5} />{t('time_slots_count', { count: timeSlots.length, duration: selectedSvc?.duration??30 })}
-                </p>
-              )}
+
             </>
           ) : (
             <div style={{ padding:'10px 14px', background:'#ffffff', fontSize:12, fontWeight:700, color:'rgba(66,52,40,0.4)' }}>

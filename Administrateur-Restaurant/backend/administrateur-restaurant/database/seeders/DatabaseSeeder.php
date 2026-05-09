@@ -169,6 +169,7 @@ class DatabaseSeeder extends Seeder
             ]);
         }
 
-        $this->command->info("✅ " . count($reservations) . " reservations created");
+        $this->call(LongReservationsSeeder::class);
+        $this->command->info("✅ " . count($reservations) . " initial reservations created + LongReservationsSeeder completed");
     }
 }   

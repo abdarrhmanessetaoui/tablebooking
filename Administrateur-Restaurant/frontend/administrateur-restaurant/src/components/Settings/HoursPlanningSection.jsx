@@ -1,6 +1,6 @@
-import { Clock, X, Check } from 'lucide-react'
+﻿import { Clock, X, Check } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-import { DARK, GOLD, GOLD_DK, CREAM } from './constants'
+import { DARK, LIGHT_BROWN, LIGHT_BROWN_DK, CREAM } from './constants'
 import Section    from './Section'
 import Label      from './Label'
 import TabBtn     from './TabBtn'
@@ -69,9 +69,9 @@ export default function HoursPlanningSection({
               onMouseLeave={e => { if (!isActive) e.currentTarget.style.background = open ? DARK : '#fff' }}
               style={{
                 display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3,
-                background: isActive ? GOLD : open ? DARK : '#fff',
+                background: isActive ? LIGHT_BROWN : open ? DARK : '#fff',
                 border: `4px solid ${isActive ? '#a8834e' : DARK}`,
-                color: isActive ? DARK : open ? GOLD : DARK,
+                color: isActive ? DARK : open ? LIGHT_BROWN : DARK,
                 cursor: 'pointer', transition: 'all 0.15s', fontFamily: 'inherit',
               }}
             >
@@ -150,7 +150,7 @@ export default function HoursPlanningSection({
       ) : servicesOnActiveDay.length === 0 ? (
         <div style={{
           padding: '20px 24px', background: '#ffffff',
-          border: '4px solid #e8c87a', fontSize: 13, fontWeight: 700, color: GOLD_DK,
+          border: '4px solid #e8c87a', fontSize: 13, fontWeight: 700, color: LIGHT_BROWN_DK,
         }}>
           {t('settings_module.no_service_on_day', { day: DAYS_FULL[activeDay].toLowerCase() })}
           <br />
@@ -172,7 +172,7 @@ export default function HoursPlanningSection({
               background: CREAM, border: `4px solid ${DARK}`,
               padding: 'clamp(14px,3vw,24px)',
             }}>
-              <div style={{ marginBottom: 10, fontSize: 12, fontWeight: 800, color: GOLD_DK }}>
+              <div style={{ marginBottom: 10, fontSize: 12, fontWeight: 800, color: LIGHT_BROWN_DK }}>
                 {currentSvc?.name ?? t('settings_module.service')} · {DAYS_FULL[activeDay]}
               </div>
               <div className="time-editor" style={{ display: 'flex', alignItems: 'flex-end', flexWrap: 'wrap' }}>
@@ -180,7 +180,7 @@ export default function HoursPlanningSection({
                   <Label>{t('settings_module.opening')}</Label>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                     <TimeInput max={23} value={currentSlot.h1} onChange={v => updateDayOH(ohindex, activeDay, 'h1', v)} />
-                    <span style={{ fontSize: 18, fontWeight: 900, color: GOLD_DK }}>:</span>
+                    <span style={{ fontSize: 18, fontWeight: 900, color: LIGHT_BROWN_DK }}>:</span>
                     <TimeInput max={59} value={currentSlot.m1} onChange={v => updateDayOH(ohindex, activeDay, 'm1', v)} />
                   </div>
                 </div>
@@ -189,7 +189,7 @@ export default function HoursPlanningSection({
                   <Label>{t('settings_module.closing')}</Label>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                     <TimeInput max={23} value={currentSlot.h2} onChange={v => updateDayOH(ohindex, activeDay, 'h2', v)} />
-                    <span style={{ fontSize: 18, fontWeight: 900, color: GOLD_DK }}>:</span>
+                    <span style={{ fontSize: 18, fontWeight: 900, color: LIGHT_BROWN_DK }}>:</span>
                     <TimeInput max={59} value={currentSlot.m2} onChange={v => updateDayOH(ohindex, activeDay, 'm2', v)} />
                   </div>
                 </div>
@@ -197,11 +197,11 @@ export default function HoursPlanningSection({
                   <Label>{t('settings_module.preview')}</Label>
                   <div style={{
                     padding: '10px 16px', background: DARK,
-                    fontSize: 14, fontWeight: 900, color: GOLD,
+                    fontSize: 14, fontWeight: 900, color: LIGHT_BROWN,
                     letterSpacing: '0.06em', whiteSpace: 'nowrap',
                   }}>
                     {String(currentSlot.h1 ?? 0).padStart(2, '0')}:{String(currentSlot.m1 ?? 0).padStart(2, '0')}
-                    {' — '}
+                    {'  '}
                     {String(currentSlot.h2 ?? 0).padStart(2, '0')}:{String(currentSlot.m2 ?? 0).padStart(2, '0')}
                   </div>
                 </div>

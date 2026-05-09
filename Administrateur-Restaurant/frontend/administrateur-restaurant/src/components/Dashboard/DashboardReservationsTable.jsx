@@ -1,12 +1,10 @@
-import { ArrowRight, CalendarDays } from 'lucide-react'
-import { useTranslation } from 'react-i18next'
+﻿import { useTranslation } from 'react-i18next'
 import ResRow from './ResRow'
 import {
   tableWrapper, tableHeader, headerCell,
   rowsContainer, viewAllBtn,
   emptyWrapper, emptyInner, emptyTitle, emptySubtitle,
 } from '../../styles/dashboard/reservationsTable.styles'
-import { DARK } from '../../styles/dashboard/tokens'
 
 // ── View all button ───────────────────────────────────────────────
 function ViewAllBtn({ onViewAll, tabLabel }) {
@@ -15,11 +13,8 @@ function ViewAllBtn({ onViewAll, tabLabel }) {
     <button
       onClick={onViewAll}
       style={viewAllBtn}
-      onMouseEnter={e => e.currentTarget.style.background = '#3d2d1e'}
-      onMouseLeave={e => e.currentTarget.style.background = DARK}
     >
-      <span>{t('view_all_reservations_period', { period: tabLabel })}</span>
-      <ArrowRight size={13} strokeWidth={2.5} />
+      <span>{t('view_all_reservations')}</span>
     </button>
   )
 }
@@ -30,11 +25,6 @@ function EmptyState({ onViewAll, tabLabel }) {
   return (
     <div style={emptyWrapper}>
       <div style={emptyInner}>
-        <CalendarDays
-          size={36}
-          color="rgba(200,169,126,0.9)"
-          style={{ marginBottom: 14 }}
-        />
         <p style={emptyTitle}>{t('no_reservations')}</p>
         <p style={emptySubtitle}>{t('reservations_will_appear_here')}</p>
       </div>
@@ -58,11 +48,11 @@ export default function DashboardReservationsTable({
 
   const COLS = [
     ...(showDate ? [{ key: 'date',       label: t('date'),      flex: 1.1  }] : []),
-    { key: 'name',       label: t('name'),       flex: 1.8  },
-    { key: 'start_time', label: t('time'),     flex: 0.7  },
-    { key: 'guests',     label: t('guests'),     flex: 0.65 },
-    { key: 'service',    label: t('service'),   flex: 1.0  },
-    { key: 'status',     label: t('status'),    flex: 1.1  },
+    { key: 'name',       label: t('name'),       flex: 2.0  },
+    { key: 'start_time', label: t('time'),     flex: 0.8  },
+    { key: 'guests',     label: t('guests'),     flex: 1.0 },
+    { key: 'service',    label: t('service'),   flex: 1.8  },
+    { key: 'status',     label: t('status'),    flex: 1.2  },
     { key: '_cta',       label: '',          flex: 0.3  },
   ]
   const tpl = COLS.map(c => `${c.flex}fr`).join(' ')

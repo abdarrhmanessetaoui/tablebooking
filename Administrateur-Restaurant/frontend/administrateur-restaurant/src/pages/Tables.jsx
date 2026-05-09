@@ -1,4 +1,4 @@
-import { useState }               from 'react'
+import { useState, useEffect }               from 'react'
 import { FileDown }               from 'lucide-react'
 import { useTranslation }         from 'react-i18next'
 import FadeUp                     from '../components/Dashboard/FadeUp'
@@ -7,22 +7,63 @@ import TableForm                  from '../components/Tables/TableForm'
 import TableList                  from '../components/Tables/TableList'
 import TableTimeline              from '../components/Tables/TableTimeline'
 import TableLocationsManager      from '../components/Tables/TableLocationsManager'
-import { Btn, BulkBar }           from '../components/Tables/shared/Shared'
+import Btn                        from '../components/Dashboard/Btn'
+import '../styles/tables/Tables.css'
 import useTables                  from '../hooks/Tables/useTables'
 import useTableLocations          from '../hooks/Tables/useTableLocations'
 import { confirm }                from '../components/ui/ConfirmDialog'
 import { toast }                  from '../components/ui/Toast'
 import { exportPDF }              from '../utils/export'
-import { getToken }               from '../utils/auth'
-import '../styles/tables/Tables.css'
-import '../styles/tables/Shared.css'
+import { apiPath, getHeaders } from '../utils/api'
+import {
+  page, header, headerLeft, h1, subtitle, divider, errorBanner
+} from '../styles/dashboard/dashboard.styles'
+import {
+  DARK, LIGHT_BROWN, WHITE, RADIUS
+} from '../styles/dashboard/tokens'
 
-const API  = 'http://localhost:8000/api/tables'
-const hdrs = () => ({
-  'Content-Type': 'application/json',
-  'Accept':       'application/json',
-  'Authorization': `Bearer ${getToken()}`,
-})
+const API = apiPath('tables')
+
+function BulkBar({ count, onDelete, onClear }) {
+  const { t, i18n } = useTranslation()
+  const isAr = i18n.language === 'ar'
+  
+  return (
+    <div style={{
+      display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap',
+      padding: '12px 16px',
+      background: LIGHT_BROWN,
+      marginBottom: 16,
+      borderRadius: RADIUS.sm,
+      color: WHITE,
+      direction: isAr ? 'rtl' : 'ltr'
+    }}>
+      <button onClick={onDelete}
+        style={{
+          padding: '4px 12px', background: '#EF4444', border: '1px solid #EF4444',
+          color: WHITE, fontSize: 11, fontWeight: 900,
+          cursor: 'pointer', borderRadius: RADIUS.sm, fontFamily: 'inherit',
+          textTransform: 'uppercase', transition: 'all 0.2s'
+        }}
+      >
+        {t('tables_module.delete')}
+      </button>
+
+      <button onClick={onClear}
+        className="tbl-list__banner-action"
+        style={{
+          marginLeft: isAr ? '0' : 'auto', 
+          marginRight: isAr ? 'auto' : '0',
+          padding: '4px 12px',
+          fontSize: 11, fontWeight: 900,
+          fontFamily: 'inherit'
+        }}
+      >
+        {t('tables_module.deselect_all')}
+      </button>
+    </div>
+  )
+}
 
 export default function Tables() {
   const { t } = useTranslation()
@@ -55,7 +96,7 @@ export default function Tables() {
     if (!ok) return
     try {
       await Promise.all(
-        selectedTables.map(idx => fetch(`${API}/${idx}`, { method: 'DELETE', headers: hdrs() }))
+        selectedTables.map(idx => fetch(`${API}/${idx}`, { method: 'DELETE', headers: getHeaders() }))
       )
       setTables(prev => prev.filter(t => !selectedTables.includes(t.idx)))
       toast(t('tables_module.tables_deleted', { count: selectedTables.length, plural: selectedTables.length > 1 ? 's' : '' }), 'warning')
@@ -71,7 +112,7 @@ export default function Tables() {
       await Promise.all(
         selectedTables
           .filter(idx => !tables.find(t => t.idx === idx)?.active)
-          .map(idx => fetch(`${API}/${idx}/toggle`, { method: 'PATCH', headers: hdrs() }))
+          .map(idx => fetch(`${API}/${idx}/toggle`, { method: 'PATCH', headers: getHeaders() }))
       )
       setTables(prev => prev.map(t => selectedTables.includes(t.idx) ? { ...t, active: true } : t))
       toast(t('tables_module.tables_activated', { count: selectedTables.length, plural: selectedTables.length > 1 ? 's' : '' }), 'success')
@@ -87,7 +128,7 @@ export default function Tables() {
       await Promise.all(
         selectedTables
           .filter(idx => tables.find(t => t.idx === idx)?.active)
-          .map(idx => fetch(`${API}/${idx}/toggle`, { method: 'PATCH', headers: hdrs() }))
+          .map(idx => fetch(`${API}/${idx}/toggle`, { method: 'PATCH', headers: getHeaders() }))
       )
       setTables(prev => prev.map(t => selectedTables.includes(t.idx) ? { ...t, active: false } : t))
       toast(t('tables_module.tables_deactivated', { count: selectedTables.length, plural: selectedTables.length > 1 ? 's' : '' }), 'warning')
@@ -109,104 +150,95 @@ export default function Tables() {
     }
   }
 
-  if (loading) return <Spinner />
+  useEffect(() => { if (!loading) window.dispatchEvent(new CustomEvent("app-ready")) }, [loading]); if (loading) return <Spinner fullPage />
 
   return (
-    <div className="tables-page">
-      <FadeUp delay={0}>
-        <div className="tables-header">
-          <div style={{ minWidth: 0, flex: 1 }}>
-            <h1 className="tables-title">{t('tables_module.title')}</h1>
+    <>
+      <div style={page}>
+        <FadeUp delay={0}>
+          <div style={header}>
+            <div style={headerLeft}>
+              <h1 style={h1}>{t('tables_module.title')}</h1>
+            </div>
+            <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
+              <Btn icon={FileDown} onClick={handleExport} disabled={exporting}>
+                {exporting ? t('tables_module.export_generating') : t('tables_module.export_pdf')}
+              </Btn>
+            </div>
           </div>
-          <div className="tables-header-actions">
-            <Btn icon={FileDown} primary onClick={handleExport} disabled={exporting}>
-              {exporting ? t('tables_module.export_generating') : t('tables_module.export_pdf')}
-            </Btn>
-          </div>
-        </div>
-      </FadeUp>
-
-      <FadeUp delay={10}>
-        <div className="tables-divider" />
-      </FadeUp>
-
-      {error && (
-        <FadeUp delay={15}>
-          <div className="tables-error">{error}</div>
         </FadeUp>
-      )}
 
-      {selectedTables.length > 0 && (
-        <BulkBar
-          count={selectedTables.length}
-          onDelete={handleBulkDelete}
-          onActivate={handleBulkActivate}
-          onDeactivate={handleBulkDeactivate}
-          onClear={() => setSelectedTables([])}
-        />
-      )}
+        <div style={divider} />
 
-      <FadeUp delay={20}>
-        <div className="tbl-layout">
-          {/* ── Left column ── */}
-          <div className="tbl-left tbl-form-sticky">
-            <div>
-              <h2 className="tbl-section-title">
-                {editingTbl ? t('tables_module.edit_table_title') : t('tables_module.add_table_title')}
-              </h2>
-              <TableForm
-                key={editingTbl?.idx ?? 'new'}
-                initial={editingTbl
-                  ? { number: editingTbl.number, capacity: editingTbl.capacity, location: editingTbl.location }
-                  : undefined
-                }
-                onSave={handleSave}
-                saving={saving}
-                editingNumber={editingTbl?.number ?? null}
-                onCancel={() => setEditingTbl(null)}
+        {error && (
+          <FadeUp delay={10}>
+            <div style={errorBanner}>{error}</div>
+          </FadeUp>
+        )}
+
+
+
+        {selectedTables.length > 0 && (
+          <FadeUp delay={0}>
+            <BulkBar
+              count={selectedTables.length}
+              onDelete={handleBulkDelete}
+              onActivate={handleBulkActivate}
+              onDeactivate={handleBulkDeactivate}
+              onClear={() => setSelectedTables([])}
+            />
+          </FadeUp>
+        )}
+        <FadeUp delay={20}>
+          <div className="tbl-layout">
+            <div className="tbl-left tbl-form-sticky">
+              <div>
+
+                <TableForm
+                  key={editingTbl?.idx ?? 'new'}
+                  initial={editingTbl
+                    ? { number: editingTbl.number, capacity: editingTbl.capacity, location: editingTbl.location }
+                    : undefined
+                  }
+                  onSave={handleSave}
+                  saving={saving}
+                  editingNumber={editingTbl?.number ?? null}
+                  onCancel={() => setEditingTbl(null)}
+                  locations={locations}
+                />
+              </div>
+              <TableLocationsManager
                 locations={locations}
+                loading={locLoading}
+                saving={locSaving}
+                onAdd={handleAdd}
+                onUpdate={handleUpdate}
+                onDelete={handleDeleteLoc}
               />
             </div>
-            <TableLocationsManager
-              locations={locations}
-              loading={locLoading}
-              saving={locSaving}
-              onAdd={handleAdd}
-              onUpdate={handleUpdate}
-              onDelete={handleDeleteLoc}
-            />
-          </div>
 
-          {/* ── Right column ── */}
-          <div>
-            <div className="tbl-mob-divider tables-divider" style={{ margin: '32px 0 28px' }} />
-            <div className="tbl-right-header">
-              <h2 className="tbl-section-title">{t('tables_module.configured_tables')}</h2>
-              <span className="tbl-count-badge">{tables.length}</span>
+            <div className="tbl-right">
+
+              <TableList
+                tables={tables}
+                editingTbl={editingTbl}
+                onEdit={tbl => setEditingTbl(tbl)}
+                onDelete={handleDelete}
+                onToggle={handleToggle}
+                selectedTables={selectedTables}
+                setSelectedTables={setSelectedTables}
+              />
             </div>
-            <TableList
-              tables={tables}
-              editingTbl={editingTbl}
-              onEdit={tbl => setEditingTbl(tbl)}
-              onDelete={handleDelete}
-              onToggle={handleToggle}
-              selectedTables={selectedTables}
-              setSelectedTables={setSelectedTables}
-            />
           </div>
-        </div>
-      </FadeUp>
+        </FadeUp>
 
-      <FadeUp delay={50}>
-        <div className="tbl-timeline-separator">
-          <div className="tbl-timeline-separator-line" />
-          <span className="tbl-timeline-separator-label">
-            {t('tables_module.timeline_title')}
-          </span>
-          <div className="tbl-timeline-separator-line" />
-        </div>
-        <TableTimeline />
-      </FadeUp>
-    </div>
+        <FadeUp delay={50}>
+          <div className="tbl-timeline-separator" style={{ margin: '40px 0 20px' }}>
+            <div className="tbl-timeline-separator-line" style={{ display: 'block', height: '1px', background: '#E5E0DA', width: '100%' }} />
+          </div>
+          <TableTimeline />
+        </FadeUp>
+      </div>
+    </>
   )
 }

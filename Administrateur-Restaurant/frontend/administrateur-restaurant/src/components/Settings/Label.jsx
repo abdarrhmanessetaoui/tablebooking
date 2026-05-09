@@ -1,4 +1,4 @@
-import { DARK } from './constants'
+﻿import { DARK } from './constants'
 
 export default function Label({ children }) {
   return (

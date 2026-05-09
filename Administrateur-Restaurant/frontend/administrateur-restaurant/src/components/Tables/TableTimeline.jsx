@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next'
 import useTablesTimeline from '../../hooks/Tables/useTablesTimeline'
 import { RED }          from '../../styles/dashboard/tokens'
 import '../../styles/tables/TableTimeline.css'
-import { GOLD, GOLD_DK, DARK, GREEN, BORDER_SOFT } from '../../styles/tables/tokens'
+import { LIGHT_BROWN, LIGHT_BROWN_DK, DARK, GREEN, BORDER_SOFT, WHITE } from '../../styles/tables/tokens'
 
 // ─── Date helpers ─────────────────────────────────────────────────
 function localToday() {
@@ -124,8 +124,8 @@ function MiniCal({ value, onChange, t, lang }) {
           className="mini-cal__nav-btn"
         >
           {lang === 'ar'
-            ? <ChevronRight size={14} color={GOLD} strokeWidth={2.5} />
-            : <ChevronLeft  size={14} color={GOLD} strokeWidth={2.5} />}
+            ? <ChevronRight size={14} color={LIGHT_BROWN} strokeWidth={2.5} />
+            : <ChevronLeft  size={14} color={LIGHT_BROWN} strokeWidth={2.5} />}
         </button>
         <span className="mini-cal__month-label">
           {formatMonthYear(cur.y, cur.m, lang)}
@@ -135,8 +135,8 @@ function MiniCal({ value, onChange, t, lang }) {
           className="mini-cal__nav-btn"
         >
           {lang === 'ar'
-            ? <ChevronLeft  size={14} color={GOLD} strokeWidth={2.5} />
-            : <ChevronRight size={14} color={GOLD} strokeWidth={2.5} />}
+            ? <ChevronLeft  size={14} color={LIGHT_BROWN} strokeWidth={2.5} />
+            : <ChevronRight size={14} color={LIGHT_BROWN} strokeWidth={2.5} />}
         </button>
       </div>
 
@@ -160,7 +160,6 @@ function MiniCal({ value, onChange, t, lang }) {
               style={{ position: 'relative' }}
             >
               {day}
-              {isTdy && !isSel && <span className="mini-cal__today-dot" />}
             </button>
           )
         })}
@@ -200,7 +199,6 @@ function Tip({ res, endTime }) {
   return (
     <div className="tl-tip">
       <div className="tl-tip__status-badge" style={{ background: sc.bg }}>
-        <span style={{ width: 4, height: 6, borderRadius: '50%', background: sc.border }} />
         <span style={{ fontSize: 9, fontWeight: 900, color: sc.text, letterSpacing: '0.12em', textTransform: 'uppercase' }}>
           {sc.label}
         </span>
@@ -213,7 +211,7 @@ function Tip({ res, endTime }) {
           { Icon: Utensils, v: res.service || null },
         ].filter(x => x.v).map(({ Icon, v }) => (
           <div key={v} className="tl-tip__detail-row">
-            <Icon size={10} color={GOLD} strokeWidth={2.5} style={{ flexShrink: 0 }} />
+            <Icon size={10} color={LIGHT_BROWN} strokeWidth={2.5} style={{ flexShrink: 0 }} />
             <span className="tl-tip__detail-text">{v}</span>
           </div>
         ))}
@@ -322,13 +320,6 @@ function TimelineRow({ row, isLast, hS, hE, hours, totalH, services, isToday, la
     }}>
       {/* Label */}
       <div className="tl-row__label" style={{ background: hasRes ? '#fdfaf7' : '#fff' }}>
-        <div
-          className="tl-row__dot"
-          style={{
-            background: hasRes ? GREEN : 'rgba(66,52,40,0.15)',
-            boxShadow:  hasRes ? `0 0 0 3px ${GREEN}22` : 'none',
-          }}
-        />
         <span className="tl-row__name">{row.table_name}</span>
         {hasRes && (
           <span className="tl-row__res-badge">{row.reservations.length}</span>
@@ -386,16 +377,16 @@ function ResRow({ res, services }) {
         </div>
         <div className="tl-res-row__chips">
           <span className="tl-res-row__chip">
-            <Clock size={12} color={GOLD_DK} strokeWidth={2.5} />
+            <Clock size={12} color={LIGHT_BROWN_DK} strokeWidth={2.5} />
             {res.start_time}{end ? ` – ${end}` : ''}
           </span>
           <span className="tl-res-row__chip">
-            <Users size={12} color={GOLD_DK} strokeWidth={2.5} />
+            <Users size={12} color={LIGHT_BROWN_DK} strokeWidth={2.5} />
             {t('count_persons', { count: res.guests })}
           </span>
           {res.service && (
             <span className="tl-res-row__chip">
-              <Utensils size={12} color={GOLD_DK} strokeWidth={2.5} />
+              <Utensils size={12} color={LIGHT_BROWN_DK} strokeWidth={2.5} />
               {res.service}
             </span>
           )}
@@ -421,13 +412,6 @@ function TableCard({ row, services }) {
         className={`tl-card__header ${hasRes ? 'tl-card__header--has-res' : 'tl-card__header--empty'}`}
         style={{ textAlign: i18n.language === 'ar' ? 'right' : 'left' }}
       >
-        <div
-          className="tl-card__dot"
-          style={{
-            background: hasRes ? GREEN : 'rgba(66,52,40,0.22)',
-            boxShadow:  hasRes ? `0 0 0 3px ${GREEN}44` : 'none',
-          }}
-        />
         <span className={`tl-card__name ${hasRes ? 'tl-card__name--has-res' : 'tl-card__name--empty'}`}>
           {row.table_name}
         </span>
@@ -437,7 +421,7 @@ function TableCard({ row, services }) {
               {t('tables_module.res_count', { count: row.reservations.length })}
             </span>
             <ChevronDown
-              size={16} color={GOLD} strokeWidth={2.5}
+              size={16} color={LIGHT_BROWN} strokeWidth={2.5}
               className={`tl-chevron ${open ? 'tl-chevron--open' : ''}`}
             />
           </>
@@ -491,12 +475,10 @@ export default function TableTimeline({ controlledDate = null }) {
         <div className="tl-mobile">
           <button onClick={() => setCalOpen(o => !o)} className="tl-date-bar">
             <span className="tl-date-bar__inner">
-              <CalendarDays size={14} color={GOLD} strokeWidth={2.5} />
               <span className="tl-date-bar__label">{formatShort(date, i18n.language)}</span>
-              {isToday && <span className="tl-today-badge">{t('tables_module.timeline_today_badge')}</span>}
             </span>
             <ChevronDown
-              size={15} color={GOLD} strokeWidth={2.5}
+              size={15} color={LIGHT_BROWN} strokeWidth={2.5}
               className={`tl-chevron ${calOpen ? 'tl-chevron--open' : ''}`}
             />
           </button>
@@ -520,19 +502,7 @@ export default function TableTimeline({ controlledDate = null }) {
             </div>
           )}
 
-          {!loading && timeline.length > 0 && totalRes === 0 && (
-            <div className="tl-no-res">
-              <CalendarDays size={14} color={GOLD_DK} strokeWidth={2} style={{ flexShrink: 0 }} />
-              <p className="tl-no-res__text">
-                {t('tables_module.timeline_no_reservations', {
-                  dateStr: isToday ? t('tables_module.timeline_today') : t('tables_module.timeline_on', { date: formatShort(date, i18n.language) }),
-                })}
-                <span className="tl-no-res__sub">
-                  {t('tables_module.timeline_free_tables', { count: timeline.length, plural: timeline.length !== 1 ? 's' : '' })}
-                </span>
-              </p>
-            </div>
-          )}
+
 
           {!loading && timeline.length > 0 && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
@@ -548,11 +518,7 @@ export default function TableTimeline({ controlledDate = null }) {
           {/* Sidebar */}
           <div className="tl-sidebar">
             <MiniCalWithRef value={date} onChange={setDate} />
-            <div className="tl-sidebar__datebox">
-              <CalendarDays size={11} color={GOLD} strokeWidth={2.5} />
-              <span className="tl-sidebar__date-label">{formatShort(date, i18n.language)}</span>
-              {isToday && <span className="tl-today-badge--sm">{t('tables_module.timeline_today_badge')}</span>}
-            </div>
+
           </div>
 
           {/* Timeline */}
@@ -572,35 +538,20 @@ export default function TableTimeline({ controlledDate = null }) {
               </div>
             )}
 
-            {!loading && timeline.length > 0 && totalRes === 0 && (
-              <div className="tl-no-res">
-                <CalendarDays size={13} color={GOLD_DK} strokeWidth={2} style={{ flexShrink: 0 }} />
-                <p className="tl-no-res__text">
-                  {t('tables_module.timeline_no_reservations', {
-                    dateStr: isToday ? t('tables_module.timeline_today') : t('tables_module.timeline_on', { date: formatShort(date, i18n.language) }),
-                  })}
-                  <span className="tl-no-res__sub">
-                    {t('tables_module.timeline_free_tables', { count: timeline.length, plural: timeline.length !== 1 ? 's' : '' })}
-                  </span>
-                </p>
-              </div>
-            )}
+
 
             {!loading && timeline.length > 0 && (
               <div className="tl-scroll">
                 <div className="tl-inner">
                   {/* Hour header */}
                   <div className="tl-hrow" style={{ display: 'grid', gridTemplateColumns: `${labelW}px 1fr` }}>
-                    <div className="tl-hrow__label-cell">
-                      <LayoutGrid size={10} color={GOLD} strokeWidth={2.5} />
-                      <span className="tl-hrow__label-text">{t('tables_module.header_table')}</span>
-                    </div>
+                    <div className="tl-hrow__label-cell"></div>
                     <div style={{ position: 'relative', height: 30, overflow: 'hidden' }}>
                       {hours.map((h, i) => {
                         const isNow = isToday && new Date().getHours() === h
                         return (
                           <div key={h} style={{ position: 'absolute', left: `${(i / totalH) * 100}%`, width: `${(1 / totalH) * 100}%`, top: 0, bottom: 0, display: 'flex', alignItems: 'center', paddingLeft: 4, borderLeft: i > 0 ? '1px solid rgba(200,169,126,0.12)' : 'none', background: isNow ? 'rgba(239,68,68,0.1)' : 'transparent', overflow: 'hidden' }}>
-                            <span style={{ fontSize: 9, fontWeight: isNow ? 900 : 500, color: isNow ? RED : 'rgba(200,169,126,0.6)', whiteSpace: 'nowrap' }}>
+                            <span style={{ fontSize: 9, fontWeight: isNow ? 900 : 500, color: isNow ? RED : WHITE, whiteSpace: 'nowrap', opacity: isNow ? 1 : 0.8 }}>
                               {t('tables_module.hour_format', { hour: String(h % 24).padStart(2, '0') })}
                             </span>
                           </div>

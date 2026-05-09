@@ -1,7 +1,7 @@
-import { useState } from 'react'
+﻿import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { LayoutGrid, Link2, MapPin } from 'lucide-react'
-import { DARK, GOLD, GREEN, BORDER } from '../../../styles/reservations/tokens'
+import { DARK, LIGHT_BROWN, GREEN, BORDER } from '../../../styles/reservations/tokens'
 
 export default function AssignTableCell({ r, onOpenAssign }) {
   const { t } = useTranslation()
@@ -12,32 +12,19 @@ export default function AssignTableCell({ r, onOpenAssign }) {
     return (
       <div
         onClick={e => { e.stopPropagation(); onOpenAssign(r) }}
-        onMouseEnter={() => setHov(true)}
-        onMouseLeave={() => setHov(false)}
         title={t('change_table')}
         style={{
           display: 'inline-flex', alignItems: 'center', gap: 4,
-          padding: '3px 8px',
-          background: hov ? DARK : '#f0fdf4',
-          border: `1px solid ${hov ? DARK : GREEN}`,
+          padding: '4px 10px',
+          background: LIGHT_BROWN,
+          border: `1px solid ${LIGHT_BROWN}`,
           fontSize: 11, fontWeight: 800,
-          color: hov ? GOLD : '#16a34a',
-          cursor: 'pointer', transition: 'all 0.12s', whiteSpace: 'nowrap',
+          color: '#ffffff',
+          cursor: 'pointer', transition: 'none', whiteSpace: 'nowrap',
+          borderRadius: 4,
         }}
       >
-        <LayoutGrid size={10} strokeWidth={2.5} />
         {t('table_header')} {r.table_number ?? r.table_idx}
-        {r.table_location && (
-          <span style={{
-            display: 'inline-flex', alignItems: 'center', gap: 2,
-            marginLeft: 3,
-            opacity: hov ? 0.75 : 0.6,
-            fontSize: 10, fontWeight: 700,
-          }}>
-            <MapPin size={9} strokeWidth={2.5} />
-            {r.table_location}
-          </span>
-        )}
       </div>
     )
   }
@@ -45,19 +32,18 @@ export default function AssignTableCell({ r, onOpenAssign }) {
   return (
     <button
       onClick={e => { e.stopPropagation(); onOpenAssign(r) }}
-      onMouseEnter={() => setHov(true)}
-      onMouseLeave={() => setHov(false)}
       style={{
-        display: 'inline-flex', alignItems: 'center', gap: 4,
-        padding: '3px 8px', background: 'none',
-        border: `1.5px dashed ${hov ? DARK : BORDER}`,
+        display: 'inline-flex', alignItems: 'center', gap: 6,
+        padding: '5px 12px', background: DARK,
+        border: 'none', borderRadius: 4,
         fontSize: 11, fontWeight: 800,
-        color: hov ? DARK : 'rgba(66,52,40,0.4)',
+        color: '#ffffff',
         cursor: 'pointer', fontFamily: 'inherit',
-        transition: 'all 0.12s', whiteSpace: 'nowrap',
+        transition: 'none', whiteSpace: 'nowrap',
       }}
+      onMouseEnter={e => e.currentTarget.style.opacity = 0.9} onMouseLeave={e => e.currentTarget.style.opacity = 1}
     >
-      <Link2 size={10} strokeWidth={2.5} />
+      <Link2 size={12} strokeWidth={2.5} color="#ffffff" />
       {t('assign_btn')}
     </button>
   )

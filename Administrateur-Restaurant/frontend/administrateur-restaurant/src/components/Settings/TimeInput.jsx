@@ -1,4 +1,4 @@
-import { DARK, GOLD, BORDER } from './constants'
+﻿import { DARK, LIGHT_BROWN, BORDER } from './constants'
 
 export default function TimeInput({ value, onChange, max }) {
   return (
@@ -8,7 +8,7 @@ export default function TimeInput({ value, onChange, max }) {
       max={max}
       value={value ?? ''}
       onChange={e => onChange(e.target.value)}
-      onFocus={e => (e.target.style.borderColor = GOLD)}
+      onFocus={e => (e.target.style.borderColor = LIGHT_BROWN)}
       onBlur={e => (e.target.style.borderColor = BORDER)}
       style={{
         width: 52,

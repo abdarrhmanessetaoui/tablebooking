@@ -1,18 +1,19 @@
-import {
-    DARK, GOLD, GOLD_DK, CREAM, WHITE,
+﻿import {
+    DARK, DARK_LIGHT, LIGHT_BROWN, BROWN_LT, BG_PAGE, BG_CARD, WHITE,
     RED, RED_BG, AMBER, AMBER_BG,
-    FONT_FAMILY, BORDER,
+    FONT_FAMILY, FONT_DISPLAY, BORDER, RADIUS, SHADOW,
   } from './tokens'
   
   // ── Page wrapper ──────────────────────────────────────────────────
   export const page = {
     minHeight:   '100vh',
-    background:  CREAM,
+    background:  BG_PAGE,
     fontFamily:  FONT_FAMILY,
-    padding:     'clamp(14px,3vw,40px) clamp(12px,4vw,36px)',
+    padding:     'clamp(20px,3vw,40px) clamp(20px,4vw,44px)',
     width:       '100%',
     overflowX:   'hidden',
     boxSizing:   'border-box',
+    color:       DARK,
   }
   
   // ── Header row ────────────────────────────────────────────────────
@@ -20,7 +21,7 @@ import {
     display:        'flex',
     alignItems:     'center',
     justifyContent: 'space-between',
-    gap:            12,
+    gap:            16,
     marginBottom:   8,
     flexWrap:       'wrap',
   }
@@ -32,59 +33,63 @@ import {
   
   export const h1 = {
     margin:        0,
-    fontSize:      'clamp(20px,5vw,36px)',
-    fontWeight:    900,
+    fontSize:      'clamp(20px,3.5vw,28px)',
+    fontWeight:    800,
     color:         DARK,
-    letterSpacing: '-1.5px',
-    lineHeight:    1,
+    letterSpacing: '-0.02em',
+    lineHeight:    1.2,
+    fontFamily:    FONT_DISPLAY,
   }
   
   export const subtitle = {
-    margin:     '6px 0 0',
-    fontSize:   12,
-    fontWeight: 700,
-    color:      GOLD_DK,
+    margin:     '4px 0 0',
+    fontSize:   13,
+    fontWeight: 600,
+    color:      DARK_LIGHT,
   }
   
   // ── Divider ───────────────────────────────────────────────────────
   export const divider = {
-    height:     2,
-    background: DARK,
-    margin:     '16px 0 20px',
+    display:    'none',
   }
   
   // ── Error banner ──────────────────────────────────────────────────
   export const errorBanner = {
-    marginTop:   12,
-    padding:     '11px 16px',
-    background:  RED_BG,
-    borderLeft:  `3px solid ${RED}`,
-    fontSize:    12,
-    fontWeight:  700,
-    color:       RED,
+    marginTop:    12,
+    padding:      '12px 16px',
+    background:   WHITE,
+    border:       `1px solid ${RED}`,
+    borderRadius: RADIUS.sm,
+    fontSize:     13,
+    fontWeight:   800,
+    color:        RED,
   }
   
   // ── Button ────────────────────────────────────────────────────────
   export function btnStyle(hov, primary, disabled) {
-    const bg    = primary ? (hov ? DARK : GOLD) : (hov ? GOLD : DARK)
-    const color = primary ? (hov ? GOLD : DARK) : WHITE
+    const bg    = primary ? LIGHT_BROWN : WHITE
+    const color = primary ? WHITE : DARK
+    const border = primary ? 'none' : `1px solid ${BORDER}`
+    
     return {
       display:        'flex',
       alignItems:     'center',
       justifyContent: 'center',
       gap:            8,
-      padding:        '10px 16px',
+      padding:        '8px 18px',
       background:     bg,
-      border:         'none',
+      border,
+      borderRadius:   RADIUS.sm,
       color,
       fontSize:       13,
       fontWeight:     800,
       cursor:         disabled ? 'not-allowed' : 'pointer',
       opacity:        disabled ? 0.5 : 1,
-      transition:     'background 0.15s, color 0.15s',
+      transition:     'none',
       fontFamily:     'inherit',
       whiteSpace:     'nowrap',
       minHeight:      40,
+      boxShadow:      'none',
     }
   }
   
@@ -99,11 +104,14 @@ import {
   
     .db-tabs {
       display: flex;
-      border-bottom: 4px solid ${DARK};
-      margin-bottom: 8px;
+      gap: 0;
+      margin-bottom: 24px;
       overflow-x: auto;
       scrollbar-width: none;
       background: ${WHITE};
+      border-radius: ${RADIUS.sm}px;
+      border: 1px solid ${BORDER};
+      padding: 0;
     }
     .db-tabs::-webkit-scrollbar { display: none; }
   
@@ -111,41 +119,39 @@ import {
       display: flex;
       align-items: center;
       gap: 7px;
-      padding: 13px clamp(16px, 2.2vw, 28px);
+      padding: 12px 24px;
       background: none;
       border: none;
-      border-bottom: 3px solid transparent;
-      margin-bottom: -2px;
+      border-right: 1px solid ${BORDER};
       color: ${DARK};
-      font-size: 10px;
-      font-weight: 900;
+      font-size: 13px;
+      font-weight: 800;
       cursor: pointer;
       font-family: inherit;
-      letter-spacing: .14em;
-      text-transform: uppercase;
-      transition: color .14s, background .14s, border-color .14s;
+      transition: none;
       white-space: nowrap;
       flex-shrink: 0;
     }
-    .db-tab:hover:not(.active) {
-      background: #f5f0eb;
-    }
+    .db-tab:last-child { border-right: none; }
+    
     .db-tab.active {
-      background: ${DARK};
-      border-bottom-color: ${GOLD};
-      color: ${GOLD};
+      background: ${LIGHT_BROWN};
+      color: ${WHITE};
     }
   
     .tab-pill {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      min-width: 17px;
-      height: 17px;
-      padding: 0 4px;
-      font-size: 9px;
+      min-width: 20px;
+      height: 20px;
+      padding: 0 6px;
+      font-size: 10px;
       font-weight: 900;
+      border-radius: 4px;
+      background: ${DARK};
+      color: ${WHITE};
+      margin-left: 4px;
     }
-    .db-tab.active .tab-pill       { background: ${GOLD}22;   color: ${GOLD};  }
-    .db-tab:not(.active) .tab-pill { background: #ffffff; color: ${AMBER}; }
+    .db-tab.active .tab-pill { background: ${WHITE}; color: ${LIGHT_BROWN}; }
   `

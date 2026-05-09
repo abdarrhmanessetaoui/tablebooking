@@ -1,7 +1,7 @@
-import { useState } from 'react'
+﻿import { useState } from 'react'
 import { Save } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-import { DARK, GOLD, GOLD_DK } from './constants'
+import { DARK, LIGHT_BROWN, LIGHT_BROWN_DK } from './constants'
 
 export default function SaveBtn({ onClick, saving }) {
   const { t } = useTranslation()
@@ -19,7 +19,7 @@ export default function SaveBtn({ onClick, saving }) {
         alignItems: 'center',
         gap: 6,
         padding: '8px 16px',
-        background: saving ? '#3d2d1e' : hov ? GOLD_DK : GOLD,
+        background: saving ? '#3d2d1e' : hov ? LIGHT_BROWN_DK : LIGHT_BROWN,
         border: 'none',
         color: DARK,
         fontSize: 11,

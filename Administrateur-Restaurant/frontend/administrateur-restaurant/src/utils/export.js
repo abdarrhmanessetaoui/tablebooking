@@ -1,6 +1,6 @@
 /* src/utils/export.js
  *
- * Arabic-safe PDF export — font embedded, correct reshaping with lam-alef.
+ * Arabic-safe PDF export   font embedded, correct reshaping with lam-alef.
  *
  * Fixes in this version:
  *  1. Lam-alef mandatory ligatures added (لا لأ لآ لإ)
@@ -18,12 +18,19 @@ import autoTable from 'jspdf-autotable'
 import i18n from '../i18n'
 import AMIRI_B64 from './amiriFont'
 
-// ─── Theme ────────────────────────────────────────────────────────────────────
-const DARK = '#423428'
-const GOLD = '#c8a97e'
-const GREEN = '#16A34A'
-const RED = '#DC2626'
-const AMBER = '#D97706'
+import {
+  DARK as DARK_TOKEN,
+  LIGHT_BROWN as LIGHT_BROWN_TOKEN,
+  GREEN as GREEN_TOKEN,
+  RED as RED_TOKEN,
+  AMBER as AMBER_TOKEN,
+} from '../styles/dashboard/tokens'
+
+const DARK  = DARK_TOKEN
+const LIGHT_BROWN  = LIGHT_BROWN_TOKEN
+const GREEN = GREEN_TOKEN
+const RED   = RED_TOKEN
+const AMBER = AMBER_TOKEN
 
 function hex2rgb(hex) {
   return [
@@ -35,42 +42,42 @@ function hex2rgb(hex) {
 
 // ─── Arabic reshaper ──────────────────────────────────────────────────────────
 const FORMS = {
-  0x0621: ['\u0621', '\u0621', '\u0621', '\u0621'],
-  0x0622: ['\u0622', '\uFE82', '\u0622', '\uFE82'],
-  0x0623: ['\u0623', '\uFE84', '\u0623', '\uFE84'],
-  0x0624: ['\u0624', '\uFE86', '\u0624', '\uFE86'],
-  0x0625: ['\u0625', '\uFE88', '\u0625', '\uFE88'],
-  0x0626: ['\u0626', '\uFE8A', '\uFE8B', '\uFE8C'],
-  0x0627: ['\u0627', '\uFE8E', '\u0627', '\uFE8E'],
-  0x0628: ['\u0628', '\uFE90', '\uFE91', '\uFE92'],
-  0x0629: ['\u0629', '\uFE94', '\u0629', '\uFE94'],
-  0x062A: ['\u062A', '\uFE96', '\uFE97', '\uFE98'],
-  0x062B: ['\u062B', '\uFE9A', '\uFE9B', '\uFE9C'],
-  0x062C: ['\u062C', '\uFE9E', '\uFE9F', '\uFEA0'],
-  0x062D: ['\u062D', '\uFEA2', '\uFEA3', '\uFEA4'],
-  0x062E: ['\u062E', '\uFEA6', '\uFEA7', '\uFEA8'],
-  0x062F: ['\u062F', '\uFEAA', '\u062F', '\uFEAA'],
-  0x0630: ['\u0630', '\uFEAC', '\u0630', '\uFEAC'],
-  0x0631: ['\u0631', '\uFEAE', '\u0631', '\uFEAE'],
-  0x0632: ['\u0632', '\uFEB0', '\u0632', '\uFEB0'],
-  0x0633: ['\u0633', '\uFEB2', '\uFEB3', '\uFEB4'],
-  0x0634: ['\u0634', '\uFEB6', '\uFEB7', '\uFEB8'],
-  0x0635: ['\u0635', '\uFEBA', '\uFEBB', '\uFEBC'],
-  0x0636: ['\u0636', '\uFEBE', '\uFEBF', '\uFEC0'],
-  0x0637: ['\u0637', '\uFEC2', '\uFEC3', '\uFEC4'],
-  0x0638: ['\u0638', '\uFEC6', '\uFEC7', '\uFEC8'],
-  0x0639: ['\u0639', '\uFECA', '\uFECB', '\uFECC'],
-  0x063A: ['\u063A', '\uFECE', '\uFECF', '\uFED0'],
-  0x0641: ['\u0641', '\uFED2', '\uFED3', '\uFED4'],
-  0x0642: ['\u0642', '\uFED6', '\uFED7', '\uFED8'],
-  0x0643: ['\u0643', '\uFEDA', '\uFEDB', '\uFEDC'],
-  0x0644: ['\u0644', '\uFEDE', '\uFEDF', '\uFEE0'],
-  0x0645: ['\u0645', '\uFEE2', '\uFEE3', '\uFEE4'],
-  0x0646: ['\u0646', '\uFEE6', '\uFEE7', '\uFEE8'],
-  0x0647: ['\u0647', '\uFEEA', '\uFEEB', '\uFEEC'],
-  0x0648: ['\u0648', '\uFEEE', '\u0648', '\uFEEE'],
-  0x0649: ['\u0649', '\uFEF0', '\u0649', '\uFEF0'],
-  0x064A: ['\u064A', '\uFEF2', '\uFEF3', '\uFEF4'],
+  0x0621: ['\uFE80', '\uFE80', '\uFE80', '\uFE80'], // Hamza
+  0x0622: ['\uFE81', '\uFE82', '\uFE81', '\uFE82'], // Alef with Madda
+  0x0623: ['\uFE83', '\uFE84', '\uFE83', '\uFE84'], // Alef with Hamza above
+  0x0624: ['\uFE85', '\uFE86', '\uFE85', '\uFE86'], // Waw with Hamza
+  0x0625: ['\uFE87', '\uFE88', '\uFE87', '\uFE88'], // Alef with Hamza below
+  0x0626: ['\uFE89', '\uFE8A', '\uFE8B', '\uFE8C'], // Yeh with Hamza
+  0x0627: ['\uFE8D', '\uFE8E', '\uFE8D', '\uFE8E'], // Alef
+  0x0628: ['\uFE8F', '\uFE90', '\uFE91', '\uFE92'], // Beh
+  0x0629: ['\uFE93', '\uFE94', '\uFE93', '\uFE94'], // Teh Marbuta
+  0x062A: ['\uFE95', '\uFE96', '\uFE97', '\uFE98'], // Teh
+  0x062B: ['\uFE99', '\uFE9A', '\uFE9B', '\uFE9C'], // Theh
+  0x062C: ['\uFE9D', '\uFE9E', '\uFE9F', '\uFEA0'], // Jeem
+  0x062D: ['\uFEA1', '\uFEA2', '\uFEA3', '\uFEA4'], // Hah
+  0x062E: ['\uFEA5', '\uFEA6', '\uFEA7', '\uFEA8'], // Khah
+  0x062F: ['\uFEA9', '\uFEAA', '\uFEA9', '\uFEAA'], // Dal
+  0x0630: ['\uFEAB', '\uFEAC', '\uFEAB', '\uFEAC'], // Thal
+  0x0631: ['\uFEAD', '\uFEAE', '\uFEAD', '\uFEAE'], // Reh
+  0x0632: ['\uFEAF', '\uFEB0', '\uFEAF', '\uFEB0'], // Zain
+  0x0633: ['\uFEB1', '\uFEB2', '\uFEB3', '\uFEB4'], // Seen
+  0x0634: ['\uFEB5', '\uFEB6', '\uFEB7', '\uFEB8'], // Sheen
+  0x0635: ['\uFEB9', '\uFEBA', '\uFEBB', '\uFEBC'], // Sad
+  0x0636: ['\uFEBD', '\uFEBE', '\uFEBF', '\uFEC0'], // Dad
+  0x0637: ['\uFEC1', '\uFEC2', '\uFEC3', '\uFEC4'], // Tah
+  0x0638: ['\uFEC5', '\uFEC6', '\uFEC7', '\uFEC8'], // Zah
+  0x0639: ['\uFEC9', '\uFECA', '\uFECB', '\uFECC'], // Ain
+  0x063A: ['\uFECD', '\uFECE', '\uFECF', '\uFED0'], // Ghain
+  0x0641: ['\uFED1', '\uFED2', '\uFED3', '\uFED4'], // Feh
+  0x0642: ['\uFED5', '\uFED6', '\uFED7', '\uFED8'], // Qaf
+  0x0643: ['\uFED9', '\uFEDA', '\uFEDB', '\uFEDC'], // Kaf
+  0x0644: ['\uFEDD', '\uFEDE', '\uFEDF', '\uFEE0'], // Lam
+  0x0645: ['\uFEE1', '\uFEE2', '\uFEE3', '\uFEE4'], // Meem
+  0x0646: ['\uFEE5', '\uFEE6', '\uFEE7', '\uFEE8'], // Noon
+  0x0647: ['\uFEE9', '\uFEEA', '\uFEEB', '\uFEEC'], // Heh
+  0x0648: ['\uFEED', '\uFEEE', '\uFEED', '\uFEEE'], // Waw
+  0x0649: ['\uFEEF', '\uFEF0', '\uFEEF', '\uFEF0'], // Alef Maksura
+  0x064A: ['\uFEF1', '\uFEF2', '\uFEF3', '\uFEF4'], // Yeh
 }
 
 // Letters that never connect on their LEFT side
@@ -166,11 +173,10 @@ function statusRgb(status) {
 }
 
 // ─── Column widths (LTR order: name, time, guests, status) ───────────────────
-// Must sum to PW - 2*PAD = 210 - 28 = 182 mm
-const COL_WIDTHS_LTR = [70, 30, 22, 60]
+const COL_WIDTHS_DEF = [70, 30, 22, 60]
 
 // ─── Export ───────────────────────────────────────────────────────────────────
-export async function exportPDF(stats, items = [], tabLabel = '') {
+export async function exportPDF(stats, items = [], tabLabel = '', customCols = null) {
   const t = i18n.t.bind(i18n)
   const lang = i18n.language || 'en'
   const isRTL = lang === 'ar'
@@ -198,7 +204,7 @@ export async function exportPDF(stats, items = [], tabLabel = '') {
 
   // 2. Title & date
   doc.setFont(FONT, 'normal')
-  doc.setFontSize(16)
+  doc.setFontSize(18)
   doc.setTextColor(...hex2rgb(DARK))
   doc.text(
     fixText(tabLabel || t('dashboard_today')),
@@ -206,37 +212,55 @@ export async function exportPDF(stats, items = [], tabLabel = '') {
     { align: isRTL ? 'right' : 'left' }
   )
 
-  doc.setFontSize(9)
-  doc.setTextColor(...hex2rgb(GOLD))
+  doc.setFontSize(10)
+  doc.setTextColor(...hex2rgb(LIGHT_BROWN))
   doc.text(
     fixText(today),
     isRTL ? PW - PAD : PAD, 25,
     { align: isRTL ? 'right' : 'left' }
   )
 
-  doc.setDrawColor(...hex2rgb(GOLD))
-  doc.setLineWidth(0.4)
+  doc.setDrawColor(...hex2rgb(LIGHT_BROWN))
+  doc.setLineWidth(0.5)
   doc.line(PAD, 28, PW - PAD, 28)
 
-  // 3. Column setup (reverse order for RTL)
-  const colLabels = [
-    fixText(t('name')),
-    fixText(t('time')),
-    fixText(t('guests')),
-    fixText(t('status')),
-  ]
-  const colWidths = isRTL ? [...COL_WIDTHS_LTR].reverse() : COL_WIDTHS_LTR
-  const colTexts = isRTL ? [...colLabels].reverse() : colLabels
+  // 3. Dynamic Columns detection
+  let labels = customCols
+  let widths = COL_WIDTHS_DEF
+
+  if (!labels) {
+    const first = items[0] || {}
+    if (first.number && first.capacity && first.location) {
+      // It's a Table
+      labels = [t('tables_module.header_table'), t('tables_module.header_capacity'), t('tables_module.header_location'), t('status')]
+      widths = [60, 40, 52, 30]
+    } else if (first.price !== undefined && first.duration) {
+      // It's a Service
+      labels = [t('services_module.name_header'), t('services_module.price_header'), t('services_module.capacity_header'), t('services_module.duration_header'), t('status')]
+      widths = [65, 25, 25, 32, 35]
+    } else if (first.date && first.reason !== undefined) {
+      // It's a Blocked Date
+      labels = [t('calendar.blocked_date'), t('calendar.block_reason')]
+      widths = [80, PW - 2 * PAD - 80]
+    } else {
+      // Default (Reservations)
+      labels = [t('name'), t('time'), t('guests'), t('status')]
+      widths = [70, 30, 22, 60]
+    }
+  }
+
+  const colLabels = labels.map(l => fixText(l))
+  const colWidths = isRTL ? [...widths].reverse() : widths
+  const colTexts  = isRTL ? [...colLabels].reverse() : colLabels
 
   // 4. Draw header row manually
-  //    (autoTable headStyles does NOT apply Identity-H → garbled Arabic)
   const headerY = 33
-  doc.setFillColor(...hex2rgb(DARK))
+  doc.setFillColor(...hex2rgb(LIGHT_BROWN))
   doc.rect(PAD, headerY, PW - 2 * PAD, COL_H, 'F')
 
   doc.setFont(FONT, 'normal')
-  doc.setFontSize(9)
-  doc.setTextColor(...hex2rgb(GOLD))
+  doc.setFontSize(10)
+  doc.setTextColor(255, 255, 255)
 
   let xCursor = PAD
   colWidths.forEach((w, i) => {
@@ -250,26 +274,33 @@ export async function exportPDF(stats, items = [], tabLabel = '') {
   // 5. Build body rows
   const rows = items.map(r => {
     const rawSt = r.status || (r.active ? 'Confirmed' : 'Pending')
-    const name = fixText(r.name || r.number || t('unknown'))
-    const time = fixText(r.start_time || r.capacity || '—')
-    const guests = fixText(r.guests || r.location || '—')
-    const status = fixText(
-      isRTL
-        ? t(`status_${rawSt.toLowerCase()}`, { defaultValue: rawSt })
-        : rawSt
-    )
-    return isRTL
-      ? [status, guests, time, name]
-      : [name, time, guests, status]
+    const stText = fixText(t(`status_${rawSt.toLowerCase()}`, { defaultValue: rawSt }))
+    
+    let vals = []
+    if (labels.length === 5) {
+      // Service
+      vals = [fixText(r.name), fixText(r.price), fixText(r.capacity), fixText(r.duration), stText]
+    } else if (labels.length === 2 && r.date) {
+      // Blocked Date
+      vals = [fixText(r.date), fixText(r.reason || r.notes || '-')]
+    } else if (labels.length === 4 && r.number) {
+      // Table
+      vals = [fixText(r.number), fixText(r.capacity), fixText(r.location), stText]
+    } else {
+      // Res
+      vals = [fixText(r.name || r.number || t('unknown')), fixText(r.start_time || r.capacity || ' '), fixText(r.guests || r.location || ' '), stText]
+    }
+    
+    return isRTL ? vals.reverse() : vals
   })
 
-  // 6. Table body — showHead:'never' because headers drawn manually above
+  // 6. Table body
   autoTable(doc, {
     startY: headerY + COL_H,
     head: [colTexts],
     showHead: 'never',
     body: rows,
-    theme: 'grid',
+    theme: 'plain',
     margin: { left: PAD, right: PAD },
 
     columnStyles: Object.fromEntries(
@@ -282,17 +313,20 @@ export async function exportPDF(stats, items = [], tabLabel = '') {
       cellPadding: 4,
       halign: isRTL ? 'right' : 'left',
       textColor: hex2rgb(DARK),
-      lineColor: [220, 215, 210],
-      lineWidth: 0.25,
+      lineWidth: 0,
     },
 
-    alternateRowStyles: {
-      fillColor: [252, 250, 247],
+    didDrawCell(data) {
+      if (data.section === 'body') {
+        doc.setDrawColor(229, 224, 218)
+        doc.setLineWidth(0.1)
+        doc.line(data.cell.x, data.cell.y + data.cell.height, data.cell.x + data.cell.width, data.cell.y + data.cell.height)
+      }
     },
 
     didParseCell(data) {
       if (data.section !== 'body') return
-      const statusColIdx = isRTL ? 0 : 3
+      const statusColIdx = isRTL ? 0 : labels.length - 1
       if (data.column.index !== statusColIdx) return
       const raw = items[data.row.index]?.status
       if (raw) data.cell.styles.textColor = statusRgb(raw)

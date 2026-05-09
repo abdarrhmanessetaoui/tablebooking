@@ -2,22 +2,22 @@ import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import '../../styles/Reports/BarChart.css'
 
-const DARK = '#423428'
-const GOLD = '#c8a97e'
-const CREAM = '#ffffff'
+const DARK = '#2D2926'
+const LIGHT_BROWN = '#C19A6B'
+const BORDER = '#E5E0DA'
 
-export default function BarChart({ data = {}, title, subtitle, highlight = false, barColor = GOLD }) {
+export default function BarChart({ data = {}, title, subtitle, highlight = false, barColor = LIGHT_BROWN }) {
   const { t, i18n } = useTranslation()
   const [mounted, setMounted] = useState(false)
-  useEffect(() => { const id = setTimeout(() => setMounted(true), 80); return () => clearTimeout(id) }, [])
+  useEffect(() => { const id = setTimeout(() => setMounted(true), 10); return () => clearTimeout(id) }, [])
 
   const entries = Object.entries(data)
   const max    = Math.max(...entries.map(([, v]) => v), 1)
   const total  = entries.reduce((s, [, v]) => s + v, 0)
-  const topKey = entries.find(([, v]) => v === max)?.[0] ?? '—'
+  const topKey = entries.find(([, v]) => v === max)?.[0] ?? ' '
 
   if (!entries.length) return (
-    <div className="barchart barchart--empty" style={{ border: `4px solid ${DARK}` }}>
+    <div className="barchart barchart--empty" style={{ border: `1px solid ${BORDER}` }}>
       <div className="barchart__label">{title}</div>
       {subtitle && <div className="barchart__subtitle barchart__subtitle--muted">{subtitle}</div>}
       <div className="barchart__empty-msg">{t('reports_module.no_data')}</div>
@@ -30,38 +30,20 @@ export default function BarChart({ data = {}, title, subtitle, highlight = false
   return (
     <div
       className="barchart"
-      style={{ border: `4px solid ${DARK}`, flex: 1, minWidth: 0 }}
+      style={{ border: `1px solid ${BORDER}`, flex: 1, minWidth: 0, borderRadius: '4px', overflow: 'hidden' }}
     >
       {/* Header */}
       <div
         className="barchart__header"
         style={{
-          borderBottom: `4px solid ${DARK}`,
           background: highlight ? DARK : '#fff',
         }}
       >
         <div>
-          <div className="barchart__label">{title}</div>
-          {subtitle && (
-            <div
-              className="barchart__subtitle"
-              style={{ color: highlight ? 'rgba(255,255,255,0.7)' : DARK }}
-            >
-              {subtitle}
-            </div>
-          )}
+          <div className="barchart__label" style={{ color: highlight ? LIGHT_BROWN : LIGHT_BROWN }}>{title}</div>
+
         </div>
-        <div style={{ textAlign: i18n.language === 'ar' ? 'left' : 'right', flexShrink: 0 }}>
-          <div
-            className="barchart__max-val"
-            style={{ color: highlight ? '#fff' : DARK }}
-          >
-            {max}
-          </div>
-          <div className="barchart__max-label">
-            {t('reports_module.max_label')} · {topKey}
-          </div>
-        </div>
+
       </div>
 
       {/* Bars */}
@@ -84,7 +66,8 @@ export default function BarChart({ data = {}, title, subtitle, highlight = false
                   style={{
                     height: mounted ? `${Math.max(pct, 2)}%` : '2%',
                     background: isTop ? DARK : barColor,
-                    opacity: isTop ? 1 : 0.55 + (value / max) * 0.45,
+                    opacity: isTop ? 1 : 0.6,
+                    borderRadius: '2px 2px 0 0',
                   }}
                 />
               </div>
@@ -93,12 +76,21 @@ export default function BarChart({ data = {}, title, subtitle, highlight = false
         </div>
 
         {/* X labels */}
-        <div className="barchart__xlabels" style={{ gap }}>
+        <div className="barchart__xlabels" style={{ gap, paddingBottom: entries.length > 12 ? 35 : 16 }}>
           {entries.map(([label]) => (
             <div
               key={label}
               className="barchart__xlabel"
-              style={{ fontSize: lblSize }}
+              style={{ 
+                fontSize: lblSize, 
+                color: DARK,
+                transform: entries.length > 12 ? 'rotate(-45deg) translateY(5px) translateX(-5px)' : 'none',
+                transformOrigin: 'left center',
+                whiteSpace: 'nowrap',
+                overflow: 'visible',
+                textOverflow: 'clip',
+                height: entries.length > 12 ? 20 : 'auto'
+              }}
             >
               {label}
             </div>
@@ -106,11 +98,7 @@ export default function BarChart({ data = {}, title, subtitle, highlight = false
         </div>
       </div>
 
-      {/* Footer */}
-      <div className="barchart__footer" style={{ background: CREAM, borderTop: '1px solid rgba(66,52,40,0.1)' }}>
-        <span className="barchart__footer-label">{t('reports_module.total')}</span>
-        <span className="barchart__footer-val">{total}</span>
-      </div>
+
     </div>
   )
 }

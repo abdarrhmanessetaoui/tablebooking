@@ -1,4 +1,4 @@
-import { useTranslation } from 'react-i18next'
+﻿import { useTranslation } from 'react-i18next'
 import useRestaurantSettings from '../../hooks/settings/useRestaurantSettings.js'
 import FadeUp from '../../Dashboard/FadeUp'
 import Spinner from '../../Dashboard/Spinner'
@@ -8,7 +8,7 @@ import NotificationsSection   from './NotificationsSection'
 import '../../styles/settings/settings.css'
 
 const DARK    = '#423428'
-const GOLD_DK = '#a8834e'
+const LIGHT_BROWN_DK = '#a8834e'
 const CREAM   = '#ffffff'
 
 export default function Settings() {
@@ -52,7 +52,7 @@ export default function Settings() {
         }}>
           {t('settings_module.title')}
         </h1>
-        <p style={{ margin: '6px 0 0', fontSize: 12, fontWeight: 700, color: GOLD_DK }} />
+        <p style={{ margin: '6px 0 0', fontSize: 12, fontWeight: 700, color: LIGHT_BROWN_DK }} />
       </FadeUp>
 
       <FadeUp delay={10}>

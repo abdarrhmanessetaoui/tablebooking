@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import Label from '../../shared/Label'
-import { DARK, GOLD, GOLD_DARK, STATUS_CONFIG } from '../../../../styles/reservations/tokens'
+import { DARK, LIGHT_BROWN, LIGHT_BROWN_DARK, STATUS_CONFIG } from '../../../../styles/reservations/tokens'
 
 export default function EditMode({ editing, form, setForm, handleSubmit, onClose }) {
   const { t } = useTranslation()
@@ -21,18 +21,26 @@ export default function EditMode({ editing, form, setForm, handleSubmit, onClose
         <div style={{ display:'flex', gap:6 }}>
           {['Confirmed','Pending','Cancelled'].map(s => (
             <button key={s} onClick={() => setForm({...form,status:s})}
-              style={{ flex:1, padding:'11px 6px', background:form.status===s?DARK:'#f5f0eb', border:'none', fontSize:12, fontWeight:900, color:form.status===s?GOLD:'#888', cursor:'pointer' }}>
+              style={{ flex:1, padding:'11px 6px', background:form.status===s?LIGHT_BROWN:'#f5f0eb', border:'none', fontSize:12, fontWeight:900, color:form.status===s?'#ffffff':'#888', cursor:'pointer', borderRadius:4 }}>
               {t(STATUS_CONFIG[s]?.key)}
             </button>
           ))}
         </div>
       </div>
-      <div style={{ display:'flex', gap:8 }}>
-        <button onClick={onClose} style={{ flex:1, padding:'12px', background:'#f5f0eb', border:'none', fontSize:13, fontWeight:800, color:DARK, cursor:'pointer' }}>
+      <div style={{ display:'flex', gap:10 }}>
+        <button onClick={onClose} style={{ 
+          flex:1, padding:'14px', background:'#f5f0eb', border:'none', 
+          fontSize:12, fontWeight:900, color:'#888', 
+          cursor:'pointer', borderRadius:4, textTransform: 'uppercase', letterSpacing: '0.05em' 
+        }}>
           {t('cancel_btn')}
         </button>
-        <button onClick={handleSubmit} onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
-          style={{ flex:2, padding:'12px', background:hov?GOLD_DARK:GOLD, border:'none', fontSize:14, fontWeight:900, color:DARK, cursor:'pointer' }}>
+        <button onClick={handleSubmit}
+          style={{ 
+            flex:2, padding:'14px', background:LIGHT_BROWN, border:'none', 
+            fontSize:12, fontWeight:900, color:'#ffffff', 
+            cursor:'pointer', borderRadius: 12, textTransform: 'uppercase', letterSpacing: '0.05em' 
+          }}>
           {t('save_btn')}
         </button>
       </div>

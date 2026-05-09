@@ -1,27 +1,27 @@
-import { DARK, BORDER, WHITE } from './tokens'
+﻿import { DARK, BORDER, BORDER_LT, WHITE, BG_CARD, RADIUS } from './tokens'
 
 export const wrapper = (bg, accent) => ({
   background:    WHITE,
-  padding:       '14px 20px',
+  padding:       '16px 20px',
   display:       'flex',
   flexDirection: 'column',
-  gap:           8,
-  borderLeft:    `6px solid ${accent}`,
+  gap:           6,
   borderBottom:  `1px solid ${BORDER}`,
+  transition:    'none',
 })
 
 export const labelRow = {
   display:    'flex',
   alignItems: 'center',
-  gap:        5,
+  gap:        6,
 }
 
 export const labelText = (accent) => ({
-  fontSize:      9,
-  fontWeight:    900,
+  fontSize:      11,
+  fontWeight:    800,
   color:         accent,
   textTransform: 'uppercase',
-  letterSpacing: '0.18em',
+  letterSpacing: '0.04em',
 })
 
 export const valueRow = {
@@ -32,44 +32,47 @@ export const valueRow = {
 
 export const valueNumber = {
   fontSize:           28,
-  fontWeight:         900,
+  fontWeight:         800,
   color:              DARK,
-  letterSpacing:      '-1px',
+  letterSpacing:      '-0.02em',
   lineHeight:         1,
   fontVariantNumeric: 'tabular-nums',
+  fontFamily:         'inherit',
 }
 
 export const valuePct = (accent) => ({
-  fontSize:   10,
+  fontSize:   11,
   fontWeight: 800,
   color:      accent,
-  opacity:    0.8,
 })
 
 export const progressRow = {
   display:    'flex',
   alignItems: 'center',
   gap:        8,
+  marginTop:  2,
 }
 
 export const progressTrack = {
-  flex:       1,
-  height:     6,
-  background: BORDER,
-  overflow:   'hidden',
-  flexShrink: 0,
+  flex:         1,
+  height:       4,
+  background:   BORDER_LT,
+  overflow:     'hidden',
+  flexShrink:   0,
+  borderRadius: RADIUS.sm,
 }
 
 export const progressFill = (w, accent) => ({
-  height:     '100%',
-  width:      `${w}%`,
-  background: accent,
-  transition: 'width 0.9s ease',
+  height:       '100%',
+  width:        `${w}%`,
+  background:   accent,
+  transition:   'width 0.9s ease',
+  borderRadius: RADIUS.sm,
 })
 
 export const progressPct = (accent) => ({
-  fontSize:   9,
-  fontWeight: 900,
+  fontSize:   10,
+  fontWeight: 800,
   color:      accent,
   flexShrink: 0,
   minWidth:   24,

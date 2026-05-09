@@ -1,6 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import { FileDown, Trash2 } from 'lucide-react'
+import { FileDown, Trash2, X } from 'lucide-react'
 import useBlockedDates from '../hooks/BlockedDates/useBlockedDates'
 import BlockedDateForm from '../components/BlockedDates/BlockedDateForm'
 import BlockedDateList from '../components/BlockedDates/BlockedDateList'
@@ -8,98 +8,52 @@ import FadeUp  from '../components/Dashboard/FadeUp'
 import Spinner from '../components/Dashboard/Spinner'
 import { confirm } from '../components/ui/ConfirmDialog'
 import { toast }   from '../components/ui/Toast'
-import { getToken } from '../utils/auth'
+import { apiPath, getHeaders } from '../utils/api'
 import { exportPDF } from '../utils/export'
-
-const DARK    = '#423428'
-const GOLD    = '#c8a97e'
-const GOLD_DK = '#a8834e'
-const RED     = '#DC2626'
-const RED_BG  = '#ffffff'
-
-function Btn({ children, onClick, primary, disabled, icon: Icon }) {
-  const [hov, setHov] = useState(false)
-  const bg    = primary ? (hov ? DARK : GOLD) : (hov ? GOLD : DARK)
-  const color = primary ? (hov ? GOLD : DARK) : '#fff'
-  return (
-    <button onClick={onClick} disabled={disabled}
-      onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
-      style={{
-        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-        padding: '10px 16px', background: bg, border: 'none', color,
-        fontSize: 13, fontWeight: 800,
-        cursor: disabled ? 'not-allowed' : 'pointer',
-        opacity: disabled ? 0.5 : 1,
-        transition: 'background 0.15s, color 0.15s',
-        fontFamily: 'inherit', whiteSpace: 'nowrap', minHeight: 40,
-      }}>
-      {Icon && <Icon size={15} strokeWidth={2.2} />}
-      <span className="btn-label">{children}</span>
-    </button>
-  )
-}
+import Btn from '../components/Dashboard/Btn'
+import {
+  page, header, headerLeft, h1, divider, errorBanner
+} from '../styles/dashboard/dashboard.styles'
+import {
+  DARK, LIGHT_BROWN, DARK_LIGHT, WHITE, BORDER, RADIUS, BROWN_BG
+} from '../styles/dashboard/tokens'
 
 function BulkBar({ count, onUnblock, onClear }) {
   const { t } = useTranslation()
-  const [hovDel, setHovDel] = useState(false)
   return (
     <div style={{
-      position: 'sticky', top: 8, zIndex: 30,
-      display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap',
-      padding: '10px 12px', background: DARK,
-      boxShadow: '0 4px 24px rgba(66,52,40,0.28)',
-      marginBottom: 12, animation: 'slideDown 0.18s ease',
+      display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap',
+      padding: '12px 16px', background: LIGHT_BROWN,
+      borderRadius: RADIUS.sm,
+      color: WHITE,
+      marginBottom: 20,
     }}>
-      <style>{`
-        @keyframes slideDown { from{opacity:0;transform:translateY(-8px)} to{opacity:1;transform:translateY(0)} }
-        @media (max-width: 480px) { .bulk-label { display: none !important; } }
-      `}</style>
-
-      <span style={{
-        display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-        minWidth: 26, height: 26, background: GOLD, color: DARK,
-        fontSize: 12, fontWeight: 900, padding: '0 7px', flexShrink: 0,
-      }}>{count}</span>
-      <span className="bulk-label" style={{ fontSize: 12, fontWeight: 700, color: '#fff', marginRight: 2 }}>
-        {t('calendar.selected_count', { count, plural: count > 1 ? 's' : '' })}
-      </span>
-
-      <div style={{ width: 1, height: 20, background: DARK, margin: '0 4px', flexShrink: 0 }} />
-
       <button onClick={onUnblock}
-        onMouseEnter={() => setHovDel(true)} onMouseLeave={() => setHovDel(false)}
         style={{
-          display: 'flex', alignItems: 'center', gap: 5, padding: '7px 12px',
-          background: hovDel ? '#ef4444' : 'rgba(239,68,68,0.12)',
-          border: '1px solid rgba(239,68,68,0.25)',
-          color: hovDel ? '#fff' : '#f87171',
-          fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit',
-          transition: 'all 0.15s', flexShrink: 0, minHeight: 34,
+          padding: '4px 12px', background: '#EF4444', border: '1px solid #EF4444',
+          color: WHITE, fontSize: 11, fontWeight: 900,
+          cursor: 'pointer', borderRadius: RADIUS.sm, fontFamily: 'inherit',
+          textTransform: 'uppercase', transition: 'all 0.2s'
         }}>
-        <Trash2 size={13} strokeWidth={2.5} />
-        <span className="bulk-label">{t('calendar.unblock_date')}</span>
+        {t('calendar.unblock_date')}
       </button>
 
       <button onClick={onClear}
         style={{
-          marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 5,
-          padding: '7px 10px', background: 'none', border: `1px solid ${DARK}`,
-          color: '#fff', fontSize: 12, fontWeight: 700,
-          cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.15s', flexShrink: 0, minHeight: 34,
+          marginLeft: 'auto', background: '#ffffff', border: 'none',
+          color: LIGHT_BROWN, fontSize: 11, fontWeight: 900,
+          cursor: 'pointer', borderRadius: RADIUS.sm, fontFamily: 'inherit',
+          padding: '4px 12px', textTransform: 'uppercase',
         }}
-        onMouseEnter={e => e.currentTarget.style.color = GOLD}
-        onMouseLeave={e => e.currentTarget.style.color = '#fff'}
       >
-        <span style={{ fontSize: 16, lineHeight: 1 }}>✕</span>
-        <span className="bulk-label">{t('calendar.deselect_all')}</span>
+        {t('deselect')}
       </button>
     </div>
   )
 }
 
 export default function BlockedDates() {
-  const { t, i18n } = useTranslation()
-  const lang = i18n.language === 'ar' ? 'ar-MA' : i18n.language === 'fr' ? 'fr-FR' : 'en-US'
+  const { t } = useTranslation()
   const {
     blockedDates, loading, error,
     form, setForm, submitting,
@@ -117,10 +71,9 @@ export default function BlockedDates() {
       confirmLabel: t('calendar.unblock_date'), type: 'danger',
     })
     if (!ok) return
-    const h = { 'Content-Type': 'application/json', 'Accept': 'application/json', 'Authorization': `Bearer ${getToken()}` }
     try {
       await Promise.all(selectedDates.map(date =>
-        fetch(`http://localhost:8000/api/blocked-dates/${date}`, { method: 'DELETE', headers: h })
+        fetch(apiPath(`blocked-dates/${date}`), { method: 'DELETE', headers: getHeaders() })
       ))
       setBlockedDates(prev => prev.filter(d => !selectedDates.includes(d.date)))
       toast(t('calendar.dates_success_unblocked', { count: selectedDates.length }), 'warning')
@@ -135,88 +88,57 @@ export default function BlockedDates() {
     } catch(e) { console.error(e) } finally { setExporting(false) }
   }
 
-  if (loading) return <Spinner />
+  useEffect(() => { if (!loading) window.dispatchEvent(new CustomEvent("app-ready")) }, [loading]); if (loading) return <Spinner fullPage />
 
   return (
     <>
       <style>{`
         @media (max-width: 480px) {
           .btn-label { display: none !important; }
-          .page-subtitle { display: none !important; }
         }
-        .bd-layout { display: grid; grid-template-columns: 1fr; gap: 0; }
-        @media (min-width: 960px) {
-          .bd-layout { grid-template-columns: 380px 1fr; gap: 48px; align-items: start; }
+        .bd-layout { display: grid; grid-template-columns: 1fr; gap: 24px; }
+        @media (min-width: 1024px) {
+          .bd-layout { grid-template-columns: 360px 1fr; gap: 40px; align-items: start; }
           .bd-form-sticky { position: sticky; top: 24px; }
           .bd-mobile-divider { display: none !important; }
         }
-        @media (max-width: 600px) { button { min-height: 60px; } }
       `}</style>
 
-      <div style={{
-        minHeight: '100vh', background: '#ffffff',
-        fontFamily: "'Inter',system-ui,-apple-system,sans-serif",
-        padding: 'clamp(14px,3vw,40px) clamp(12px,4vw,36px)',
-        boxSizing: 'border-box', width: '100%', overflowX: 'hidden',
-      }}>
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
-
+      <div style={page}>
         <FadeUp delay={0}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, marginBottom: 8, flexWrap: 'wrap' }}>
-            <div style={{ minWidth: 0, flex: 1 }}>
-              <h1 style={{ margin: 0, fontSize: 'clamp(20px,5vw,36px)', fontWeight: 900, color: DARK, letterSpacing: '-1.5px', lineHeight: 1 }}>
-                {t('calendar.blocked_dates_list')}
-              </h1>
-              <p className="page-subtitle" style={{ margin: '6px 0 0', fontSize: 12, fontWeight: 700, color: GOLD_DK }}>
-               
-              </p>
+          <div style={header}>
+            <div style={headerLeft}>
+              <h1 style={h1}>{t('calendar.blocked_dates_list')}</h1>
             </div>
-            <div style={{ display: 'flex', gap: 3, flexShrink: 0 }}>
-              <Btn icon={FileDown} primary onClick={handleExport} disabled={exporting}>
+            <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
+              <Btn icon={FileDown} onClick={handleExport} disabled={exporting}>
                 {exporting ? t('exporting') : t('export_pdf')}
               </Btn>
             </div>
           </div>
         </FadeUp>
 
-
-        <FadeUp delay={10}>
-          <div style={{ height: 4, background: DARK, margin: '16px 0 28px' }} />
-        </FadeUp>
+        <div style={divider} />
 
         {error && (
-          <FadeUp delay={15}>
-            <div style={{ marginBottom: 20, padding: '11px 16px', background: RED_BG, borderLeft: `3px solid ${RED}`, fontSize: 12, fontWeight: 700, color: RED }}>
-              {error}
-            </div>
+          <FadeUp delay={10}>
+            <div style={errorBanner}>{error}</div>
           </FadeUp>
         )}
 
         {selectedDates.length > 0 && (
-          <BulkBar count={selectedDates.length} onUnblock={handleBulkUnblock} onClear={() => setSelectedDates([])} />
+          <FadeUp delay={0}>
+            <BulkBar count={selectedDates.length} onUnblock={handleBulkUnblock} onClear={() => setSelectedDates([])} />
+          </FadeUp>
         )}
 
         <FadeUp delay={20}>
           <div className="bd-layout">
             <div className="bd-form-sticky" style={{ minWidth: 0 }}>
-              <h2 style={{ margin: '0 0 5px', fontSize: 'clamp(15px,2.5vw,22px)', fontWeight: 900, color: DARK, letterSpacing: '-0.8px' }}>
-                {t('calendar.add_blocked_date')}
-              </h2>
-              <p className="page-subtitle" style={{ margin: '0 0 16px', fontSize: 12, fontWeight: 700, color: GOLD_DK }}>
-                
-              </p>
               <BlockedDateForm form={form} setForm={setForm} handleBlock={handleBlock} submitting={submitting} getDatesToBlock={getDatesToBlock} />
             </div>
             <div>
-              <div className="bd-mobile-divider" style={{ height: 4, background: DARK, margin: '32px 0 28px' }} />
-              <div style={{ marginBottom: 16, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
-                <h2 style={{ margin: 0, fontSize: 'clamp(15px,2.5vw,22px)', fontWeight: 900, color: DARK, letterSpacing: '-0.8px' }}>
-                  {t('calendar.blocked_dates_list')}
-                </h2>
-                <span style={{ padding: '4px 10px', background: DARK, fontSize: 11, fontWeight: 900, color: GOLD, letterSpacing: '0.05em', flexShrink: 0 }}>
-                  {blockedDates.length}
-                </span>
-              </div>
+              <div className="bd-mobile-divider" style={{ display: 'none' }} />
               <BlockedDateList blockedDates={blockedDates} handleUnblock={handleUnblock} selectedDates={selectedDates} setSelectedDates={setSelectedDates} />
             </div>
           </div>

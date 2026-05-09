@@ -1,6 +1,4 @@
-import { CheckCircle, Clock, XCircle, CalendarDays, ArrowRight } from 'lucide-react'
-import { useTranslation }        from 'react-i18next'
-import Ring                       from './Ring'
+﻿import { useTranslation } from 'react-i18next'
 import StatBlock                  from './StatBlock'
 import DashboardReservationsTable from './DashboardReservationsTable'
 import ResCardMobile              from './ResCardMobile'
@@ -54,7 +52,7 @@ export default function TabPanel({ tab, stats, reservations, onViewAll, tabLabel
           {/* ── Left: stats panel ─────────────────────────────── */}
           <div className="db-left db-stats-sticky">
 
-            {/* Hero number + ring */}
+            {/* Hero number   no ring chart */}
             <div style={heroSection}>
               <div>
                 <p style={heroNumber}>{hero}</p>
@@ -62,44 +60,39 @@ export default function TabPanel({ tab, stats, reservations, onViewAll, tabLabel
                   {t(hero === 1 ? 'reservation' : 'reservation_plural')}
                 </p>
               </div>
-              <Ring c={c} p={p} a={a} size={88} />
             </div>
 
-{/* Stat blocks — stretch to fill remaining height */}
-<div className="db-stat-blocks">
-  <StatBlock
-    icon={CheckCircle}
-    value={c}
-    label={t('confirmed_plural')}
-    accent={GREEN}
-    bg={GREEN_BG}
-    delay={50}
-    total={total}
-  />
-  <StatBlock
-    icon={Clock}
-    value={p}
-    label={t('pending_plural')}
-    accent={AMBER}
-    bg={AMBER_BG}
-    delay={80}
-    total={total}
-  />
-  <StatBlock
-    icon={XCircle}
-    value={a}
-    label={t('cancelled_plural')}
-    accent={RED}
-    bg={RED_BG}
-    delay={110}
-    total={total}
-  />
-</div>
+            {/* Stat blocks   stretch to fill remaining height */}
+            <div className="db-stat-blocks">
+              <StatBlock
+                value={c}
+                label={t('confirmed_plural')}
+                accent={GREEN}
+                bg={GREEN_BG}
+                delay={50}
+                total={total}
+              />
+              <StatBlock
+                value={p}
+                label={t('pending_plural')}
+                accent={AMBER}
+                bg={AMBER_BG}
+                delay={80}
+                total={total}
+              />
+              <StatBlock
+                value={a}
+                label={t('cancelled_plural')}
+                accent={RED}
+                bg={RED_BG}
+                delay={110}
+                total={total}
+              />
+            </div>
           </div>
 
           {/* ── Right: reservations ───────────────────────────── */}
-          {/* Right: reservations */}
-<div className="db-right">
+          <div className="db-right">
 
             {/* Desktop table */}
             <div className="res-desktop">
@@ -125,11 +118,6 @@ export default function TabPanel({ tab, stats, reservations, onViewAll, tabLabel
                 ))
               ) : (
                 <div style={mobileEmpty}>
-                  <CalendarDays
-                    size={32}
-                    color="rgba(66,52,40,0.1)"
-                    style={{ display: 'block', margin: '0 auto 12px' }}
-                  />
                   <p style={mobileEmptyTitle}>{t('no_reservations')}</p>
                   <p style={mobileEmptySubtitle}>{periodLabel}</p>
                 </div>
@@ -141,7 +129,6 @@ export default function TabPanel({ tab, stats, reservations, onViewAll, tabLabel
                 style={mobileViewAllBtn}
               >
                 <span>{t('view_all_reservations_period', { period: periodLabel })}</span>
-                <ArrowRight size={13} strokeWidth={2.5} />
               </button>
             </div>
 

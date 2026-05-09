@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+﻿import { useState, useEffect, useRef } from 'react'
 
 export default function useCountUp(target, duration = 700, delay = 0) {
   const safeTarget = isNaN(Number(target)) ? 0 : Number(target)

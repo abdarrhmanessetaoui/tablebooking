@@ -1,17 +1,17 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Globe, Check } from 'lucide-react'
+import { DARK, LIGHT_BROWN as LB, BORDER as BD, WHITE, RADIUS } from '../styles/dashboard/tokens'
 
-const DARK = '#423428'
-const GOLD = '#c8a97e'
-const CREAM = '#ffffff'
+const LIGHT_BROWN = LB
+const BORDER = BD
 
 /**
  * Reusable LanguageSwitcher component
  * @param {boolean} collapsed - If true, shows only icon (useful for sidebar)
  * @param {string} position - 'top' or 'bottom' for the dropdown menu
  */
-export default function LanguageSwitcher({ collapsed = false, position = 'top', dark = false }) {
+export default function LanguageSwitcher({ collapsed = false, position = 'top', inline = false }) {
   const { t, i18n } = useTranslation()
   const [open, setOpen] = useState(false)
   const [hovBtn, setHovBtn] = useState(false)
@@ -31,24 +31,64 @@ export default function LanguageSwitcher({ collapsed = false, position = 'top', 
     setOpen(false)
   }
 
+  if (inline) {
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center' }}>
+        <select
+          value={currentLang}
+          onChange={(e) => handleSelect(e.target.value)}
+          style={{
+            background: WHITE,
+            color: DARK,
+            border: `1.5px solid ${BORDER}`,
+            borderRadius: RADIUS.sm,
+            padding: '10px 20px',
+            fontSize: '14px',
+            fontWeight: '700',
+            cursor: 'pointer',
+            outline: 'none',
+            appearance: 'none',
+            WebkitAppearance: 'none',
+            MozAppearance: 'none',
+            minWidth: '140px',
+            fontFamily: 'inherit'
+          }}
+        >
+          {langs.map((l) => (
+            <option key={l.code} value={l.code}>
+              {l.label}
+            </option>
+          ))}
+        </select>
+      </div>
+    )
+  }
+
+  // ... rest of existing code ...
+  const menuBg      = WHITE
+  const menuBorder  = BORDER
+  const menuItemColor = DARK
+  const menuItemHov = '#FAF7F4'
+  const activeColor = LIGHT_BROWN
+
   const menuStyle = {
     position: 'absolute',
     [position === 'top' ? 'bottom' : 'top']: '100%',
     [position === 'top' ? 'marginBottom' : 'marginTop']: 8,
-    left: collapsed ? '50%' : 0,
-    transform: collapsed ? 'translateX(-50%)' : 'none',
-    background: DARK,
-    border: `2px solid ${GOLD}`,
+    ...(i18n.language === 'ar' ? { right: 0 } : { left: 0 }),
+    background: menuBg,
+    border: `1px solid ${menuBorder}`,
+    borderRadius: RADIUS.sm,
     zIndex: 100,
     display: 'flex',
     flexDirection: 'column',
-    minWidth: 140,
-    padding: 4,
-    boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)'
+    minWidth: 160,
+    padding: 6,
+    boxShadow: 'none',
+    overflow: 'hidden',
   }
 
-  const defaultTextColor = dark ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.4)'
-  const hovBgColor      = dark ? 'rgba(200,169,126,0.1)' : 'rgba(200,169,126,0.08)'
+  const hovBgColor       = '#FAF7F4'
 
   return (
     <div style={{ position: 'relative', width: collapsed ? 'auto' : '100%' }}>
@@ -63,16 +103,17 @@ export default function LanguageSwitcher({ collapsed = false, position = 'top', 
                 onMouseEnter={() => setHovItem(i)}
                 onMouseLeave={() => setHovItem(null)}
                 style={{
-                  background: hovItem === i ? 'rgba(200,169,126,0.08)' : 'transparent',
-                  color: currentLang === l.code ? GOLD : 'rgba(255,255,255,0.8)',
+                  background: hovItem === i ? menuItemHov : 'transparent',
+                  color: currentLang === l.code ? activeColor : menuItemColor,
                   border: 'none',
+                  borderRadius: RADIUS.sm,
                   padding: '10px 14px',
                   textAlign: i18n.language === 'ar' ? 'right' : 'left',
                   cursor: 'pointer',
                   fontSize: 13,
-                  fontWeight: 700,
+                  fontWeight: currentLang === l.code ? 800 : 600,
                   fontFamily: 'inherit',
-                  transition: 'background 0.15s, color 0.15s',
+                  transition: 'none',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'space-between',
@@ -81,19 +122,9 @@ export default function LanguageSwitcher({ collapsed = false, position = 'top', 
                 }}
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                   <span style={{ 
-                     fontSize: 10, 
-                     width: 22, height: 22, 
-                     display: 'flex', alignItems: 'center', justifyContent: 'center',
-                     borderRadius: '50%', background: currentLang === l.code ? GOLD : 'rgba(200,169,126,0.3)',
-                     color: currentLang === l.code ? DARK : CREAM,
-                     fontWeight: 900
-                   }}>
-                     {l.short}
-                   </span>
                    {l.label}
                 </div>
-                {currentLang === l.code && <Check size={14} strokeWidth={3} />}
+                {currentLang === l.code && <Check size={14} strokeWidth={2.5} />}
               </button>
             ))}
           </div>
@@ -110,24 +141,24 @@ export default function LanguageSwitcher({ collapsed = false, position = 'top', 
           height: collapsed ? 44 : 'auto',
           display: 'flex',
           alignItems: 'center',
-          gap: collapsed ? 0 : 13,
+          gap: collapsed ? 0 : 12,
           justifyContent: collapsed ? 'center' : 'flex-start',
-          padding: collapsed ? 0 : '10px 12px',
-          background: open ? 'rgba(200,169,126,0.08)' : hovBtn ? hovBgColor : 'transparent',
+          padding: collapsed ? '12px 0' : '10px 14px',
+          background: open ? hovBgColor : hovBtn ? hovBgColor : 'transparent',
           border: 'none',
-          color: open || hovBtn ? GOLD : defaultTextColor,
+          borderRadius: RADIUS.sm,
+          color: DARK,
           cursor: 'pointer',
-          transition: 'background 0.15s, color 0.15s',
+          transition: 'none',
           fontFamily: 'inherit',
-          fontSize: 14,
-          fontWeight: 600,
-          borderRadius: 4
+          fontSize: 13,
+          fontWeight: 800,
         }}
       >
-        <span style={{ display: 'flex', alignItems: 'center', flexShrink: 0, color: 'inherit' }}>
-          <Globe size={20} strokeWidth={2} />
+        <span style={{ display: 'flex', alignItems: 'center', flexShrink: 0, color: 'inherit', opacity: 0.4 }}>
+          <Globe size={20} strokeWidth={1.5} />
         </span>
-        {!collapsed && <span style={{ textAlign: i18n.language === 'ar' ? 'right' : 'left', flex: 1 }}>{t('language')}</span>}
+        {!collapsed && <span style={{ textAlign: i18n.language === 'ar' ? 'right' : 'left', flex: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{t('language')}</span>}
       </button>
     </div>
   )

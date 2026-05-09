@@ -1,4 +1,4 @@
-import { useTranslation } from 'react-i18next'
+﻿import { useTranslation } from 'react-i18next'
 import { ToggleRight, ToggleLeft, Trash2 } from 'lucide-react'
 import '../../../styles/tables/Shared.css'
 

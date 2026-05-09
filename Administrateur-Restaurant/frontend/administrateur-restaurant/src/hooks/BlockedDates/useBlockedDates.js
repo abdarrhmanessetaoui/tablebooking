@@ -1,16 +1,11 @@
 import { useState, useEffect } from 'react'
-import { getToken } from '../../utils/auth'
+import { useTranslation } from 'react-i18next'
+import { apiPath, getHeaders } from '../../utils/api'
 import { toast } from '../../components/ui/Toast'
 import { confirm } from '../../components/ui/ConfirmDialog'
 
-const API_GET = 'http://localhost:8000/api/admin/blocked-dates'
-const API_WRITE = 'http://localhost:8000/api/blocked-dates'
-
-const headers = () => ({
-  'Content-Type': 'application/json',
-  'Accept': 'application/json',
-  'Authorization': `Bearer ${getToken()}`,
-})
+const API_GET   = apiPath('admin/blocked-dates')
+const API_WRITE = apiPath('blocked-dates')
 
 const EMPTY_FORM = {
   mode: 'single',
@@ -23,22 +18,25 @@ const EMPTY_FORM = {
 }
 
 export default function useBlockedDates() {
+  const { t, i18n } = useTranslation()
   const [blockedDates, setBlockedDates] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [form, setForm] = useState(EMPTY_FORM)
   const [submitting, setSubmitting] = useState(false)
 
+  const lang = i18n.language === 'ar' ? 'ar-MA' : i18n.language === 'fr' ? 'fr-FR' : 'en-US'
+
   useEffect(() => { fetchBlockedDates() }, [])
 
   const fetchBlockedDates = async () => {
     setLoading(true)
     try {
-      const res = await fetch(API_GET, { headers: headers() })
+      const res = await fetch(API_GET, { headers: getHeaders() })
       const data = await res.json()
       setBlockedDates(Array.isArray(data) ? data : [])
     } catch {
-      setError('Impossible de charger les dates bloquées.')
+      setError(t('calendar.error_loading_blocked'))
       setBlockedDates([])
     } finally {
       setLoading(false)
@@ -84,10 +82,10 @@ export default function useBlockedDates() {
 
     if (dates.length > 10) {
       const ok = await confirm({
-        title: 'Bloquer plusieurs dates',
-        message: `Vous allez bloquer ${dates.length} dates.`,
-        sub: 'Cette action peut prendre un moment.',
-        confirmLabel: 'Confirmer',
+        title: t('calendar.block_multiple_title'),
+        message: t('calendar.block_multiple_msg', { count: dates.length }),
+        sub: t('calendar.block_multiple_sub'),
+        confirmLabel: t('calendar.confirm'),
         type: 'warning',
       })
       if (!ok) return
@@ -98,7 +96,7 @@ export default function useBlockedDates() {
     try {
       const res = await fetch(API_WRITE + '/bulk', {
         method: 'POST',
-        headers: headers(),
+        headers: getHeaders(),
         body: JSON.stringify({ dates, reason }),
       })
 
@@ -108,7 +106,7 @@ export default function useBlockedDates() {
         for (const date of dates) {
           const r = await fetch(API_WRITE, {
             method: 'POST',
-            headers: headers(),
+            headers: getHeaders(),
             body: JSON.stringify({ date, reason }),
           })
           if (r.ok) added.push(await r.json())
@@ -130,35 +128,36 @@ export default function useBlockedDates() {
 
       toast(
         dates.length === 1
-          ? 'Date bloquée avec succès'
-          : `${dates.length} dates bloquées avec succès`,
+          ? t('calendar.date_success_blocked')
+          : t('calendar.dates_success_blocked', { count: dates.length }),
         'success'
       )
       setForm(EMPTY_FORM)
     } catch {
-      toast('Impossible de bloquer les dates', 'error')
+      toast(t('calendar.error_blocking'), 'error')
     } finally {
       setSubmitting(false)
     }
   }
 
   const handleUnblock = async (date) => {
-    const label = new Date(date).toLocaleDateString('fr-FR', {
+    const dt = new Date(date + 'T00:00:00')
+    const label = dt.toLocaleDateString(lang, {
       weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
     })
     const ok = await confirm({
-      title: 'Débloquer la date',
-      message: `Voulez-vous débloquer le ${label} ?`,
-      confirmLabel: 'Débloquer',
+      title: t('calendar.unblock_date'),
+      message: t('calendar.unblock_single_msg', { date: label }),
+      confirmLabel: t('calendar.unblock'),
       type: 'danger',
     })
     if (!ok) return
     try {
-      await fetch(`${API_WRITE}/${date}`, { method: 'DELETE', headers: headers() })
+      await fetch(`${API_WRITE}/${date}`, { method: 'DELETE', headers: getHeaders() })
       setBlockedDates(prev => prev.filter(d => d.date !== date))
-      toast('Date débloquée', 'warning')
+      toast(t('calendar.date_success_unblocked'), 'warning')
     } catch {
-      toast('Impossible de débloquer la date', 'error')
+      toast(t('calendar.error_unblocking'), 'error')
     }
   }
 

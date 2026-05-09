@@ -1,14 +1,16 @@
+import { Outlet } from 'react-router-dom'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useLocation } from 'react-router-dom'
 import useDashboard from '../hooks/Dashboard/useDashboard'
 import Sidebar from './Sidebar'
 import { HamburgerIcon, CloseIcon } from '../data/sidebarItems'
+import {
+  DARK, LIGHT_BROWN, BG_PAGE, BORDER, RADIUS, WHITE, FONT_URL
+} from '../styles/dashboard/tokens'
 
-const DARK = '#423428'
-const GOLD = '#c8a97e'
-const SW_OPEN      = 220
-const SW_COLLAPSED = 64
+const SW_OPEN      = 240
+const SW_COLLAPSED = 68
 
 const PAGE_TITLES = {
   '/dashboard':     'dashboard',
@@ -33,47 +35,11 @@ export default function Layout({ children }) {
 
   return (
     <>
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-        html, body { background: #fff; }
-        body { overflow-x: hidden; }
-
-        .l-root  { min-height: 100vh; display: flex; font-family: 'Inter',system-ui,-apple-system,sans-serif; }
-        .l-aside {
-          flex-shrink: 0; position: sticky; top: 0; height: 100vh;
-          overflow: hidden; z-index: 20;
-          width: ${SW}px;
-          transition: width 0.22s cubic-bezier(0.4,0,0.2,1);
-          border-right: 1px solid rgba(200,169,126,0.12);
-        }
-        .l-main    { flex: 1; min-width: 0; background: #ffff; overflow-x: hidden; }
-        .l-topbar  {
-          display: none; align-items: center; justify-content: space-between;
-          padding: 0 16px; height: 52px; background: ${DARK};
-          position: sticky; top: 0; z-index: 30; flex-shrink: 0;
-        }
-        .l-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.55); z-index: 40; }
-        .l-drawer  {
-          display: none; position: fixed; top: 0; left: 0;
-          width: ${SW_OPEN}px; height: 100%; z-index: 50;
-          transform: translateX(-100%);
-          transition: transform 0.26s cubic-bezier(0.22,1,0.36,1);
-        }
-        .l-drawer.open { transform: translateX(0); }
-
-        @media (max-width: 767px) {
-          .l-aside   { display: none !important; }
-          .l-topbar  { display: flex !important; }
-          .l-drawer  { display: block !important; }
-          .l-overlay { display: block !important; }
-        }
-      `}</style>
 
     <div className="l-root" dir={i18n.language === 'ar' ? 'rtl' : 'ltr'}>
 
         {/* Desktop sidebar */}
-        <aside className="l-aside">
+        <aside className="l-aside" style={{ width: SW }}>
           <Sidebar
             handleLogout={handleLogout}
             onNavClick={() => {}}
@@ -84,9 +50,8 @@ export default function Layout({ children }) {
 
         {/* Mobile overlay */}
         <div
-          className={`l-overlay${open ? '' : ' hidden'}`}
+          className={`l-overlay ${open ? 'active' : ''}`}
           onClick={() => setOpen(false)}
-          style={{ opacity: open ? 1 : 0, pointerEvents: open ? 'all' : 'none', transition: 'opacity 0.22s' }}
         />
 
         {/* Mobile drawer */}
@@ -107,20 +72,20 @@ export default function Layout({ children }) {
             <button
               onClick={() => setOpen(o => !o)}
               aria-label="Menu"
-              style={{ width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(200,169,126,0.08)', border: 'none', color: GOLD, cursor: 'pointer', flexShrink: 0 }}>
+              style={{ width: 34, height: 34, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'transparent', border: `1px solid ${BORDER}`, borderRadius: RADIUS.sm, color: DARK, cursor: 'pointer', flexShrink: 0, transition: 'none' }}>
               {open ? <CloseIcon /> : <HamburgerIcon />}
             </button>
 
             <img src="/images/tablebooking.png" alt="TableBooking.ma"
-              style={{ height: 24, objectFit: 'contain' }}
+              style={{ height: 20, objectFit: 'contain' }}
               onError={e => { e.target.style.display = 'none' }} />
 
-            <span style={{ fontSize: 11, fontWeight: 700, color: 'rgba(200,169,126,0.6)', minWidth: 72, textAlign: i18n.language === 'ar' ? 'left' : 'right', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+            <span style={{ fontSize: 12, fontWeight: 900, color: DARK, minWidth: 72, textAlign: i18n.language === 'ar' ? 'left' : 'right', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
               {title}
             </span>
           </header>
 
-          <main className="l-main">{children}</main>
+          <main className="l-main">{children || <Outlet />}</main>
         </div>
       </div>
     </>

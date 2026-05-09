@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { DARK, GOLD, BORDER, CREAM } from './constants'
+﻿import { useState } from 'react'
+import { DARK, LIGHT_BROWN, BORDER, CREAM } from './constants'
 
 export default function TextInput({ value, onChange, placeholder, type = 'text', icon: Icon, disabled, readOnly }) {
   const [focused, setFocused] = useState(false)
@@ -10,7 +10,7 @@ export default function TextInput({ value, onChange, placeholder, type = 'text',
         <Icon
           size={14}
           strokeWidth={2}
-          color={focused ? GOLD : DARK}
+          color={focused ? LIGHT_BROWN : DARK}
           style={{
             position: 'absolute',
             left: 12,
@@ -33,7 +33,7 @@ export default function TextInput({ value, onChange, placeholder, type = 'text',
           width: '100%',
           boxSizing: 'border-box',
           padding: Icon ? '11px 14px 11px 36px' : '11px 14px',
-          border: `4px solid ${focused ? GOLD : BORDER}`,
+          border: `4px solid ${focused ? LIGHT_BROWN : BORDER}`,
           fontSize: 13,
           fontWeight: 700,
           color: DARK,

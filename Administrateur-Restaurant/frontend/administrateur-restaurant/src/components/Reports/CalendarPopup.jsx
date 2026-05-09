@@ -1,15 +1,15 @@
-import { useState, useEffect, useRef } from 'react'
+﻿import { useState, useEffect, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import '../../styles/Reports/CalendarPopup.css'
 
-const DARK = '#423428'
-const GOLD = '#c8a97e'
+const DARK = '#2D2926'
+const LIGHT_BROWN = '#C19A6B'
 
 const navBtnStyle = {
   background: 'none', border: 'none', cursor: 'pointer',
-  color: 'rgba(200,169,126,0.7)', padding: '4px 6px',
+  color: '#fff', padding: '4px 6px',
   fontFamily: 'inherit', display: 'flex', alignItems: 'center',
 }
 
@@ -183,12 +183,10 @@ export default function CalendarPopup({ filterDate, setFilterDate, onClose, anch
             <div
               key={i}
               onClick={c.onClick}
-              onMouseEnter={e => { if (!c.isOther && !c.isSelected) e.currentTarget.style.background = '#f5f0eb' }}
-              onMouseLeave={e => { if (!c.isSelected) e.currentTarget.style.background = 'transparent' }}
               className="cal-popup__day-cell"
               style={{
-                fontWeight:  c.isSelected ? 800 : c.isToday ? 900 : c.isOther ? 400 : 700,
-                color:       c.isSelected ? GOLD : c.isToday ? GOLD : c.isOther ? '#423428' : DARK,
+                fontWeight:  c.isSelected ? 900 : c.isToday ? 900 : c.isOther ? 400 : 800,
+                color:       c.isSelected ? '#fff' : c.isToday ? LIGHT_BROWN : c.isOther ? '#E5E0DA' : DARK,
                 background:  c.isSelected ? DARK : 'transparent',
                 cursor:      c.isOther ? 'default' : 'pointer',
               }}
@@ -209,12 +207,10 @@ export default function CalendarPopup({ filterDate, setFilterDate, onClose, anch
               <div
                 key={m}
                 onClick={() => pickMonth(i)}
-                onMouseEnter={e => { if (!isSelected) e.currentTarget.style.background = '#f5f0eb' }}
-                onMouseLeave={e => { e.currentTarget.style.background = isSelected ? DARK : 'transparent' }}
                 className="cal-popup__month-cell"
                 style={{
-                  fontWeight: isSelected ? 800 : isCurrent ? 900 : 700,
-                  color:      isSelected ? GOLD : isCurrent ? GOLD : DARK,
+                  fontWeight: isSelected ? 900 : isCurrent ? 900 : 800,
+                  color:      isSelected ? '#fff' : isCurrent ? LIGHT_BROWN : DARK,
                   background: isSelected ? DARK : 'transparent',
                 }}
               >

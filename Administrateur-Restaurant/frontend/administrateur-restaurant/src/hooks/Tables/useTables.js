@@ -1,15 +1,10 @@
 import { useState, useEffect } from 'react'
 import { useTranslation }     from 'react-i18next'
-import { getToken }           from '../../utils/auth'
+import { apiPath, getHeaders } from '../../utils/api'
 import { toast }              from '../../components/ui/Toast'
 import { confirm }            from '../../components/ui/ConfirmDialog'
 
-const API  = 'http://localhost:8000/api/tables'
-const hdrs = () => ({
-  'Content-Type':  'application/json',
-  'Accept':        'application/json',
-  'Authorization': `Bearer ${getToken()}`,
-})
+const API = apiPath('tables')
 
 export default function useTables() {
   const { t } = useTranslation()
@@ -24,7 +19,7 @@ export default function useTables() {
   async function fetchTables() {
     setLoading(true)
     try {
-      const res  = await fetch(API, { headers: hdrs() })
+      const res  = await fetch(API, { headers: getHeaders() })
       const data = await res.json()
       setTables(Array.isArray(data) ? data : [])
     } catch {
@@ -40,7 +35,7 @@ export default function useTables() {
       if (editingTbl) {
         await fetch(`${API}/${editingTbl.idx}`, {
           method: 'PUT',
-          headers: hdrs(),
+          headers: getHeaders(),
           body: JSON.stringify({
             number:   form.number,
             capacity: parseInt(form.capacity) || 1,
@@ -58,7 +53,7 @@ export default function useTables() {
       } else {
         const res  = await fetch(API, {
           method: 'POST',
-          headers: hdrs(),
+          headers: getHeaders(),
           body: JSON.stringify({
             number:   form.number,
             capacity: parseInt(form.capacity) || 1,
@@ -88,7 +83,7 @@ export default function useTables() {
     })
     if (!ok) return
     try {
-      await fetch(`${API}/${tbl.idx}`, { method: 'DELETE', headers: hdrs() })
+      await fetch(`${API}/${tbl.idx}`, { method: 'DELETE', headers: getHeaders() })
       setTables(prev => prev.filter(t => t.idx !== tbl.idx))
       if (editingTbl?.idx === tbl.idx) setEditingTbl(null)
       toast(t('tables_module.table_deleted', { number: tbl.number }), 'warning')
@@ -99,7 +94,7 @@ export default function useTables() {
 
   async function handleToggle(tbl) {
     try {
-      await fetch(`${API}/${tbl.idx}/toggle`, { method: 'PATCH', headers: hdrs() })
+      await fetch(`${API}/${tbl.idx}/toggle`, { method: 'PATCH', headers: getHeaders() })
       setTables(prev => prev.map(t =>
         t.idx === tbl.idx ? { ...t, active: !t.active } : t
       ))

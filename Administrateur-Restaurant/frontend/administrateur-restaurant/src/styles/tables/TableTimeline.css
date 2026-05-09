@@ -9,10 +9,11 @@
   margin-bottom: 10px;
   padding: 10px 14px;
   background: #ffffff;
-  border-left: 3px solid #DC2626;
+  border: 1px solid #EF4444;
+  border-radius: 4px;
   font-size: 12px;
   font-weight: 700;
-  color: #DC2626;
+  color: #EF4444;
 }
 
 /* ── Mobile layout ── */
@@ -28,8 +29,9 @@
   align-items: center;
   justify-content: space-between;
   padding: 11px 14px;
-  background: #423428;
+  background: #2D2926;
   border: none;
+  border-radius: 4px;
   cursor: pointer;
   font-family: inherit;
   width: 100%;
@@ -51,29 +53,27 @@
 .tl-today-badge {
   font-size: 10px;
   font-weight: 900;
-  color: #c8a97e;
+  color: #C19A6B;
   padding: 1px 7px;
-  border: 1px solid rgba(200, 169, 126, 0.55);
+  border: 1px solid #C19A6B;
+  border-radius: 4px;
   letter-spacing: 0.05em;
 }
 
 .tl-today-badge--sm {
   font-size: 9px;
   font-weight: 900;
-  color: #c8a97e;
+  color: #C19A6B;
   letter-spacing: 0.08em;
-  border: 1px solid rgba(200, 169, 126, 0.55);
+  border: 1px solid #C19A6B;
   padding: 1px 6px;
+  border-radius: 2px;
   flex-shrink: 0;
 }
 
 .tl-chevron {
-  transition: transform 0.2s;
+  transition: none;
   flex-shrink: 0;
-}
-
-.tl-chevron--open {
-  transform: rotate(180deg);
 }
 
 /* ── Loading spinner ── */
@@ -86,8 +86,8 @@
   width: 28px;
   height: 28px;
   border-radius: 50%;
-  border: 4px solid rgba(66, 52, 40, 0.10);
-  border-top-color: #c8a97e;
+  border: 4px solid rgba(45, 41, 38, 0.08);
+  border-top-color: #C19A6B;
   animation: tl-spin 0.8s linear infinite;
   margin: 0 auto 10px;
 }
@@ -96,7 +96,7 @@
   margin: 0;
   font-size: 12px;
   font-weight: 700;
-  color: rgba(66, 52, 40, 0.3);
+  color: #4A4A4A;
 }
 
 /* ── Empty states ── */
@@ -104,27 +104,29 @@
   padding: 40px 20px;
   text-align: center;
   background: #fff;
-  border: 4px solid #423428;
+  border: 1px solid #E5E0DA;
+  border-radius: 4px;
 }
 
 .tl-empty__title {
   margin: 10px 0 4px;
   font-size: 13px;
-  font-weight: 900;
-  color: #423428;
+  font-weight: 800;
+  color: #2D2926;
 }
 
 .tl-empty__sub {
   margin: 0;
   font-size: 11px;
   font-weight: 600;
-  color: rgba(66, 52, 40, 0.35);
+  color: #4A4A4A;
 }
 
 .tl-no-res {
   padding: 12px 14px;
   background: #ffffff;
-  border: 1px solid rgba(200, 169, 126, 0.3);
+  border: 1px solid #E5E0DA;
+  border-radius: 4px;
   display: flex;
   align-items: center;
   gap: 10px;
@@ -135,31 +137,32 @@
   margin: 0;
   font-size: 12px;
   font-weight: 800;
-  color: #423428;
+  color: #2D2926;
 }
 
 .tl-no-res__sub {
-  font-weight: 600;
-  color: #a8834e;
+  font-weight: 700;
+  color: #A8834E;
   margin-left: 8px;
 }
 
 /* ── Desktop layout ── */
 .tl-desktop {
   display: flex;
-  gap: 14px;
+  gap: 24px;
   align-items: flex-start;
 }
 
 .tl-sidebar {
-  width: 196px;
+  width: 320px;
   flex-shrink: 0;
 }
 
 .tl-sidebar__datebox {
   margin-top: 8px;
   padding: 8px 12px;
-  background: #423428;
+  background: #2D2926;
+  border-radius: 4px;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -191,7 +194,8 @@
 
 .tl-inner {
   min-width: 420px;
-  border: 4px solid #423428;
+  border: 1px solid #E5E0DA;
+  border-radius: 4px;
   overflow: hidden;
 }
 
@@ -200,12 +204,12 @@
   position: sticky;
   top: 0;
   z-index: 20;
-  background: #423428;
+  background: #2D2926;
 }
 
 .tl-hrow__label-cell {
   padding: 7px 10px;
-  border-right: 1px solid rgba(200, 169, 126, 0.08);
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
   display: flex;
   align-items: center;
   gap: 6px;
@@ -213,16 +217,16 @@
 
 .tl-hrow__label-text {
   font-size: 9px;
-  font-weight: 900;
-  color: #c8a97e;
-  letter-spacing: 0.14em;
+  font-weight: 800;
+  color: #C19A6B;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
 }
 
 /* ── Row label cell ── */
 .tl-row__label {
   padding: 0 10px;
-  border-right: 1px solid rgba(66, 52, 40, 0.09);
+  border-right: 1px solid #E5E0DA;
   display: flex;
   align-items: center;
   gap: 7px;
@@ -239,8 +243,8 @@
 
 .tl-row__name {
   font-size: 12px;
-  font-weight: 900;
-  color: #423428;
+  font-weight: 800;
+  color: #2D2926;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -250,10 +254,11 @@
 
 .tl-row__res-badge {
   font-size: 9px;
-  font-weight: 900;
-  padding: 1px 5px;
-  background: #423428;
-  color: #c8a97e;
+  font-weight: 800;
+  padding: 1px 6px;
+  background: #2D2926;
+  color: #C19A6B;
+  border-radius: 2px;
   flex-shrink: 0;
 }
 
@@ -264,8 +269,8 @@
   left: 50%;
   transform: translate(-50%, -50%);
   font-size: 8px;
-  font-weight: 900;
-  color: rgba(66, 52, 40, 0.07);
+  font-weight: 800;
+  color: rgba(45, 41, 38, 0.05);
   letter-spacing: 0.35em;
   text-transform: uppercase;
   pointer-events: none;
@@ -275,12 +280,14 @@
 /* ── Mini Calendar ── */
 .mini-cal {
   background: #fff;
-  border: 4px solid #423428;
+  border: 1px solid #E5E0DA;
+  border-radius: 4px;
   user-select: none;
+  overflow: hidden;
 }
 
 .mini-cal__header {
-  background: #423428;
+  background: #2D2926;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -289,10 +296,9 @@
 
 .mini-cal__month-label {
   font-size: 11px;
-  font-weight: 900;
+  font-weight: 800;
   color: #fff;
   text-transform: capitalize;
-  letter-spacing: 0.02em;
 }
 
 .mini-cal__nav-btn {
@@ -302,21 +308,23 @@
   padding: 4px;
   display: flex;
   align-items: center;
+  color: #fff;
 }
 
 .mini-cal__day-names {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  background: #ffffff;
-  border-bottom: 1px solid rgba(66, 52, 40, 0.10);
+  background: #FDF8F3;
+  border-bottom: 1px solid #E5E0DA;
 }
 
 .mini-cal__day-name {
   padding: 5px 0;
   text-align: center;
   font-size: 9px;
-  font-weight: 900;
-  color: #a8834e;
+  font-weight: 800;
+  color: #A8834E;
+  text-transform: uppercase;
 }
 
 .mini-cal__days {
@@ -333,59 +341,45 @@
   font-size: 11px;
   cursor: pointer;
   text-align: center;
-  transition: background 0.1s;
-}
-
-.mini-cal__day-btn:hover {
-  background: #ffffff;
+  transition: none;
+  color: #2D2926;
+  font-weight: 600;
 }
 
 .mini-cal__day-btn--selected {
-  background: #423428 !important;
-  color: #c8a97e !important;
-  font-weight: 900;
+  background: #C19A6B !important;
+  color: #ffffff !important;
+  font-weight: 800;
 }
 
 .mini-cal__day-btn--today {
-  color: #a8834e;
-  font-weight: 900;
-}
-
-.mini-cal__today-dot {
-  position: absolute;
-  bottom: 1px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 3px;
-  height: 3px;
-  border-radius: 50%;
-  background: #a8834e;
-  display: block;
+  color: #C19A6B;
+  font-weight: 800;
 }
 
 .mini-cal__footer {
-  padding: 6px 8px;
-  border-top: 1px solid rgba(66, 52, 40, 0.10);
+  padding: 8px;
+  border-top: 1px solid #E5E0DA;
 }
 
 .mini-cal__today-btn {
   width: 100%;
   padding: 6px;
-  border: 1px solid rgba(66, 52, 40, 0.10);
+  border: 1px solid #E5E0DA;
+  border-radius: 4px;
+  background: #fff;
   font-size: 11px;
   font-weight: 800;
+  color: #2D2926;
   cursor: pointer;
   font-family: inherit;
-  transition: all 0.15s;
-}
-
-.mini-cal__today-btn:hover {
-  background: #e8e0d8;
+  transition: none;
 }
 
 .mini-cal__today-btn--active {
-  background: #423428;
-  color: #c8a97e;
+  background: #2D2926;
+  color: #fff;
+  border-color: #2D2926;
 }
 
 /* ── Tooltip ── */
@@ -394,43 +388,31 @@
   bottom: calc(100% + 8px);
   left: 50%;
   transform: translateX(-50%);
-  background: #423428;
+  background: #2D2926;
   padding: 10px 14px;
   z-index: 9999;
   pointer-events: none;
-  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.55);
+  box-shadow: none;
+  border: 1px solid #C19A6B;
+  border-radius: 4px;
   min-width: 200px;
   max-width: 260px;
   font-family: inherit;
 }
 
-.tl-tip__status-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  padding: 2px 8px;
-  margin-bottom: 8px;
-}
-
 .tl-tip__name {
   margin: 0 0 8px;
   font-size: 13px;
-  font-weight: 900;
+  font-weight: 800;
   color: #fff;
   white-space: normal;
   word-break: break-word;
 }
 
-.tl-tip__detail-row {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-}
-
 .tl-tip__detail-text {
   font-size: 11px;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.85);
+  color: rgba(255, 255, 255, 0.9);
 }
 
 .tl-tip__arrow {
@@ -442,12 +424,13 @@
   height: 0;
   border-left: 5px solid transparent;
   border-right: 5px solid transparent;
-  border-top: 5px solid #423428;
+  border-top: 5px solid #2D2926;
 }
 
 /* ── Mobile table cards ── */
 .tl-card {
-  border: 4px solid #423428;
+  border: 1px solid #E5E0DA;
+  border-radius: 4px;
   overflow: hidden;
   background: #fff;
 }
@@ -463,12 +446,12 @@
 }
 
 .tl-card__header--has-res {
-  background: #423428;
+  background: #2D2926;
   cursor: pointer;
 }
 
 .tl-card__header--empty {
-  background: #f0ece8;
+  background: #FDF8F3;
   cursor: default;
 }
 
@@ -481,22 +464,22 @@
 
 .tl-card__name {
   flex: 1;
-  font-size: 15px;
-  font-weight: 900;
+  font-size: 14px;
+  font-weight: 800;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .tl-card__name--has-res { color: #fff; }
-.tl-card__name--empty   { color: rgba(66, 52, 40, 0.4); }
+.tl-card__name--empty   { color: #4A4A4A; }
 
 .tl-card__res-badge {
   font-size: 11px;
-  font-weight: 900;
+  font-weight: 800;
   padding: 3px 10px;
-  background: #c8a97e;
-  color: #423428;
+  background: #C19A6B;
+  color: #ffffff;
   border-radius: 2px;
   flex-shrink: 0;
 }
@@ -504,8 +487,7 @@
 .tl-card__free-label {
   font-size: 11px;
   font-weight: 700;
-  color: rgba(66, 52, 40, 0.35);
-  font-style: italic;
+  color: #A8834E;
 }
 
 /* ── Mobile res row ── */
@@ -513,7 +495,7 @@
   display: flex;
   gap: 10px;
   padding: 12px 14px;
-  border-top: 1px solid rgba(66, 52, 40, 0.10);
+  border-top: 1px solid #E5E0DA;
   background: #fff;
   align-items: flex-start;
 }
@@ -540,8 +522,8 @@
 
 .tl-res-row__name {
   font-size: 15px;
-  font-weight: 900;
-  color: #423428;
+  font-weight: 800;
+  color: #2D2926;
   flex: 1;
   min-width: 0;
   overflow: hidden;
@@ -551,7 +533,7 @@
 
 .tl-res-row__badge {
   font-size: 10px;
-  font-weight: 900;
+  font-weight: 800;
   padding: 3px 8px;
   border-radius: 2px;
   flex-shrink: 0;
@@ -566,11 +548,17 @@
   gap: 4px 16px;
 }
 
+.tl-res-row__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+}
+
 .tl-res-row__chip {
   display: flex;
   align-items: center;
   gap: 5px;
   font-size: 12px;
   font-weight: 700;
-  color: #423428;
-}
+  color: #2D2926;
+}

@@ -6,7 +6,7 @@ import {
 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import '../../styles/tables/TableList.css'
-import { DARK, GOLD, GOLD_DK, LOC_COLORS } from '../../styles/tables/tokens'
+import { DARK, LIGHT_BROWN, LIGHT_BROWN_DK } from '../../styles/tables/tokens'
 
 const PAGE_SIZE = 10
 
@@ -28,15 +28,22 @@ function Checkbox({ checked, indeterminate, onChange }) {
     <div
       onClick={e => { e.stopPropagation(); onChange() }}
       className="tbl-checkbox"
-      style={{ background: checked || indeterminate ? DARK : '#fff' }}
+      style={{ 
+        width: 18, height: 18,
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        cursor: 'pointer',
+        borderRadius: 5,
+        background: checked || indeterminate ? LIGHT_BROWN : '#fff',
+        border: `1.5px solid ${checked || indeterminate ? LIGHT_BROWN : '#d1d5db'}`
+      }}
     >
       {checked && (
-        <svg width="9" height="7" viewBox="0 0 10 8" fill="none">
-          <path d="M1 4L3.5 6.5L9 1" stroke={GOLD} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+        <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
+          <path d="M1.5 4L4 6.5L8.5 1.5" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
       )}
       {indeterminate && !checked && (
-        <div style={{ width: 7, height: 4, background: GOLD }} />
+        <div style={{ width: 8, height: 2, background: '#fff', borderRadius: 1 }} />
       )}
     </div>
   )
@@ -58,7 +65,6 @@ function PageBtn({ onClick, disabled, active, children }) {
 // ─── TableRow ────────────────────────────────────────────────────
 function TableRow({ tbl, isEditing, isSelected, onEdit, onDelete, onToggle, onSelect, idx }) {
   const { t } = useTranslation()
-  const locStyle = LOC_COLORS[tbl.location] || { bg: '#f5f5f5', color: '#666' }
   const bg = isSelected ? '#ffffff' : isEditing ? '#ffffff' : idx % 2 === 0 ? '#fff' : '#ffffff'
 
   return (
@@ -66,7 +72,6 @@ function TableRow({ tbl, isEditing, isSelected, onEdit, onDelete, onToggle, onSe
       className={`tbl-row ${!tbl.active ? 'tbl-row--inactive' : ''}`}
       style={{
         background: bg,
-        borderLeft: `3px solid ${isSelected || isEditing ? GOLD : 'transparent'}`,
       }}
     >
       {/* Checkbox */}
@@ -74,46 +79,33 @@ function TableRow({ tbl, isEditing, isSelected, onEdit, onDelete, onToggle, onSe
         <Checkbox checked={isSelected} onChange={onSelect} />
       </div>
 
-      {/* Content */}
-      <div className="tbl-row__content">
+      {/* Name Column */}
+      <div className="tbl-row__content" style={{ padding: '12px 0' }}>
         <div className="tbl-row__name-row">
           <p className="tbl-row__name">
-            {t('tables_module.header_table', { defaultValue: 'Table' })} {tbl.number}
+            {t('tables_module.header_table')} {tbl.number}
           </p>
-          {!tbl.active && (
-            <span className="tbl-row__inactive-badge">{t('tables_module.inactive')}</span>
-          )}
+
         </div>
-        <div className="tbl-row__tags">
-          <span className="tbl-row__tag" style={{ background: '#ffffff', color: GOLD_DK }}>
-            <Users size={10} strokeWidth={2.5} color={GOLD} />
-            {tbl.capacity} {t('tables_module.persons_max')}
-          </span>
-          <span className="tbl-row__tag" style={{ background: locStyle.bg, color: locStyle.color }}>
-            <MapPin size={10} strokeWidth={2.5} color={locStyle.color} />
-            {tbl.location}
-          </span>
-        </div>
+      </div>
+
+      {/* Capacity Column */}
+      <div className="tbl-row__col-cell tbl-row__col-cell--center">
+        <span className="tbl-row__text">{tbl.capacity}</span>
+      </div>
+
+      {/* Location Column */}
+      <div className="tbl-row__col-cell">
+        <span className="tbl-row__text">{tbl.location}</span>
       </div>
 
       {/* Actions */}
       <div className="tbl-row__actions">
-        {/* Toggle */}
-        <button
-          onClick={() => onToggle(tbl)}
-          title={tbl.active ? t('tables_module.deactivate') : t('tables_module.activate')}
-          className={`tbl-icon-btn ${tbl.active ? 'tbl-icon-btn--green' : 'tbl-icon-btn--grey'}`}
-        >
-          {tbl.active
-            ? <ToggleRight size={14} strokeWidth={2.5} />
-            : <ToggleLeft  size={14} strokeWidth={2.5} />
-          }
-        </button>
 
         <button
           onClick={() => onEdit(tbl)}
           title={t('tables_module.edit')}
-          className="tbl-icon-btn tbl-icon-btn--gold"
+          className="tbl-row__action-btn tbl-row__action-btn--edit"
         >
           <Pencil size={14} strokeWidth={2.5} />
         </button>
@@ -121,7 +113,7 @@ function TableRow({ tbl, isEditing, isSelected, onEdit, onDelete, onToggle, onSe
         <button
           onClick={() => onDelete(tbl)}
           title={t('tables_module.delete')}
-          className="tbl-icon-btn tbl-icon-btn--red"
+          className="tbl-row__action-btn tbl-row__action-btn--delete"
         >
           <Trash2 size={14} strokeWidth={2.5} />
         </button>
@@ -136,11 +128,10 @@ export default function TableList({
   editingTbl,
   onEdit,
   onDelete,
-  onToggle,
   selectedTables,
   setSelectedTables,
 }) {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const [page, setPage] = useState(1)
   const isXs = useIsMobile(400)
 
@@ -149,7 +140,6 @@ export default function TableList({
   if (!tables || tables.length === 0) {
     return (
       <div className="tbl-list__empty">
-        <LayoutGrid size={40} color={DARK} strokeWidth={1.5} style={{ display: 'block', margin: '0 auto' }} />
         <p className="tbl-list__empty-title">{t('tables_module.no_tables_found')}</p>
         <p className="tbl-list__empty-sub">{t('tables_module.use_form_to_add')}</p>
       </div>
@@ -189,26 +179,14 @@ export default function TableList({
 
   return (
     <>
-      {/* Stats bar */}
-      <div className="tbl-stats">
-        {[
-          { label: t('tables_module.total'),    val: tables.length,    bg: '#423428' },
-          { label: t('tables_module.actives'),  val: activeCnt,        bg: '#3d2d1e' },
-          { label: t('tables_module.capacity'), val: `${totalCap} ${t('tables_module.persons')}`, bg: '#4a3525' },
-        ].map((s, i) => (
-          <div key={i} className="tbl-stats__item" style={{ background: s.bg }}>
-            <p className="tbl-stats__label">{s.label}</p>
-            <p className="tbl-stats__value">{s.val}</p>
-          </div>
-        ))}
-      </div>
+
 
       <div className="tbl-list">
         {/* Partial selection banner */}
         {selectedTables.length > 0 && !allSel && (
-          <div className="tbl-list__banner" style={{ background: '#ffffff' }}>
+          <div className="tbl-list__banner">
             <span className="tbl-list__banner-text">
-              {t('tables_module.selected_count', { count: selectedTables.length })}
+              {t('tables_module.tables_selected_count', { count: selectedTables.length })}
             </span>
             <button
               onClick={() => setSelectedTables(tables.map(t => t.idx))}
@@ -221,7 +199,7 @@ export default function TableList({
 
         {/* All selected banner */}
         {allSel && tables.length > PAGE_SIZE && (
-          <div className="tbl-list__banner tbl-list__banner--green" style={{ background: '#ffffff', borderBottom: '1px solid #b8ddb8' }}>
+          <div className="tbl-list__banner tbl-list__banner--green">
             <span className="tbl-list__banner-text">
               {t('tables_module.tables_selected_count', { count: tables.length })}
             </span>
@@ -234,13 +212,19 @@ export default function TableList({
           </div>
         )}
 
-        {/* Header */}
         <div className="tbl-list__header">
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <Checkbox checked={pageAllSel} indeterminate={pageSomeSel} onChange={togglePage} />
           </div>
-          <span className="tbl-list__col-label">{t('tables_module.table_name_col')}</span>
-          <span className="tbl-list__col-label" style={{ paddingRight: 4 }}>
+          <span className="tbl-list__col-label" style={{ fontWeight: '900' }}>
+            {t('tables_module.header_table')}
+          </span>
+          <span className="tbl-list__col-label" style={{ fontWeight: '900', textAlign: 'center' }}>
+            {t('tables_module.header_capacity')}
+          </span>
+          <span className="tbl-list__col-label" style={{ fontWeight: '900' }}>
+            {t('tables_module.header_location')}
+          </span>
+          <span className="tbl-list__col-label" style={{ fontWeight: '900', textAlign: 'right', paddingRight: 10 }}>
             {t('tables_module.actions_col')}
           </span>
         </div>
@@ -255,7 +239,6 @@ export default function TableList({
             isSelected={selectedTables.includes(tbl.idx)}
             onEdit={onEdit}
             onDelete={onDelete}
-            onToggle={onToggle}
             onSelect={() => toggleOne(tbl.idx)}
           />
         ))}
@@ -263,15 +246,9 @@ export default function TableList({
         {/* Pagination */}
         {total > 1 && (
           <div className="tbl-pagination">
-            <span className="tbl-pagination__info">
-              {(safe - 1) * PAGE_SIZE + 1}–{Math.min(safe * PAGE_SIZE, tables.length)} / {tables.length}
-            </span>
+            <span className="tbl-pagination__info"></span>
             <div className="tbl-pagination__pages">
-              {!isXs && (
-                <PageBtn onClick={() => setPage(1)} disabled={safe === 1}>
-                  <ChevronsLeft size={12} strokeWidth={2.5} />
-                </PageBtn>
-              )}
+
               <PageBtn onClick={() => setPage(p => Math.max(1, p - 1))} disabled={safe === 1}>
                 <ChevronLeft size={12} strokeWidth={2.5} />
               </PageBtn>
@@ -283,11 +260,7 @@ export default function TableList({
               <PageBtn onClick={() => setPage(p => Math.min(total, p + 1))} disabled={safe === total}>
                 <ChevronRight size={12} strokeWidth={2.5} />
               </PageBtn>
-              {!isXs && (
-                <PageBtn onClick={() => setPage(total)} disabled={safe === total}>
-                  <ChevronsRight size={12} strokeWidth={2.5} />
-                </PageBtn>
-              )}
+
             </div>
           </div>
         )}
