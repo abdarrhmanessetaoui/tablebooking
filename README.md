@@ -8,7 +8,7 @@ It is built with **React** (frontend) and **Laravel** (backend) and includes fea
 ---
 
 
-![TableBooking Screenshot](https://raw.githubusercontent.com/abdarrhmanessetaoui/tablebooking/main/Administrateur-Restaurant/frontend/administrateur-restaurant/public/images/Capture.PNG)
+![TableBooking Screenshot](https://raw.githubusercontent.com/abdarrhmanessetaoui/tablebooking/main/Administrateur-Restaurant/frontend/administrateur-restaurant/public/images/Capture1.PNG)
 
 
 
