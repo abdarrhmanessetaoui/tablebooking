@@ -410,7 +410,7 @@ export default function Settings() {
           </FadeUp>
         </div>
       </div>
-    </div>
+    </>
   )
 }
 
