@@ -8,6 +8,7 @@ import { GREEN, RED } from '../../styles/dashboard/tokens'
 
 const DARK      = '#2D2926'
 const LIGHT_BROWN      = '#C19A6B'
+const GOLD      = LIGHT_BROWN
 const BORDER    = '#E5E0DA'
 const CREAM     = '#ffffff'
 

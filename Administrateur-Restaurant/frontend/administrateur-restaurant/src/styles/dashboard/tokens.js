@@ -8,6 +8,7 @@ export const DARK_LIGHT  = '#4A4A4A'      // Medium gray
 export const LIGHT_BROWN    = '#C19A6B'      // Logo-inspired light brown
 export const LIGHT_BROWN_DK   = '#A8834E'      // Darker light brown for contrast
 export const LIGHT_BROWN_DARK = LIGHT_BROWN_DK // Alias for consistency
+export const GOLD            = LIGHT_BROWN    // Alias for gold color
 export const BROWN_LT       = '#D2B48C'      // Very light brown / tan
 export const BROWN_BG    = '#FDF8F3'      // Extremely light brown for backgrounds
 export const WHITE       = '#ffffff'

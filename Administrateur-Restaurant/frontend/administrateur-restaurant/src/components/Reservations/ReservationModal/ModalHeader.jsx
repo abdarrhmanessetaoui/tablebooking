@@ -1,6 +1,6 @@
-﻿import { useTranslation } from 'react-i18next'
+import { useTranslation } from 'react-i18next'
 import { X } from 'lucide-react'
-import { DARK, LIGHT_BROWN } from '../../../styles/reservations/tokens'
+import { DARK, LIGHT_BROWN, GOLD } from '../../../styles/reservations/tokens'
 
 export default function ModalHeader({ modalMode, step, editing, onClose }) {
   const { t } = useTranslation()

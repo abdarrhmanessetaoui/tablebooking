@@ -1,6 +1,7 @@
 export const DARK             = '#2D2926'
 export const DARK_LIGHT       = '#4A4A4A'
 export const LIGHT_BROWN      = '#C19A6B'
+export const GOLD             = LIGHT_BROWN
 export const LIGHT_BROWN_DARK = '#A8834E'
 export const CREAM            = '#FDF8F3'
 export const WHITE            = '#ffffff'

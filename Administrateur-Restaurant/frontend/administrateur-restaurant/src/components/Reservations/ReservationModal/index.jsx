@@ -1,4 +1,4 @@
-﻿import { useState } from 'react'
+import { useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import useModalData   from '../../../hooks/Reservations/useModalData'
@@ -10,6 +10,7 @@ import StepService    from './steps/StepService'
 import StepDateTime   from './steps/StepDateTime'
 import StepContact    from './steps/StepContact'
 import { overlayStyle, panelStyle } from '../../../styles/reservations/modal.styles'
+import { GOLD } from '../../../styles/reservations/tokens'
 
 export default function ReservationModal({ modalMode, editing, form, setForm, handleSubmit, handleCreate, handleDelete, setModalMode }) {
   const { t } = useTranslation()

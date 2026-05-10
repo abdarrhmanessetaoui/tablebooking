@@ -1,4 +1,4 @@
-﻿import { useTranslation } from 'react-i18next'
+import { useTranslation } from 'react-i18next'
 import StatBlock                  from './StatBlock'
 import DashboardReservationsTable from './DashboardReservationsTable'
 import ResCardMobile              from './ResCardMobile'
@@ -10,7 +10,7 @@ import {
   mobileViewAllBtn,
 } from '../../styles/dashboard/tabPanel.styles'
 import {
-  DARK, WHITE,
+  DARK, WHITE, GOLD,
   GREEN, GREEN_BG,
   RED,   RED_BG,
   AMBER, AMBER_BG,
