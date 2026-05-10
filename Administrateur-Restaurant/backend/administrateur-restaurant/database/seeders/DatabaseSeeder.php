@@ -18,7 +18,7 @@ class DatabaseSeeder extends Seeder
             ['email' => 'admin@tablebooking.ma'],
             [
                 'name'               => 'Dal Corso Admin',
-                'password'           => 'password', // auto-hashed
+                'password'           => \Illuminate\Support\Facades\Hash::make('password'),
                 'restaurant_form_id' => 13,
                 'email_verified_at'  => now(),
             ]
