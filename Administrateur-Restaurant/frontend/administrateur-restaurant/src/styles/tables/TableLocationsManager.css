@@ -1,0 +1,201 @@
+/* ─── TableLocationsManager ─────────────────────────────────────── */
+.tbl-locs {
+  background: #fff;
+  border: 1px solid #E5E0DA;
+  border-radius: 12px;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  overflow: hidden;
+}
+
+.tbl-locs__header {
+  padding: 12px 16px;
+  background: #FDF8F3;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-bottom: none;
+}
+
+.tbl-locs__header-label {
+  font-size: 11px;
+  font-weight: 800;
+  color: #2D2926;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.tbl-locs__count {
+  margin-left: auto;
+  min-width: 20px;
+  height: 20px;
+  background: #C19A6B;
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 6px;
+  border-radius: 12px;
+}
+
+.tbl-locs__body {
+  padding: 16px;
+}
+
+/* ── Add new ── */
+.tbl-locs__add {
+  margin-bottom: 16px;
+  padding: 14px;
+  background: #ffffff;
+  border: 1px solid #E5E0DA;
+  border-radius: 12px;
+}
+
+.tbl-locs__add-title {
+  margin: 0 0 10px;
+  font-size: 10px;
+  font-weight: 800;
+  color: #2D2926;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.tbl-locs__add-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.tbl-locs__input {
+  padding: 9px 12px;
+  border: 1px solid #E5E0DA;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #2D2926;
+  font-family: inherit;
+  outline: none;
+  background: #fff;
+  width: 100%;
+  box-sizing: border-box;
+  transition: none;
+}
+
+.tbl-locs__input:focus {
+  border-color: #C19A6B;
+}
+
+.tbl-locs__add-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px;
+  background: #2D2926;
+  border: none;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #ffffff;
+  font-family: inherit;
+  cursor: pointer;
+  transition: none;
+}
+
+.tbl-locs__add-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+/* ── Color picker ── */
+.color-picker {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.color-dot {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 1px solid #E5E0DA;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: none;
+}
+
+.color-dot--selected {
+  border: 2px solid #2D2926;
+}
+
+/* ── Location list ── */
+.tbl-locs__list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.tbl-locs__item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid #E5E0DA;
+  border-radius: 12px;
+  background: #fff;
+}
+
+.tbl-locs__dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.tbl-locs__name {
+  flex: 1;
+  font-size: 13px;
+  font-weight: 700;
+  color: #2D2926;
+}
+
+/* ── Icon buttons ── */
+.tbl-locs__icon-btn {
+  padding: 4px 8px;
+  border-radius: 12px;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: none;
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.tbl-locs__icon-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.tbl-locs__icon-btn--edit   { background: #C19A6B; }
+.tbl-locs__icon-btn--delete { background: #EF4444; }
+.tbl-locs__icon-btn--save   { background: #22C55E; }
+.tbl-locs__icon-btn--cancel { background: #2D2926; }
+
+/* ── Empty / loading ── */
+.tbl-locs__loading,
+.tbl-locs__empty {
+  font-size: 12px;
+  font-weight: 700;
+  text-align: center;
+  padding: 20px 0;
+}
+
+.tbl-locs__loading { color: #2D2926; }
+.tbl-locs__empty   { color: #4A4A4A; }

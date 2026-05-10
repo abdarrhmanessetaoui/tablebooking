@@ -1,3 +1,162 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* ── Premium Global Reset ── */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Poppins:wght@400;500;600;700;800&display=swap');
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background: #F5F1ED;
+  color: #4B3621;
+  overflow-x: hidden;
+  transition: background-color 0.3s ease;
+}
+
+/* ── Typography Refinements ── */
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Poppins', sans-serif;
+  letter-spacing: -0.02em;
+}
+
+/* ── Global Select Style ── */
+select {
+  background: #ffffff;
+  border: 1px solid #E5E0DA;
+  border-radius: 4px;
+  padding: 10px 14px;
+  font-size: 13px;
+  font-weight: 800;
+  color: #2D2926;
+  font-family: inherit;
+  outline: none;
+  transition: none;
+  box-sizing: border-box;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+/* ── Scrollbar styling ── */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(75, 54, 33, 0.1);
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(75, 54, 33, 0.2);
+}
+
+/* ── Selection styling ── */
+::selection {
+  background: rgba(200, 169, 126, 0.25);
+  color: #4B3621;
+}
+
+/* ── Focus styling ── */
+:focus-visible {
+  outline: 2px solid #C8A97E;
+  outline-offset: 2px;
+}
+
+/* ── Smooth Page Transitions ── */
+.fade-in { animation: fadeIn 0.2s cubic-bezier(0, 0, 0.2, 1); }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Layout Classes ── */
+.l-root { 
+  min-height: 100vh; 
+  display: flex; 
+  font-family: 'Inter', system-ui, -apple-system, sans-serif; 
+}
+.l-aside {
+  flex-shrink: 0; 
+  position: sticky; 
+  top: 0; 
+  height: 100vh;
+  overflow: hidden; 
+  z-index: 20;
+  background: #ffffff;
+}
+.l-main { 
+  flex: 1; 
+  min-width: 0; 
+  background: #F5F1ED; 
+  overflow-x: hidden; 
+}
+.l-topbar {
+  display: none; 
+  align-items: center; 
+  justify-content: space-between;
+  padding: 0 16px; 
+  height: 56px; 
+  background: #ffffff;
+  position: sticky; 
+  top: 0; 
+  z-index: 30; 
+  flex-shrink: 0;
+  border-bottom: 1px solid #E5E0DA;
+}
+.l-overlay { 
+  display: none; 
+  position: fixed; 
+  inset: 0; 
+  background: rgba(0, 0, 0, 0.4); 
+  z-index: 40; 
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+.l-overlay.active {
+  opacity: 1;
+  pointer-events: all;
+}
+.l-drawer {
+  display: none; 
+  position: fixed; 
+  top: 0; 
+  width: 240px; 
+  height: 100%; 
+  z-index: 50;
+  background: #ffffff;
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* LTR Drawer */
+[dir="ltr"] .l-drawer { left: 0; transform: translateX(-100%); }
+[dir="ltr"] .l-drawer.open { transform: translateX(0); }
+
+/* RTL Drawer */
+[dir="rtl"] .l-drawer { right: 0; transform: translateX(100%); }
+[dir="rtl"] .l-drawer.open { transform: translateX(0); }
+
+@media (max-width: 767px) {
+  .l-aside   { display: none !important; }
+  .l-topbar  { display: flex !important; }
+  .l-drawer  { display: block !important; }
+  .l-overlay { display: block !important; }
+  .l-overlay.hidden { display: none !important; }
+}
+
+.hidden { display: none !important; }

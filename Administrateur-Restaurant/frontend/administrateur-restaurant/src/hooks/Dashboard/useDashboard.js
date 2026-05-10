@@ -1,18 +1,15 @@
 import { useNavigate } from 'react-router-dom'
-import { getToken, removeToken } from '../../utils/auth'
+import { removeToken } from '../../utils/auth'
+import { apiPath, getHeaders } from '../../utils/api'
 
 export default function useDashboard() {
   const navigate = useNavigate()
 
   const handleLogout = async () => {
     try {
-      await fetch('http://localhost:8000/api/logout', {
+      await fetch(apiPath('logout'), {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-          'Authorization': `Bearer ${getToken()}`,
-        },
+        headers: getHeaders(),
       })
     } catch (e) {
       // fail silently, still log out client side

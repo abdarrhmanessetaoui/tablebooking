@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react'
+﻿import { useState, useEffect, useMemo } from 'react'
 
 function generateSlots(oh, durationMin = 30) {
   if (!oh) return []

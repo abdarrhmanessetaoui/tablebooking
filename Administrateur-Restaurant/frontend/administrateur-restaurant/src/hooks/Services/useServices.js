@@ -1,17 +1,13 @@
 import { useState, useEffect } from 'react'
-import { getToken }  from '../../utils/auth'
-import { toast }     from '../../components/ui/Toast'
-import { confirm }   from '../../components/ui/ConfirmDialog'
+import { useTranslation } from 'react-i18next'
+import { apiPath, getHeaders } from '../../utils/api'
+import { toast } from '../../components/ui/Toast'
+import { confirm } from '../../components/ui/ConfirmDialog'
 
-const API = 'http://localhost:8000/api/services'
-
-const hdrs = () => ({
-  'Content-Type': 'application/json',
-  'Accept':       'application/json',
-  'Authorization': `Bearer ${getToken()}`,
-})
+const API = apiPath('services')
 
 export default function useServices() {
+  const { t } = useTranslation()
   const [services,   setServices]   = useState([])
   const [loading,    setLoading]    = useState(true)
   const [error,      setError]      = useState('')
@@ -23,11 +19,11 @@ export default function useServices() {
   async function fetchServices() {
     setLoading(true)
     try {
-      const res  = await fetch(API, { headers: hdrs() })
+      const res  = await fetch(API, { headers: getHeaders() })
       const data = await res.json()
       setServices(Array.isArray(data) ? data : [])
     } catch {
-      setError('Impossible de charger les services.')
+      setError(t('services_module.error_loading'))
     } finally {
       setLoading(false)
     }
@@ -45,22 +41,22 @@ export default function useServices() {
     try {
       if (editingSvc) {
         await fetch(`${API}/${editingSvc.idx}`, {
-          method: 'PUT', headers: hdrs(), body: JSON.stringify(body),
+          method: 'PUT', headers: getHeaders(), body: JSON.stringify(body),
         })
         setServices(prev => prev.map(s =>
           s.idx === editingSvc.idx ? { ...s, ...body } : s
         ))
-        toast(`Service "${form.name}" modifié`, 'success')
+        toast(t('services_module.service_modified', { name: form.name }), 'success')
         setEditingSvc(null)
       } else {
-        const res  = await fetch(API, { method: 'POST', headers: hdrs(), body: JSON.stringify(body) })
+        const res  = await fetch(API, { method: 'POST', headers: getHeaders(), body: JSON.stringify(body) })
         const data = await res.json()
         setServices(prev => [...prev, data])
-        toast(`Service "${form.name}" ajouté`, 'success')
+        toast(t('services_module.service_added', { name: form.name }), 'success')
         if (resetForm) resetForm()
       }
     } catch {
-      toast(editingSvc ? 'Impossible de modifier' : "Impossible d'ajouter", 'error')
+      toast(editingSvc ? t('services_module.error_modifying') : t('services_module.error_adding'), 'error')
     } finally {
       setSaving(false)
     }
@@ -68,18 +64,19 @@ export default function useServices() {
 
   async function handleDelete(svc) {
     const ok = await confirm({
-      title: 'Supprimer le service', message: `Voulez-vous supprimer "${svc.name}" ?`,
-      sub: 'Les réservations existantes ne seront pas affectées.',
-      confirmLabel: 'Supprimer', type: 'danger',
+      title: t('services_module.delete_service_title'), 
+      message: t('services_module.delete_service_msg', { name: svc.name }),
+      sub: t('services_module.delete_service_sub'),
+      confirmLabel: t('services_module.delete'), type: 'danger',
     })
     if (!ok) return
     try {
-      await fetch(`${API}/${svc.idx}`, { method: 'DELETE', headers: hdrs() })
+      await fetch(`${API}/${svc.idx}`, { method: 'DELETE', headers: getHeaders() })
       setServices(prev => prev.filter(s => s.idx !== svc.idx))
       if (editingSvc?.idx === svc.idx) setEditingSvc(null)
-      toast(`Service "${svc.name}" supprimé`, 'warning')
+      toast(t('services_module.service_deleted', { name: svc.name }), 'warning')
     } catch {
-      toast('Impossible de supprimer', 'error')
+      toast(t('services_module.error_deleting'), 'error')
     }
   }
 

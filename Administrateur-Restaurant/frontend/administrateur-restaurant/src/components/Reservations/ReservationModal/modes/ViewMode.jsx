@@ -1,41 +1,53 @@
 import { useState } from 'react'
-
+import { useTranslation } from 'react-i18next'
+import { User, Phone, Mail, CalendarDays, Clock, Users, Utensils, FileText, Trash2 } from 'lucide-react'
 import InfoRow    from '../../shared/InfoRow'
 import StatusBadge from '../../shared/StatusBadge'
-import { DARK, GOLD, RED } from '../../../../styles/reservations/tokens'
+import { DARK, LIGHT_BROWN, RED } from '../../../../styles/reservations/tokens'
 
 export default function ViewMode({ editing, setForm, setModalMode, handleDelete }) {
-
+  const { t } = useTranslation()
+  const [hovDel, setHovDel] = useState(false)
   return (
     <>
-      <div style={{ display:'flex', flexDirection:'column', gap:14 }}>
-        <InfoRow label="Nom"      value={editing?.name}       />
-        <InfoRow label="Tél"      value={editing?.phone}      />
-        <InfoRow label="Email"    value={editing?.email}      />
-        <InfoRow label="Date"     value={editing?.date}       />
-        <InfoRow label="Heure"    value={editing?.start_time} />
-        <InfoRow label="Couverts" value={editing?.guests}     />
-        <InfoRow label="Service"  value={editing?.service}    />
-        <InfoRow label="Notes"    value={editing?.notes}      />
+      <div style={{ display:'flex', flexDirection:'column', gap:18, padding:'4px 0' }}>
+        <InfoRow label={t('name')}          value={editing?.name}       />
+        <InfoRow label={t('tel_header')}    value={editing?.phone}      />
+        <InfoRow label={t('email_label')}   value={editing?.email}      />
+        <InfoRow label={t('date')}          value={editing?.date}       />
+        <InfoRow label={t('time')}          value={editing?.start_time} />
+        <InfoRow label={t('pers_header')}   value={editing?.guests}     />
+        <InfoRow label={t('service')}       value={editing?.service}    />
+        <InfoRow label={t('notes_label')}   value={editing?.notes}      />
       </div>
-      <StatusBadge status={editing?.status} />
-      <div style={{ height:2, background:'#f0ebe4' }} />
-      <div style={{ display:'flex', gap:8 }}>
+
+      <div style={{ margin:'10px 0' }}>
+        <StatusBadge status={editing?.status} />
+      </div>
+
+      <div style={{ height:1, background: '#E5E0DA', margin: '8px 0' }} />
+
+      <div style={{ display:'flex', gap:10, marginTop: 10 }}>
         <button onClick={() => { setForm({...editing}); setModalMode('edit') }}
-          style={{
-            flex:1, display:'flex', alignItems:'center', justifyContent:'center', gap:8,
-            padding:'12px', background:DARK, border:'none', fontSize:13, fontWeight:900, color:GOLD, cursor:'pointer',
-            textTransform: 'uppercase'
+          style={{ 
+            flex: 2, padding:'14px', 
+            background:LIGHT_BROWN, border:'none', 
+            fontSize:12, fontWeight:900, color:'#ffffff', 
+            cursor:'pointer', borderRadius: 12,
+            textTransform: 'uppercase', letterSpacing: '0.05em'
           }}>
-          Modifier le statut
+          {t('edit_status')}
         </button>
         <button onClick={() => handleDelete(editing.id)}
-          style={{
-            padding:'12px 18px', background:'#FF0000', border:'none', cursor:'pointer',
-            display:'flex', alignItems:'center', justifyContent:'center',
-            fontSize: 10, fontWeight: 900, color: '#fff', textTransform: 'uppercase'
-          }}>
-          Supprimer
+          style={{ 
+            flex: 1, padding:'14px', 
+            background:'#EF4444', border:'none', 
+            fontSize:12, fontWeight:900, color:'#ffffff', 
+            cursor:'pointer', borderRadius: 12,
+            textTransform: 'uppercase', letterSpacing: '0.05em'
+          }}
+        >
+          {t('delete_btn')}
         </button>
       </div>
     </>

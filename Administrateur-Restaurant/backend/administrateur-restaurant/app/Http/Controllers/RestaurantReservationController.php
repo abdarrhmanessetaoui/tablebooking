@@ -160,6 +160,43 @@ class RestaurantReservationController extends Controller
         return response()->json($message->toCleanArray());
     }
 
+    public function bulkUpdateStatus(Request $request)
+    {
+        $request->validate([
+            'ids'    => 'required|array',
+            'status' => 'required|in:Pending,Confirmed,Cancelled',
+        ]);
+
+        $messages = WpMessage::where('formid', $this->formId())
+            ->whereIn('id', $request->ids)
+            ->get();
+
+        foreach ($messages as $message) {
+            $data = @unserialize($message->posted_data);
+            if (is_array($data)) {
+                $data['app_status_1']         = $request->status;
+                $data['apps'][0]['cancelled'] = $request->status;
+                $message->posted_data         = serialize($data);
+                $message->save();
+            }
+        }
+
+        return response()->json(['success' => true, 'count' => $messages->count()]);
+    }
+
+    public function bulkDestroy(Request $request)
+    {
+        $request->validate([
+            'ids' => 'required|array',
+        ]);
+
+        $deleted = WpMessage::where('formid', $this->formId())
+            ->whereIn('id', $request->ids)
+            ->delete();
+
+        return response()->json(['deleted' => true, 'count' => $deleted]);
+    }
+
     public function show(int $id)
     {
         $message = WpMessage::where('formid', $this->formId())->findOrFail($id);

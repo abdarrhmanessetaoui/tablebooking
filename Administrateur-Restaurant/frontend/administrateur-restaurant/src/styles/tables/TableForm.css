@@ -1,0 +1,151 @@
+/* ─── TableForm ─────────────────────────────────────────────────── */
+.tbl-form {
+  background: #fff;
+  border: 1px solid #E5E0DA;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.tbl-form__header {
+  padding: 12px 16px;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-bottom: 1px solid #E5E0DA;
+}
+
+.tbl-form__header-label {
+  font-size: 11px;
+  font-weight: 900;
+  color: #C19A6B;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.tbl-form__body {
+  padding: clamp(14px, 4vw, 24px);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.tbl-form__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+/* ── Field ── */
+.tbl-field {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.tbl-field__label {
+  font-size: 10px;
+  font-weight: 800;
+  color: #2D2926;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  display: block;
+  margin-bottom: 6px;
+}
+
+.tbl-field__input,
+.tbl-field__select {
+  padding: 12px 14px;
+  border: 1px solid #E5E0DA;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 800;
+  color: #2D2926;
+  font-family: inherit;
+  outline: none;
+  background: #fff;
+  transition: none;
+  width: 100%;
+  box-sizing: border-box;
+  min-width: 0;
+  -webkit-appearance: none;
+}
+
+.tbl-field__input:focus,
+.tbl-field__select:focus {
+  border-color: #C19A6B;
+}
+
+.tbl-field__select {
+  cursor: pointer;
+}
+
+.tbl-field__empty {
+  padding: 12px 14px;
+  border: 1px solid #E5E0DA;
+  border-radius: 4px;
+  font-size: 12px;
+  color: #2D2926;
+  display: flex;
+  align-items: center;
+  pointer-events: none;
+  background: #FAF7F4;
+  font-weight: 800;
+}
+
+/* ── Submit button ── */
+.tbl-form__submit {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 18px;
+  background: #C19A6B;
+  border: none;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 800;
+  color: #ffffff;
+  cursor: pointer;
+  transition: none;
+  font-family: inherit;
+  width: 100%;
+  min-height: 44px;
+}
+
+.tbl-form__submit:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+/* ── Cancel button ── */
+.tbl-form__cancel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 11px;
+  background: #ffffff;
+  border: 1px solid #E5E0DA;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 800;
+  color: #2D2926;
+  cursor: pointer;
+  font-family: inherit;
+  transition: none;
+  width: 100%;
+}
+.tbl-btn-spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top: 2px solid #ffffff;
+  border-radius: 50%;
+  animation: tbl-spin 0.6s linear infinite;
+  display: inline-block;
+}
+
+@keyframes tbl-spin {
+  to { transform: rotate(360deg); }
+}

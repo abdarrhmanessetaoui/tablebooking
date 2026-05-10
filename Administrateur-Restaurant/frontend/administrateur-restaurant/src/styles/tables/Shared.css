@@ -1,0 +1,125 @@
+/* ─── Btn component ─────────────────────────────────────────────── */
+.tbl-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border: none;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  font-family: inherit;
+  white-space: nowrap;
+  min-height: 40px;
+}
+
+.tbl-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+/* ─── BulkBar ────────────────────────────────────────────────────── */
+@keyframes bulkSlideDown {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.bulk-bar {
+  position: sticky;
+  top: 8px;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  padding: 10px 12px;
+  background: #423428;
+  box-shadow: 0 4px 24px rgba(66, 52, 40, 0.28);
+  margin-bottom: 12px;
+  animation: bulkSlideDown 0.18s ease;
+}
+
+.bulk-bar__count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 26px;
+  height: 26px;
+  background: #c8a97e;
+  color: #423428;
+  font-size: 12px;
+  font-weight: 900;
+  padding: 0 7px;
+  flex-shrink: 0;
+}
+
+.bulk-bar__divider {
+  display: none;
+}
+
+.bulk-bar__btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 7px 12px;
+  border: none;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s;
+  flex-shrink: 0;
+  min-height: 34px;
+}
+
+.bulk-bar__btn--activate {
+  background: rgba(22, 163, 74, 0.12);
+  border: 1px solid rgba(22, 163, 74, 0.25);
+  color: #4ade80;
+}
+
+.bulk-bar__btn--activate:hover {
+  background: #16a34a;
+  color: #fff;
+}
+
+.bulk-bar__btn--deactivate {
+  background: rgba(200, 169, 126, 0.12);
+  border: 1px solid rgba(200, 169, 126, 0.25);
+  color: #c8a97e;
+}
+
+.bulk-bar__btn--deactivate:hover {
+  background: #c8a97e;
+  color: #423428;
+}
+
+.bulk-bar__btn--delete {
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  color: #f87171;
+}
+
+.bulk-bar__btn--delete:hover {
+  background: #ef4444;
+  color: #fff;
+}
+
+.bulk-bar__btn--clear {
+  margin-left: auto;
+  background: none;
+  border: 1px solid #3d2d1e;
+  color: #fff;
+}
+
+.bulk-bar__btn--clear:hover {
+  color: #c8a97e;
+}
+
+@media (max-width: 480px) {
+  .bulk-label {
+    display: none !important;
+  }
+}

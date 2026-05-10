@@ -1,30 +1,57 @@
 // ─────────────────────────────────────────────────────────────────
-// Design tokens — single source of truth for the Dashboard UI
+// Design tokens   Minimalist Light Brown & White for TableBooking.ma
 // ─────────────────────────────────────────────────────────────────
 
 // ── Core palette ─────────────────────────────────────────────────
-export const DARK     = '#2b2118'
-export const GOLD     = '#c8a97e'
-export const GOLD_DK  = '#a8834e'
-export const WHITE    = '#ffffff'
+export const DARK        = '#2D2926'      // Soft charcoal (not pure black)
+export const DARK_LIGHT  = '#4A4A4A'      // Medium gray
+export const LIGHT_BROWN    = '#C19A6B'      // Logo-inspired light brown
+export const LIGHT_BROWN_DK   = '#A8834E'      // Darker light brown for contrast
+export const LIGHT_BROWN_DARK = LIGHT_BROWN_DK // Alias for consistency
+export const BROWN_LT       = '#D2B48C'      // Very light brown / tan
+export const BROWN_BG    = '#FDF8F3'      // Extremely light brown for backgrounds
+export const WHITE       = '#ffffff'
 
-// ── Brown replaces all grays ──────────────────────────────────────
-export const CREAM    = '#FFFFFF'
-export const BORDER   = '#2b2118'
+// ── Background palette ───────────────────────────────────────────
+export const BG_PAGE     = '#ffffff'      // Clean white background
+export const BG_CARD     = '#ffffff'      // White surfaces
+export const BG_SIDEBAR  = '#FDF8F3'      // Very light brown sidebar
+export const BG_HOVER    = '#ffffff'      // No hover effect (keep white)
+export const CREAM       = '#FDF8F3'      // Cream/off-white
 
-// ── Semantic colors ───────────────────────────────────────────────
-export const GREEN    = '#16A34A'
-export const GREEN_BG = '#16A34A'
+// ── Border colors ────────────────────────────────────────────────
+export const BORDER      = '#E5E0DA'      // Subtle warm border
+export const BORDER_LT   = '#F2EFEB'      // Even more subtle
 
-export const RED      = '#DC2626'
-export const RED_BG   = '#DC2626'
-
-export const AMBER    = '#c2410c'
-export const AMBER_BG = '#c2410c'
+// ── Semantic colors (Solid versions) ────────────────────────────
+export const GREEN       = '#22C55E'      // Solid Success Green
+export const GREEN_BG    = '#F0FDF4'      // Light background for success
+export const RED         = '#EF4444'      // Solid Error Red
+export const RED_BG      = '#FEF2F2'      // Light background for error banners
+export const AMBER       = '#F59E0B'      // Solid Warning Amber
+export const AMBER_BG     = '#FFFBEB'      // Light background for warnings
 
 // ── Typography ────────────────────────────────────────────────────
-export const FONT_FAMILY = "'Plus Jakarta Sans','DM Sans',system-ui,sans-serif"
-export const FONT_URL    = "https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800;900&display=swap"
+export const FONT_FAMILY  = "'Inter', system-ui, -apple-system, sans-serif"
+export const FONT_DISPLAY = "'Inter', system-ui, sans-serif"
+export const FONT_URL     = "https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+
+// ── Radius (Small & Consistent) ───────────────────────────────────
+export const RADIUS = {
+  sm:   4,
+  md:   6,
+  lg:   8,
+  xl:   10,
+  full: 9999,
+}
+
+// ── Shadows (None per requirement) ────────────────────────────────
+export const SHADOW = {
+  card:      'none',
+  cardHover: 'none',
+  glass:     'none',
+  subtle:    'none',
+}
 
 // ── Fixed dates ───────────────────────────────────────────────────
 export const TODAY_DATE    = new Date().toISOString().slice(0, 10)
@@ -36,18 +63,20 @@ export const SPACING = {
   sm:  8,
   md:  12,
   lg:  16,
-  xl:  20,
-  xxl: 28,
+  xl:  24,
+  xxl: 32,
+  xxxl: 40,
 }
 
 // ── Font sizes ────────────────────────────────────────────────────
 export const FONT_SIZE = {
-  xxs:  7,
-  xs:   8,
-  sm:   9,
-  md:   10,
-  base: 11,
-  lg:   12,
-  xl:   13,
-  xxl:  14,
+  xxs:  11,
+  xs:   12,
+  sm:   13,
+  md:   14,
+  base: 15,
+  lg:   16,
+  xl:   18,
+  xxl:  20,
+  xxxl: 24,
 }

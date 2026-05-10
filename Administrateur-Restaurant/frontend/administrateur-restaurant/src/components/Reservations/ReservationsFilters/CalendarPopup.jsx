@@ -1,13 +1,15 @@
-import { useState, useEffect, useRef } from 'react'
+﻿import { useState, useEffect, useRef } from 'react'
 import { createPortal } from 'react-dom'
-
-import { DARK, GOLD, GOLD_DARK } from '../../../styles/reservations/tokens'
+import { useTranslation } from 'react-i18next'
+import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react'
+import { DARK, LIGHT_BROWN, LIGHT_BROWN_DARK } from '../../../styles/reservations/tokens'
 import { calNavBtnStyle } from '../../../styles/reservations/filters.styles'
 
-const MONTHS_FR = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre']
-const DAYS_FR   = ['Lu','Ma','Me','Je','Ve','Sa','Di']
-
 export default function CalendarPopup({ filterDate, setFilterDate, onClose, anchorRef }) {
+  const { t, i18n } = useTranslation()
+  const isRtl = i18n.language === 'ar'
+  const lang = isRtl ? 'ar-MA' : i18n.language === 'fr' ? 'fr-FR' : 'en-US'
+  
   const today    = new Date()
   const initDate = filterDate
     ? (filterDate.length === 7 ? new Date(filterDate+'-01') : new Date(filterDate))
@@ -17,6 +19,13 @@ export default function CalendarPopup({ filterDate, setFilterDate, onClose, anch
   const [mode,      setMode]      = useState('day')
   const [pos,       setPos]       = useState({ top:-9999, left:-9999 })
   const popupRef = useRef(null)
+
+  const MONTHS = Array.from({ length: 12 }, (_, i) => 
+    new Intl.DateTimeFormat(lang, { month: 'long' }).format(new Date(2024, i, 1))
+  )
+  const DAYS = Array.from({ length: 7 }, (_, i) => 
+    new Intl.DateTimeFormat(lang, { weekday: 'short' }).format(new Date(2024, 0, i + 1))
+  )
 
   useEffect(() => {
     function calc() {
@@ -83,33 +92,33 @@ export default function CalendarPopup({ filterDate, setFilterDate, onClose, anch
   return createPortal(
     <div ref={popupRef} style={{
       position:'fixed', top:pos.top, left:pos.left, width:pos.width??280,
-      zIndex:99999, background:'#fff', border:`2px solid ${DARK}`,
-      boxShadow:'0 8px 32px rgba(43,33,24,0.22)',
-      fontFamily:"'Plus Jakarta Sans','DM Sans',system-ui,sans-serif",
+      zIndex:99999, background:'#fff', border:`4px solid ${DARK}`,
+      boxShadow:'0 8px 32px rgba(66,52,40,0.22)',
+      fontFamily:"'Inter',system-ui,-apple-system,sans-serif",
     }}>
       {/* Header */}
       <div style={{ display:'flex', alignItems:'center', background:DARK, padding:'8px 6px', gap:2 }}>
-        <button onClick={() => setViewYear(y=>y-1)} style={{ ...calNavBtnStyle, fontWeight:900, color:GOLD }}>«</button>
-        <button onClick={() => navMonth(-1)}         style={{ ...calNavBtnStyle, fontWeight:900, color:GOLD }}>‹</button>
-        <span style={{ flex:1, textAlign:'center', fontSize:11, fontWeight:900, color:GOLD, textTransform:'uppercase', letterSpacing:'0.05em' }}>
-          {MONTHS_FR[viewMonth]} {viewYear}
+        <button onClick={() => setViewYear(y=>y-1)} style={calNavBtnStyle}>{isRtl ? <ChevronsRight size={13} strokeWidth={2.5} /> : <ChevronsLeft  size={13} strokeWidth={2.5} />}</button>
+        <button onClick={() => navMonth(-1)}         style={calNavBtnStyle}>{isRtl ? <ChevronRight  size={13} strokeWidth={2.5} /> : <ChevronLeft   size={13} strokeWidth={2.5} />}</button>
+        <span style={{ flex:1, textAlign:'center', fontSize:13, fontWeight:800, color:LIGHT_BROWN, textTransform:'capitalize' }}>
+          {MONTHS[viewMonth]} {viewYear}
         </span>
-        <button onClick={() => navMonth(1)}          style={{ ...calNavBtnStyle, fontWeight:900, color:GOLD }}>›</button>
-        <button onClick={() => setViewYear(y=>y+1)}  style={{ ...calNavBtnStyle, fontWeight:900, color:GOLD }}>»</button>
+        <button onClick={() => navMonth(1)}          style={calNavBtnStyle}>{isRtl ? <ChevronLeft   size={13} strokeWidth={2.5} /> : <ChevronRight  size={13} strokeWidth={2.5} />}</button>
+        <button onClick={() => setViewYear(y=>y+1)}  style={calNavBtnStyle}>{isRtl ? <ChevronsLeft  size={13} strokeWidth={2.5} /> : <ChevronsRight size={13} strokeWidth={2.5} />}</button>
       </div>
 
       {/* Mode tabs */}
-      <div style={{ display:'flex', borderBottom:`2px solid rgba(43,33,24,0.12)` }}>
+      <div style={{ display:'flex', borderBottom:`4px solid rgba(66,52,40,0.12)` }}>
         {['day','month'].map(m => (
           <button key={m} onClick={() => setMode(m)} style={{
             flex:1, padding:'7px', fontSize:11, fontWeight:800,
             textTransform:'uppercase', letterSpacing:'0.08em',
             background:'none', border:'none', cursor:'pointer',
             fontFamily:'inherit', color:DARK,
-            borderBottom: mode===m ? `2px solid ${DARK}` : 'none',
+            borderBottom: mode===m ? `4px solid ${DARK}` : 'none',
             marginBottom: mode===m ? -2 : 0,
           }}>
-            {m==='day' ? 'Jour' : 'Mois'}
+            {m==='day' ? t('day') : t('month')}
           </button>
         ))}
       </div>
@@ -117,18 +126,17 @@ export default function CalendarPopup({ filterDate, setFilterDate, onClose, anch
       {/* Day grid */}
       {mode === 'day' && (
         <div style={{ display:'grid', gridTemplateColumns:'repeat(7,1fr)', padding:'6px 8px 10px' }}>
-          {DAYS_FR.map(d => (
-            <div key={d} style={{ textAlign:'center', fontSize:10, fontWeight:800, color:GOLD_DARK, padding:'4px 0', letterSpacing:'0.06em' }}>{d}</div>
+          {DAYS.map(d => (
+            <div key={d} style={{ textAlign:'center', fontSize:10, fontWeight:800, color:LIGHT_BROWN_DARK, padding:'4px 0', letterSpacing:'0.06em' }}>{d}</div>
           ))}
           {cells.map((c,i) => (
             <div key={i} onClick={c.onClick}
               style={{
-                textAlign:'center', fontSize:11, borderRadius:0,
-                fontWeight: c.isSelected?900 : c.isToday?900 : 800,
-                color: c.isSelected?GOLD : c.isToday?GOLD : c.isOther?'#ddd' : DARK,
-                background: c.isSelected?DARK : c.isToday?GOLD_DARK : 'transparent',
-                border: c.isToday ? `1px solid ${GOLD}` : 'none',
-                padding:'6px 2px',
+                textAlign:'center', fontSize:12, borderRadius:2,
+                fontWeight: c.isSelected?800 : c.isToday?900 : 600,
+                color: c.isSelected?LIGHT_BROWN : c.isToday?LIGHT_BROWN_DARK : c.isOther?'rgba(66,52,40,0.2)' : DARK,
+                background: c.isSelected?DARK : 'transparent',
+                padding:'5px 2px',
                 cursor: c.isOther?'default':'pointer',
               }}
             >{c.content}</div>
@@ -139,21 +147,23 @@ export default function CalendarPopup({ filterDate, setFilterDate, onClose, anch
       {/* Month grid */}
       {mode === 'month' && (
         <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:4, padding:8 }}>
-          {MONTHS_FR.map((m,i) => {
+          {MONTHS.map((m,i) => {
             const isCurrent  = i===today.getMonth() && viewYear===today.getFullYear()
             const isSelected = selMonth && selMon===i && selYear===viewYear
             return (
               <div key={m} onClick={() => pickMonth(i)}
-                style={{ padding:'10px 4px', textAlign:'center', fontSize:11, cursor:'pointer', fontWeight:900, color:isSelected?GOLD:isCurrent?GOLD:DARK, background:isSelected?DARK:isCurrent?GOLD_DARK:'transparent', textTransform:'uppercase' }}
-              >{m.slice(0,3)}</div>
+                onMouseEnter={e => { if(!isSelected) e.currentTarget.style.background='#f5f0eb' }}
+                onMouseLeave={e => { e.currentTarget.style.background = isSelected?DARK:'transparent' }}
+                style={{ padding:'8px 4px', textAlign:'center', fontSize:12, cursor:'pointer', fontWeight:isSelected?800:isCurrent?900:700, color:isSelected?LIGHT_BROWN:isCurrent?LIGHT_BROWN_DARK:DARK, background:isSelected?DARK:'transparent', transition:'background 0.1s' }}
+              >{m.slice(0,4)}</div>
             )
           })}
         </div>
       )}
 
       {selFull && (
-        <div style={{ padding:'6px 10px', borderTop:`1px solid rgba(43,33,24,0.1)`, fontSize:11, fontWeight:700, color:DARK, background:'#faf8f5', textAlign:'center' }}>
-          {String(selDay).padStart(2,'0')} {MONTHS_FR[selMon]} {selYear}
+        <div style={{ padding:'6px 10px', borderTop:`1px solid rgba(66,52,40,0.1)`, fontSize:11, fontWeight:700, color:DARK, background:'#ffffff', textAlign:'center' }}>
+          {new Intl.DateTimeFormat(lang, { day:'2-digit', month:'long', year:'numeric' }).format(new Date(filterDate))}
         </div>
       )}
     </div>,

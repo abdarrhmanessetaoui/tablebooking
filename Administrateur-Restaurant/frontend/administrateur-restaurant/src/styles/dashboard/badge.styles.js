@@ -1,22 +1,32 @@
-import { GREEN, RED, AMBER, DARK } from './tokens'
+﻿import { GREEN, RED, AMBER, WHITE, RADIUS } from './tokens'
 
 // ── Status color map ──────────────────────────────────────────────
 export const STATUS_MAP = {
-  Confirmed: { label: 'Confirmée',  color: GREEN },
-  Pending:   { label: 'En attente', color: AMBER },
-  Cancelled: { label: 'Annulée',    color: RED   },
+  Confirmed: { color: WHITE, bg: GREEN },
+  Pending:   { color: WHITE, bg: AMBER },
+  Cancelled: { color: WHITE, bg: RED },
 }
 
 // ── Badge wrapper ─────────────────────────────────────────────────
-export const badge = (color) => ({
+export const badge = (color, bg) => ({
   display:       'inline-flex',
   alignItems:    'center',
-  padding:       '4px 12px',
-  background:    color,
-  fontSize:      10,
-  fontWeight:    900,
-  color:         DARK,
+  padding:       '4px 10px',
+  borderRadius:  RADIUS.sm,
+  fontSize:      11,
+  fontWeight:    800,
+  color:         color,
+  background:    bg,
+  textTransform: 'uppercase',
   letterSpacing: '0.04em',
   whiteSpace:    'nowrap',
 })
-
+
+// ── Dot ───────────────────────────────────────────────────────────
+export const dot = (color) => ({
+  width:        6,
+  height:       6,
+  borderRadius: '50%',
+  background:   color,
+  flexShrink:   0,
+})

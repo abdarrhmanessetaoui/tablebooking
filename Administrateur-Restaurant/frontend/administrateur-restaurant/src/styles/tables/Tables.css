@@ -1,0 +1,145 @@
+/* ─── Tables Page ──────────────────────────────────────────────── */
+
+.tables-page {
+  background: #ffffff;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  padding: clamp(20px, 3vw, 40px) clamp(20px, 4vw, 44px);
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 100vh;
+  overflow-x: hidden;
+  color: #2D2926;
+}
+
+/* ── Header ── */
+.tables-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+
+.tables-title {
+  margin: 0;
+  font-size: clamp(20px, 3.5vw, 28px);
+  font-weight: 800;
+  color: #2D2926;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  font-family: inherit;
+}
+
+.tables-header-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+/* ── Divider ── */
+.tables-divider {
+  display: none;
+}
+
+/* ── Error banner ── */
+.tables-error {
+  margin-bottom: 20px;
+  padding: 12px 16px;
+  background: #EF4444;
+  border: 1px solid #EF4444;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+/* ── Two-column layout ── */
+.tbl-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+}
+
+@media (min-width: 480px) {
+  .tbl-layout {
+    grid-template-columns: 320px 1fr;
+    gap: 24px;
+    align-items: start;
+  }
+
+  .tbl-form-sticky {
+    position: sticky;
+    top: 24px;
+  }
+}
+
+.tbl-left {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.tbl-section-title {
+  margin: 0 0 8px;
+  font-size: 15px;
+  font-weight: 800;
+  color: #2D2926;
+  font-family: inherit;
+}
+
+.tbl-right-header {
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.tbl-count-badge {
+  padding: 4px 10px;
+  background: #2D2926;
+  border: 1px solid #2D2926;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 900;
+  color: #ffffff;
+  letter-spacing: 0.02em;
+  flex-shrink: 0;
+}
+
+/* ── Timeline section ── */
+.tbl-timeline-separator {
+  margin: 40px 0 0;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.tbl-timeline-separator-line {
+  display: none;
+}
+
+.tbl-timeline-separator-label {
+  font-size: 11px;
+  font-weight: 800;
+  color: #C19A6B;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* ── Responsive ── */
+@media (min-width: 1024px) {
+  .tbl-layout {
+    grid-template-columns: 360px 1fr;
+    gap: 40px;
+    align-items: start;
+  }
+
+  .tbl-form-sticky {
+    position: sticky;
+    top: 24px;
+  }
+}

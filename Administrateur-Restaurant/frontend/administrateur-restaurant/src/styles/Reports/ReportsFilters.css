@@ -1,0 +1,86 @@
+/* styles/Reports/ReportsFilters.css */
+
+.rp-filters-wrap {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.rp-filters-date  { grid-column: 1 / -1; position: relative; }
+.rp-filters-clear { grid-column: 1 / -1; }
+
+@media (min-width: 640px) {
+  .rp-filters-wrap  { grid-template-columns: 1fr 1fr 1fr auto; }
+  .rp-filters-date  { grid-column: auto; }
+  .rp-filters-clear { grid-column: auto; }
+}
+
+/* Select */
+.rp-filter-select {
+  background: #fff;
+  border: 1px solid #E5E0DA;
+  padding: 10px 14px;
+  font-size: 13px;
+  font-weight: 800;
+  color: #2D2926;
+  font-family: inherit;
+  outline: none;
+  box-sizing: border-box;
+  width: 100%;
+  border-radius: 4px;
+  cursor: pointer;
+  -webkit-appearance: none;
+}
+
+/* Date button */
+.rp-date-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  padding: 10px 14px;
+  font-size: 13px;
+  font-weight: 900;
+  cursor: pointer;
+  font-family: inherit;
+  transition: none;
+  border-radius: 4px;
+}
+
+/* Date clear × */
+.rp-date-clear {
+  position: absolute;
+  right: 36px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px 6px;
+  display: flex;
+  align-items: center;
+  color: #2D2926;
+  z-index: 1;
+}
+
+/* Clear all button */
+.rp-clear-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 14px;
+  width: 100%;
+  background: #2D2926;
+  border: none;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 900;
+  color: #ffffff;
+  cursor: pointer;
+  font-family: inherit;
+  white-space: nowrap;
+  transition: none;
+}

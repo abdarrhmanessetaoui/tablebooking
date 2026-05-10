@@ -1,37 +1,32 @@
+﻿import { useTranslation } from 'react-i18next'
 import ResRow from './ResRow'
 import {
   tableWrapper, tableHeader, headerCell,
   rowsContainer, viewAllBtn,
   emptyWrapper, emptyInner, emptyTitle, emptySubtitle,
 } from '../../styles/dashboard/reservationsTable.styles'
-import { DARK, GOLD } from '../../styles/dashboard/tokens'
 
 // ── View all button ───────────────────────────────────────────────
 function ViewAllBtn({ onViewAll, tabLabel }) {
+  const { t } = useTranslation()
   return (
     <button
       onClick={onViewAll}
-      style={{
-        width: '100%', padding: '12px 16px',
-        background: DARK, border: `2px solid ${DARK}`,
-        color: GOLD, fontSize: 13, fontWeight: 900,
-        cursor: 'pointer', fontFamily: 'inherit',
-        textTransform: 'uppercase', letterSpacing: '0.05em',
-        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10
-      }}
+      style={viewAllBtn}
     >
-      <span>Toutes les réservations — {tabLabel}</span>
+      <span>{t('view_all_reservations')}</span>
     </button>
   )
 }
 
 // ── Empty state ───────────────────────────────────────────────────
 function EmptyState({ onViewAll, tabLabel }) {
+  const { t } = useTranslation()
   return (
     <div style={emptyWrapper}>
       <div style={emptyInner}>
-        <p style={{ ...emptyTitle, fontSize: 16, fontWeight: 900, marginBottom: 4 }}>AUCUNE RÉSERVATION</p>
-        <p style={emptySubtitle}>LES RÉSERVATIONS APPARAÎTRONT ICI</p>
+        <p style={emptyTitle}>{t('no_reservations')}</p>
+        <p style={emptySubtitle}>{t('reservations_will_appear_here')}</p>
       </div>
       <ViewAllBtn onViewAll={onViewAll} tabLabel={tabLabel} />
     </div>
@@ -46,17 +41,18 @@ export default function DashboardReservationsTable({
   onRowClick,
   showDate,
 }) {
+  const { t } = useTranslation()
   if (!reservations?.length) {
     return <EmptyState onViewAll={onViewAll} tabLabel={tabLabel} />
   }
 
   const COLS = [
-    ...(showDate ? [{ key: 'date',       label: 'Date',      flex: 1.1  }] : []),
-    { key: 'name',       label: 'Nom',       flex: 1.8  },
-    { key: 'start_time', label: 'Heure',     flex: 0.7  },
-    { key: 'guests',     label: 'Personnes', flex: 0.65 },
-    { key: 'service',    label: 'Service',   flex: 1.0  },
-    { key: 'status',     label: 'Statut',    flex: 1.1  },
+    ...(showDate ? [{ key: 'date',       label: t('date'),      flex: 1.1  }] : []),
+    { key: 'name',       label: t('name'),       flex: 2.0  },
+    { key: 'start_time', label: t('time'),     flex: 0.8  },
+    { key: 'guests',     label: t('guests'),     flex: 1.0 },
+    { key: 'service',    label: t('service'),   flex: 1.8  },
+    { key: 'status',     label: t('status'),    flex: 1.2  },
     { key: '_cta',       label: '',          flex: 0.3  },
   ]
   const tpl = COLS.map(c => `${c.flex}fr`).join(' ')

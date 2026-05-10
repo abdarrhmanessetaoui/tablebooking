@@ -1,22 +1,22 @@
 import { useState } from 'react'
-
+import { useTranslation } from 'react-i18next'
+import { Eye, Pencil, Trash2, CalendarDays, Clock3, Users, Utensils, User2, Phone } from 'lucide-react'
 import Checkbox        from './Checkbox'
 import ActionBtn       from './ActionBtn'
 import AssignTableCell from './AssignTableCell'
-import { DARK, GOLD, GOLD_DARK, CREAM, BORDER, STATUS_CONFIG } from '../../../styles/reservations/tokens'
+import { DARK, LIGHT_BROWN, LIGHT_BROWN_DARK, CREAM, BORDER, STATUS_CONFIG, WHITE } from '../../../styles/reservations/tokens'
 import { cellStyle }   from '../../../styles/reservations/table.styles'
 
 function trunc(str, max=14) {
-  if (!str) return '—'
+  if (!str) return ' '
   return str.length > max ? str.slice(0,max)+'…' : str
 }
 
 export default function TableRow({ r, i, selected, highlighted, highlightRef, toggleOne, openView, openEdit, handleDelete, onOpenAssign }) {
-  let rowBg = i % 2 === 0 ? '#fff' : CREAM
-  if (selected)    rowBg = '#fdf6ec'
-  if (highlighted) rowBg = '#fff8ec'
-  const bg = rowBg
-
+  const { t } = useTranslation()
+  const s = STATUS_CONFIG[r.status] || { bg:WHITE, color:DARK, label:r.status||' ', dot:LIGHT_BROWN }
+  const bg = highlighted ? '#FAF7F4' : selected ? '#FAF7F4' : WHITE
+  
   return (
     <tr
       ref={highlighted ? highlightRef : null}
@@ -24,8 +24,8 @@ export default function TableRow({ r, i, selected, highlighted, highlightRef, to
       onClick={() => toggleOne(r.id)}
       style={{
         background: bg,
-        borderBottom: `2px solid ${DARK}`,
-        borderLeft: highlighted ? `6px solid ${GOLD}` : selected ? `6px solid ${GOLD}` : '6px solid transparent',
+        borderBottom: `1px solid ${BORDER}`,
+        transition: 'none',
         cursor: 'pointer',
       }}
     >
@@ -33,55 +33,48 @@ export default function TableRow({ r, i, selected, highlighted, highlightRef, to
         <Checkbox checked={selected} onChange={() => toggleOne(r.id)} />
       </td>
       <td style={cellStyle}>
-        <div style={{ display:'flex', alignItems:'center', gap:5 }}>
-          <span style={{ fontSize: 8, fontWeight: 900, color: GOLD, marginRight: 2 }}>NOM:</span>
-          <span style={{ fontSize:12, fontWeight:900, color:DARK, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap', maxWidth:100 }}>
-            {r.name||'—'}
-          </span>
-        </div>
-      </td>
-      <td style={cellStyle}>
-        <span style={{ display:'inline-flex', alignItems:'center', gap:4, fontSize:11, fontWeight:700, color:DARK, whiteSpace:'nowrap' }}>
-          <span style={{ fontSize: 8, fontWeight: 900, color: GOLD, marginRight: 2 }}>TÉL:</span>
-          {r.phone||'—'}
+        <span style={{ fontSize:12, fontWeight:900, color:highlighted?LIGHT_BROWN:DARK, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap', maxWidth:100 }}>
+          {r.name||' '}
         </span>
       </td>
       <td style={cellStyle}>
-        <span style={{ display:'inline-flex', alignItems:'center', gap:4, fontSize:11, fontWeight:700, color:DARK, whiteSpace:'nowrap' }}>
-          <span style={{ fontSize: 8, fontWeight: 900, color: GOLD, marginRight: 2 }}>DATE:</span>
-          {r.date||'—'}
+        <span style={{ fontSize:11, fontWeight:800, color:DARK, whiteSpace:'nowrap' }}>
+          {r.phone||' '}
         </span>
       </td>
       <td style={cellStyle}>
-        <span style={{ display:'inline-flex', alignItems:'center', gap:4, padding:'3px 7px', background:DARK, fontSize:11, fontWeight:900, color:GOLD, whiteSpace:'nowrap' }}>
-          {r.start_time||'—'}
+        <span style={{ fontSize:11, fontWeight:800, color:DARK, whiteSpace:'nowrap' }}>
+          {r.date||' '}
         </span>
       </td>
       <td style={cellStyle}>
-        <span style={{ display:'inline-flex', alignItems:'center', gap:4, fontSize:11, fontWeight:700, color:DARK, whiteSpace:'nowrap' }}>
-          <span style={{ fontSize: 8, fontWeight: 900, color: GOLD, marginRight: 2 }}>PERS:</span>
-          {r.guests||'—'}
+        <span style={{ display:'inline-flex', padding:'3px 0', fontSize:11, fontWeight:800, color:LIGHT_BROWN, whiteSpace:'nowrap' }}>
+          {r.start_time||' '}
         </span>
       </td>
       <td style={cellStyle}>
-        <span style={{ display:'inline-flex', alignItems:'center', gap:4, padding:'3px 7px', background:DARK, fontSize:11, fontWeight:900, color:GOLD, maxWidth:110, overflow:'hidden' }}>
-          <span style={{ overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{r.service||'—'}</span>
+        <span style={{ fontSize:11, fontWeight:800, color:DARK, whiteSpace:'nowrap' }}>
+          {r.guests||' '}
+        </span>
+      </td>
+      <td style={cellStyle}>
+        <span style={{ display:'inline-flex', padding:'3px 0', fontSize:11, fontWeight:800, color:LIGHT_BROWN, maxWidth:110, overflow:'hidden' }}>
+          <span style={{ overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{r.service||' '}</span>
         </span>
       </td>
       <td style={cellStyle} onClick={e => e.stopPropagation()}>
         <AssignTableCell r={r} onOpenAssign={onOpenAssign} />
       </td>
       <td style={cellStyle}>
-        <span style={{ display:'inline-flex', alignItems:'center', gap:4, padding:'3px 8px', background:s.bg, fontSize:10, fontWeight:800, color:s.color, whiteSpace:'nowrap' }}>
-          <span style={{ width:5, height:5, borderRadius:'50%', background:s.dot, flexShrink:0 }} />
-          {s.label}
+        <span style={{ display:'inline-flex', alignItems:'center', padding:'3px 8px', background:s.bg, fontSize:10, fontWeight:900, color:s.color, whiteSpace:'nowrap', borderRadius: 2 }}>
+          {t(`status_${(r.status || 'pending').toLowerCase()}`)}
         </span>
       </td>
       <td style={{ ...cellStyle, padding:'9px 10px' }}>
         <div style={{ display:'flex', gap:3 }}>
-          <ActionBtn icon={Eye}    title="Voir"      onClick={() => openView(r)} />
-          <ActionBtn icon={Pencil} title="Modifier"  onClick={() => openEdit(r)} />
-          <ActionBtn icon={Trash2} title="Supprimer" onClick={() => handleDelete(r.id)} danger />
+          <ActionBtn icon={Eye}    title={t('view_btn')}      onClick={() => openView(r)} />
+          <ActionBtn icon={Pencil} title={t('edit_btn')}  onClick={() => openEdit(r)} />
+          <ActionBtn icon={Trash2} title={t('delete_btn')} onClick={() => handleDelete(r.id)} danger />
         </div>
       </td>
     </tr>

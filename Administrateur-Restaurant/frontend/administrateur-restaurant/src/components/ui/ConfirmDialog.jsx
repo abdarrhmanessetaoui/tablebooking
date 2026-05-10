@@ -1,7 +1,9 @@
-
-
-const DARK = '#2b2118'
-const GOLD = '#c8a97e'
+﻿import { useState, useEffect, useCallback } from 'react'
+import { AlertCircle, Trash2, X } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
+import {
+  DARK, LIGHT_BROWN, WHITE, BORDER, RADIUS, DARK_LIGHT
+} from '../../styles/dashboard/tokens'
 
 let _show = null
 export function confirm(options) {
@@ -11,6 +13,7 @@ export function confirm(options) {
 }
 
 export default function ConfirmDialog() {
+  const { t } = useTranslation()
   const [dialog, setDialog] = useState(null)
 
   const show = useCallback((d) => setDialog(d), [])
@@ -28,67 +31,76 @@ export default function ConfirmDialog() {
   return (
     <div style={{
       position: 'fixed', inset: 0, zIndex: 9998,
-      background: '#1a120b',
+      background: 'rgba(66,52,40,0.3)',
       display: 'flex', alignItems: 'center', justifyContent: 'center',
       padding: 16,
-      fontFamily: "'Plus Jakarta Sans','DM Sans',system-ui,sans-serif",
+      animation: 'fadeIn 0.15s ease',
+      fontFamily: "'Inter', sans-serif",
     }}>
-
+      <style>{`
+        @keyframes fadeIn { from{opacity:0} to{opacity:1} }
+        @keyframes popIn  { from{opacity:0;transform:scale(0.98)} to{opacity:1;transform:scale(1)} }
+      `}</style>
 
       <div style={{
-        background: '#fff', width: '100%', maxWidth: 400,
-        border: `3px solid ${DARK}`,
+        background: WHITE, width: '100%', maxWidth: 400,
+        borderRadius: RADIUS.sm,
+        border: `1px solid ${BORDER}`,
+        animation: 'popIn 0.18s ease',
         overflow: 'hidden',
       }}>
         {/* Header */}
-        <div style={{ background: DARK, padding: '18px 22px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <span style={{ fontSize: 14, fontWeight: 900, color: '#fff', letterSpacing: '-0.3px', textTransform: 'uppercase' }}>
-            {dialog.title || 'Confirmation'}
-          </span>
+        <div style={{ padding: '20px 24px 12px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            {isDanger
+              ? <Trash2 size={16} color="#DC2626" strokeWidth={2.5} />
+              : <AlertCircle size={16} color={LIGHT_BROWN} strokeWidth={2.5} />
+            }
+            <span style={{ fontSize: 16, fontWeight: 700, color: DARK }}>
+              {dialog.title || t('confirmation')}
+            </span>
+          </div>
           <button onClick={() => handle(false)} style={{
-            background: 'none', border: `1px solid ${GOLD}`,
-            padding: '4px 10px',
-            fontSize: 10, fontWeight: 900,
-            cursor: 'pointer', color: GOLD,
-            textTransform: 'uppercase', letterSpacing: '0.05em',
-            fontFamily: 'inherit'
+            background: 'none', border: 'none',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            cursor: 'pointer', color: DARK_LIGHT,
           }}>
-            Fermer
+            <X size={18} strokeWidth={2.5} />
           </button>
         </div>
 
         {/* Body */}
-        <div style={{ padding: '22px 22px 18px' }}>
-          <p style={{ margin: 0, fontSize: 14, fontWeight: 600, color: DARK, lineHeight: 1.6 }}>
+        <div style={{ padding: '0 24px 24px' }}>
+          <p style={{ margin: 0, fontSize: 14, fontWeight: 500, color: DARK_LIGHT, lineHeight: 1.6 }}>
             {dialog.message}
           </p>
           {dialog.sub && (
-            <p style={{ margin: '8px 0 0', fontSize: 12, fontWeight: 600, color: '#aaa' }}>
+            <p style={{ margin: '8px 0 0', fontSize: 12, fontWeight: 500, color: DARK_LIGHT, opacity: 0.7 }}>
               {dialog.sub}
             </p>
           )}
         </div>
 
         {/* Actions */}
-        <div style={{ padding: '0 22px 20px', display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
+        <div style={{ padding: '0 24px 24px', display: 'flex', gap: 12, justifyContent: 'flex-end' }}>
           <button onClick={() => handle(false)} style={{
-            padding: '12px 24px', background: '#F5F5F5', border: 'none',
-            fontSize: 12, fontWeight: 900, color: DARK,
+            padding: '10px 16px', background: WHITE, border: `1px solid ${BORDER}`,
+            borderRadius: RADIUS.sm,
+            fontSize: 13, fontWeight: 600, color: DARK,
             cursor: 'pointer', fontFamily: 'inherit',
-            textTransform: 'uppercase', letterSpacing: '0.05em'
           }}>
-            Annuler
+            {dialog.cancelLabel || t('cancel_btn')}
           </button>
           <button onClick={() => handle(true)} style={{
-            padding: '12px 24px',
-            background: isDanger ? '#FF0000' : DARK,
+            padding: '10px 16px',
+            background: isDanger ? '#DC2626' : DARK,
             border: 'none',
-            fontSize: 12, fontWeight: 900,
-            color: isDanger ? '#fff' : GOLD,
+            borderRadius: RADIUS.sm,
+            fontSize: 13, fontWeight: 600,
+            color: WHITE,
             cursor: 'pointer', fontFamily: 'inherit',
-            textTransform: 'uppercase', letterSpacing: '0.05em'
           }}>
-            {dialog.confirmLabel || 'Confirmer'}
+            {dialog.confirmLabel || t('confirm_btn')}
           </button>
         </div>
       </div>

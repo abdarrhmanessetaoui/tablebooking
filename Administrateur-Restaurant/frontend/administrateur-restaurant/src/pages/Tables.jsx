@@ -1,115 +1,72 @@
+import { useState, useEffect }               from 'react'
+import { FileDown }               from 'lucide-react'
+import { useTranslation }         from 'react-i18next'
+import FadeUp                     from '../components/Dashboard/FadeUp'
+import Spinner                    from '../components/Dashboard/Spinner'
+import TableForm                  from '../components/Tables/TableForm'
+import TableList                  from '../components/Tables/TableList'
+import TableTimeline              from '../components/Tables/TableTimeline'
+import TableLocationsManager      from '../components/Tables/TableLocationsManager'
+import Btn                        from '../components/Dashboard/Btn'
+import '../styles/tables/Tables.css'
+import useTables                  from '../hooks/Tables/useTables'
+import useTableLocations          from '../hooks/Tables/useTableLocations'
+import { confirm }                from '../components/ui/ConfirmDialog'
+import { toast }                  from '../components/ui/Toast'
+import { exportPDF }              from '../utils/export'
+import { apiPath, getHeaders } from '../utils/api'
+import {
+  page, header, headerLeft, h1, subtitle, divider, errorBanner
+} from '../styles/dashboard/dashboard.styles'
+import {
+  DARK, LIGHT_BROWN, WHITE, RADIUS
+} from '../styles/dashboard/tokens'
 
-import FadeUp                from '../components/Dashboard/FadeUp'
-import Spinner               from '../components/Dashboard/Spinner'
-import TableForm             from '../components/Tables/TableForm'
-import TableList             from '../components/Tables/TableList'
-import TableTimeline         from '../components/Tables/TableTimeline'
-import TableLocationsManager from '../components/Tables/TableLocationsManager'
-import useTables             from '../hooks/Tables/useTables'
-import useTableLocations     from '../hooks/Tables/useTableLocations'
-import { confirm }           from '../components/ui/ConfirmDialog'
-import { toast }             from '../components/ui/Toast'
-import { getToken }          from '../utils/auth'
+const API = apiPath('tables')
 
-const DARK    = '#2b2118'
-const GOLD    = '#c8a97e'
-const GOLD_DK = '#a8834e'
-const RED     = '#b94040'
-const RED_BG  = '#fdf0f0'
-const CREAM   = '#faf8f5'
-
-const API  = 'http://localhost:8000/api/tables'
-const hdrs = () => ({
-  'Content-Type': 'application/json', 'Accept': 'application/json',
-  'Authorization': `Bearer ${getToken()}`,
-})
-
-function Btn({ children, onClick, primary, disabled }) {
-  return (
-    <button onClick={onClick} disabled={disabled}
-      style={{
-        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-        padding: '10px 16px', background: DARK, border: 'none', color: GOLD,
-        fontSize: 13, fontWeight: 900,
-        cursor: disabled ? 'not-allowed' : 'pointer',
-        opacity: disabled ? 0.5 : 1,
-        fontFamily: 'inherit', whiteSpace: 'nowrap', minHeight: 40,
-      }}>
-      <span className="btn-label">{children}</span>
-    </button>
-  )
-}
-
-function BulkBar({ count, onDelete, onActivate, onDeactivate, onClear }) {
+function BulkBar({ count, onDelete, onClear }) {
+  const { t, i18n } = useTranslation()
+  const isAr = i18n.language === 'ar'
+  
   return (
     <div style={{
-      position: 'sticky', top: 8, zIndex: 30,
-      display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap',
-      padding: '10px 12px', background: DARK,
-      marginBottom: 12, border: `2px solid ${GOLD}`,
+      display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap',
+      padding: '12px 16px',
+      background: LIGHT_BROWN,
+      marginBottom: 16,
+      borderRadius: RADIUS.sm,
+      color: WHITE,
+      direction: isAr ? 'rtl' : 'ltr'
     }}>
-      <style>{`
-        @media (max-width: 480px) { .bulk-label { display: none !important; } }
-      `}</style>
-
-      <span style={{
-        display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-        minWidth: 26, height: 26, background: GOLD, color: DARK,
-        fontSize: 12, fontWeight: 900, padding: '0 7px', flexShrink: 0,
-      }}>{count}</span>
-      <span className="bulk-label" style={{ fontSize: 12, fontWeight: 700, color: '#fff', marginRight: 2 }}>
-        sélectionnée{count > 1 ? 's' : ''}
-      </span>
-
-      <div style={{ width: 1, height: 20, background: '#3d2d1e', margin: '0 4px', flexShrink: 0 }} />
-
-      <button onClick={onActivate} style={{
-        padding: '7px 12px',
-        background: '#00A651', border: 'none',
-        color: '#fff', fontSize: 11, fontWeight: 900, cursor: 'pointer', fontFamily: 'inherit',
-        flexShrink: 0, minHeight: 34, textTransform: 'uppercase'
-      }}
-      >
-        ACTIVER
-      </button>
-
-      <button onClick={onDeactivate} style={{
-        padding: '7px 12px',
-        background: GOLD, border: 'none',
-        color: DARK, fontSize: 11, fontWeight: 900, cursor: 'pointer', fontFamily: 'inherit',
-        flexShrink: 0, minHeight: 34, textTransform: 'uppercase'
-      }}
-      >
-        DÉSACTIVER
-      </button>
-
       <button onClick={onDelete}
         style={{
-          padding: '7px 12px',
-          background: '#FF0000',
-          border: 'none',
-          color: '#fff',
-          fontSize: 11, fontWeight: 900, cursor: 'pointer', fontFamily: 'inherit',
-          flexShrink: 0, minHeight: 34, textTransform: 'uppercase'
-        }}>
-        SUPPRIMER
+          padding: '4px 12px', background: '#EF4444', border: '1px solid #EF4444',
+          color: WHITE, fontSize: 11, fontWeight: 900,
+          cursor: 'pointer', borderRadius: RADIUS.sm, fontFamily: 'inherit',
+          textTransform: 'uppercase', transition: 'all 0.2s'
+        }}
+      >
+        {t('tables_module.delete')}
       </button>
 
-      <button onClick={onClear} style={{
-        marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 5,
-        padding: '7px 10px', background: 'none', border: '1px solid #3d2d1e',
-        color: GOLD, fontSize: 12, fontWeight: 700,
-        cursor: 'pointer', fontFamily: 'inherit', flexShrink: 0, minHeight: 34,
-      }}
+      <button onClick={onClear}
+        className="tbl-list__banner-action"
+        style={{
+          marginLeft: isAr ? '0' : 'auto', 
+          marginRight: isAr ? 'auto' : '0',
+          padding: '4px 12px',
+          fontSize: 11, fontWeight: 900,
+          fontFamily: 'inherit'
+        }}
       >
-        <span style={{ fontSize: 16, lineHeight: 1 }}>✕</span>
-        <span className="bulk-label">Désélectionner</span>
+        {t('tables_module.deselect_all')}
       </button>
     </div>
   )
 }
 
 export default function Tables() {
+  const { t } = useTranslation()
   const {
     tables, loading, error,
     editingTbl, setEditingTbl,
@@ -117,28 +74,35 @@ export default function Tables() {
     setTables,
   } = useTables()
 
-  // ── Locations — fetched once, shared between TableForm & TableLocationsManager
-  const { locations, loading: locLoading, saving: locSaving, handleAdd, handleUpdate, handleDelete: handleDeleteLoc } = useTableLocations()
+  const {
+    locations, loading: locLoading, saving: locSaving,
+    handleAdd, handleUpdate, handleDelete: handleDeleteLoc,
+  } = useTableLocations()
 
   const [selectedTables, setSelectedTables] = useState([])
   const [exporting,      setExporting]      = useState(false)
 
+  // ── Bulk handlers ──────────────────────────────────────────────
   async function handleBulkDelete() {
     const ok = await confirm({
-      title: 'Supprimer la sélection',
-      message: `Voulez-vous supprimer ${selectedTables.length} table${selectedTables.length > 1 ? 's' : ''} ?`,
-      confirmLabel: 'Supprimer', type: 'danger',
+      title:        t('tables_module.delete_selection_title'),
+      message:      t('tables_module.delete_selection_msg', {
+        count: selectedTables.length,
+        plural: selectedTables.length > 1 ? 's' : '',
+      }),
+      confirmLabel: t('tables_module.delete'),
+      type:         'danger',
     })
     if (!ok) return
     try {
-      await Promise.all(selectedTables.map(idx =>
-        fetch(`${API}/${idx}`, { method: 'DELETE', headers: hdrs() })
-      ))
+      await Promise.all(
+        selectedTables.map(idx => fetch(`${API}/${idx}`, { method: 'DELETE', headers: getHeaders() }))
+      )
       setTables(prev => prev.filter(t => !selectedTables.includes(t.idx)))
-      toast(`${selectedTables.length} table${selectedTables.length > 1 ? 's supprimées' : ' supprimée'}`, 'warning')
+      toast(t('tables_module.tables_deleted', { count: selectedTables.length, plural: selectedTables.length > 1 ? 's' : '' }), 'warning')
       setSelectedTables([])
     } catch {
-      toast('Erreur lors de la suppression', 'error')
+      toast(t('tables_module.error_deleting'), 'error')
       setSelectedTables([])
     }
   }
@@ -148,13 +112,13 @@ export default function Tables() {
       await Promise.all(
         selectedTables
           .filter(idx => !tables.find(t => t.idx === idx)?.active)
-          .map(idx => fetch(`${API}/${idx}/toggle`, { method: 'PATCH', headers: hdrs() }))
+          .map(idx => fetch(`${API}/${idx}/toggle`, { method: 'PATCH', headers: getHeaders() }))
       )
       setTables(prev => prev.map(t => selectedTables.includes(t.idx) ? { ...t, active: true } : t))
-      toast(`${selectedTables.length} table${selectedTables.length > 1 ? 's activées' : ' activée'}`, 'success')
+      toast(t('tables_module.tables_activated', { count: selectedTables.length, plural: selectedTables.length > 1 ? 's' : '' }), 'success')
       setSelectedTables([])
     } catch {
-      toast("Erreur lors de l'activation", 'error')
+      toast(t('tables_module.error_status_change'), 'error')
       setSelectedTables([])
     }
   }
@@ -164,13 +128,13 @@ export default function Tables() {
       await Promise.all(
         selectedTables
           .filter(idx => tables.find(t => t.idx === idx)?.active)
-          .map(idx => fetch(`${API}/${idx}/toggle`, { method: 'PATCH', headers: hdrs() }))
+          .map(idx => fetch(`${API}/${idx}/toggle`, { method: 'PATCH', headers: getHeaders() }))
       )
       setTables(prev => prev.map(t => selectedTables.includes(t.idx) ? { ...t, active: false } : t))
-      toast(`${selectedTables.length} table${selectedTables.length > 1 ? 's désactivées' : ' désactivée'}`, 'warning')
+      toast(t('tables_module.tables_deactivated', { count: selectedTables.length, plural: selectedTables.length > 1 ? 's' : '' }), 'warning')
       setSelectedTables([])
     } catch {
-      toast('Erreur lors de la désactivation', 'error')
+      toast(t('tables_module.error_status_change'), 'error')
       setSelectedTables([])
     }
   }
@@ -178,123 +142,58 @@ export default function Tables() {
   async function handleExport() {
     setExporting(true)
     try {
-      if (!window.jspdf) await new Promise((res, rej) => {
-        const s = document.createElement('script')
-        s.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js'
-        s.onload = res; s.onerror = rej; document.head.appendChild(s)
-      })
-      const { jsPDF } = window.jspdf
-      const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' })
-      const dateStr = new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
-      doc.setFillColor(43,33,24); doc.rect(0,0,210,32,'F')
-      doc.setFont('helvetica','bold'); doc.setFontSize(18); doc.setTextColor(200,169,126)
-      doc.text('TableBooking.ma',20,14)
-      doc.setFontSize(9); doc.setTextColor(255,255,255); doc.text('Tables',20,22)
-      doc.setTextColor(200,169,126); doc.setFontSize(8); doc.text(dateStr,190,22,{align:'right'})
-      doc.setTextColor(43,33,24); doc.setFontSize(20); doc.text('Tables',20,48)
-      doc.setFontSize(10); doc.setTextColor(200,169,126)
-      doc.text(`${tables.length} table${tables.length!==1?'s':''}`,20,56)
-      doc.setDrawColor(43,33,24); doc.setLineWidth(0.5); doc.line(20,61,190,61)
-      let y = 70
-      doc.setFillColor(43,33,24); doc.rect(20,y,170,9,'F')
-      doc.setTextColor(200,169,126); doc.setFontSize(8); doc.setFont('helvetica','bold')
-      doc.text('TABLE',24,y+6); doc.text('CAPACITÉ',80,y+6); doc.text('EMPLACEMENT',120,y+6); doc.text('STATUT',170,y+6)
-      y += 9
-      tables.forEach((t,i) => {
-        if (y>270) { doc.addPage(); y=20 }
-        doc.setFillColor(i%2===0?255:250,i%2===0?255:248,i%2===0?255:245); doc.rect(20,y,170,9,'F')
-        doc.setTextColor(43,33,24); doc.setFontSize(9); doc.setFont('helvetica','normal')
-        doc.text(`Table ${t.number}`,24,y+6)
-        doc.text(`${t.capacity} Personnes`,80,y+6)
-        doc.text(t.location||'—',120,y+6)
-        doc.text(t.active?'Active':'Inactive',170,y+6)
-        y+=9
-      })
-      const pH = doc.internal.pageSize.height
-      doc.setFillColor(200,169,126); doc.rect(0,pH-10,210,10,'F')
-      doc.setTextColor(43,33,24); doc.setFontSize(7); doc.setFont('helvetica','bold')
-      doc.text('TableBooking.ma',20,pH-4); doc.text(dateStr,190,pH-4,{align:'right'})
-      doc.save(`tables_${new Date().toISOString().slice(0,10)}.pdf`)
-    } catch(e) { console.error(e) } finally { setExporting(false) }
+      await exportPDF(null, tables, t('tables_module.title'))
+    } catch (e) {
+      console.error(e)
+    } finally {
+      setExporting(false)
+    }
   }
 
-  if (loading) return <Spinner />
+  useEffect(() => { if (!loading) window.dispatchEvent(new CustomEvent("app-ready")) }, [loading]); if (loading) return <Spinner fullPage />
 
   return (
     <>
-      <style>{`
-        @media (max-width: 480px) {
-          .btn-label { display: none !important; }
-          .page-subtitle { display: none !important; }
-        }
-        .tbl-layout { display: grid; grid-template-columns: 1fr; gap: 0; }
-        @media (min-width: 960px) {
-          .tbl-layout      { grid-template-columns: 380px 1fr; gap: 48px; align-items: start; }
-          .tbl-form-sticky { position: sticky; top: 24px; }
-          .tbl-mob-divider { display: none !important; }
-        }
-        @media (max-width: 600px) { button { min-height: 40px; } }
-      `}</style>
-
-      <div style={{
-        background: '#FFFFFF',
-        fontFamily: "'Plus Jakarta Sans','DM Sans',system-ui,sans-serif",
-        padding: 'clamp(14px,3vw,40px) clamp(12px,4vw,36px)',
-        boxSizing: 'border-box', width: '100%', overflowX: 'hidden',
-      }}>
-        <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800;900&display=swap" rel="stylesheet" />
-
+      <div style={page}>
         <FadeUp delay={0}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, marginBottom: 8, flexWrap: 'wrap' }}>
-            <div style={{ minWidth: 0, flex: 1 }}>
-              <h1 style={{ margin: 0, fontSize: 'clamp(20px,5vw,36px)', fontWeight: 900, color: DARK, letterSpacing: '-1.5px', lineHeight: 1 }}>
-                Tables
-              </h1>
+          <div style={header}>
+            <div style={headerLeft}>
+              <h1 style={h1}>{t('tables_module.title')}</h1>
             </div>
-            <div style={{ display: 'flex', gap: 3, flexShrink: 0 }}>
-              <Btn primary onClick={handleExport} disabled={exporting}>
-                {exporting ? 'Génération…' : 'Exporter PDF'}
+            <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
+              <Btn icon={FileDown} onClick={handleExport} disabled={exporting}>
+                {exporting ? t('tables_module.export_generating') : t('tables_module.export_pdf')}
               </Btn>
             </div>
           </div>
         </FadeUp>
 
-        <FadeUp delay={10}>
-          <div style={{ height: 2, background: DARK, margin: '16px 0 28px' }} />
-        </FadeUp>
+        <div style={divider} />
 
         {error && (
-          <FadeUp delay={15}>
-            <div style={{ marginBottom: 20, padding: '11px 16px', background: RED_BG, borderLeft: `3px solid ${RED}`, fontSize: 12, fontWeight: 700, color: RED }}>
-              {error}
-            </div>
+          <FadeUp delay={10}>
+            <div style={errorBanner}>{error}</div>
           </FadeUp>
         )}
 
-        {selectedTables.length > 0 && (
-          <BulkBar
-            count={selectedTables.length}
-            onDelete={handleBulkDelete}
-            onActivate={handleBulkActivate}
-            onDeactivate={handleBulkDeactivate}
-            onClear={() => setSelectedTables([])}
-          />
-        )}
 
+
+        {selectedTables.length > 0 && (
+          <FadeUp delay={0}>
+            <BulkBar
+              count={selectedTables.length}
+              onDelete={handleBulkDelete}
+              onActivate={handleBulkActivate}
+              onDeactivate={handleBulkDeactivate}
+              onClear={() => setSelectedTables([])}
+            />
+          </FadeUp>
+        )}
         <FadeUp delay={20}>
           <div className="tbl-layout">
-
-            {/* ── Left column: form + locations manager ── */}
-            <div className="tbl-form-sticky" style={{ minWidth: 0, display: 'flex', flexDirection: 'column', gap: 24 }}>
-
-              {/* Table form */}
+            <div className="tbl-left tbl-form-sticky">
               <div>
-                <h2 style={{ margin: '0 0 5px', fontSize: 'clamp(15px,2.5vw,22px)', fontWeight: 900, color: DARK, letterSpacing: '-0.8px' }}>
-                  {editingTbl ? 'Modifier la table' : 'Ajouter une table'}
-                </h2>
-                <p className="page-subtitle" style={{ margin: '0 0 16px', fontSize: 12, fontWeight: 700, color: GOLD_DK }}>
-                  
-                </p>
+
                 <TableForm
                   key={editingTbl?.idx ?? 'new'}
                   initial={editingTbl
@@ -308,8 +207,6 @@ export default function Tables() {
                   locations={locations}
                 />
               </div>
-
-              {/* Locations manager */}
               <TableLocationsManager
                 locations={locations}
                 loading={locLoading}
@@ -318,20 +215,10 @@ export default function Tables() {
                 onUpdate={handleUpdate}
                 onDelete={handleDeleteLoc}
               />
-
             </div>
 
-            {/* ── Right column: table list ── */}
-            <div>
-              <div className="tbl-mob-divider" style={{ height: 2, background: DARK, margin: '32px 0 28px' }} />
-              <div style={{ marginBottom: 16, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
-                <h2 style={{ margin: 0, fontSize: 'clamp(15px,2.5vw,22px)', fontWeight: 900, color: DARK, letterSpacing: '-0.8px' }}>
-                  Tables configurées
-                </h2>
-                <span style={{ padding: '4px 10px', background: DARK, fontSize: 11, fontWeight: 900, color: GOLD, letterSpacing: '0.05em', flexShrink: 0 }}>
-                  {tables.length}
-                </span>
-              </div>
+            <div className="tbl-right">
+
               <TableList
                 tables={tables}
                 editingTbl={editingTbl}
@@ -342,22 +229,15 @@ export default function Tables() {
                 setSelectedTables={setSelectedTables}
               />
             </div>
-
           </div>
         </FadeUp>
 
-        {/* ── Timeline ── */}
         <FadeUp delay={50}>
-          <div style={{ margin: '40px 0 0', display: 'flex', alignItems: 'center', gap: 14 }}>
-            <div style={{ height: 2, background: DARK, flex: 1 }} />
-            <span style={{ fontSize: 9, fontWeight: 900, color: DARK, letterSpacing: '0.2em', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>
-              Occupation des tables
-            </span>
-            <div style={{ height: 2, background: DARK, flex: 1 }} />
+          <div className="tbl-timeline-separator" style={{ margin: '40px 0 20px' }}>
+            <div className="tbl-timeline-separator-line" style={{ display: 'block', height: '1px', background: '#E5E0DA', width: '100%' }} />
           </div>
           <TableTimeline />
         </FadeUp>
-
       </div>
     </>
   )

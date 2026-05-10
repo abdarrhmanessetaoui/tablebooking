@@ -1,14 +1,16 @@
 import { useState, useEffect, useRef } from 'react'
+import { useTranslation } from 'react-i18next'
 import DesktopTable    from './DesktopTable'
 import MobileCards     from './MobileCards'
 import Pagination      from './Pagination'
 import AssignTableModal from '../AssignTableModal'
-import { DARK, GOLD, GOLD_DARK, CREAM, BORDER, GREEN } from '../../../styles/reservations/tokens'
+import { DARK, LIGHT_BROWN, DARK_LIGHT, WHITE, BORDER, RADIUS } from '../../../styles/dashboard/tokens'
 
 export default function ReservationsTable({
   reservations, openView, openEdit, handleDelete,
   selectedIds, setSelectedIds, highlightId, onTableAssigned,
 }) {
+  const { t, i18n } = useTranslation()
   const [page,         setPage]         = useState(1)
   const [pageSize,     setPageSize]     = useState(25)
   const [assignTarget, setAssignTarget] = useState(null)
@@ -54,36 +56,52 @@ export default function ReservationsTable({
           .res-table-wrap { display:none; }
           .res-cards-wrap { display:block; }
         }
-        @keyframes pulse-gold {
-          0%,100%{ box-shadow:inset 3px 0 0 ${GOLD},0 0 0 3px ${GOLD}33; }
-          50%    { box-shadow:inset 3px 0 0 ${GOLD},0 0 0 6px ${GOLD}11; }
+        .row-highlighted { background: rgba(193, 154, 107, 0.05) !important; }
+        
+        .tbl-list__banner {
+          background: #C19A6B;
+          color: #ffffff;
+          padding: 10px 16px;
+          display: flex;
+          align-items: center;
+          gap: 16px;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
-        .row-highlighted { animation:pulse-gold 1.8s ease 2; }
+        .tbl-list__banner--green { background: #51a351; }
+        .tbl-list__banner-text { font-size: 13px; font-weight: 900; flex-grow: 1; }
+        .tbl-list__banner-action {
+          background: #ffffff; border: none; color: #C19A6B;
+          padding: 6px 14px; border-radius: 4px; font-size: 11px;
+          font-weight: 900; cursor: pointer; text-transform: uppercase;
+          transition: opacity 0.2s ease; font-family: inherit;
+          line-height: 1; display: inline-flex; align-items: center; justify-content: center;
+        }
+        .tbl-list__banner-action:hover { opacity: 0.95; }
       `}</style>
 
-      <div style={{ background:'#fff', border:`1px solid ${BORDER}`, fontFamily:"'Plus Jakarta Sans','DM Sans',system-ui,sans-serif" }}>
+      <div style={{ background: WHITE, border:`1px solid ${BORDER}`, borderRadius: RADIUS.sm, overflow: 'hidden' }}>
 
-        {/* Selection banners */}
-        {someSelected && (
-          <div style={{ padding:'9px 16px', background:'#fdf6ec', borderBottom:`1px solid #e8d8b0`, display:'flex', alignItems:'center', justifyContent:'space-between', gap:8, flexWrap:'wrap' }}>
-            <span style={{ fontSize:12, fontWeight:700, color:GOLD_DARK }}>{selectedIds.length} sélectionné{selectedIds.length>1?'s':''}</span>
-            <button onClick={toggleAll} style={{ background:'none', border:'none', cursor:'pointer', fontSize:12, fontWeight:800, color:DARK, textDecoration:'underline', fontFamily:'inherit', padding:0 }}>
-              Sélectionner les {reservations.length} réservations
+        {/* Partial selection banner */}
+        {selectedIds.length > 0 && !allSelected && (
+          <div className="tbl-list__banner">
+            <button onClick={toggleAll} className="tbl-list__banner-action">
+              {i18n.language === 'ar' ? 'تحديد الكل' : 'TOUT SÉLECTIONNER'}
             </button>
           </div>
         )}
+
+        {/* All selected banner */}
         {allSelected && reservations.length > pageSize && (
-          <div style={{ padding:'9px 16px', background:'#f0fdf4', borderBottom:`1px solid #bbf7d0`, display:'flex', alignItems:'center', justifyContent:'space-between', gap:8, flexWrap:'wrap' }}>
-            <span style={{ fontSize:12, fontWeight:700, color:'#16a34a' }}>Toutes les {reservations.length} réservations sélectionnées</span>
-            <button onClick={() => setSelectedIds([])} style={{ background:'none', border:'none', cursor:'pointer', fontSize:12, fontWeight:800, color:'#16a34a', textDecoration:'underline', fontFamily:'inherit', padding:0 }}>
-              Désélectionner tout
+          <div className="tbl-list__banner tbl-list__banner--green">
+            <span className="tbl-list__banner-text">
+              {i18n.language === 'ar'
+                ? `تم اختيار جميع الحجوزات`
+                : `Toutes les réservations sélectionnées`
+              }
+            </span>
+            <button onClick={() => setSelectedIds([])} className="tbl-list__banner-action">
+              {i18n.language === 'ar' ? 'إلغاء التحديد' : 'DÉSÉLECTIONNER'}
             </button>
-          </div>
-        )}
-        {highlightId && pageItems.some(r => r.id === highlightId) && (
-          <div style={{ padding:'9px 16px', background:'#fff8ec', borderBottom:`2px solid ${GOLD}66`, display:'flex', alignItems:'center', gap:10 }}>
-            <span style={{ width:8, height:8, borderRadius:'50%', background:GOLD, flexShrink:0, boxShadow:`0 0 0 3px ${GOLD}33` }} />
-            <span style={{ fontSize:12, fontWeight:700, color:GOLD_DARK }}>Réservation sélectionnée depuis le tableau de bord</span>
           </div>
         )}
 

@@ -10,8 +10,10 @@ use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\TableController;
 
 // ── Auth ──────────────────────────────────────────────────────────
-Route::post('/login',  [AuthenticatedSessionController::class, 'store']);
-Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->middleware('auth:sanctum');
+Route::post('/login',           [AuthenticatedSessionController::class, 'store']);
+Route::post('/auth/forgot-password', [App\Http\Controllers\Auth\PasswordResetLinkController::class, 'store']);
+Route::post('/auth/reset-password',  [App\Http\Controllers\Auth\NewPasswordController::class, 'store']);
+Route::post('/logout',          [AuthenticatedSessionController::class, 'destroy'])->middleware('auth:sanctum');
 
 // ── Public ────────────────────────────────────────────────────────
 Route::get('/blocked-dates', [BlockedDateController::class, 'index']);
@@ -34,6 +36,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::patch ('/restaurant/reservations/{id}/status',           [RestaurantReservationController::class, 'updateStatus']);
     Route::patch ('/restaurant/reservations/{id}/assign-table',     [RestaurantReservationController::class, 'assignTable']);
     Route::delete('/restaurant/reservations/{id}',                  [RestaurantReservationController::class, 'destroy']);
+    Route::post  ('/restaurant/reservations/bulk-status',           [RestaurantReservationController::class, 'bulkUpdateStatus']);
+    Route::post  ('/restaurant/reservations/bulk-delete',           [RestaurantReservationController::class, 'bulkDestroy']);
 
     // ── Restaurant settings ───────────────────────────────────
     Route::get('/restaurant/info',          [RestaurantReservationController::class, 'info']);

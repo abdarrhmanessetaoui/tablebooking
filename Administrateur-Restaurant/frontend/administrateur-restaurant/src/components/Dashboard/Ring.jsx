@@ -1,10 +1,12 @@
+﻿import { useTranslation } from 'react-i18next'
 import {
   ringWrapper, svg, trackCircle,
   segment, centerOverlay, centerPct, centerLabel,
 } from '../../styles/dashboard/ring.styles'
-import { GREEN, RED, GOLD, DARK } from '../../styles/dashboard/tokens'
+import { GREEN, RED, LIGHT_BROWN, DARK } from '../../styles/dashboard/tokens'
 
 export default function Ring({ c, p, a, size = 88 }) {
+  const { t } = useTranslation()
   const total = c + p + a || 1
   const pct   = Math.round((c / total) * 100)
   const r     = 30
@@ -12,7 +14,7 @@ export default function Ring({ c, p, a, size = 88 }) {
 
   const segs = [
     { v: c, color: GREEN },
-    { v: p, color: GOLD  },
+    { v: p, color: LIGHT_BROWN  },
     { v: a, color: RED   },
   ]
 
@@ -45,7 +47,7 @@ export default function Ring({ c, p, a, size = 88 }) {
       {/* Center label */}
       <div style={centerOverlay}>
         <span style={centerPct}>{pct}%</span>
-        <span style={centerLabel}>Confirmées</span>
+        <span style={centerLabel}>{t('confirmed_plural')}</span>
       </div>
     </div>
   )

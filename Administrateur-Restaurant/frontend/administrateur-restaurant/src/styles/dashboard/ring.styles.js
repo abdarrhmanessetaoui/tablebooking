@@ -1,4 +1,4 @@
-import { DARK, GOLD } from './tokens'
+﻿import { DARK, LIGHT_BROWN_DK, BORDER } from './tokens'
 
 // ── Wrapper (size-based flex container) ───────────────────────────
 export const ringWrapper = (size) => ({
@@ -18,16 +18,17 @@ export const svg = (size) => ({
 
 // ── Background track circle ───────────────────────────────────────
 export const trackCircle = {
-  fill:         'none',
-  stroke:       '#f5f0eb',
-  strokeWidth:  '8',
+  fill:        'none',
+  stroke:      '#F0EBE5',
+  strokeWidth: '7',
 }
 
 // ── Progress segment circle style ─────────────────────────────────
 export const segment = (arc, circ, offset, color, index) => ({
   fill:              'none',
   stroke:            color,
-  strokeWidth:       '8',
+  strokeWidth:       '7',
+  strokeLinecap:     'round',
   strokeDasharray:   `${arc} ${circ}`,
   strokeDashoffset:  -offset,
   // NO TRANSITION — strictly static
@@ -47,19 +48,19 @@ export const centerOverlay = {
 }
 
 export const centerPct = {
-  display:       'block',
-  fontSize:      '26px',
-  fontWeight:    '900',
-  color:         DARK,
-  lineHeight:    '1',
-  letterSpacing: '-1.5px',
+  fontSize:           17,
+  fontWeight:         700,
+  color:              DARK,
+  lineHeight:         1,
+  fontVariantNumeric: 'tabular-nums',
+  fontFamily:         "'Poppins','Inter',system-ui,sans-serif",
 }
 
 export const centerLabel = {
-  fontSize:      '10px',
-  fontWeight:    '900',
-  color:         DARK,
+  fontSize:      8,
+  fontWeight:    600,
+  color:         '#000000',
   textTransform: 'uppercase',
-  marginTop:     '4px',
-  opacity:       '0.6',
+  letterSpacing: '0.08em',
+  marginTop:     3,
 }

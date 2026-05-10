@@ -1,11 +1,14 @@
 import { useState, useEffect, useCallback } from 'react'
-
+import { CheckCircle, XCircle, AlertCircle, X, Info } from 'lucide-react'
+import {
+  DARK, LIGHT_BROWN, WHITE, BORDER, RADIUS, DARK_LIGHT, AMBER, GREEN, RED
+} from '../../styles/dashboard/tokens'
 
 const TYPES = {
-  success: { bg: '#00A651', border: '#00A651', color: '#fff' },
-  error:   { bg: '#FF0000', border: '#FF0000', color: '#fff' },
-  warning: { bg: '#c8a97e', border: '#c8a97e', color: '#fff' },
-  info:    { bg: '#2b2118', border: '#2b2118', color: '#fff' },
+  success: { bg: GREEN, color: WHITE },
+  error:   { bg: RED,   color: WHITE },
+  warning: { bg: AMBER, color: WHITE },
+  info:    { bg: DARK,  color: WHITE },
 }
 
 let _addToast = null
@@ -34,33 +37,36 @@ export default function ToastContainer() {
       pointerEvents: 'none',
     }}>
       <style>{`
+        @keyframes toastIn { from { opacity:0; transform:translateY(12px) } to { opacity:1; transform:translateY(0) } }
         @media (max-width: 600px) { .toast-item { width: calc(100vw - 48px) !important; } }
       `}</style>
       {toasts.map(t => {
-        const cfg  = TYPES[t.type] || TYPES.info
+        const cfg = TYPES[t.type] || TYPES.info
         return (
           <div key={t.id} className="toast-item" style={{
             pointerEvents: 'all',
-            display: 'flex', alignItems: 'center', gap: 10,
+            display: 'flex', alignItems: 'center', gap: 12,
             padding: '12px 16px',
             background: cfg.bg,
-            border: `1px solid ${cfg.border}`,
-            minWidth: 280, maxWidth: 380,
-            fontFamily: "'Plus Jakarta Sans','DM Sans',system-ui,sans-serif",
+            border: 'none',
+            borderRadius: RADIUS.sm,
+            minWidth: 240, maxWidth: 380,
+            animation: 'toastIn 0.22s ease',
+            fontFamily: "'Inter', sans-serif",
+            boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
           }}>
-            <span style={{ flex: 1, fontSize: 13, fontWeight: 900, color: cfg.color, lineHeight: 1.4 }}>
+            <span style={{ flex: 1, fontSize: 13, fontWeight: 700, color: cfg.color, lineHeight: 1.4 }}>
               {t.message}
             </span>
             <button
               onClick={() => setToasts(prev => prev.filter(x => x.id !== t.id))}
               style={{
-                background: 'none', border: `1px solid ${cfg.color}`, cursor: 'pointer',
-                padding: '4px 8px', display: 'flex', flexShrink: 0,
-                color: cfg.color, fontSize: 10, fontWeight: 900, textTransform: 'uppercase',
-                fontFamily: 'inherit',
+                background: 'none', border: 'none', cursor: 'pointer',
+                padding: 2, display: 'flex', flexShrink: 0,
+                color: cfg.color, opacity: 0.8,
               }}
             >
-              OK
+              <X size={14} strokeWidth={3} />
             </button>
           </div>
         )

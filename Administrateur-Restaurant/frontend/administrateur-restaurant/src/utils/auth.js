@@ -1,4 +1,4 @@
-export const saveToken = (token, remember) => {
+﻿export const saveToken = (token, remember) => {
     const storage = remember ? localStorage : sessionStorage;
     storage.setItem('auth_token', token);
   };

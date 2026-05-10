@@ -1,14 +1,14 @@
-import { Badge } from './Badge'
+﻿import { useTranslation } from 'react-i18next'
+import Badge from './Badge'
 import {
-  row, nameWrapper, nameInner, nameTxt, phoneTxt,
+  row, nameWrapper, nameTxt, phoneTxt,
   dateTxt, timeChip, guestsTxt,
-  serviceChip, serviceText, chevron,
+  serviceChip, serviceText,
 } from '../../styles/dashboard/resRow.styles'
-import { DARK, GOLD_DK } from '../../styles/dashboard/tokens'
 
-function fmtDate(iso) {
+function fmtDate(iso, lang) {
   if (!iso) return ''
-  return new Date(iso).toLocaleDateString('fr-FR', {
+  return new Date(iso).toLocaleDateString(lang, {
     weekday: 'short',
     day:     'numeric',
     month:   'short',
@@ -16,23 +16,23 @@ function fmtDate(iso) {
 }
 
 export default function ResRow({ r, i, tpl, showDate, onRowClick }) {
+  const { i18n } = useTranslation()
+
   return (
     <div
       onClick={() => onRowClick(r)}
-      style={{ ...row(false, i), gridTemplateColumns: tpl, cursor: 'pointer' }}
+      style={{ ...row(false, i), gridTemplateColumns: tpl }}
     >
-      {/* Date — only in month tab */}
+      {/* Date   only in month tab */}
       {showDate && (
         <div style={nameWrapper}>
-          <span style={dateTxt}>{fmtDate(r.date)}</span>
+          <span style={dateTxt}>{fmtDate(r.date, i18n.language)}</span>
         </div>
       )}
 
       {/* Name + phone */}
       <div style={nameWrapper}>
-        <div style={nameInner}>
-          <p style={nameTxt}>{r.name}</p>
-        </div>
+        <p style={nameTxt}>{r.name}</p>
         {r.phone && <p style={phoneTxt}>{r.phone}</p>}
       </div>
 
@@ -43,16 +43,17 @@ export default function ResRow({ r, i, tpl, showDate, onRowClick }) {
 
       {/* Guests */}
       <span style={guestsTxt}>
-        {r.guests} pers.
+        {r.guests}
       </span>
 
       {/* Service chip */}
       <span style={serviceChip}>
-        <span style={serviceText}>{r.service || '—'}</span>
+        <span style={serviceText}>{r.service || ' '}</span>
       </span>
 
       {/* Status badge */}
       <Badge status={r.status} />
+
     </div>
   )
 }

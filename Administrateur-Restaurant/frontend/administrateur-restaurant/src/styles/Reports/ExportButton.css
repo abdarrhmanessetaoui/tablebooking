@@ -1,0 +1,25 @@
+/* styles/Reports/ExportButton.css */
+
+.export-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 18px;
+  background: #ffffff;
+  border: 1px solid #E5E0DA;
+  border-radius: 4px;
+  color: #2D2926;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: none;
+  font-family: inherit;
+  white-space: nowrap;
+  min-height: 40px;
+}
+
+.export-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

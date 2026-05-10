@@ -1,6 +1,7 @@
 import { useState } from 'react'
-
-import { DARK, GOLD, CREAM, BORDER } from '../../../styles/reservations/tokens'
+import { useTranslation } from 'react-i18next'
+import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react'
+import { DARK, LIGHT_BROWN, CREAM, BORDER } from '../../../styles/reservations/tokens'
 import { pageBtnStyle } from '../../../styles/reservations/table.styles'
 
 const PAGE_SIZES = [10, 25, 50, 100]
@@ -17,6 +18,7 @@ function PageBtn({ onClick, disabled, active, children }) {
 }
 
 export default function Pagination({ total, page, pageSize, setPage, setPageSize, start }) {
+  const { t } = useTranslation()
   const totalPages = Math.ceil(total / pageSize) || 1
   const safePage   = Math.min(page, totalPages)
 
@@ -31,18 +33,11 @@ export default function Pagination({ total, page, pageSize, setPage, setPageSize
   }
 
   return (
-    <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', flexWrap:'wrap', gap:10, padding:'12px 16px', borderTop:`1.5px solid ${BORDER}`, background:CREAM }}>
+    <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', flexWrap:'wrap', gap:10, padding:'12px 16px', borderTop:`4px solid ${BORDER}`, background:CREAM }}>
       <div style={{ display:'flex', alignItems:'center', gap:10, flexWrap:'wrap' }}>
         <span style={{ fontSize:12, fontWeight:700, color:DARK }}>
           {start + 1}–{Math.min(start + pageSize, total)} / {total}
         </span>
-        <select
-          value={pageSize}
-          onChange={e => { setPageSize(Number(e.target.value)); setPage(1) }}
-          style={{ padding:'4px 8px', border:`2px solid ${DARK}`, fontSize:11, fontWeight:900, color:DARK, background:'#fff', cursor:'pointer', outline:'none', fontFamily:'inherit', textTransform:'uppercase' }}
-        >
-          {PAGE_SIZES.map(s => <option key={s} value={s}>{s} / PAGE</option>)}
-        </select>
       </div>
       <div style={{ display:'flex', alignItems:'center', gap:3 }}>
         <PageBtn onClick={() => setPage(1)} disabled={safePage===1}>PREMIER</PageBtn>

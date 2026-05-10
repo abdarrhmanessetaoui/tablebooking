@@ -1,37 +1,43 @@
-import { useState } from 'react'
-import useRestaurantSettings from '../hooks/useRestaurantSettings'
-
-const DARK    = '#2b2118'
-const GOLD    = '#c8a97e'
-const GOLD_DK = '#a8834e'
-const CREAM   = '#faf8f5'
-const BORDER  = '#2b2118'
-
-const FR_DAYS      = ['Dim','Lun','Mar','Mer','Jeu','Ven','Sam']
-const FR_DAYS_FULL = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi']
+import { useState, useEffect } from 'react'
+import { X, Check } from 'lucide-react'
+import useRestaurantSettings from '../hooks/settings/useRestaurantSettings.js'
+import FadeUp  from '../components/Dashboard/FadeUp'
+import Spinner from '../components/Dashboard/Spinner'
+import { useTranslation } from 'react-i18next'
+import {
+  page, header, headerLeft, h1, divider, errorBanner
+} from '../styles/dashboard/dashboard.styles'
+import {
+  DARK, LIGHT_BROWN, DARK_LIGHT, WHITE, BORDER, RADIUS, FONT_URL
+} from '../styles/dashboard/tokens'
 
 function Label({ children }) {
   return (
-    <p style={{ margin: '0 0 6px', fontSize: 10, fontWeight: 900, color: DARK, letterSpacing: '0.18em', textTransform: 'uppercase' }}>
+    <p style={{ margin: '0 0 8px', fontSize: '11px', fontWeight: '900', color: DARK, letterSpacing: '0.04em', textTransform: 'uppercase' }}>
       {children}
     </p>
   )
 }
 
-function TextInput({ value, onChange, placeholder, type = 'text', disabled }) {
+function TextInput({ value, onChange, placeholder, type = 'text', icon: Icon, disabled, readOnly }) {
   return (
     <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
-      <input type={type} value={value ?? ''} onChange={e => onChange(e.target.value)}
-        placeholder={placeholder} disabled={disabled}
+      <input type={type} value={value ?? ''} onChange={e => { if (!readOnly) onChange(e.target.value) }}
+        placeholder={placeholder} disabled={disabled} readOnly={readOnly}
         style={{
           width: '100%', boxSizing: 'border-box',
-          padding: '12px 14px',
-          border: `2px solid ${DARK}`,
-          fontSize: 14, fontWeight: 700, color: DARK,
+          padding: '12px 16px',
+          borderWidth: 1, borderStyle: 'solid', borderColor: BORDER,
+          borderRadius: RADIUS.sm,
+          fontSize: '13px', fontWeight: '800', color: DARK,
           fontFamily: 'inherit', outline: 'none',
-          background: disabled ? '#F5F5F5' : '#fff',
-          borderRadius: 0,
+          background: disabled || readOnly ? '#FAF7F4' : WHITE,
+          cursor: readOnly ? 'text' : (disabled ? 'not-allowed' : 'text'),
+          boxShadow: 'none',
+          transition: 'none',
         }}
+        onFocus={e => !readOnly && !disabled && (e.target.style.borderColor = LIGHT_BROWN)}
+        onBlur={e => e.target.style.borderColor = BORDER}
       />
     </div>
   )
@@ -42,59 +48,78 @@ function TimeInput({ value, onChange, max }) {
     <input type="number" min="0" max={max} value={value ?? ''}
       onChange={e => onChange(e.target.value)}
       style={{
-        width: 58, textAlign: 'center',
-        border: `2px solid ${DARK}`, padding: '10px 6px',
-        fontSize: 16, fontWeight: 900, color: DARK,
+        width: 60, textAlign: 'center',
+        borderWidth: 1, borderStyle: 'solid', borderColor: BORDER,
+        padding: '10px 6px',
+        borderRadius: RADIUS.sm,
+        fontSize: '15px', fontWeight: '900', color: DARK,
         fontFamily: 'inherit', outline: 'none',
-        background: '#fff', borderRadius: 0,
+        background: WHITE,
+        boxShadow: 'none',
+        transition: 'none',
       }}
+      onFocus={e => e.target.style.borderColor = LIGHT_BROWN}
+      onBlur={e => e.target.style.borderColor = BORDER}
     />
   )
 }
 
-function SaveBtn({ onClick, saving, disabled }) {
+function SaveBtn({ onClick, saving }) {
+  const { t } = useTranslation()
   return (
-    <button onClick={onClick} disabled={disabled || saving}
+    <button onClick={onClick} disabled={saving}
       style={{
-        display: 'flex', alignItems: 'center', gap: 6, padding: '10px 20px',
-        background: DARK,
-        border: 'none', color: GOLD, fontSize: 12, fontWeight: 900,
-        cursor: (disabled || saving) ? 'not-allowed' : 'pointer',
-        opacity: (disabled || saving) ? 0.6 : 1,
-        fontFamily: 'inherit', letterSpacing: '0.08em', textTransform: 'uppercase',
-      }}>
-      {saving ? 'Enregistrement…' : 'Enregistrer'}
+        display: 'flex', alignItems: 'center', gap: 8, padding: '8px 16px',
+        background: LIGHT_BROWN,
+        borderRadius: RADIUS.sm,
+        border: 'none', color: WHITE, fontSize: '12px', fontWeight: '900',
+        cursor: saving ? 'not-allowed' : 'pointer', opacity: saving ? 0.7 : 1,
+        whiteSpace: 'nowrap',
+        transition: 'none',
+        boxShadow: 'none',
+      }}
+    >
+      <span className="save-btn-label">{saving ? t('settings_module.saving') : t('settings_module.save_btn')}</span>
     </button>
   )
 }
 
-function Section({ title, action, children, defaultOpen = true }) {
-  const [open, setOpen] = useState(defaultOpen)
+function Section({ title, action, children }) {
   return (
-    <div style={{ background: '#fff', border: `2px solid ${DARK}`, marginBottom: 24 }}>
-      <div onClick={() => setOpen(o => !o)} style={{
-        padding: '16px 20px', background: DARK,
+    <div style={{
+      background: WHITE,
+      borderRadius: RADIUS.sm,
+      border: `1px solid ${BORDER}`,
+      overflow: 'hidden',
+      boxShadow: 'none',
+    }}>
+      <div style={{
+        padding: '16px 24px',
+        background: WHITE,
+        borderBottom: `1px solid ${BORDER}`,
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        cursor: 'pointer', userSelect: 'none', gap: 8,
+        userSelect: 'none', gap: 12,
       }}>
-        <span style={{ fontSize: 12, fontWeight: 900, color: GOLD, letterSpacing: '0.14em', textTransform: 'uppercase' }}>
-          {title}
-        </span>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          {action && <div onClick={e => e.stopPropagation()}>{action}</div>}
-          <span style={{ fontSize: 11, fontWeight: 900, color: GOLD, textTransform: 'uppercase' }}>
-            {open ? 'Masquer' : 'Afficher'}
+        <div style={{ display: 'flex', alignItems: 'center', minWidth: 0, flex: 1 }}>
+          <span style={{
+            fontSize: '15px', fontWeight: '900', color: DARK,
+            overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+          }}>
+            {title}
           </span>
         </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexShrink: 0 }}>
+          {action && <div onClick={e => e.stopPropagation()}>{action}</div>}
+        </div>
       </div>
-      {open && <div style={{ padding: '24px' }}>{children}</div>}
+      <div style={{ padding: '24px' }}>{children}</div>
     </div>
   )
 }
 
 function Grid({ children }) {
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 20 }}>
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 24 }}>
       {children}
     </div>
   )
@@ -102,7 +127,7 @@ function Grid({ children }) {
 
 function Field({ label, children }) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
       <Label>{label}</Label>
       {children}
     </div>
@@ -113,15 +138,16 @@ function TabBtn({ active, onClick, children, disabled }) {
   return (
     <button onClick={onClick} disabled={disabled}
       style={{
-        padding: '10px 20px',
-        background: active ? DARK : '#FFFFFF',
-        border: `2px solid ${DARK}`,
-        color: active ? GOLD : DARK,
-        fontSize: 13, fontWeight: 900,
+        padding: '8px 16px',
+        background: active ? DARK : WHITE,
+        border: `1px solid ${active ? DARK : BORDER}`,
+        borderRadius: RADIUS.sm,
+        color: active ? WHITE : DARK,
+        fontSize: '12px', fontWeight: '900',
         cursor: disabled ? 'default' : 'pointer',
-        fontFamily: 'inherit',
-        textTransform: 'uppercase',
-        opacity: disabled ? 0.4 : 1,
+        opacity: disabled ? 0.4 : 1, whiteSpace: 'nowrap',
+        transition: 'none',
+        boxShadow: 'none',
       }}>
       {children}
     </button>
@@ -129,6 +155,7 @@ function TabBtn({ active, onClick, children, disabled }) {
 }
 
 export default function Settings() {
+  const { t } = useTranslation()
   const {
     loading,
     info, setInfoField, saveInfo, savingInfo,
@@ -138,11 +165,26 @@ export default function Settings() {
     notifications, setNotifField, saveNotif, savingNotif,
   } = useRestaurantSettings()
 
-  if (loading) return (
-    <div style={{ minHeight: '100vh', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, fontWeight: 900, color: DARK, textTransform: 'uppercase' }}>
-      Chargement…
-    </div>
-  )
+  const DAYS = [
+    t('services_module.sun_short', { defaultValue: 'Sun' }),
+    t('services_module.mon_short', { defaultValue: 'Mon' }),
+    t('services_module.tue_short', { defaultValue: 'Tue' }),
+    t('services_module.wed_short', { defaultValue: 'Wed' }),
+    t('services_module.thu_short', { defaultValue: 'Thu' }),
+    t('services_module.fri_short', { defaultValue: 'Fri' }),
+    t('services_module.sat_short', { defaultValue: 'Sat' })
+  ]
+  const DAYS_FULL = [
+    t('services_module.sun_full', { defaultValue: 'Sunday' }),
+    t('services_module.mon_full', { defaultValue: 'Monday' }),
+    t('services_module.tue_full', { defaultValue: 'Tuesday' }),
+    t('services_module.wed_full', { defaultValue: 'Wednesday' }),
+    t('services_module.thu_full', { defaultValue: 'Thursday' }),
+    t('services_module.fri_full', { defaultValue: 'Friday' }),
+    t('services_module.sat_full', { defaultValue: 'Saturday' })
+  ]
+
+  useEffect(() => { if (!loading) window.dispatchEvent(new CustomEvent("app-ready")) }, [loading]); if (loading) return <Spinner fullPage />
 
   const currentSvc  = servicesOnActiveDay[activeService]
   const ohindex     = currentSvc?.ohindex ?? 0
@@ -151,168 +193,233 @@ export default function Settings() {
   const isDayOpen   = hours.working_dates?.[activeDay] ?? false
 
   return (
-    <div style={{
-      minHeight: '100vh', background: '#fff',
-      fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
-      padding: '40px 24px', width: '100%',
-    }}>
-      <h1 style={{ margin: 0, fontSize: 32, fontWeight: 900, color: DARK, letterSpacing: '-1.5px', textTransform: 'uppercase', marginBottom: 32 }}>
-        Paramètres
-      </h1>
+    <>
+      <style>{`
+        @media (max-width: 600px) {
+          .save-btn-label { display: none !important; }
+        }
+      `}</style>
 
-      <div style={{ display: 'flex', flexDirection: 'column', maxWidth: 960 }}>
-
-        {/* 1. INFOS */}
-        <Section title="Informations du restaurant" action={<SaveBtn onClick={saveInfo} saving={savingInfo} />}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-            <Grid>
-              <Field label="Nom du restaurant">
-                <TextInput value={info.form_name} onChange={v => setInfoField('form_name', v)} placeholder="Ex: Dal Corso" />
-              </Field>
-              <Field label="Capacité totale">
-                <TextInput value={info.capacity} onChange={v => setInfoField('capacity', v)} type="number" />
-              </Field>
-            </Grid>
-            <Field label="Adresse physique">
-              <TextInput value={info.address} onChange={v => setInfoField('address', v)} />
-            </Field>
-            <Grid>
-              <Field label="Google Maps">
-                <TextInput value={info.google_maps_link} onChange={v => setInfoField('google_maps_link', v)} />
-              </Field>
-              <Field label="Site web">
-                <TextInput value={info.website} onChange={v => setInfoField('website', v)} />
-              </Field>
-            </Grid>
-            <Grid>
-              <Field label="Téléphone">
-                <TextInput value={info.phone} onChange={v => setInfoField('phone', v)} type="tel" />
-              </Field>
-              <Field label="Email contact">
-                <TextInput value={info.contact_email} onChange={v => setInfoField('contact_email', v)} type="email" />
-              </Field>
-            </Grid>
-            <Field label="Description">
-              <textarea value={info.description ?? ''} onChange={e => setInfoField('description', e.target.value)}
-                rows={4}
-                style={{
-                  width: '100%', padding: '12px 14px',
-                  border: `2px solid ${DARK}`, fontSize: 14, fontWeight: 700, color: DARK,
-                  fontFamily: 'inherit', outline: 'none', background: '#fff',
-                  borderRadius: 0, resize: 'vertical',
-                }}
-              />
-            </Field>
-          </div>
-        </Section>
-
-        {/* 2. HOURS */}
-        <Section title="Jours & Horaires d'ouverture" action={<SaveBtn onClick={saveHours} saving={savingHours} />}>
-          <Label>Jours disponibles</Label>
-          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 24 }}>
-            {FR_DAYS.map((day, i) => {
-              const open     = hours.working_dates?.[i] ?? false
-              const isActive = activeDay === i
-              return (
-                <button key={i}
-                  onClick={() => { setActiveDay(i); setActiveServiceIdx(0) }}
-                  style={{
-                    padding: '12px 18px',
-                    display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2,
-                    background: isActive ? GOLD : (open ? DARK : '#fff'),
-                    border: `2px solid ${DARK}`,
-                    color: isActive ? DARK : (open ? GOLD : DARK),
-                    cursor: 'pointer', fontFamily: 'inherit',
-                  }}
-                >
-                  <span style={{ fontSize: 11, fontWeight: 900, textTransform: 'uppercase' }}>{day}</span>
-                  <span style={{ fontSize: 9, fontWeight: 900, opacity: 0.8 }}>{open ? 'OUVERT' : 'FERMÉ'}</span>
-                </button>
-              )
-            })}
-          </div>
-
-          <div style={{ border: `2px solid ${DARK}`, padding: 20, background: CREAM }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                <span style={{ fontSize: 18, fontWeight: 900, color: DARK, textTransform: 'uppercase' }}>{FR_DAYS_FULL[activeDay]}</span>
-                <span style={{ padding: '4px 12px', background: isDayOpen ? '#16A34A' : '#FF0000', color: '#fff', fontSize: 11, fontWeight: 900, textTransform: 'uppercase' }}>
-                  {isDayOpen ? 'Ouvert' : 'Fermé'}
-                </span>
-              </div>
-              <button onClick={() => toggleWorkingDay(activeDay)}
-                style={{ padding: '10px 16px', background: isDayOpen ? '#FF0000' : '#16A34A', color: '#fff', border: 'none', fontSize: 11, fontWeight: 900, cursor: 'pointer', textTransform: 'uppercase' }}>
-                {isDayOpen ? 'Marquer Fermé' : 'Marquer Ouvert'}
-              </button>
+      <div style={page}>
+        <FadeUp delay={0}>
+          <div style={header}>
+            <div style={headerLeft}>
+              <h1 style={h1}>{t('settings_module.title')}</h1>
             </div>
+          </div>
+        </FadeUp>
 
-            {isDayOpen && servicesOnActiveDay.length > 0 && (
-              <>
-                <Label>Service sélectionné</Label>
-                <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', marginBottom: 20 }}>
-                  {servicesOnActiveDay.map((svc, i) => (
-                    <TabBtn key={svc.idx} active={activeService === i} onClick={() => setActiveServiceIdx(i)}>
-                      {svc.name}
-                    </TabBtn>
-                  ))}
+        <div style={divider} />
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 24, maxWidth: 1000 }}>
+
+          {/* ══ 1. INFOS ══ */}
+          <FadeUp delay={10}>
+            <Section title={t('settings_module.restaurant_info')} action={<SaveBtn onClick={saveInfo} saving={savingInfo} />}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+                <Grid>
+                  <Field label={t('settings_module.restaurant_name')}>
+                    <TextInput value={info.form_name} onChange={v => setInfoField('form_name', v)} placeholder={t('settings_module.restaurant_name_placeholder')} />
+                  </Field>
+                  <Field label={t('settings_module.capacity')}>
+                    <TextInput value={info.capacity} onChange={v => setInfoField('capacity', v)} placeholder={t('settings_module.capacity_placeholder')} type="number" />
+                  </Field>
+                </Grid>
+                <Field label={t('settings_module.address')}>
+                  <TextInput value={info.address} onChange={v => setInfoField('address', v)} placeholder={t('settings_module.address_placeholder')} />
+                </Field>
+                <Grid>
+                  <Field label={t('settings_module.google_maps')}>
+                    <TextInput value={info.google_maps_link} onChange={v => setInfoField('google_maps_link', v)} placeholder={t('settings_module.google_maps_placeholder')} />
+                  </Field>
+                  <Field label={t('settings_module.website')}>
+                    <TextInput value={info.website} onChange={v => setInfoField('website', v)} placeholder={t('settings_module.website_placeholder')} />
+                  </Field>
+                </Grid>
+                <Grid>
+                  <Field label={t('settings_module.phone')}>
+                    <TextInput value={info.phone} onChange={v => setInfoField('phone', v)} placeholder={t('settings_module.phone_placeholder')} type="tel" />
+                  </Field>
+                  <Field label={t('settings_module.contact_email')}>
+                    <TextInput value={info.contact_email} onChange={v => setInfoField('contact_email', v)} placeholder={t('settings_module.contact_email_placeholder')} type="email" />
+                  </Field>
+                </Grid>
+                <Field label={t('settings_module.description')}>
+                  <textarea value={info.description ?? ''} onChange={e => setInfoField('description', e.target.value)}
+                    placeholder={t('settings_module.description_placeholder')} rows={4}
+                    style={{
+                      width: '100%', padding: '12px 16px',
+                      borderWidth: 1, borderStyle: 'solid', borderColor: BORDER, borderRadius: RADIUS.sm,
+                      fontSize: '13px', fontWeight: '800', color: DARK,
+                      fontFamily: 'inherit', outline: 'none', background: WHITE,
+                      resize: 'vertical',
+                      boxShadow: 'none',
+                      transition: 'none',
+                    }}
+                    onFocus={e => e.target.style.borderColor = LIGHT_BROWN}
+                    onBlur={e => e.target.style.borderColor = BORDER}
+                  />
+                </Field>
+              </div>
+            </Section>
+          </FadeUp>
+
+          {/* ══ 2. PLANNING ══ */}
+          <FadeUp delay={10}>
+            <Section title={t('settings_module.hours_planning')} action={<SaveBtn onClick={saveHours} saving={savingHours} />}>
+              <Label>{t('settings_module.opening_days')}</Label>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(70px, 1fr))', gap: 8, marginTop: 4, marginBottom: 24 }}>
+                {DAYS.map((day, i) => {
+                  const isOpen   = hours.working_dates?.[i] ?? false
+                  const isActive = activeDay === i
+                  return (
+                    <button key={i}
+                      onClick={() => { setActiveDay(i); setActiveServiceIdx(0) }}
+                      style={{
+                        display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
+                        padding: '12px 8px',
+                        background: isActive ? DARK : WHITE,
+                        border: `1px solid ${isActive ? DARK : BORDER}`,
+                        borderRadius: RADIUS.sm,
+                        color: isActive ? WHITE : DARK,
+                        cursor: 'pointer', fontFamily: 'inherit',
+                        transition: 'none',
+                        boxShadow: 'none',
+                      }}
+                    >
+                      <span style={{ fontSize: '10px', fontWeight: '900', textTransform: 'uppercase' }}>{day}</span>
+                    </button>
+                  )
+                })}
+              </div>
+
+              <div style={{
+                background: WHITE, border: `1px solid ${BORDER}`, borderRadius: RADIUS.sm, padding: '24px'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16, marginBottom: 24 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+                    <h3 style={{ margin: 0, fontSize: '18px', fontWeight: '900', color: DARK }}>{DAYS_FULL[activeDay]}</h3>
+                    <span style={{
+                      fontSize: '10px', fontWeight: '900', color: WHITE,
+                      background: isDayOpen ? '#22C55E' : RED,
+                      padding: '4px 12px', borderRadius: '4px',
+                      letterSpacing: '0.04em', textTransform: 'uppercase'
+                    }}>
+                      {isDayOpen ? t('settings_module.open') : t('settings_module.closed')}
+                    </span>
+                  </div>
+
+                  <button onClick={() => toggleWorkingDay(activeDay)}
+                    style={{
+                      display: 'flex', alignItems: 'center', gap: 6,
+                      padding: '8px 16px', fontSize: '12px', fontWeight: '900', borderRadius: RADIUS.sm,
+                      background: isDayOpen ? RED : '#22C55E',
+                      border: 'none',
+                      color: WHITE,
+                      cursor: 'pointer',
+                      transition: 'none',
+                    }}
+                  >
+                    {isDayOpen ? <><X size={14} strokeWidth={2.5} /> {t('settings_module.mark_closed')}</> : <><Check size={14} strokeWidth={2.5} /> {t('settings_module.mark_open')}</>}
+                  </button>
                 </div>
 
-                {currentSlot && (
-                  <div style={{ borderTop: `2px solid ${DARK}`, paddingTop: 20 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 32 }}>
-                      <div>
-                        <Label>Début</Label>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                          <TimeInput max={23} value={currentSlot.h1} onChange={v => updateDayOH(ohindex, activeDay, 'h1', v)} />
-                          <span style={{ fontWeight: 900 }}>:</span>
-                          <TimeInput max={59} value={currentSlot.m1} onChange={v => updateDayOH(ohindex, activeDay, 'm1', v)} />
-                        </div>
-                      </div>
-                      <div style={{ fontSize: 24, fontWeight: 900, paddingTop: 20 }}>→</div>
-                      <div>
-                        <Label>Fin</Label>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                          <TimeInput max={23} value={currentSlot.h2} onChange={v => updateDayOH(ohindex, activeDay, 'h2', v)} />
-                          <span style={{ fontWeight: 900 }}>:</span>
-                          <TimeInput max={59} value={currentSlot.m2} onChange={v => updateDayOH(ohindex, activeDay, 'm2', v)} />
-                        </div>
-                      </div>
+                {isDayOpen && servicesOnActiveDay.length > 0 ? (
+                  <>
+                    <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 24 }}>
+                      {servicesOnActiveDay.map((svc, i) => (
+                        <TabBtn key={svc.idx} active={activeService === i} onClick={() => setActiveServiceIdx(i)}>
+                          {svc.name}
+                        </TabBtn>
+                      ))}
                     </div>
+
+                    {currentSlot && (
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 32, alignItems: 'end' }}>
+                        <div style={{ display: 'flex', gap: 16 }}>
+                          <Field label={t('settings_module.opening')}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                              <TimeInput max={23} value={currentSlot.h1} onChange={v => updateDayOH(ohindex, activeDay, 'h1', v)} />
+                              <span style={{ fontWeight: '900', color: DARK }}>:</span>
+                              <TimeInput max={59} value={currentSlot.m1} onChange={v => updateDayOH(ohindex, activeDay, 'm1', v)} />
+                            </div>
+                          </Field>
+                          <div style={{ paddingBottom: 12, alignSelf: 'end', color: LIGHT_BROWN }}>
+                            <ArrowRight size={22} />
+                          </div>
+                          <Field label={t('settings_module.closing')}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                              <TimeInput max={23} value={currentSlot.h2} onChange={v => updateDayOH(ohindex, activeDay, 'h2', v)} />
+                              <span style={{ fontWeight: '900', color: DARK }}>:</span>
+                              <TimeInput max={59} value={currentSlot.m2} onChange={v => updateDayOH(ohindex, activeDay, 'm2', v)} />
+                            </div>
+                          </Field>
+                        </div>
+                        <div style={{
+                          background: DARK, borderRadius: RADIUS.sm, padding: '12px 20px',
+                          display: 'flex', justifyContent: 'space-between', alignItems: 'center'
+                        }}>
+                          <span style={{ color: LIGHT_BROWN, fontSize: '10px', fontWeight: '900', textTransform: 'uppercase' }}>{t('settings_module.preview')}</span>
+                          <span style={{ color: WHITE, fontSize: '18px', fontWeight: '900' }}>
+                            {String(currentSlot.h1 ?? 0).padStart(2,'0')}:{String(currentSlot.m1 ?? 0).padStart(2,'0')} - {String(currentSlot.h2 ?? 0).padStart(2,'0')}:{String(currentSlot.m2 ?? 0).padStart(2,'0')}
+                          </span>
+                        </div>
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <div style={{
+                    padding: '40px 24px', textAlign: 'center', background: '#FAF7F4',
+                    borderRadius: RADIUS.sm, border: `1px solid ${BORDER}`, color: DARK, fontSize: '14px', fontWeight: '800'
+                  }}>
+                    {isDayOpen ? t('settings_module.no_service_on_day', { day: DAYS_FULL[activeDay] }) : t('settings_module.closed_day_msg')}
                   </div>
                 )}
-              </>
-            )}
-          </div>
-        </Section>
-
-        {/* 3. NOTIF */}
-        <Section title="Emails & Notifications" action={<SaveBtn onClick={saveNotif} saving={savingNotif} />}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
-            <Grid>
-              <Field label="Nom d'expéditeur">
-                <TextInput value={notifications.fp_from_name} onChange={v => setNotifField('fp_from_name', v)} />
-              </Field>
-              <Field label="Email d'expéditeur">
-                <TextInput value={notifications.fp_from_email} onChange={v => setNotifField('fp_from_email', v)} type="email" />
-              </Field>
-            </Grid>
-            <Field label="Destinataires (séparés par des virgules)">
-              <TextInput value={notifications.fp_destination_emails} onChange={v => setNotifField('fp_destination_emails', v)} />
-            </Field>
-            <div>
-              <Label>Statut par défaut des réservations</Label>
-              <div style={{ display: 'flex', gap: 6 }}>
-                {['Pending', 'Confirmed'].map(s => (
-                  <TabBtn key={s} active={notifications.defaultstatus === s} onClick={() => setNotifField('defaultstatus', s)}>
-                    {s === 'Pending' ? 'En attente' : 'Confirmée'}
-                  </TabBtn>
-                ))}
               </div>
-            </div>
-          </div>
-        </Section>
+            </Section>
+          </FadeUp>
 
+          {/* ══ 3. NOTIFICATIONS ══ */}
+          <FadeUp delay={20}>
+            <Section title={t('settings_module.email_notifications')} defaultOpen={false} action={<SaveBtn onClick={saveNotif} saving={savingNotif} />}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+                <Grid>
+                  <Field label={t('settings_module.sender_name')}>
+                    <TextInput readOnly value={notifications.fp_from_name} onChange={v => setNotifField('fp_from_name', v)} placeholder={t('settings_module.sender_name_placeholder')} />
+                  </Field>
+                  <Field label={t('settings_module.sender_email')}>
+                    <TextInput readOnly value={notifications.fp_from_email} onChange={v => setNotifField('fp_from_email', v)} placeholder={t('settings_module.sender_email_placeholder')} type="email" />
+                  </Field>
+                </Grid>
+                <Field label={t('settings_module.dest_emails')}>
+                  <TextInput value={notifications.fp_destination_emails} onChange={v => setNotifField('fp_destination_emails', v)} placeholder={t('settings_module.dest_emails_placeholder')} />
+                </Field>
+                <div style={{ height: 1, background: BORDER }} />
+                <div>
+                  <Label>{t('settings_module.default_status')}</Label>
+                  <div style={{ display: 'flex', gap: 12, marginTop: 4 }}>
+                    {['Pending', 'Confirmed'].map(s => (
+                      <TabBtn key={s} active={notifications.defaultstatus === s} onClick={() => setNotifField('defaultstatus', s)}>
+                        {s === 'Pending' ? t('settings_module.pending') : t('settings_module.confirmed')}
+                      </TabBtn>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </Section>
+          </FadeUp>
+        </div>
       </div>
     </div>
   )
 }
+
+function ArrowRight({ size }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M5 12h14M12 5l7 7-7 7"/>
+    </svg>
+  )
+}
+
+const RED = '#EF4444'

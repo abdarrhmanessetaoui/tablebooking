@@ -1,123 +1,137 @@
 import { NavLink } from 'react-router-dom'
 import { navItems, LogoutIcon } from '../data/sidebarItems'
 import { useState } from 'react'
-
-
-const DARK = '#2b2118'
-const GOLD = '#c8a97e'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
+import LanguageSwitcher from './LanguageSwitcher'
+import {
+  DARK, LIGHT_BROWN, BORDER, RADIUS, WHITE
+} from '../styles/dashboard/tokens'
 
 export default function Sidebar({ handleLogout, onNavClick, collapsed, onToggle }) {
+  const { t, i18n } = useTranslation()
+  const isRtl = i18n.language === 'ar'
 
   return (
     <div style={{
       width: '100%', height: '100%',
-      background: '#FFFFFF',
-      borderRight: `2px solid ${DARK}`,
+      background: WHITE,
       display: 'flex', flexDirection: 'column',
-      fontFamily: "'Plus Jakarta Sans','DM Sans',system-ui,sans-serif",
+      fontFamily: "'Inter',system-ui,-apple-system,sans-serif",
       overflow: 'hidden',
+      borderRight: `1px solid ${BORDER}`,
     }}>
 
       {/* LOGO */}
       <div style={{
-        padding: collapsed ? '28px 0 24px' : '28px 24px 24px',
-        borderBottom: `2px solid ${DARK}`,
+        position: 'relative',
+        padding: collapsed ? '24px 0' : '32px 14px',
+        borderBottom: 'none',
         flexShrink: 0,
         display: 'flex', alignItems: 'center',
-        justifyContent: collapsed ? 'center' : 'space-between',
-        gap: 8,
+        justifyContent: collapsed ? 'center' : 'flex-start',
+        minHeight: collapsed ? 'auto' : 100,
       }}>
         {!collapsed && (
-          <>
-            <img
-              src="/images/tablebooking.png"
-              alt="TableBooking.ma"
-              style={{ height: 32, objectFit: 'contain', display: 'block', flexShrink: 0 }}
-              onError={e => { e.target.style.display='none'; e.target.nextSibling.style.display='block' }}
-            />
-            <span style={{ display:'none', fontSize:14, fontWeight:900, color: GOLD, letterSpacing:'-0.3px', whiteSpace:'nowrap' }}>
-              TableBooking
-            </span>
-          </>
+          <img
+            src="/images/tablebooking.png"
+            alt="TableBooking.ma"
+            style={{ height: 56, objectFit: 'contain', display: 'block', flexShrink: 0 }}
+          />
         )}
 
-        {/* Collapse toggle — desktop only */}
+        {/* Collapse toggle */}
         {onToggle && (
           <button
             onClick={onToggle}
-            title={collapsed ? 'Agrandir' : 'Réduire'}
+            title={collapsed ? t('expand') : t('collapse')}
             style={{
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              width: 28, height: 28, flexShrink: 0,
-              background: DARK,
-              border: `1px solid ${GOLD}`,
-              color: GOLD,
-              cursor: 'pointer',
-              fontSize: 10, fontWeight: 900
+              ...(collapsed ? {
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+              } : {
+                position: 'absolute', top: 16, right: isRtl ? 'auto' : 16, left: isRtl ? 16 : 'auto',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }),
+              width: 26, height: 26, flexShrink: 0,
+              background: 'transparent',
+              border: 'none',
+              borderRadius: RADIUS.sm,
+              color: LIGHT_BROWN,
+              cursor: 'pointer', transition: 'none',
             }}
           >
-            {collapsed ? '›' : '‹'}
+            {collapsed
+              ? (isRtl ? <ChevronLeft size={13} strokeWidth={2.5} /> : <ChevronRight size={13} strokeWidth={2.5} />)
+              : (isRtl ? <ChevronRight size={13} strokeWidth={2.5} /> : <ChevronLeft size={13} strokeWidth={2.5} />)
+            }
           </button>
         )}
       </div>
 
       {/* NAV */}
       <nav style={{
-        flex: 1, padding: '16px 8px',
+        flex: 1, padding: '12px 10px',
         display: 'flex', flexDirection: 'column', gap: 2,
         overflowY: 'auto', overflowX: 'hidden',
       }}>
-        {navItems.map((item, i) => (
+        {navItems.map((item) => (
           <NavLink
             key={item.to}
             to={item.to}
             onClick={onNavClick}
-            title={collapsed ? item.label : undefined}
+            title={collapsed ? t(item.i18nKey) : undefined}
             style={({ isActive }) => ({
               display: 'flex', alignItems: 'center',
-              gap: collapsed ? 0 : 13,
-              padding: collapsed ? '13px 0' : '13px 16px',
+              gap: collapsed ? 0 : 12,
+              padding: collapsed ? '12px 0' : '10px 14px',
               justifyContent: collapsed ? 'center' : 'flex-start',
               textDecoration: 'none',
-              position: 'relative',
-              background: isActive ? DARK : 'transparent',
-              color: isActive ? GOLD : DARK,
-              overflow: 'hidden',
-              fontWeight: 900,
-              textTransform: 'uppercase',
-              letterSpacing: '0.05em'
+              borderRadius: RADIUS.sm,
+              background: isActive ? LIGHT_BROWN : 'transparent',
+              color: isActive ? WHITE : DARK,
+              transition: 'none',
             })}
           >
+            {({ isActive }) => (
+              <>
+                <span style={{ display:'flex', alignItems:'center', flexShrink:0, color: 'inherit', opacity: isActive ? 1 : 0.4 }}>
+                  {item.icon}
+                </span>
                 {!collapsed && (
-                  <span style={{ fontSize:14, fontWeight: isActive ? 900 : 700, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>
-                    {item.label}
+                  <span style={{ fontSize:13, fontWeight: 800, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>
+                    {t(item.i18nKey)}
                   </span>
                 )}
           </NavLink>
         ))}
       </nav>
 
-      {/* LOGOUT */}
-      <div style={{ padding: collapsed ? '10px 8px 28px' : '10px 8px 28px', borderTop:`2px solid ${DARK}`, flexShrink:0 }}>
+      {/* FOOTER ACTIONS */}
+      <div style={{ padding: '12px 10px 24px', borderTop:`1px solid ${BORDER}`, flexShrink:0 }}>
+        
+        <LanguageSwitcher collapsed={collapsed} dark={false} />
+
         <button
           onClick={handleLogout}
-          title={collapsed ? 'Déconnexion' : undefined}
+          title={collapsed ? t('logout') : undefined}
           style={{
             width:'100%', display:'flex', alignItems:'center',
-            gap: collapsed ? 0 : 13,
+            gap: collapsed ? 0 : 12,
             justifyContent: collapsed ? 'center' : 'flex-start',
-            padding: collapsed ? '13px 0' : '13px 16px',
-            marginTop: 8,
-            background: '#FF0000',
+            padding: '10px 14px',
+            borderRadius: RADIUS.sm,
+            background: 'transparent',
             border: 'none',
-            color: '#FFFFFF',
+            color: DARK,
             cursor:'pointer',
-            fontFamily:'inherit', fontSize:13, fontWeight:900, textAlign:'left',
-            textTransform: 'uppercase'
+            transition: 'none',
+            fontFamily:'inherit', fontSize:13, fontWeight:800, textAlign: isRtl ? 'right' : 'left',
           }}
         >
-          {!collapsed && <span>Déconnexion</span>}
-          {collapsed && <span>OFF</span>}
+          <span style={{ display:'flex', alignItems:'center', flexShrink:0, color:'inherit', opacity: 0.4 }}>
+            <LogoutIcon />
+          </span>
+          {!collapsed && <span>{t('logout')}</span>}
         </button>
       </div>
     </div>

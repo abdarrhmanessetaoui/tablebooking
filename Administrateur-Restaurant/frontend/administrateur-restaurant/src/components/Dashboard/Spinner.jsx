@@ -1,23 +1,39 @@
-import { B } from '../../utils/brand'
+﻿import { useState, useEffect } from 'react'
+import { ThreeDot } from 'react-loading-indicators'
+import { BG_PAGE } from '../../styles/dashboard/tokens'
 
-export default function Spinner() {
+/**
+ * A spinner that only appears after a certain delay (default 300ms).
+ * This prevents the "flicker" of loading states for fast requests.
+ */
+export default function Spinner({ fullPage = false, delay = 0, color = "#C19A6B" }) {
+  const [show, setShow] = useState(false)
+
+  useEffect(() => {
+    const timer = setTimeout(() => setShow(true), delay)
+    return () => clearTimeout(timer)
+  }, [delay])
+
+  if (!show) return null
+
   return (
     <div style={{
-      display: 'flex', flexDirection: 'column',
-      alignItems: 'center', justifyContent: 'center',
-      height: '100vh', background: B.pageBg, gap: 16,
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      ...(fullPage ? {
+        position: 'fixed',
+        inset: 0,
+        background: BG_PAGE,
+        zIndex: 9999,
+        height: '100vh'
+      } : {
+        padding: '64px 0',
+        width: '100%',
+        minHeight: '200px',
+      }),
     }}>
-      <div style={{
-        width: 36, height: 36,
-        border: `3px solid #EBEBEB`,
-        borderTop: `3px solid ${B.brown}`,
-        borderRadius: '50%',
-        animation: 'sp 0.75s linear infinite',
-      }} />
-      <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: B.inkMute }}>
-        Chargement...
-      </p>
-      <style>{`@keyframes sp { to { transform: rotate(360deg) } }`}</style>
+      <ThreeDot variant="bounce" color={color} size="small" text="" textColor="" />
     </div>
   )
 }

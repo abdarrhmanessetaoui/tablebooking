@@ -1,15 +1,15 @@
-import { useState } from 'react'
-
+﻿import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import Badge from './Badge'
 import {
   card, topRow, nameBlock, nameTxt, phoneTxt,
   badgeRow, chipsRow, chip,
 } from '../../styles/dashboard/resCardMobile.styles'
-import { DARK, GOLD_DK, TODAY_DATE, TOMORROW_DATE } from '../../styles/dashboard/tokens'
+import { DARK, LIGHT_BROWN_DK, TODAY_DATE, TOMORROW_DATE } from '../../styles/dashboard/tokens'
 
-function fmtDate(iso) {
+function fmtDate(iso, lang) {
   if (!iso) return ''
-  return new Date(iso).toLocaleDateString('fr-FR', {
+  return new Date(iso).toLocaleDateString(lang, {
     weekday: 'short',
     day:     'numeric',
     month:   'short',
@@ -17,17 +17,19 @@ function fmtDate(iso) {
 }
 
 export default function ResCardMobile({ r, i, onRowClick }) {
+  const { t, i18n } = useTranslation()
+  const [hov, setHov] = useState(false)
+
   const chips = [
     {
-      label: 'DATE',
       value: r.date && r.date !== TODAY_DATE && r.date !== TOMORROW_DATE
-               ? fmtDate(r.date)
+               ? fmtDate(r.date, i18n.language)
                : null,
-      gold: false,
+      LIGHT_BROWN: false,
     },
-    { label: 'HEURE', value: r.start_time, gold: false },
-    { label: 'PERS',  value: r.guests ? `${r.guests}` : null, gold: false },
-    { label: 'SERVICE', value: r.service || null, gold: true  },
+    { value: r.start_time,                         LIGHT_BROWN: false },
+    { value: r.guests ? t('count_persons', { count: r.guests }) : null, LIGHT_BROWN: false },
+    { value: r.service || null,                    LIGHT_BROWN: true  },
   ].filter(item => item.value)
 
   return (
@@ -49,8 +51,7 @@ export default function ResCardMobile({ r, i, onRowClick }) {
       {/* Chips row */}
       <div style={chipsRow}>
         {chips.map((item, idx) => (
-          <span key={idx} style={{ ...chip(item.gold), background: item.gold ? GOLD : DARK, color: item.gold ? DARK : GOLD, padding: '4px 8px', fontSize: 10, fontWeight: 900 }}>
-            <span style={{ fontSize: 8, opacity: 0.8, marginRight: 4 }}>{item.label}</span>
+          <span key={idx} style={{ ...chip(item.LIGHT_BROWN), fontSize: '12px', fontWeight: '600' }}>
             {item.value}
           </span>
         ))}

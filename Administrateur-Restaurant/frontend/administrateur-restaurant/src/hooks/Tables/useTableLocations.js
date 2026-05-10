@@ -1,17 +1,13 @@
 import { useState, useEffect } from 'react'
-import { getToken } from '../../utils/auth'
-import { toast }    from '../../components/ui/Toast'
-import { confirm }  from '../../components/ui/ConfirmDialog'
+import { useTranslation } from 'react-i18next'
+import { apiPath, getHeaders } from '../../utils/api'
+import { toast }              from '../../components/ui/Toast'
+import { confirm }            from '../../components/ui/ConfirmDialog'
 
-const API = 'http://localhost:8000/api/table-locations'
-
-const hdrs = () => ({
-  'Content-Type':  'application/json',
-  'Accept':        'application/json',
-  'Authorization': `Bearer ${getToken()}`,
-})
+const API = apiPath('table-locations')
 
 export default function useTableLocations() {
+  const { t } = useTranslation()
   const [locations, setLocations] = useState([])
   const [loading,   setLoading]   = useState(true)
   const [saving,    setSaving]    = useState(false)
@@ -21,11 +17,11 @@ export default function useTableLocations() {
   async function fetchLocations() {
     setLoading(true)
     try {
-      const res  = await fetch(API, { headers: hdrs() })
+      const res  = await fetch(API, { headers: getHeaders() })
       const data = await res.json()
       setLocations(Array.isArray(data) ? data : [])
     } catch {
-      toast('Impossible de charger les emplacements', 'error')
+      toast(t('tables_module.error_loading_locations'), 'error')
     } finally {
       setLoading(false)
     }
@@ -36,20 +32,21 @@ export default function useTableLocations() {
     setSaving(true)
     try {
       const res = await fetch(API, {
-        method: 'POST', headers: hdrs(),
+        method: 'POST',
+        headers: getHeaders(),
         body: JSON.stringify({ name: name.trim(), color }),
       })
       if (!res.ok) {
         const err = await res.json()
-        toast(err.message ?? "Impossible d'ajouter", 'error')
+        toast(err.message ?? t('tables_module.error_adding_location'), 'error')
         return
       }
       const data = await res.json()
       setLocations(prev => [...prev, data])
-      toast(`Emplacement "${data.name}" ajouté`, 'success')
-      if (resetForm) resetForm()
+      toast(t('tables_module.location_added', { name: data.name }), 'success')
+      resetForm?.()
     } catch {
-      toast("Impossible d'ajouter l'emplacement", 'error')
+      toast(t('tables_module.error_adding_location'), 'error')
     } finally {
       setSaving(false)
     }
@@ -59,14 +56,15 @@ export default function useTableLocations() {
     setSaving(true)
     try {
       const res  = await fetch(`${API}/${id}`, {
-        method: 'PUT', headers: hdrs(),
+        method: 'PUT',
+        headers: getHeaders(),
         body: JSON.stringify({ name: name.trim(), color }),
       })
       const data = await res.json()
       setLocations(prev => prev.map(l => l.id === id ? data : l))
-      toast('Emplacement mis à jour', 'success')
+      toast(t('tables_module.location_updated'), 'success')
     } catch {
-      toast("Impossible de modifier l'emplacement", 'error')
+      toast(t('tables_module.error_modifying_location'), 'error')
     } finally {
       setSaving(false)
     }
@@ -74,24 +72,21 @@ export default function useTableLocations() {
 
   async function handleDelete(loc) {
     const ok = await confirm({
-      title:        "Supprimer l'emplacement",
-      message:      `Voulez-vous supprimer "${loc.name}" ?`,
-      sub:          'Les tables utilisant cet emplacement ne seront pas supprimées.',
-      confirmLabel: 'Supprimer',
+      title:        t('tables_module.delete_location_title'),
+      message:      t('tables_module.delete_location_msg', { name: loc.name }),
+      sub:          t('tables_module.delete_location_sub'),
+      confirmLabel: t('tables_module.delete'),
       type:         'danger',
     })
     if (!ok) return
     try {
-      await fetch(`${API}/${loc.id}`, { method: 'DELETE', headers: hdrs() })
+      await fetch(`${API}/${loc.id}`, { method: 'DELETE', headers: getHeaders() })
       setLocations(prev => prev.filter(l => l.id !== loc.id))
-      toast(`Emplacement "${loc.name}" supprimé`, 'warning')
+      toast(t('tables_module.location_deleted', { name: loc.name }), 'warning')
     } catch {
-      toast("Impossible de supprimer l'emplacement", 'error')
+      toast(t('tables_module.error_deleting_location'), 'error')
     }
   }
 
-  return {
-    locations, loading, saving,
-    handleAdd, handleUpdate, handleDelete,
-  }
+  return { locations, loading, saving, handleAdd, handleUpdate, handleDelete }
 }
