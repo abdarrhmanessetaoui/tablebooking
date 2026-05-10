@@ -14,13 +14,15 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         // ─────────────── 1. USER ───────────────
-        $user = \App\Models\User::create([
-            'name'               => 'Dal Corso Admin',
-            'email'              => 'admin@tablebooking.ma',
-            'password'           => 'password', // auto-hashed
-            'restaurant_form_id' => 13,
-            'email_verified_at'  => now(),
-        ]);
+        $user = \App\Models\User::updateOrCreate(
+            ['email' => 'admin@tablebooking.ma'],
+            [
+                'name'               => 'Dal Corso Admin',
+                'password'           => 'password', // auto-hashed
+                'restaurant_form_id' => 13,
+                'email_verified_at'  => now(),
+            ]
+        );
         $userId = $user->id;
 
         $this->command->info("✅ User created — admin@tablebooking.ma / password");
