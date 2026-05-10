@@ -236,6 +236,7 @@ function MonthView({ monthDays, currentDate, getByDate, setCurrentDate, setView 
   const { t, i18n } = useTranslation()
   const lang = i18n.language === 'ar' ? 'ar-MA' : i18n.language === 'fr' ? 'fr-FR' : 'en-US'
   const today = new Date().toDateString()
+  const [hovIdx, setHovIdx] = useState(null)
 
   const daysShort = Array.from({ length: 7 }, (_, i) => 
     new Intl.DateTimeFormat(lang, { weekday: 'short' }).format(new Date(2024, 0, i + 1))
