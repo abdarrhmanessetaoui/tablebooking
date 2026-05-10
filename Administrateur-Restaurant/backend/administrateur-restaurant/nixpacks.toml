@@ -1,0 +1,11 @@
+[build]
+plan = "php"
+
+[setup]
+aptPkgs = ["php-mysql", "php-gd", "php-xml", "php-mbstring"]
+
+[phases.build]
+cmds = ["composer install --no-dev --optimize-autoloader", "php artisan key:generate --force"]
+
+[phases.deploy]
+cmds = ["php artisan migrate --force", "php artisan serve --host 0.0.0.0 --port $PORT"]
