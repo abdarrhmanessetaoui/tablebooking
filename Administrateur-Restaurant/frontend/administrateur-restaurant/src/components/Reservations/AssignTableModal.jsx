@@ -165,7 +165,7 @@ export default function AssignTableModal({ reservation, onClose, onAssigned }) {
         maxHeight: '88vh', overflow: 'auto',
         display: 'flex', flexDirection: 'column',
         boxShadow: '0 24px 64px rgba(66,52,40,0.35)',
-        borderRadius: 12, overflow: 'hidden',
+        borderRadius: 12,
       }}>
 
         {/* Header */}

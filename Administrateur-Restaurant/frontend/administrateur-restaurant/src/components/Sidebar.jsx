@@ -102,6 +102,8 @@ export default function Sidebar({ handleLogout, onNavClick, collapsed, onToggle 
                     {t(item.i18nKey)}
                   </span>
                 )}
+              </>
+            )}
           </NavLink>
         ))}
       </nav>
