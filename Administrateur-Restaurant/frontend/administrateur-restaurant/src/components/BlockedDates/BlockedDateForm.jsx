@@ -150,7 +150,7 @@ export default function BlockedDateForm({ form, setForm, handleBlock, submitting
             fontFamily: 'inherit', width: '100%', borderRadius: '12px',
           }}
         >
-          {submitting ? <ThreeDot variant="bounce" color="#ffffff" size="small" text="" textColor="" /> : preview.length > 1 ? t('calendar.block_count_dates', { count: preview.length }) : t('calendar.block_date')}
+          {submitting ? t('services_module.saving') : preview.length > 1 ? t('calendar.block_count_dates', { count: preview.length }) : t('calendar.block_date')}
         </button>
       </div>
     </div>

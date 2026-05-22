@@ -172,8 +172,7 @@ export default function ServiceForm({ initial = EMPTY, onSave, saving, editingNa
               fontFamily: 'inherit', width: '100%', borderRadius: '12px',
             }}
           >
-            {saving ? <ThreeDot variant="bounce" color="#ffffff" size="small" text="" textColor="" />
-              : editingName
+            {saving ? t('services_module.saving') : editingName
                 ? <><Check size={16} strokeWidth={2.5} /> {t('services_module.save_changes_btn')}</>
                 : <><Plus size={16} strokeWidth={2.5} /> {t('services_module.add_service_btn')}</>
             }

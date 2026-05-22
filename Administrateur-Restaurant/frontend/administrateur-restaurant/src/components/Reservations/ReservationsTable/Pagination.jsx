@@ -40,15 +40,15 @@ export default function Pagination({ total, page, pageSize, setPage, setPageSize
         </span>
       </div>
       <div style={{ display:'flex', alignItems:'center', gap:3 }}>
-        <PageBtn onClick={() => setPage(1)} disabled={safePage===1}>PREMIER</PageBtn>
-        <PageBtn onClick={() => setPage(p => Math.max(1,p-1))} disabled={safePage===1}>AVANT</PageBtn>
+        <PageBtn onClick={() => setPage(1)} disabled={safePage===1}><ChevronsLeft size={16} /></PageBtn>
+        <PageBtn onClick={() => setPage(p => Math.max(1,p-1))} disabled={safePage===1}><ChevronLeft size={16} /></PageBtn>
         {getPages().map((p,i) =>
           p === '...'
             ? <span key={`d${i}`} style={{ padding:'0 4px', fontSize:12, color:DARK, userSelect:'none', fontWeight:900 }}>…</span>
             : <PageBtn key={p} active={p===safePage} onClick={() => setPage(p)}>{p}</PageBtn>
         )}
-        <PageBtn onClick={() => setPage(p => Math.min(totalPages,p+1))} disabled={safePage===totalPages}>SUIVANT</PageBtn>
-        <PageBtn onClick={() => setPage(totalPages)} disabled={safePage===totalPages}>DERNIER</PageBtn>
+        <PageBtn onClick={() => setPage(p => Math.min(totalPages,p+1))} disabled={safePage===totalPages}><ChevronRight size={16} /></PageBtn>
+        <PageBtn onClick={() => setPage(totalPages)} disabled={safePage===totalPages}><ChevronsRight size={16} /></PageBtn>
       </div>
     </div>
   )

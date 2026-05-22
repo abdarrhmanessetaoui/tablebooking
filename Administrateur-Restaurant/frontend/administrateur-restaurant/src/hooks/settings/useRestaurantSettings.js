@@ -76,7 +76,12 @@ export default function useRestaurantSettings() {
       .then(([d, svcs]) => {
         const normalized = (d.allOH ?? []).map(normalizeDaySlots)
         const svcList    = Array.isArray(svcs) ? svcs : []
-        setHours({ allOH: normalized, working_dates: d.working_dates ?? [false,true,true,true,true,true,true] })
+        const maxOh      = Math.max(0, ...svcList.map(s => s.ohindex ?? 0))
+        const paddedOH   = [...normalized]
+        for (let i = paddedOH.length; i <= maxOh; i++) {
+          paddedOH.push(normalizeDaySlots({ openhours: [] }))
+        }
+        setHours({ allOH: paddedOH, working_dates: d.working_dates ?? [false,true,true,true,true,true,true] })
         setServices(svcList)
         const firstOpen = (d.working_dates ?? [false,true,true,true,true,true,true]).findIndex(Boolean)
         if (firstOpen >= 0) setActiveDay(firstOpen)

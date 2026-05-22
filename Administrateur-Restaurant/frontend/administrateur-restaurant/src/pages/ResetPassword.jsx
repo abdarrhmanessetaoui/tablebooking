@@ -237,7 +237,7 @@ const ResetPassword = () => {
               >
                 {loading ? (
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '24px', scale: '0.8' }}>
-                    <ThreeDot variant="bounce" color={WHITE} size="small" text="" textColor="" />
+                    {t('settings_module.saving', { defaultValue: 'Loading...' })}
                   </div>
                 ) : (
                   <>

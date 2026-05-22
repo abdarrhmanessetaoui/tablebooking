@@ -297,8 +297,8 @@ const Login = () => {
                     className="login-btn"
                   >
                     {resetLoading ? (
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '24px', scale: '0.8' }}>
-                        <ThreeDot variant="bounce" color={WHITE} size="small" text="" textColor="" />
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '24px' }}>
+                        {t('settings_module.saving', { defaultValue: 'Loading...' })}
                       </div>
                     ) : t('login_module.reset_button')}
                   </button>

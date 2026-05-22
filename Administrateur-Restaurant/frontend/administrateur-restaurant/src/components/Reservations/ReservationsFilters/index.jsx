@@ -166,7 +166,7 @@ export default function ReservationsFilters({
               onClick={e => { e.stopPropagation(); setFilterDate(''); setCalOpen(false) }}
               style={{ position:'absolute', right:36, top:'50%', transform:'translateY(-50%)', background:'none', border:'none', cursor:'pointer', padding:'4px 6px', display:'flex', alignItems:'center', color: WHITE, opacity: 0.8, zIndex:1 }}
             >
-              EFFACER
+              <X size={14} strokeWidth={2.5} />
             </button>
           )}
         </div>

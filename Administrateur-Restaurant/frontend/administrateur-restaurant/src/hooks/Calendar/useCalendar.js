@@ -2,7 +2,12 @@ import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { apiPath, getHeaders } from '../../utils/api'
 
-const toDateString = (date) => date.toISOString().split('T')[0]
+const toDateString = (date) => {
+  const yr = date.getFullYear()
+  const mo = String(date.getMonth() + 1).padStart(2, '0')
+  const da = String(date.getDate()).padStart(2, '0')
+  return `${yr}-${mo}-${da}`
+}
 
 const getWeekDays = (date) => {
   const day    = date.getDay()
@@ -96,14 +101,15 @@ export default function useCalendar() {
   const getByMonth = (year, month) =>
     reservations.filter(r => {
       if (!r.date) return false
-      const d = new Date(r.date)
-      return d.getFullYear() === year && d.getMonth() === month
+      const [y, m, d] = r.date.split('-')
+      return parseInt(y, 10) === year && parseInt(m, 10) - 1 === month
     })
 
   const getByYear = (year) =>
     reservations.filter(r => {
       if (!r.date) return false
-      return new Date(r.date).getFullYear() === year
+      const [y] = r.date.split('-')
+      return parseInt(y, 10) === year
     })
 
   const navLabel = () => {

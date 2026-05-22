@@ -1,4 +1,4 @@
-﻿import { useState, useRef } from 'react'
+import { useState, useRef } from 'react'
 import { X, Calendar } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import CalendarPopup from './CalendarPopup'
@@ -95,7 +95,7 @@ export default function ReportsFilters({
               title={t('reports_module.clear_date_btn')}
               className="rp-date-clear"
             >
-              EFFACER
+              <X size={14} strokeWidth={2.5} />
             </button>
           )}
         </div>

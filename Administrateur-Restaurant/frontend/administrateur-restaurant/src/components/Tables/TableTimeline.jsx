@@ -229,7 +229,8 @@ function Block({ res, laneCount, laneIdx, hS, hE, services, trackPx }) {
   const dur     = getDur(services, res.service)
   const sD      = toDecimal(res.start_time) ?? 0
   const eD      = res.end_time ? (toDecimal(res.end_time) ?? (sD + dur)) : (sD + dur)
-  const pos     = getPos(res.start_time, decimalToTime(eD), hS, hE)
+  const endTime = res.end_time || decimalToTime(eD)
+  const pos     = getPos(res.start_time, endTime, hS, hE)
   if (!pos) return null
 
   const sc      = STATUS[res.status] ?? STATUS.Pending

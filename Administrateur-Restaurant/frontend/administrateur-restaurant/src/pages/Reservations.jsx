@@ -41,9 +41,9 @@ function BulkBar({ count, onDelete, onStatus, onClear }) {
     }}>
 
       {[
-        { status: 'Confirmed', label: t('confirmed_label'), bg: WHITE, color: LIGHT_BROWN },
-        { status: 'Pending',   label: t('pending_label'),   bg: WHITE, color: LIGHT_BROWN },
-        { status: 'Cancelled', label: t('cancelled_label'), bg: WHITE, color: LIGHT_BROWN },
+        { status: 'Confirmed', label: t('status_confirmed'), bg: WHITE, color: LIGHT_BROWN },
+        { status: 'Pending',   label: t('status_pending'),   bg: WHITE, color: LIGHT_BROWN },
+        { status: 'Cancelled', label: t('status_cancelled'), bg: WHITE, color: LIGHT_BROWN },
       ].map(({ status, label, bg, color }) => (
         <button key={status} onClick={() => onStatus(status)}
           style={{
@@ -81,7 +81,7 @@ function BulkBar({ count, onDelete, onStatus, onClear }) {
           cursor: 'pointer', textTransform: 'uppercase', fontFamily: 'inherit'
         }}
       >
-        {t('deselect_all_btn')}
+        {t('deselect_all')}
       </button>
     </div>
   )
