@@ -74,50 +74,85 @@ After logging in, you will be able to manage reservations, tables, services, and
 
 ---
 
-## Installation
+## 🚀 Quick Start Guide (For Beginners)
 
-### Backend
+Follow these step-by-step instructions to clone and run this project on a new PC. 
+
+### 1️⃣ Prerequisites
+Before you begin, make sure you have installed:
+- [Git](https://git-scm.com/downloads)
+- [PHP](https://www.php.net/downloads) (v8.1 or higher) & [Composer](https://getcomposer.org/download/)
+- [Node.js](https://nodejs.org/) (v16 or higher)
+
+### 2️⃣ Clone the Repository
+Open your terminal (or command prompt) and run:
 ```bash
-cd Administrateur-Restaurant/backend/administrateur-restaurant
-composer install
-cp .env.example .env
-php artisan key:generate
-php artisan migrate --seed
-php artisan serve
-````
-
-### Frontend
-
-```bash
-cd Administrateur-Restaurant/frontend/administrateur-restaurant
-npm install
-npm run dev
+git clone https://github.com/abdarrhmanessetaoui/tablebooking.git
+cd tablebooking
 ```
 
-Frontend runs at [http://localhost:5173](http://localhost:5173)
-Backend runs at [http://localhost:8000](http://localhost:8000)
+### 3️⃣ Setup the Backend (Laravel)
+Keep your terminal open and run the following commands one by one to start the API:
+
+```bash
+# 1. Navigate to the backend folder
+cd Administrateur-Restaurant/backend/administrateur-restaurant
+
+# 2. Install PHP dependencies
+composer install
+
+# 3. Create your environment configuration file
+cp .env.example .env
+
+# 4. Generate the application key
+php artisan key:generate
+
+# 5. Create a local SQLite database file
+# (On Windows, you can just manually create an empty file named "database.sqlite" inside the "database" folder)
+touch database/database.sqlite
+
+# 6. Build the database and insert the default Admin user
+php artisan migrate --seed
+
+# 7. Start the backend server
+php artisan serve
+```
+✅ Your backend is now running at **http://localhost:8000** (Keep this terminal open!)
+
+### 4️⃣ Setup the Frontend (React)
+Open a **NEW** terminal window, and run the following commands:
+
+```bash
+# 1. Navigate to the frontend folder
+cd tablebooking/Administrateur-Restaurant/frontend/administrateur-restaurant
+
+# 2. Install all frontend packages
+npm install
+
+# 3. Start the React frontend
+npm start
+```
+✅ Your frontend is now running at **http://localhost:3000** (or http://localhost:5173 if using Vite).
 
 ---
 
-## Configuration
+## ⚙️ Configuration (Optional)
 
-### Database
-
-Update `.env` in backend with your credentials:
-
+### Database Settings
+By default, the steps above use **SQLite** which requires no installation. 
+If you prefer to use **MySQL**, open the `.env` file in the backend folder and update:
 ```env
 DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
-DB_PORT=3307
+DB_PORT=3306
 DB_DATABASE=tablebooking
 DB_USERNAME=root
 DB_PASSWORD=
 ```
+*(Don't forget to run `php artisan migrate --seed` after changing your database!)*
 
-### Mail
-
-Use SMTP or Mailtrap for email notifications. Example with Gmail App Password:
-
+### Email Settings
+To enable password resets and email notifications, update the `.env` file in the backend with your SMTP credentials (e.g., a Gmail App Password):
 ```env
 MAIL_MAILER=smtp
 MAIL_HOST=smtp.gmail.com
@@ -129,57 +164,25 @@ MAIL_FROM_ADDRESS="youremail@gmail.com"
 MAIL_FROM_NAME="Restaurant Admin"
 ```
 
-### Frontend
-
-* i18n translations in `frontend/src/i18n.js`
-* Change default language or add new translations in `en`, `fr`, `ar`
-* RTL layout is applied automatically for Arabic
-
 ---
 
-## Project Structure
+## 📁 Project Structure
 
 ```text
 tablebooking/
 ├─ Administrateur-Restaurant/
-│  ├─ backend/  # Laravel backend
-│  │  ├─ app/
-│  │  │  ├─ Http/Controllers/       # All controllers including Auth, Reservations, Services
-│  │  │  ├─ Models/                 # User, BlockedDate, WpForm, WpMessage
-│  │  │  ├─ Console/Commands/       # CancelExpiredReservations
-│  │  │  ├─ Requests/               # Form request validations
-│  │  │  └─ Providers/              # AppServiceProvider
-│  │  ├─ database/
-│  │  │  ├─ migrations/             # Database schema
-│  │  │  └─ seeders/                # Default data
-│  │  ├─ routes/                    # api.php, web.php, auth.php
-│  │  └─ config/                    # app.php, auth.php, mail.php, etc.
-│  └─ frontend/                     # React frontend
+│  ├─ backend/  # Laravel PHP backend
+│  │  ├─ app/           # Controllers, Models, Requests
+│  │  ├─ database/      # SQLite database, Migrations, Seeders
+│  │  └─ routes/        # api.php, web.php
+│  └─ frontend/ # React JavaScript frontend
 │     ├─ src/
-│     │  ├─ components/             # Dashboard, Calendar, Reservations, Tables, Services
-│     │  ├─ hooks/                  # useReservations, useServices, useTables, useDashboard
-│     │  ├─ pages/                  # Login, Dashboard, Reports, Reservations, Settings, Tables, Services
-│     │  ├─ styles/                 # CSS & style tokens
-│     │  ├─ i18n.js                  # Translation configuration
-│     │  └─ utils/                  # Auth, PDF export, Brand utils
-│     ├─ public/                     # favicon, images
-│     ├─ package.json
-│     └─ vite.config.js
+│     │  ├─ components/ # Reusable UI components
+│     │  ├─ pages/      # Dashboard, Reservations, Settings
+│     │  └─ i18n.js     # Translations (EN, FR, AR)
 └─ README.md
 ```
 
----
-
-## Notes
-
-* Fully responsive and mobile-friendly
-* Multilingual with RTL for Arabic
-* Backend & frontend fully integrated
-* No changes to component structure or layout to maintain consistency
-* Ready for deployment locally or on server
-
----
-
-## License
+## 📝 License
 
 Open-source, free to use and modify.
