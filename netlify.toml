@@ -1,0 +1,4 @@
+[build]
+  base = "Administrateur-Restaurant/frontend/administrateur-restaurant"
+  command = "npm run build"
+  publish = "dist"
